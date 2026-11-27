@@ -99,7 +99,7 @@ window.SHL_DATA = (function () {
     boar: { name: '山豬', g: '豬', hp: 30, dmg: [5, 7], heavy: [12, 16], spd: 8, armor: 2, beast: true, pat: ['atk', 'charge', 'guard', 'atk'], skin: [1, 2], meat: [1, 2] },
     bug: { name: '毒蟲', g: '蟲', hp: 12, dmg: [2, 4], spd: 14, armor: 0, beast: true, pat: ['atk', 'bleed'], skin: [0, 0], meat: [0, 0], extra: 'vine_du' },
     bandit: { name: '劫匪', g: '匪', hp: 26, dmg: [5, 8], heavy: [12, 15], spd: 10, armor: 3, pat: ['atk', 'charge', 'guard', 'atk'], silver: [8, 20] },
-    corpse: { name: '窯屍', g: '屍', hp: 30, dmg: [5, 8], heavy: [14, 18], spd: 6, armor: 2, pat: ['atk', 'charge', 'atk', 'guard'] },
+    corpse: { name: '窯屍', g: '屍', hp: 26, dmg: [4, 7], heavy: [12, 16], spd: 6, armor: 2, pat: ['atk', 'charge', 'atk', 'guard'] },
     corpse_king: { name: '窯屍王', g: '王', hp: 60, dmg: [6, 9], heavy: [16, 22], spd: 7, armor: 4, boss: true, pat: ['atk', 'charge', 'bleed', 'atk', 'guard'] },
     serpent: { name: '沉淵祭蛇', g: '蛇', hp: 40, dmg: [7, 10], spd: 13, armor: 2, pat: ['atk', 'bleed', 'atk', 'guard'] },
     shaman: { name: '祭窟巫祝', g: '巫', hp: 95, dmg: [9, 12], heavy: [22, 28], spd: 9, armor: 5, boss: true, pat: ['atk', 'charge', 'bleed', 'guard', 'atk'] },

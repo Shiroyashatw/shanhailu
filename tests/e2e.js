@@ -359,11 +359,24 @@ async function travelTo(page, node) {
   await page.mouse.move(640, 300);
 
   // 持續深入直到永久死亡（不喝藥）
-  let guard = 0;
+  let guard = 0, richShot = false;
   while (guard++ < 40) {
     s = await st(page);
     if (s.scene === 'dead') break;
-    if (s.scene === 'combat') { await fight(page, { noHeal: true }); continue; }
+    if (s.scene === 'combat') {
+      // 若行囊有帶詞綴的掉寶，改拍滑過該裝備的提示卡（含對比現穿）
+      const ei = s.pack.findIndex((x) => x && x.k === 'eq' && x.eq.affixes.length >= 1);
+      if (!richShot && ei >= 0) {
+        await page.hover('[data-testid=pack-' + ei + ']');
+        const tb = await page.evaluate(() => { const r = document.getElementById('tip').getBoundingClientRect(); return { left: r.left, right: r.right }; });
+        check('掉寶裝備 Hover 提示卡（含詞綴與對比）只在左欄', tb.left >= 10 && tb.right <= 242, tb);
+        await audit(page, '戰鬥＋掉寶提示卡');
+        await shot(page, '02-combat-tooltip.png');
+        await page.mouse.move(640, 300);
+        richShot = true;
+      }
+      await fight(page, { noHeal: true }); continue;
+    }
     if (s.scene === 'loot') { await click(page, 'btn-loot-done'); continue; }
     if (s.scene === 'dungeon') {
       if (await page.$('[data-testid=btn-delve]')) { await click(page, 'btn-delve'); continue; }
