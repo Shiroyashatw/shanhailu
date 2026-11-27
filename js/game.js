@@ -1,13 +1,12 @@
-/* 《山海錄》灰盒 v0.1 — 遊戲邏輯（狀態、存檔、時間、背包、戰鬥、事件） */
+/* 《山海錄》灰盒 v0.25 — 遊戲邏輯（狀態、存檔、時間、背包、戰鬥、事件） */
 'use strict';
 
 window.SHL = (function () {
   const D = window.SHL_DATA;
   const SAVE_KEY = 'shanhailu.save';
-  const SCHEMA = 1;
+  const SCHEMA = 2;
   const DAY_START = 8 * 60; // 第 1 日 08:00
-  const BASE_HP = 80;
-  const BASE_CAP = 80;
+  const START_AGE = 20;
 
   let S = null; // 目前狀態
   let listeners = [];
@@ -39,12 +38,17 @@ window.SHL = (function () {
   function dayOf(t) { return Math.floor(t / 1440) + 1; }
   function hourOf(t) { return Math.floor((t % 1440) / 60); }
   function isNight(t) { const h = hourOf(t); return h >= 20 || h < 5; }
+  // 曆法：一季 30 天、一年 120 天；開局元年春第 1 日、20 歲
+  function seasonOf(t) { return Math.floor((dayOf(t) - 1) / 30) % 4; }
+  function yearOf(t) { return Math.floor((dayOf(t) - 1) / 120); }
+  function ageOf(t) { return START_AGE + yearOf(t); }
+  function fmtDate(t) { return (D.YEAR_NAMES[yearOf(t)] || (yearOf(t) + 1)) + '年' + D.SEASONS[seasonOf(t)]; }
 
   // ================= 物品工具 =================
-  function newEq(baseId, rarity) {
+  function newEq(baseId, rarity, unid) {
     const b = D.BASES[baseId];
     rarity = rarity || 'white';
-    const eq = { uid: ++S.uid, base: baseId, rarity, name: b.name, affixes: [], unique: null };
+    const eq = { uid: ++S.uid, base: baseId, rarity, name: b.name, affixes: [], unique: null, unid: !!unid && rarity !== 'white' };
     if (b.slot !== 'bag') {
       const [lo, hi] = D.RARITY[rarity].affix;
       const n = ri(lo, hi);
@@ -65,13 +69,14 @@ window.SHL = (function () {
     return { k: 'eq', eq };
   }
   function eqBase(eq) { return D.BASES[eq.base]; }
-  function eqValue(eq) { return Math.round(eqBase(eq).val * D.RARITY[eq.rarity].mult); }
+  function eqValue(eq) { return Math.round(eqBase(eq).val * D.RARITY[eq.rarity].mult * (eq.unid ? 0.4 : 1)); }
   function itemWt(it) {
     if (!it) return 0;
     if (it.k === 'eq') return eqBase(it.eq).wt;
     return D.ITEMS[it.k].wt * it.n;
   }
-  function itemName(it) { return it.k === 'eq' ? it.eq.name : D.ITEMS[it.k].name; }
+  function itemName(it) { return it.k === 'eq' ? (it.eq.unid ? '未鑑定的' + eqBase(it.eq).name : it.eq.name) : D.ITEMS[it.k].name; }
+  function itemIcon(it) { return it.k === 'eq' ? eqBase(it.eq).ic : (D.ITEMS[it.k].ic || it.k); }
   function itemGlyph(it) { return it.k === 'eq' ? eqBase(it.eq).g : D.ITEMS[it.k].g; }
 
   // ================= 衍生數值 =================
@@ -86,15 +91,50 @@ window.SHL = (function () {
     return v;
   }
   function hasUnique(u) { return allEquipped().some((eq) => eq.unique === u); }
-  function maxHp() { return BASE_HP + affixSum('hp'); }
+
+  // ---------- 素質與熟練度 ----------
+  function attrVal(id) { return S.attr[id] + affixSum('a_' + id); }
+  function attrNeed(id) { return Math.max(20, 50 + (S.attr[id] - 10) * 12); }
+  function attrProgress(id) { return clamp(S.attrXp[id] / attrNeed(id), 0, 1); }
+  const PROF = {}; D.PROFS.forEach((p) => (PROF[p.id] = p));
+  function profLv(id) { return S.prof[id] ? S.prof[id].lv : 0; }
+  function profNeed(lv) { return 4 + lv * 0.6; }
+  function profProgress(id) { const p = S.prof[id]; return p.lv >= 100 ? 1 : clamp(p.xp / profNeed(p.lv), 0, 1); }
+  function perk(id, th) { return profLv(id) >= th; }
+  // 行為累積：base＝這次行為的基礎經驗；dl＝難度（熟練度高出 15 以上開始遞減，高出 40 歸零）
+  function gainProf(id, base, dl) {
+    const P = PROF[id]; const st = S.prof[id];
+    if (!P || P.locked || st.lv >= 100) return 0;
+    let f = 1;
+    if (dl !== undefined) { const over = st.lv - dl; f = over <= 15 ? 1 : over >= 40 ? 0 : 1 - (over - 15) / 25; }
+    const mult = 1 + (attrVal(P.attr) - 10) * 0.03 + (attrVal('wu') - 10) * 0.03;
+    const xp = base * f * Math.max(0.4, mult);
+    if (xp <= 0) return 0;
+    st.xp += xp;
+    while (st.lv < 100 && st.xp >= profNeed(st.lv)) {
+      st.xp -= profNeed(st.lv); st.lv++;
+      const pk = P.perks[st.lv];
+      if (pk) { log(P.name + ' ' + st.lv + '：領悟「' + pk + '」', 'good'); S.attr[P.attr]++; log(attrName(P.attr) + ' +1（' + S.attr[P.attr] + '）', 'good'); }
+      else if (st.lv % 25 === 0) { S.attr[P.attr]++; log(P.name + ' ' + st.lv + '，' + attrName(P.attr) + ' +1（' + S.attr[P.attr] + '）', 'good'); }
+      else if (st.lv % 5 === 0) log(P.name + '熟練度 ' + st.lv, 'good');
+    }
+    // 練熟練度順便練素質（20%）
+    S.attrXp[P.attr] += xp * 0.2;
+    while (S.attrXp[P.attr] >= attrNeed(P.attr)) { S.attrXp[P.attr] -= attrNeed(P.attr); S.attr[P.attr]++; log(attrName(P.attr) + '增長至 ' + S.attr[P.attr], 'good'); }
+    return xp;
+  }
+  function attrName(id) { return D.ATTRS.find((a) => a.id === id).name; }
+
+  function maxHp() { return 50 + attrVal('ti') * 3 + affixSum('hp'); }
   function bagCap() { return S.equip.bag ? eqBase(S.equip.bag).bag : 0; }
   function carryCap() {
     const belt = S.equip.belt ? eqBase(S.equip.belt).cap || 0 : 0;
-    return BASE_CAP + belt + affixSum('cap');
+    return Math.round((40 + attrVal('ti') * 4) * (1 + profLv('fuz') * 0.005)) + belt + affixSum('cap');
   }
+  function eqWt(eq) { const B = eqBase(eq); return B.ac === 'light' && perk('qing', 25) ? B.wt / 2 : B.wt; }
   function totalWt() {
     let w = 0;
-    allEquipped().forEach((eq) => (w += eqBase(eq).wt));
+    allEquipped().forEach((eq) => (w += eqWt(eq)));
     if (S.equip.bag) w += eqBase(S.equip.bag).wt;
     S.pack.forEach((it) => (w += itemWt(it)));
     return w;
@@ -102,8 +142,8 @@ window.SHL = (function () {
   function loadBand(w) {
     const r = (w === undefined ? totalWt() : w) / carryCap();
     if (r <= 0.4) return { id: 'light', name: '輕裝', mult: 1, fat: 1 };
-    if (r <= 0.75) return { id: 'normal', name: '常態重負', mult: 0.82, fat: 1.2 };
-    if (r <= 1) return { id: 'heavy', name: '超載', mult: 0.6, fat: 1.5 };
+    if (r <= 0.75) return { id: 'normal', name: '常態重負', mult: perk('fuz', 25) ? 0.91 : 0.82, fat: 1.2 };
+    if (r <= 1) return { id: 'heavy', name: '超載', mult: perk('fuz', 50) ? 0.7 : 0.6, fat: 1.5 };
     return { id: 'over', name: '超載（過量）', mult: 0.4, fat: 2 };
   }
   function speedMult() {
@@ -113,40 +153,34 @@ window.SHL = (function () {
   }
   function armor() {
     let a = 0;
-    allEquipped().forEach((eq) => (a += eqBase(eq).armor || 0));
-    return a + affixSum('armor');
+    allEquipped().forEach((eq) => {
+      const B = eqBase(eq); let v = B.armor || 0;
+      if (B.ac === 'light') v *= 1 + profLv('qing') / 200;
+      if (B.ac === 'heavy') v *= 1 + profLv('zhong') / 200;
+      a += v;
+    });
+    return Math.round(a + affixSum('armor'));
   }
+  // 目前武器對應的熟練度：無主手＝拳腳
+  function weaponType() { return S.equip.main ? eqBase(S.equip.main).wtype || 'dao' : 'quan'; }
   function weaponDmg() {
-    const m = S.equip.main ? eqBase(S.equip.main).dmg : [1, 3];
+    const wt = weaponType(); const lv = profLv(wt);
+    const m = S.equip.main ? eqBase(S.equip.main).dmg : [1 + Math.floor(lv / 8), 3 + Math.floor(lv / 6)];
     const o = S.equip.off && eqBase(S.equip.off).dmg ? eqBase(S.equip.off).dmg : [0, 0];
-    const flat = affixSum('dmg') + (profLv('zhan') - 1);
+    const src = wt === 'gong' ? 'shen' : 'li';
+    const flat = affixSum('dmg') + Math.floor((attrVal(src) - 10) / 2) + Math.floor(lv / 12);
     const pct = 1 + affixSum('dmgp') / 100;
-    return [Math.round((m[0] + o[0] + flat) * pct), Math.round((m[1] + o[1] + flat) * pct)];
+    return [Math.max(1, Math.round((m[0] + o[0] + flat) * pct)), Math.max(1, Math.round((m[1] + o[1] + flat) * pct))];
   }
   function hitChance() {
-    let h = 0.88 + affixSum('acc') / 100 + (profLv('zhan') - 1) * 0.02;
+    let h = 0.86 + affixSum('acc') / 100 + profLv(weaponType()) * 0.0015 + (attrVal('shen') - 10) * 0.005;
     if (S.fat >= 80) h -= 0.15;
     if (S.food < 20) h -= 0.05;
     return clamp(h, 0.3, 0.98);
   }
-  function profLv(id) {
-    const xp = S.prof[id];
-    let lv = 1;
-    for (let i = 0; i < D.PROF_XP.length; i++) if (xp >= D.PROF_XP[i]) lv = i + 1;
-    return lv;
-  }
-  function profProgress(id) {
-    const lv = profLv(id); const xp = S.prof[id];
-    if (lv >= D.PROF_XP.length) return 1;
-    const a = D.PROF_XP[lv - 1], b = D.PROF_XP[lv];
-    return (xp - a) / (b - a);
-  }
-  function gainProf(id, n) {
-    const before = profLv(id);
-    S.prof[id] += n;
-    const after = profLv(id);
-    if (after > before) log(D.PROFS.find((p) => p.id === id).name + '熟練度提升至 ' + after, 'good');
-  }
+  function dodgeChance() { return clamp(0.1 + profLv('shan') * 0.002 + (attrVal('shen') - 10) * 0.01, 0.02, 0.45); }
+  function priceBonus() { return clamp(1 + profLv('yi') * 0.0015 + (attrVal('kou') - 10) * 0.01, 0.7, 1.4); }
+  function tideOn() { return !!(S.world.tide && dayOf(S.t) >= S.world.tide.start && dayOf(S.t) <= S.world.tide.end); }
 
   // ================= 紀錄 =================
   function log(text, cls) {
@@ -155,39 +189,61 @@ window.SHL = (function () {
   }
 
   // ================= 新局／存檔（永久死亡＋城鎮檢查點雙模式預留） =================
-  function newGame(seed) {
+  function newGame(seed, originId) {
+    const attr = {}, attrXp = {}, prof = {};
+    D.ATTRS.forEach((a) => { attr[a.id] = 10; attrXp[a.id] = 0; });
+    D.PROFS.forEach((p) => (prof[p.id] = { lv: 0, xp: 0 }));
     S = {
       schema: SCHEMA,
       seed: seed >>> 0, rng: seed >>> 0, uid: 0,
       meta: { saveMode: 'permadeath', createdAt: Date.now() },
-      name: '沈衡',
-      t: DAY_START, loc: 'huiyao', scene: 'town', overlay: null,
-      hp: BASE_HP, food: 80, fat: 10, silver: 60,
-      prof: { zhan: 0, cai: 0, lie: 0, yao: 0, xing: 0 },
+      name: '沈衡', origin: null,
+      t: DAY_START, loc: 'huiyao', scene: 'origin', overlay: null,
+      hp: 80, food: 80, fat: 10, silver: 60,
+      attr, attrXp, prof, profTab: 'ye',
       skills: [],
       equip: { main: null, off: null, head: null, chest: null, gloves: null, boots: null, amulet: null, ring1: null, ring2: null, belt: null, bag: null, cart: null, cartLocked: true },
       pack: [], ground: { node: 'huiyao', items: [] },
       nodes: {}, fire: false,
-      bounties: [], dungeon: null, combat: null, event: null, loot: null,
+      quests: [], rumors: [], freeRumor: {},
+      world: { tide: null, next: 0, hurt: {} },
+      dungeon: null, combat: null, event: null, loot: null,
       townTab: 'market', trade: null, dest: null, retreatSel: [],
-      log: [], stats: { kills: 0, gathers: 0, crafts: 0, hours: 0, maxSilver: 60, bounties: 0, cause: '' },
+      log: [], stats: { kills: 0, gathers: 0, crafts: 0, hours: 0, maxSilver: 60, bounties: 0, rumors: 0, cause: '' },
       shops: {}, dead: null,
     };
-    S.equip.main = newEq('blade_rust').eq;
-    S.equip.chest = newEq('robe').eq;
+    S.world.next = ri(D.TIDE.first[0], D.TIDE.first[1]);
     S.equip.bag = newEq('bag_cloth').eq;
+    padPack();
+    if (originId) applyOrigin(originId);
+    else emit();
+  }
+  function applyOrigin(id) {
+    const O = D.ORIGINS.find((o) => o.id === id) || D.ORIGINS[D.ORIGINS.length - 1];
+    S.origin = O.id;
+    Object.keys(O.attr).forEach((k) => (S.attr[k] = O.attr[k]));
+    Object.keys(O.prof).forEach((k) => (S.prof[k].lv = O.prof[k]));
+    O.gear.forEach((b) => { const eq = newEq(b).eq; const slot = eqBase(eq).slot; S.equip[slot] = eq; });
+    S.silver = O.silver; S.stats.maxSilver = O.silver;
     S.pack = [{ k: 'pot_hp', n: 2 }, { k: 'bread', n: 2 }];
     padPack();
+    (O.items || []).forEach(([k, n]) => addItem({ k, n }));
+    S.hp = maxHp();
+    S.scene = 'town';
     restockShops();
-    D.BOUNTIES.forEach((b) => S.bounties.push({ id: b.id, prog: 0, status: b.start ? 'active' : 'open' }));
-    log('沈衡在灰窯鎮醒來。賞金板上的「灰髯狼 ×3」已揭下。');
-    log('枯骨獸徑多狼；青霧藥林可採藥。');
+    D.BOUNTIES.forEach((b) => S.quests.push({ id: b.id, town: b.town, g: b.g, ic: b.enemy || D.NODES[b.dungeon].ic, title: b.title, kind: b.kind, enemy: b.enemy, dungeon: b.dungeon, need: b.need, reward: b.reward, due: null, fixed: true, prog: 0, status: b.start ? 'active' : 'open' }));
+    genQuests();
+    log('沈衡（' + O.name + '）在灰窯鎮醒來。委託板上的「灰髯狼 ×3」已揭下。');
+    log('枯骨獸徑多狼；青霧藥林可採藥。客棧能打聽傳聞。');
     save();
     emit();
   }
+  function chooseOrigin(id) { if (S.scene !== 'origin') return; applyOrigin(id); }
   function restockShops() {
     Object.keys(D.TOWNS).forEach((tid) => {
-      S.shops[tid] = D.TOWNS[tid].stock.map((row) => {
+      // 獸潮沒擊退：城鎮受創，貨架剩一半
+      const hurt = townHurt(tid);
+      S.shops[tid] = D.TOWNS[tid].stock.filter((row, i) => !hurt || i % 2 === 0).map((row) => {
         const [k, price, extra] = row;
         if (D.BASES[k]) return { it: newEq(k, typeof extra === 'string' ? extra : 'white'), price, stock: 1 };
         return { it: { k, n: 1 }, price, stock: extra || 5 };
@@ -195,6 +251,7 @@ window.SHL = (function () {
     });
     S.shopDay = dayOf(S.t);
   }
+  function townHurt(tid) { return (S.world.hurt[tid] || 0) >= dayOf(S.t); }
   function save() {
     if (!S) return;
     // 純永久死亡：死後不再寫回存檔
@@ -276,13 +333,14 @@ window.SHL = (function () {
     S.ground.items.push(it);
     return true;
   }
-  function pickupGround(i) {
+  function pickupGround(i, toIdx) {
     ensureGround();
     const it = S.ground.items[i];
     if (!it) return;
     if (it.k === 'eq') {
       if (!canAdd(it)) { log('行囊已滿，撿不起來。', 'bad'); return emit(); }
-      S.ground.items.splice(i, 1); addItem(it);
+      S.ground.items.splice(i, 1);
+      if (toIdx !== undefined && S.pack[toIdx] === null) S.pack[toIdx] = it; else addItem(it);
     } else {
       // 盡量撿：能放多少放多少
       const st = D.ITEMS[it.k].stack; let room = 0;
@@ -303,9 +361,11 @@ window.SHL = (function () {
     const startDay = dayOf(S.t);
     S.t += mins;
     S.stats.hours += hours;
-    const fatMult = (opts.fatMult || 1) * (1 - affixSum('fatred') / 100);
-    S.food = clamp(S.food - (opts.food !== undefined ? opts.food : 4 * hours), 0, 100);
-    S.fat = clamp(S.fat + (opts.fat !== undefined ? opts.fat : 2 * hours) * fatMult, 0, 100);
+    const fatMult = (opts.fatMult || 1) * (1 - affixSum('fatred') / 100) * clamp(1 - (attrVal('xin') - 10) * 0.02, 0.6, 1.3);
+    const foodMult = seasonOf(S.t) === 3 ? 1.25 : 1; // 冬季飽食消耗 +25%
+    S.food = clamp(S.food - (opts.food !== undefined ? opts.food : 4 * hours) * foodMult, 0, 100);
+    const df = opts.fat !== undefined ? opts.fat : 2 * hours;
+    S.fat = clamp(S.fat + (df > 0 ? df * fatMult : df), 0, 100);
     // 生命：飽食過低回復停滯、斷糧扣血；過度疲累扣血
     if (S.food <= 0) { S.hp -= 3 * hours; S.stats.cause = '餓死荒野'; }
     else if (S.food >= 30 && !opts.noRegen) S.hp = Math.min(maxHp(), S.hp + 1 * hours);
@@ -315,15 +375,25 @@ window.SHL = (function () {
     checkDeath();
   }
   function newDay() {
+    const day = dayOf(S.t);
     S.nodes = {}; // 採集點每日回復
-    restockShops();
     if (S.dungeon) S.dungeon.clearedDay = null;
     log(fmtTime(S.t) + '，新的一天：採集點與貨架已回補。');
+    worldTick(day);
+    restockShops();
+    questTick(day);
+    rumorTick(day);
   }
   function nodeState(id) {
     if (!S.nodes[id]) {
       const W = D.WILDS[id]; const pts = {};
-      if (W) W.points.forEach((p) => (pts[p.id] = p.max));
+      const se = seasonOf(S.t); const tide = tideOn();
+      if (W) W.points.forEach((p) => {
+        let m = p.max;
+        if (p.kind === 'herb') m += se === 0 ? 1 : se === 3 ? -1 : 0; // 春多冬少
+        if (p.kind === 'track') m += (se === 2 ? 1 : 0) + (tide ? 1 : 0); // 秋與獸潮獸跡多
+        pts[p.id] = Math.max(0, m);
+      });
       S.nodes[id] = { pts };
     }
     return S.nodes[id];
@@ -340,7 +410,10 @@ window.SHL = (function () {
     S.dead = {
       cause, where: N.name, when: fmtTime(S.t),
       days: dayOf(S.t), hours: Math.round(S.stats.hours),
-      profs: D.PROFS.map((p) => p.name + ' ' + profLv(p.id)).join('・'),
+      origin: (D.ORIGINS.find((o) => o.id === S.origin) || {}).name || '無名', age: ageOf(S.t), date: fmtDate(S.t),
+      attrs: D.ATTRS.map((a) => a.name + ' ' + S.attr[a.id]).join('・'),
+      profs: D.PROFS.filter((p) => profLv(p.id) > 0).sort((a, b) => profLv(b.id) - profLv(a.id)).slice(0, 5).map((p) => p.name + ' ' + profLv(p.id)).join('・') || '一事無成',
+      rumors: S.stats.rumors,
       kills: S.stats.kills, gathers: S.stats.gathers, crafts: S.stats.crafts, maxSilver: S.stats.maxSilver,
       bounties: S.stats.bounties, skills: S.skills.map((k) => D.SKILLS[k].name),
     };
@@ -356,8 +429,9 @@ window.SHL = (function () {
     const it = S.pack[i];
     if (!it) return false;
     if (it.k === 'eq') {
+      if (it.eq.unid) { identify(i, false); return false; }
       if (inCombat) { log('戰鬥中不能換裝。', 'bad'); return false; }
-      equip(i); return true;
+      return equipTo(i, slotFor(it.eq));
     }
     const I = D.ITEMS[it.k];
     if (I.type === 'scroll') {
@@ -368,21 +442,51 @@ window.SHL = (function () {
     }
     if (I.type !== 'use') { log(I.name + '：' + I.desc); return false; }
     const u = I.use;
-    if (u.hp) { const heal = u.hp + (profLv('yao') - 1) * 4; S.hp = Math.min(maxHp(), S.hp + heal); log('飲下' + I.name + '，生命 +' + heal); }
+    if (u.hp) { const heal = u.hp + Math.round(profLv('yao') * 0.3); S.hp = Math.min(maxHp(), S.hp + heal); log('飲下' + I.name + '，生命 +' + heal); }
     if (u.fat) { S.fat = clamp(S.fat + u.fat, 0, 100); log('飲下' + I.name + '，疲累 ' + u.fat); }
-    if (u.food) { S.food = clamp(S.food + u.food, 0, 100); log('吃下' + I.name + '，飽食 +' + u.food); }
+    if (u.food) { const f = u.food + (it.k === 'ration' ? Math.round(profLv('peng') * 0.2) : 0); S.food = clamp(S.food + f, 0, 100); log('吃下' + I.name + '，飽食 +' + f); }
     it.n -= 1; if (it.n <= 0) S.pack[i] = null;
     return true;
+  }
+  // ---------- 鑑定：鑑物夠高自己來，否則城鎮付費 ----------
+  const ID_NEED = { blue: 0, rare: 25, legend: 50 };
+  const ID_FEE = { blue: 4, rare: 12, legend: 30 };
+  function identifyFee(eq) { return ID_FEE[eq.rarity] || 0; }
+  function identify(i, pay) {
+    const it = S.pack[i]; if (!it || it.k !== 'eq' || !it.eq.unid) return false;
+    const eq = it.eq; const need = ID_NEED[eq.rarity] || 0;
+    if (pay) {
+      if (D.NODES[S.loc].kind !== 'town') return false;
+      const fee = identifyFee(eq);
+      if (S.silver < fee) { log('銀兩不足，鑑定要 ' + fee + ' 兩。', 'bad'); emit(); return false; }
+      S.silver -= fee;
+    } else if (profLv('jian') < need) {
+      log('看不出門道（需鑑物 ' + need + '）。可到城鎮市集付 ' + identifyFee(eq) + ' 兩鑑定。', 'bad'); emit(); return false;
+    } else gainProf('jian', 8, need);
+    eq.unid = false;
+    log('鑑定出' + D.RARITY[eq.rarity].name + '「' + eq.name + '」' + (eq.affixes.length ? '：' + eq.affixes.map((a) => D.AFFIXES[a.id].t.replace('{v}', a.v)).join('、') : ''), 'good');
+    if (S.trade && S.trade.mode === 'sell' && S.trade.slot === i) S.trade = null;
+    commit(); return true;
   }
   function slotFor(eq) {
     const s = eqBase(eq).slot;
     if (s === 'ring') return !S.equip.ring1 ? 'ring1' : !S.equip.ring2 ? 'ring2' : 'ring1';
     return s;
   }
-  function equip(i) {
-    const it = S.pack[i];
+  function slotFits(eq, slot) { const s = eqBase(eq).slot; return s === 'ring' ? slot === 'ring1' || slot === 'ring2' : s === slot; }
+  function reqUnmet(eq) {
+    const rq = eqBase(eq).req; if (!rq) return null;
+    const k = Object.keys(rq).find((a) => attrVal(a) < rq[a]);
+    return k ? attrName(k) + ' ' + rq[k] : null;
+  }
+  function equipTo(i, slot) {
+    const it = S.pack[i]; if (!it || it.k !== 'eq') return false;
     const eq = it.eq; const B = eqBase(eq);
-    const slot = slotFor(eq);
+    if (S.combat) { log('戰鬥中不能換裝。', 'bad'); emit(); return false; }
+    if (eq.unid) { log('未鑑定的裝備不能穿。', 'bad'); emit(); return false; }
+    if (!slotFits(eq, slot)) { log(eq.name + '不能放在' + D.SLOT_NAMES[slot] + '。', 'bad'); emit(); return false; }
+    const miss = reqUnmet(eq);
+    if (miss) { log('穿不上' + eq.name + '：需要' + miss + '。', 'bad'); emit(); return false; }
     S.pack[i] = null;
     const back = [];
     if (S.equip[slot]) back.push(S.equip[slot]);
@@ -390,17 +494,62 @@ window.SHL = (function () {
     if (slot === 'off' && S.equip.main && eqBase(S.equip.main).twoHanded) { back.push(S.equip.main); S.equip.main = null; }
     S.equip[slot] = eq;
     if (slot === 'bag') padPack();
-    back.forEach((e) => addItem({ k: 'eq', eq: e }));
+    back.forEach((e, n) => { if (n === 0 && !S.pack[i] && i < S.pack.length) S.pack[i] = { k: 'eq', eq: e }; else addItem({ k: 'eq', eq: e }); });
+    S.hp = Math.min(S.hp, maxHp());
     log('裝備' + eq.name);
-    commit();
+    commit(); return true;
   }
-  function unequip(slot) {
+  function unequip(slot, toIdx) {
     const eq = S.equip[slot];
-    if (!eq || slot === 'bag' || S.combat) return;
-    if (!S.pack.some((x) => !x)) { log('行囊已滿，無法卸下。', 'bad'); return emit(); }
-    S.equip[slot] = null; addItem({ k: 'eq', eq });
+    if (!eq || slot === 'bag' || S.combat) return false;
+    if (toIdx !== undefined && S.pack[toIdx] === null) { S.equip[slot] = null; S.pack[toIdx] = { k: 'eq', eq }; }
+    else {
+      if (!S.pack.some((x) => !x)) { log('行囊已滿，無法卸下。', 'bad'); emit(); return false; }
+      S.equip[slot] = null; addItem({ k: 'eq', eq });
+    }
+    S.hp = Math.min(S.hp, maxHp());
     log('卸下' + eq.name);
-    commit();
+    commit(); return true;
+  }
+  // ---------- 拖拉：from／to 形如 pack:3、slot:main、ground:0、ground、shop:2、sell ----------
+  function drag(from, to) {
+    if (S.dead || S.scene === 'origin' || from === to) return false;
+    const [fz, fv] = from.split(':'); const [tz, tv] = to.split(':');
+    const inMarket = S.scene === 'town' && S.townTab === 'market';
+    if (fz === 'pack') {
+      const i = +fv; const it = S.pack[i]; if (!it) return false;
+      if (tz === 'pack') {
+        const j = +tv; if (j >= S.pack.length) return false;
+        const o = S.pack[j];
+        if (o && o.k !== 'eq' && o.k === it.k && o.n < D.ITEMS[o.k].stack) {
+          const m = Math.min(D.ITEMS[o.k].stack - o.n, it.n); o.n += m; it.n -= m; if (it.n <= 0) S.pack[i] = null;
+        } else { S.pack[i] = o; S.pack[j] = it; }
+        S.trade = null; S.retreatSel = [];
+        commit(); return true;
+      }
+      if (S.combat) { log('戰鬥中只能整理行囊。', 'bad'); emit(); return false; }
+      if (tz === 'slot') return it.k === 'eq' ? equipTo(i, slotFits(it.eq, tv) ? tv : slotFor(it.eq)) : false;
+      if (tz === 'ground') { S.pack[i] = null; S.trade = null; dropToGround(it); log('放下' + itemName(it) + '。'); commit(); return true; }
+      if (tz === 'sell' && inMarket) { sell(i, it.k === 'eq' ? 1 : it.n); return true; }
+      return false;
+    }
+    if (S.combat) return false;
+    if (fz === 'slot') {
+      if (tz === 'pack') {
+        const j = +tv; const o = S.pack[j]; const eq = S.equip[fv];
+        if (o && o.k === 'eq' && eq && slotFits(o.eq, fv)) return equipTo(j, fv);
+        return unequip(fv, o === null ? j : undefined);
+      }
+      if (tz === 'ground') {
+        const eq = S.equip[fv]; if (!eq || fv === 'bag') return false;
+        S.equip[fv] = null; dropToGround({ k: 'eq', eq }); S.hp = Math.min(S.hp, maxHp());
+        log('放下' + eq.name + '。'); commit(); return true;
+      }
+      return false;
+    }
+    if (fz === 'ground') { if (tz === 'pack' || tz === 'slot') { pickupGround(+fv, tz === 'pack' ? +tv : undefined); return true; } return false; }
+    if (fz === 'shop' && inMarket && (tz === 'pack' || tz === 'slot')) { S.trade = { mode: 'buy', idx: +fv, qty: 1 }; buy(); return true; }
+    return false;
   }
   function clickPack(i) {
     if (S.dead) return;
@@ -436,13 +585,15 @@ window.SHL = (function () {
     const sm = speedMult();
     const hours = Math.max(1, Math.ceil(base / sm));
     const band = loadBand();
-    const xingRed = 1 - (profLv('xing') - 1) * 0.05 - (S.skills.includes('jixing') ? 0.1 : 0);
+    const xingRed = clamp(1 - profLv('jiao') * 0.003 - (S.skills.includes('jixing') ? 0.1 : 0), 0.4, 1);
     const fat = Math.round(3 * hours * band.fat * xingRed * (1 - affixSum('fatred') / 100));
     const food = 4 * hours;
     const wild = edges.some((e) => !e.road);
     let risk = wild ? (edges.length > 1 ? 0.3 : 0.22) : 0.04;
     if (isNight(S.t)) risk *= 2;
     if (band.id === 'heavy' || band.id === 'over') risk *= 1.4;
+    if (wild && perk('jiao', 25)) risk *= 0.8;
+    if (wild && tideOn()) risk *= 1.5;
     const riskName = risk < 0.15 ? '低' : risk < 0.35 ? '中' : '高';
     const via = edges.length > 1 ? D.NODES[edges[0].a === S.loc ? edges[0].b : edges[0].a].name : (edges[0] && edges[0].road ? '官道' : '野徑');
     return { edges, hours, fat, food, risk, riskName, mult: sm, via, wild };
@@ -464,8 +615,11 @@ window.SHL = (function () {
     S.fire = false;
     S.dest = null;
     S.loc = to; S.ground = { node: to, items: [] };
+    const bandId = loadBand().id;
     passTime(p.hours, { fat: p.fat / ((1 - affixSum('fatred') / 100) || 1), food: p.food });
-    gainProf('xing', 1);
+    gainProf('jiao', 3 * p.hours);
+    // 負重訓練：常態重負以上趕路才會漲
+    if (bandId !== 'light') gainProf('fuz', (bandId === 'normal' ? 4 : 6) * p.hours);
     log('自' + fromName + '出發，經' + p.via + '，' + p.hours + ' 小時後抵達' + D.NODES[to].name + '。');
     if (S.dead) return commit();
     if (rnd() < p.risk) { startEvent(to); return commit(); }
@@ -489,11 +643,18 @@ window.SHL = (function () {
   // ================= 城鎮 =================
   function townPrice(k, town) { return (D.TOWNS[town || S.loc].buy || {})[k]; }
   function avgPrice(k) { const a = D.TOWNS.huiyao.buy[k], b = D.TOWNS.duyin.buy[k]; return (a + b) / 2; }
+  function isPotion(k) { return k === 'pot_hp' || k === 'pot_ft'; }
   function sellPrice(it) {
-    const bonus = 1 + (profLv('xing') - 1) * 0.03;
+    const bonus = priceBonus();
     if (it.k === 'eq') return Math.max(1, Math.floor(eqValue(it.eq) * 0.6 * bonus));
     const p = townPrice(it.k);
-    return p ? Math.max(1, Math.floor(p * bonus)) : 0;
+    return p ? Math.max(1, Math.floor(p * bonus * (isPotion(it.k) && tideOn() ? D.TIDE.potMult : 1))) : 0;
+  }
+  // 買價：議價與口才打折；獸潮期間藥水漲價
+  function buyPrice(row) {
+    let p = row.price / priceBonus();
+    if (row.it.k !== 'eq' && isPotion(row.it.k) && tideOn()) p *= D.TIDE.potMult;
+    return Math.max(1, Math.round(p));
   }
   function setTab(t) { S.townTab = t; S.trade = null; emit(); }
   function selectShop(i) { const row = S.shops[S.loc][i]; if (!row) return; S.trade = { mode: 'buy', idx: i, qty: 1 }; emit(); }
@@ -509,7 +670,7 @@ window.SHL = (function () {
     const tr = S.trade; if (!tr || tr.mode !== 'buy') return;
     const row = S.shops[S.loc][tr.idx]; if (!row || row.stock <= 0) return;
     const qty = row.it.k === 'eq' ? 1 : Math.min(tr.qty, row.stock);
-    const cost = row.price * qty;
+    const cost = buyPrice(row) * qty;
     if (S.silver < cost) { log('銀兩不足。', 'bad'); return emit(); }
     if (row.it.k === 'eq') {
       const eq = row.it.eq;
@@ -525,10 +686,12 @@ window.SHL = (function () {
       }
       S.silver -= cost; row.stock = 0;
       S.shops[S.loc].splice(tr.idx, 1); S.trade = null;
+      gainProf('yi', clamp(1 + cost / 12, 1, 6));
     } else {
       const it = { k: row.it.k, n: qty };
       if (!canAdd(it)) { log('行囊放不下。', 'bad'); return emit(); }
       addItem(it); S.silver -= cost; row.stock -= qty;
+      gainProf('yi', clamp(1 + cost / 12, 1, 6));
       log('買下' + D.ITEMS[it.k].name + ' ×' + qty + '，' + cost + ' 兩');
       if (row.stock <= 0) { S.shops[S.loc].splice(tr.idx, 1); S.trade = null; } else tr.qty = 1;
     }
@@ -537,22 +700,25 @@ window.SHL = (function () {
   function sell(slot, qty) {
     if (slot === undefined && S.trade && S.trade.mode === 'sell') { slot = S.trade.slot; qty = S.trade.qty; }
     const it = S.pack[slot]; if (!it) return;
-    const p = sellPrice(it);
+    const p = sellPrice(it); let got = p;
     if (!p) { log('此地不收' + itemName(it) + '。', 'bad'); return emit(); }
     if (it.k === 'eq') { S.pack[slot] = null; S.silver += p; log('賣出' + it.eq.name + '，得銀 ' + p + ' 兩'); }
     else {
       const n = Math.min(qty || it.n, it.n);
       it.n -= n; if (it.n <= 0) S.pack[slot] = null;
+      got = p * n;
       S.silver += p * n; log('賣出' + D.ITEMS[it.k].name + ' ×' + n + '，得銀 ' + p * n + ' 兩');
     }
-    gainProf('xing', 1);
+    gainProf('yi', clamp(1 + got / 12, 1, 6));
     S.stats.maxSilver = Math.max(S.stats.maxSilver, S.silver);
     S.trade = null;
     commit();
   }
+  function innCost() { const m = townHurt(S.loc) ? 2 : 1; return { rest: 8 * m, soup: 3 * m, rumor: perk('tan', 50) ? Math.ceil(D.RUMOR.cost / 2) : D.RUMOR.cost }; }
   function innRest() {
-    if (S.silver < 8) { log('銀兩不足。', 'bad'); return emit(); }
-    S.silver -= 8;
+    const c = innCost().rest;
+    if (S.silver < c) { log('銀兩不足。', 'bad'); return emit(); }
+    S.silver -= c;
     // 歇一夜：睡到隔日 08:00
     const now = S.t; let next = (dayOf(now)) * 1440 + 8 * 60;
     if (next - now < 6 * 60) next += 1440;
@@ -562,36 +728,253 @@ window.SHL = (function () {
     commit();
   }
   function innSoup() {
-    if (S.silver < 3) { log('銀兩不足。', 'bad'); return emit(); }
-    S.silver -= 3; S.food = clamp(S.food + 30, 0, 100);
+    const c = innCost().soup;
+    if (S.silver < c) { log('銀兩不足。', 'bad'); return emit(); }
+    S.silver -= c; S.food = clamp(S.food + 30, 0, 100);
     passTime(0.5, { food: 0, fat: 0 });
     log('喝了碗熱湯，飽食 +30');
     commit();
   }
-  function claimBounty(id) {
-    const b = S.bounties.find((x) => x.id === id); const B = D.BOUNTIES.find((x) => x.id === id);
-    if (!b) return;
-    if (b.status === 'open') { b.status = 'active'; log('揭下賞金：' + B.title); return commit(); }
-    if (b.status === 'done') {
-      b.status = 'claimed'; S.silver += B.reward; S.stats.bounties++;
-      S.stats.maxSilver = Math.max(S.stats.maxSilver, S.silver);
-      log('交付賞金「' + B.title + '」，得銀 ' + B.reward + ' 兩', 'good');
-      return commit();
-    }
-  }
-  function bountyProgress(kind, key) {
-    S.bounties.forEach((b) => {
-      const B = D.BOUNTIES.find((x) => x.id === b.id);
-      if (b.status !== 'active') return;
-      if ((kind === 'kill' && B.kind === 'kill' && B.enemy === key) || (kind === 'clear' && B.kind === 'clear' && B.dungeon === key)) {
-        b.prog = Math.min(B.need, b.prog + 1);
-        if (b.prog >= B.need) { b.status = 'done'; log('賞金「' + B.title + '」已達成，回城鎮賞金板交付。', 'good'); }
+
+  // ================= 委託（任務板） =================
+  function questReward(q) { return Math.round(q.reward * (perk('yi', 25) ? 1.1 : 1)); }
+  function genQuests() {
+    const day = dayOf(S.t); const G = D.QUEST_GEN;
+    Object.keys(D.TOWNS).forEach((town) => {
+      let n = S.quests.filter((q) => q.town === town && !q.fixed && q.status === 'open').length;
+      let guard = 0;
+      while (n < G.perTown && guard++ < 12) {
+        const kind = pickW({ collect: 45, kill: 35, deliver: 20 });
+        const q = { id: 'q' + (++S.uid), town, kind, fixed: false, prog: 0, status: 'open' };
+        if (kind === 'collect') {
+          const [item, cnt] = pick(G.collect.pool);
+          if (S.quests.some((x) => x.town === town && x.kind === 'collect' && x.item === item && x.status !== 'claimed')) continue;
+          Object.assign(q, { item, need: cnt, g: D.ITEMS[item].g, ic: item, title: '收購' + D.ITEMS[item].name + ' ×' + cnt, reward: Math.round(D.TOWNS[town].buy[item] * cnt * 1.8) + 6, due: day + G.collect.days });
+        } else if (kind === 'kill') {
+          const [enemy, cnt, reward] = pick(G.kill.pool);
+          if (S.quests.some((x) => x.kind === 'kill' && x.enemy === enemy && (x.status === 'open' || x.status === 'active'))) continue;
+          Object.assign(q, { enemy, need: cnt, g: D.ENEMIES[enemy].g, ic: enemy, title: '獵殺' + D.ENEMIES[enemy].name + ' ×' + cnt, reward, due: day + G.kill.days });
+        } else {
+          if (S.quests.some((x) => x.town === town && x.kind === 'deliver' && x.status !== 'claimed')) continue;
+          const to = Object.keys(D.TOWNS).find((t) => t !== town);
+          Object.assign(q, { to, need: 1, g: '包', ic: 'parcel', title: '送貨至' + D.NODES[to].name, reward: G.deliver.reward, deposit: G.deliver.deposit, due: day + G.deliver.days });
+        }
+        S.quests.push(q); n++;
       }
     });
   }
-  function trackedBounty() {
-    const b = S.bounties.find((x) => x.status === 'active' || x.status === 'done');
-    return b ? { b, B: D.BOUNTIES.find((x) => x.id === b.id) } : null;
+  function questTick(day) {
+    S.quests = S.quests.filter((q) => {
+      if (q.status === 'claimed' && !q.fixed) return false;
+      if (q.due && day > q.due && (q.status === 'open' || q.status === 'active')) {
+        if (q.status === 'active') {
+          log('委託「' + q.title + '」逾期' + (q.kind === 'deliver' ? '，押金沒收。' : '，已被撕榜。'), 'bad');
+          if (q.kind === 'deliver') removeItem('parcel', 1);
+        }
+        return false;
+      }
+      return true;
+    });
+    genQuests();
+  }
+  // 委託板在此地列出的委託：本地發的＋要送到這裡的
+  function questsHere() { return S.quests.filter((q) => q.town === S.loc || (q.kind === 'deliver' && q.to === S.loc && q.status === 'active')); }
+  function questReady(q) {
+    if (q.status === 'done') return q.town === S.loc;
+    if (q.status !== 'active') return false;
+    if (q.kind === 'collect') return q.town === S.loc && countItem(q.item) >= q.need;
+    if (q.kind === 'deliver') return q.to === S.loc && countItem('parcel') > 0;
+    return false;
+  }
+  function questAct(id) {
+    const q = S.quests.find((x) => x.id === id); if (!q) return;
+    if (q.status === 'open') {
+      if (q.kind === 'deliver') {
+        if (S.silver < q.deposit) { log('押金不足（' + q.deposit + ' 兩）。', 'bad'); return emit(); }
+        if (!canAdd({ k: 'parcel', n: 1 })) { log('行囊沒有空格放包裹。', 'bad'); return emit(); }
+        S.silver -= q.deposit; addItem({ k: 'parcel', n: 1 });
+      }
+      q.status = 'active';
+      log('揭下委託：' + q.title + (q.due ? '（第 ' + q.due + ' 日前）' : '') + (q.kind === 'deliver' ? '，押金 ' + q.deposit + ' 兩' : ''));
+      return commit();
+    }
+    if (!questReady(q)) return;
+    if (q.kind === 'collect') removeItem(q.item, q.need);
+    if (q.kind === 'deliver') removeItem('parcel', 1);
+    const r = questReward(q) + (q.deposit || 0);
+    q.status = 'claimed'; S.silver += r; S.stats.bounties++;
+    S.stats.maxSilver = Math.max(S.stats.maxSilver, S.silver);
+    gainProf('yi', 4);
+    log('交付委託「' + q.title + '」，得銀 ' + r + ' 兩' + (q.deposit ? '（含退還押金）' : ''), 'good');
+    commit();
+  }
+  function questProgress(kind, key) {
+    S.quests.forEach((q) => {
+      if (q.status !== 'active') return;
+      const hit = (kind === 'kill' && q.kind === 'kill' && q.enemy === key) || (kind === 'clear' && q.kind === 'clear' && q.dungeon === key) || (kind === 'beast' && q.kind === 'tide');
+      if (!hit) return;
+      q.prog = Math.min(q.need, q.prog + 1);
+      if (q.prog >= q.need && q.kind !== 'tide') { q.status = 'done'; q.due = null; log('委託「' + q.title + '」已達成，回' + D.NODES[q.town].name + '委託板交付。', 'good'); }
+    });
+  }
+  function trackedQuest() { return S.quests.find((x) => x.status === 'done') || S.quests.find((x) => x.status === 'active') || null; }
+  function activeQuests() { return S.quests.filter((x) => x.status === 'active' || x.status === 'done'); }
+
+  // ================= 傳聞 =================
+  function addRumor(kind, node, truth, free) {
+    const K = D.RUMOR.kinds[kind];
+    const r = { id: 'r' + (++S.uid), kind, node, truth, day: dayOf(S.t), text: pick(K.text).replace('{n}', D.NODES[node].name), hint: null, traced: false };
+    if (perk('tan', 25)) r.hint = D.RUMOR.hint[truth];
+    S.rumors.push(r);
+    return r;
+  }
+  function hearRumor() {
+    if (D.NODES[S.loc].kind !== 'town') return;
+    const day = dayOf(S.t); const free = S.freeRumor[S.loc] !== day; const cost = free ? 0 : innCost().rumor;
+    if (S.rumors.length >= D.RUMOR.max) { log('傳聞記得太多了，先去查證幾則再說。', 'bad'); return emit(); }
+    if (S.silver < cost) { log('銀兩不足，請不起酒。', 'bad'); return emit(); }
+    S.silver -= cost; S.freeRumor[S.loc] = day;
+    const kind = pickW({ cache: 40, vein: 30, beast: 30 });
+    const K = D.RUMOR.kinds[kind];
+    const free2 = K.nodes.filter((n) => !S.rumors.some((r) => r.node === n && r.kind === kind));
+    const node = pick(free2.length ? free2 : K.nodes);
+    const r = addRumor(kind, node, pickW(D.RUMOR.truth));
+    passTime(0.5, { food: 0, fat: 0 });
+    gainProf('tan', 6);
+    log((cost ? '請了一輪酒（' + cost + ' 兩）。' : '') + '聽來一則' + K.name + '傳聞：' + r.text);
+    if (r.hint) log('（探聞）' + r.hint, 'good');
+    commit();
+  }
+  function rumorTick(day) {
+    S.rumors = S.rumors.filter((r) => {
+      if (day - r.day >= D.RUMOR.days) { log('「' + D.NODES[r.node].name + '的' + D.RUMOR.kinds[r.kind].name + '」已無人再提。'); return false; }
+      // 時間會改變真相：屬實與有人盤踞的，每天 20% 被人取走
+      if ((r.truth === 'true' || r.truth === 'guard') && rnd() < D.RUMOR.decay) r.truth = 'gone';
+      return true;
+    });
+  }
+  function rumorsHere() { return S.rumors.filter((r) => r.node === S.loc); }
+  function traceRumor(id) {
+    const r = S.rumors.find((x) => x.id === id); if (!r || r.node !== S.loc || r.traced || !perk('zong', 25)) return;
+    passTime(0.5, { fat: 1 }); if (S.dead) return commit();
+    r.traced = true; gainProf('zong', 5, 30);
+    log('（辨痕）' + D.RUMOR.trace[r.truth], 'good');
+    commit();
+  }
+  function rumorReward(r, tier) {
+    const gains = []; let silver = 0;
+    if (r.kind === 'cache') {
+      silver = ri(20, 40) * tier;
+      gains.push(lootEq(tier > 1 ? pickW({ rare: 60, legend: 40 }) : pickW({ blue: 30, rare: 70 })));
+    } else if (r.kind === 'vein') {
+      if (r.node === 'chishi') { gains.push({ k: 'ore_xs', n: 2 * tier }, { k: 'ore_cu', n: 2 }); }
+      else { gains.push({ k: 'vine_du', n: 3 * tier }, { k: 'leaf_qx', n: 3 }, { k: 'herb_zx', n: 3 }); }
+    } else { gains.push({ k: 'beast_core', n: tier }, { k: 'hide_fine', n: 2 }); }
+    return { gains, silver };
+  }
+  function grantRumor(r, tier) {
+    const rw = rumorReward(r, tier); const names = [];
+    rw.gains.forEach((g) => { names.push(itemName(g) + (g.k === 'eq' ? '' : ' ×' + g.n)); addItem(g); });
+    S.silver += rw.silver; S.stats.maxSilver = Math.max(S.stats.maxSilver, S.silver); S.stats.rumors++;
+    S.rumors = S.rumors.filter((x) => x.id !== r.id);
+    return (rw.silver ? '銀兩 +' + rw.silver + '；' : '') + names.join('、');
+  }
+  function investigate(id) {
+    const r = S.rumors.find((x) => x.id === id); if (!r || r.node !== S.loc || S.combat || S.dead) return;
+    passTime(1, { fat: 3 }); if (S.dead) return commit();
+    const K = D.RUMOR.kinds[r.kind];
+    const ev = { id: 'rumor', rid: r.id, dest: S.loc, result: null, dyn: { title: '查探傳聞・' + K.name, text: '', opts: [] } };
+    S.event = ev; S.scene = 'event';
+    const done = (t, cls) => { ev.result = t; log(t, cls); };
+    if (r.truth === 'true') {
+      if (r.kind === 'beast') {
+        ev.dyn.text = '循著血跡找到了那頭異獸，牠身上帶著舊傷，正伏在石後喘息。';
+        ev.dyn.opts = [{ k: 'r_hunt', label: '趁牠帶傷動手', note: '入戰・敵方半血' }, { k: 'r_leave', label: '放過牠', note: '傳聞保留' }];
+      } else { ev.dyn.text = '傳聞是真的，東西就在那裡，四下無人。'; done('到手：' + grantRumor(r, 1), 'good'); }
+    } else if (r.truth === 'gone') {
+      ev.dyn.text = '來晚了。地上只剩翻開的土和一口空箱。';
+      S.rumors = S.rumors.filter((x) => x.id !== r.id);
+      if (rnd() < 0.3 && S.rumors.length < D.RUMOR.max) {
+        const k2 = pick(Object.keys(D.RUMOR.kinds)); const n2 = pick(D.RUMOR.kinds[k2].nodes.filter((n) => n !== r.node));
+        const r2 = addRumor(k2, n2, 'true');
+        done('箱底壓著半張字條：' + r2.text, 'good');
+      } else done('一無所獲。');
+    } else if (r.truth === 'guard') {
+      ev.dyn.text = '已經有人先到了：兩個劫匪守在那裡，還沒把東西搬走。';
+      ev.dyn.opts = [{ k: 'r_fight', label: '動手搶', note: '入戰・劫匪 ×2' }, { k: 'r_talk', label: '開口談分帳', note: '說服檢定・成則付 10 兩' }, { k: 'r_leave', label: '退走', note: '傳聞保留' }];
+    } else if (r.truth === 'strong') {
+      ev.dyn.text = '洞口蹲著一頭山魈，正啃著上一個來查探的人。牠還沒發現你。';
+      ev.dyn.opts = [{ k: 'r_boss', label: '硬闖', note: '入戰・山魈' }, { k: 'r_sneak', label: '悄悄退走', note: '身法檢定' }];
+    } else {
+      // 根本是餌：靈覺與追蹤決定能不能先察覺
+      const p = clamp(0.15 + (attrVal('ling') - 10) * 0.05 + profLv('zong') * 0.004 + (r.traced ? 0.5 : 0), 0.05, 0.95);
+      if (rnd() < p) {
+        ev.dyn.text = '你察覺兩側草叢裡有人蹲伏。這則傳聞是個餌。';
+        ev.dyn.opts = [{ k: 'r_strike', label: '先下手', note: '入戰・首回合敵人不動' }, { k: 'r_leave2', label: '不動聲色退走', note: '傳聞作廢' }];
+      } else {
+        S.rumors = S.rumors.filter((x) => x.id !== r.id);
+        S.event = null;
+        log('中計了！放消息的人就是劫匪，兩側殺出人來。', 'bad');
+        startCombat(['bandit', 'bandit'], { type: 'wild', node: S.loc }, { ambush: true });
+      }
+    }
+    commit();
+  }
+  function rumorChoose(k) {
+    const ev = S.event; const r = S.rumors.find((x) => x.id === ev.rid);
+    const res = (t, cls) => { ev.result = t; ev.dyn.opts = []; log(t, cls); };
+    if (!r) { res('這裡已經沒什麼可查的了。'); return commit(); }
+    const node = S.loc;
+    switch (k) {
+      case 'r_leave': res('你退了出去，這則傳聞還記著。'); break;
+      case 'r_leave2': S.rumors = S.rumors.filter((x) => x.id !== r.id); res('你裝作路過，慢慢退開。'); break;
+      case 'r_hunt': S.event = null; startCombat(['redboar'], { type: 'rumor', node, rid: r.id, tier: 1 }, { hpMult: 0.5 }); break;
+      case 'r_fight': S.event = null; startCombat(['bandit', 'bandit'], { type: 'rumor', node, rid: r.id, tier: 1 }); break;
+      case 'r_boss': S.event = null; startCombat(['xiao'], { type: 'rumor', node, rid: r.id, tier: 2 }); break;
+      case 'r_strike': S.rumors = S.rumors.filter((x) => x.id !== r.id); S.event = null; startCombat(['bandit', 'bandit'], { type: 'wild', node }, { stun: 1 }); break;
+      case 'r_talk': {
+        const p = clamp(0.25 + profLv('shuo') * 0.007 + (attrVal('kou') - 10) * 0.05, 0.05, 0.92);
+        gainProf('shuo', 8, 20);
+        if (rnd() < p && S.silver >= 10) { S.silver -= 10; res('你說動了他們，付 10 兩分了一份：' + grantRumor(r, 1), 'good'); }
+        else { S.event = null; log('話不投機，劫匪拔刀了。', 'bad'); startCombat(['bandit', 'bandit'], { type: 'rumor', node, rid: r.id, tier: 1 }); }
+        break;
+      }
+      case 'r_sneak': {
+        const p = clamp(0.5 + (attrVal('shen') - 10) * 0.06 + profLv('shan') * 0.004, 0.1, 0.95);
+        if (rnd() < p) res('你屏住呼吸退了出來。山魈還在那裡，這則傳聞還記著。');
+        else { S.event = null; log('腳下踩斷了枯枝，山魈轉過頭來。', 'bad'); startCombat(['xiao'], { type: 'rumor', node, rid: r.id, tier: 2 }); }
+        break;
+      }
+    }
+    commit();
+  }
+
+  // ================= 世界事件：獸潮 =================
+  function worldTick(day) {
+    const W = S.world; const T = D.TIDE;
+    if (W.tide && day > W.tide.end) {
+      const td = W.tide; const q = S.quests.find((x) => x.kind === 'tide');
+      if (td.kills >= td.need) {
+        if (q) { q.status = 'done'; q.due = null; }
+        log('獸潮退了。' + D.NODES[td.town].name + '守住了，委託板可領「擊退獸潮」的賞。', 'good');
+      } else {
+        S.quests = S.quests.filter((x) => x.kind !== 'tide');
+        W.hurt[td.town] = day + T.hurtDays - 1;
+        log('獸潮沖進了' + D.NODES[td.town].name + '。城鎮受創 ' + T.hurtDays + ' 天：貨架剩一半、客棧漲價。', 'bad');
+      }
+      W.tide = null; W.next = day + ri(T.gap[0], T.gap[1]);
+    }
+    if (!W.tide && day === W.next - 1) log('山裡的獸群躁動不安，城裡人說明天怕有獸潮。', 'bad');
+    if (!W.tide && day >= W.next) {
+      const town = pick(Object.keys(D.TOWNS));
+      W.tide = { town, start: day, end: day + T.days - 1, kills: 0, need: T.need };
+      S.quests.push({ id: 'tide' + day, town, kind: 'tide', g: '潮', ic: 'wolf', title: '擊退獸潮', need: T.need, reward: T.reward, due: W.tide.end, fixed: false, prog: 0, status: 'active' });
+      log('獸潮來了，直撲' + D.NODES[town].name + '！為期 ' + T.days + ' 天：獸跡變多、野徑更險、藥水漲價。殺滿 ' + T.need + ' 頭野獸可領賞。', 'bad');
+    }
+  }
+  function tideInfo() {
+    const td = S.world.tide; if (!td || !tideOn()) return null;
+    return { town: td.town, kills: td.kills, need: td.need, left: td.end - dayOf(S.t) + 1 };
   }
 
   // ================= 製作（營火／藥爐） =================
@@ -604,13 +987,15 @@ window.SHL = (function () {
     const R = D.RECIPES.find((r) => r.id === rid);
     if (!R || !canCraftHere(R)) { log(R && R.fireOnly ? '需要先生起營火。' : '需要營火或城鎮藥爐。', 'bad'); return emit(); }
     if (countItem(R.mat) < R.n) { log('材料不足：' + D.ITEMS[R.mat].name + ' ' + countItem(R.mat) + '/' + R.n, 'bad'); return emit(); }
-    const saved = profLv('yao') >= 3 && R.n > 1 && rnd() < 0.3;
+    const food = R.out === 'ration'; const sk = food ? 'peng' : 'yao';
+    const saved = !food && perk('yao', 25) && R.n > 1 && rnd() < 0.3;
+    const dbl = food ? perk('peng', 25) && rnd() < 0.3 : perk('yao', 50) && rnd() < 0.25;
     removeItem(R.mat, saved ? R.n - 1 : R.n);
     passTime(R.h, { fat: 1 });
     if (S.dead) return commit();
-    addItem({ k: R.out, n: 1 });
-    gainProf('yao', 1); S.stats.crafts++;
-    log('製成' + R.name + (saved ? '（省下 1 份材料）' : ''), 'good');
+    addItem({ k: R.out, n: dbl ? 2 : 1 });
+    gainProf(sk, 6); S.stats.crafts++;
+    log('製成' + R.name + (dbl ? ' ×2' : '') + (saved ? '（省下 1 份材料）' : ''), 'good');
     commit();
   }
 
@@ -623,34 +1008,39 @@ window.SHL = (function () {
     if (ns.pts[p.id] <= 0) { log(p.label + '已採盡。', 'bad'); return emit(); }
     kind = p.kind;
     if (kind === 'track') return track(p);
-    const caiLv = profLv('cai');
-    const hours = kind === 'herb' ? 1 : 2;
-    const fat = (kind === 'herb' ? 4 : 10) * (1 - (caiLv - 1) * 0.06);
+    const herb = kind === 'herb'; const sk = herb ? 'cai' : 'kuang';
+    const hours = herb ? 1 : 2;
+    const fat = gatherFat(kind);
     passTime(hours, { fat });
     if (S.dead) return commit();
     ns.pts[p.id] -= 1;
-    let n = kind === 'herb' ? ri(1, 2) : 1;
-    if (caiLv >= 3 && rnd() < 0.4) n += 1;
+    let n = herb ? ri(1, 2) : 1;
+    const notes = [];
+    if (herb && perk('cai', 50) && rnd() < 0.4) { n *= 2; notes.push('雙份'); }
+    if (!herb && perk('kuang', 50) && rnd() < 0.35) { n += 1; notes.push('多挖一塊'); }
+    if (rnd() < (attrVal('ling') - 10) * 0.02) { n += 1; notes.push('靈覺'); }
     if (rnd() < affixSum('gather') / 100) n += 1;
-    const lost = addItem({ k: p.item, n });
-    gainProf('cai', 1); S.stats.gathers++;
-    log((kind === 'herb' ? '採得' : '挖得') + D.ITEMS[p.item].name + ' ×' + n + '（採集 +1）' + (lost ? '，行囊滿，' + lost + ' 份落在地面' : ''));
+    let lost = addItem({ k: p.item, n });
+    if (herb && perk('cai', 25) && rnd() < 0.25) { lost += addItem({ k: 'vine_du', n: 1 }); notes.push('辨出毒藤 ×1'); }
+    gainProf(sk, herb ? 6 : 7, D.ITEMS[p.item].dl); S.stats.gathers++;
+    log((herb ? '採得' : '挖得') + D.ITEMS[p.item].name + ' ×' + n + (notes.length ? '（' + notes.join('、') + '）' : '') + (lost ? '，行囊滿，' + lost + ' 份落在地面' : ''));
     // 偶發：毒蟲遇襲／崩塌
     const A = W.ambush;
-    if (A && A.on === kind && rnd() < A.p) {
+    if (A && A.on === kind && rnd() < A.p && !(A.enemy && perk('cai', 75))) {
       if (A.enemy) { log('驚動了' + D.ENEMIES[A.enemy].name + '！', 'bad'); startCombat([A.enemy], { type: 'wild', node: S.loc }); }
-      else { const d = ri(5, 9); S.hp -= d; log('坑道落石，生命 −' + d, 'bad'); checkDeath('礦坑崩塌'); }
+      else { const d = Math.ceil(ri(5, 9) * (perk('kuang', 25) ? 0.5 : 1)); S.hp -= d; log('坑道落石，生命 −' + d, 'bad'); checkDeath('礦坑崩塌'); }
     }
     commit();
   }
+  function gatherFat(kind) { return kind === 'herb' ? 4 * (1 - profLv('cai') * 0.004) : 10 * (1 - profLv('kuang') * 0.004); }
   function track(p) {
     const ns = nodeState(S.loc);
     passTime(1, { fat: 3 });
     if (S.dead) return commit();
     ns.pts[p.id] -= 1;
-    gainProf('lie', 1);
+    gainProf('zong', 5, D.ENEMIES[p.enemy].lv);
     log('循著' + p.label + '追蹤，找到了' + D.ENEMIES[p.enemy].name + '。');
-    startCombat([p.enemy], { type: 'hunt', node: S.loc });
+    startCombat([p.enemy], { type: 'hunt', node: S.loc }, { stun: perk('zong', 50) ? 1 : 0 });
     commit();
   }
   function camp() {
@@ -658,15 +1048,16 @@ window.SHL = (function () {
     if (!S.fire) {
       passTime(1, { fat: 1 });
       if (S.dead) return commit();
-      S.fire = true; log('生起營火。可調和藥水、烤製乾糧，或露宿到天亮。');
+      S.fire = true; gainProf('ying', 4); log('生起營火。可調和藥水、烤製乾糧，或露宿到天亮。');
       return commit();
     }
     // 露宿：睡 8 小時，夜警風險
     const night = isNight(S.t) || isNight(S.t + 8 * 60);
-    const risk = (night ? 0.25 : 0.12) * (D.WILDS[S.loc].risk === '低' ? 0.6 : 1);
-    const rec = 50 * (S.skills.includes('xi') ? 1.25 : 1);
+    const risk = (night ? 0.25 : 0.12) * (D.WILDS[S.loc].risk === '低' ? 0.6 : 1) * (perk('ying', 25) ? 0.6 : 1) * (tideOn() ? 1.5 : 1);
+    const rec = 50 * (S.skills.includes('xi') ? 1.25 : 1) * (perk('ying', 50) ? 1.25 : 1);
     passTime(8, { food: 16, fat: -rec });
     if (S.dead) return commit();
+    gainProf('ying', 8);
     log('露宿 8 小時，疲累 −' + Math.round(rec) + '。');
     if (rnd() < risk) {
       log('夜警！營火外有東西逼近。', 'bad');
@@ -704,22 +1095,36 @@ window.SHL = (function () {
     if (k === 'heavy') range = E.heavy || [E.dmg[0] * 2, E.dmg[1] * 2];
     e.intent = { k, range };
   }
-  function startCombat(ids, ctx) {
+  function startCombat(ids, ctx, opts) {
+    opts = opts || {};
     const enemies = ids.map((id, i) => mkEnemy(id, i));
+    if (opts.hpMult) enemies.forEach((e) => (e.hp = Math.max(1, Math.round(e.hp * opts.hpMult))));
     enemies.forEach(rollIntent);
-    S.combat = { enemies, round: 1, target: 0, ctx, bleed: 0, cd: 0, defend: false, retreatOpen: false, flash: null };
+    S.combat = { enemies, round: 1, target: 0, ctx, bleed: 0, cd: 0, defend: false, retreatOpen: false, flash: null, stun: opts.stun || 0 };
     S.retreatSel = [];
     S.scene = 'combat';
     S.stats.cause = '';
+    const c = S.combat;
+    if (c.stun) log('你搶得先機，對方措手不及。', 'good');
+    // 弓弩 25：開戰前免費射一箭
+    if (weaponType() === 'gong' && perk('gong', 25)) { log('先射！'); dealToEnemy(enemies[0], 1, false, '先射'); }
+    // 遇伏：敵人先動一輪
+    if (opts.ambush) {
+      enemies.forEach((e) => { if (e.hp > 0 && S.hp > 0) enemyAct(e); });
+      if (checkDeath()) return;
+      enemies.forEach((e) => { if (e.hp > 0) rollIntent(e); });
+    }
+    if (enemies.every((e) => e.hp <= 0)) victory();
   }
   function playerSpeed() {
-    let s = 10 * speedMult();
-    if (S.combat && S.combat.ctx.type === 'hunt') s += profLv('lie') - 1;
+    let s = 10 * speedMult() + (attrVal('shen') - 10) * 0.4;
+    if (S.combat && S.combat.ctx.type === 'hunt') s += profLv('zong') * 0.05;
     return Math.round(s * 10) / 10;
   }
   function combatOrder() {
     const c = S.combat; if (!c) return [];
-    const list = [{ who: 'you', spd: playerSpeed() }];
+    const first = c.round === 1 && weaponType() === 'qiang' && perk('qiang', 25); // 長兵 25：先制
+    const list = [{ who: 'you', spd: first ? 999 : playerSpeed() }];
     c.enemies.forEach((e, i) => { if (e.hp > 0) list.push({ who: i, spd: e.spd }); });
     list.sort((a, b) => b.spd - a.spd || (a.who === 'you' ? -1 : 1));
     return list;
@@ -728,7 +1133,7 @@ window.SHL = (function () {
     const after = totalWt() - (dropWt || 0);
     const band = loadBand(after);
     let p = { light: 0.6, normal: 0.4, heavy: 0.18, over: 0.05 }[band.id];
-    p += (profLv('xing') - 1) * 0.03 + (profLv('lie') - 1) * 0.02;
+    p += profLv('jiao') * 0.003 + (attrVal('shen') - 10) * 0.02 + (perk('shan', 25) ? 0.08 : 0);
     if (S.skills.includes('jixing')) p += 0.1;
     if (hasUnique('sure_retreat')) p += 0.25;
     if (dropWt) p += (dropWt / carryCap()) * 0.8;
@@ -745,41 +1150,60 @@ window.SHL = (function () {
   }
   function setTarget(i) { if (S.combat && S.combat.enemies[i] && S.combat.enemies[i].hp > 0) { S.combat.target = i; emit(); } }
 
+  function killEnemy(e) {
+    e.hp = 0; S.stats.kills++;
+    const E = D.ENEMIES[e.id];
+    log(e.name + '倒下了。', 'good');
+    questProgress('kill', e.id);
+    if (E.beast) { questProgress('beast'); if (S.world.tide && tideOn()) S.world.tide.kills++; }
+    if (hasUnique('kill_heal')) S.hp = Math.min(maxHp(), S.hp + 8);
+  }
   function dealToEnemy(e, mult, ignoreGuard, label) {
-    if (rnd() > hitChance()) { log('你的' + label + '落空了。'); return 0; }
+    const wt = weaponType(); const lv = D.ENEMIES[e.id].lv;
+    if (rnd() > hitChance()) { log('你的' + label + '落空了。'); gainProf(wt, 1, lv); return 0; }
     const [a, b] = weaponDmg();
     let d = ri(a, b) * mult;
     if (hasUnique('crit_heavy') && e.intent && e.intent.k === 'heavy' && !e.hitOnce) { d *= 1.8; log('鎮淵古刃：重擊破綻，暴擊！', 'good'); }
     e.hitOnce = true;
-    d -= e.armor / 2;
+    if (!(wt === 'fu' && perk('fu', 25))) d -= e.armor / 2; // 斧錘 25：破甲
     if (e.guard && !ignoreGuard) d *= 0.5;
     d = Math.max(1, Math.round(d));
     e.hp -= d;
     S.combat.flash = { i: e.idx, d };
     log('你以' + label + '擊中' + e.name + '，造成 ' + d + ' 傷害');
-    if (e.hp <= 0) {
-      e.hp = 0; S.stats.kills++; gainProf('zhan', 1);
-      log(e.name + '倒下了。', 'good');
-      bountyProgress('kill', e.id);
-      if (hasUnique('kill_heal')) S.hp = Math.min(maxHp(), S.hp + 8);
-    }
+    gainProf(wt, 3, lv);
+    if (wt === 'dao' && perk('dao', 25) && e.hp > 0 && rnd() < 0.2) { e.bleed = 3; log(e.name + '被劃開一道口子，開始流血。', 'good'); }
+    if (e.hp <= 0) { gainProf(wt, 4, lv); killEnemy(e); }
     return d;
   }
+  function chestAc() { return S.equip.chest ? eqBase(S.equip.chest).ac : null; }
+  function hasShield() { return !!(S.equip.off && eqBase(S.equip.off).shield); }
   function enemyAct(e) {
     const c = S.combat; const it = e.intent; e.guard = 0;
+    const lv = D.ENEMIES[e.id].lv;
     if (!it) return;
     if (it.k === 'guard') { e.guard = 6; log(e.name + '架起防禦 +6'); return; }
     if (it.k === 'charge') { e.charged = true; log(e.name + ' 蓄力：下回合重擊', 'bad'); return; }
-    if (rnd() > 0.88) { log(e.name + '撲空了。'); return; }
+    gainProf('shan', 2, lv);
+    if (rnd() < dodgeChance()) { log('你閃過了' + e.name + '的攻擊。'); return; }
     let d = ri(it.range[0], it.range[1]);
-    const ar = armor();
+    const ar = armor(); const ac = chestAc();
     d = d * (1 - ar / (ar + 30));
-    if (c.defend) d *= 0.4;
+    if (c.defend) {
+      d *= hasShield() ? clamp(0.4 - profLv('dun') * 0.002, 0.2, 0.4) : 0.45;
+      if (hasShield()) {
+        gainProf('dun', 4, lv);
+        if (perk('dun', 25) && e.hp > 0) { const rf = ri(2, 4); e.hp -= rf; log('盾面反震，' + e.name + '受到 ' + rf + ' 傷害'); if (e.hp <= 0) killEnemy(e); }
+      }
+    }
+    if (it.k === 'heavy' && ac === 'heavy' && perk('zhong', 25)) d *= 0.85;
+    if (!S.equip.main && perk('quan', 25)) d *= 0.85;
     d = Math.max(1, Math.round(d));
     S.hp -= d;
+    if (ac === 'light') gainProf('qing', 2, lv); else if (ac === 'heavy') gainProf('zhong', 2, lv);
     log(e.name + (it.k === 'heavy' ? '重擊' : it.k === 'bleed' ? '撕咬' : '攻擊') + '，你受到 ' + d + ' 傷害', it.k === 'heavy' ? 'bad' : '');
     if (it.k === 'bleed' && !c.defend) {
-      const res = affixSum('bleedres');
+      const res = affixSum('bleedres') + (attrVal('xin') - 10) * 3;
       if (rnd() * 100 >= res) { c.bleed = 3; log('你開始流血（3 回合）', 'bad'); }
     }
     if (S.hp <= 0) { S.stats.cause = e.name + (it.k === 'heavy' ? '的重擊' : '的攻擊'); }
@@ -801,7 +1225,7 @@ window.SHL = (function () {
       const dropped = S.retreatSel.length; S.retreatSel = []; c.retreatOpen = false;
       if (rnd() < p) {
         log('棄物撤退成功' + (dropped ? '（丟下 ' + dropped + ' 格，落在地面）' : '') + '。', 'good');
-        gainProf('xing', 1);
+        gainProf('jiao', 4);
         endCombat('retreat');
         return commit();
       }
@@ -824,7 +1248,7 @@ window.SHL = (function () {
         else if (kind === 'wait') { S.fat = clamp(S.fat - 4, 0, 100); log('你調勻呼吸，疲累 −4'); }
       } else {
         const e = c.enemies[o.who];
-        if (e.hp > 0) enemyAct(e);
+        if (e.hp > 0 && !c.stun) enemyAct(e);
       }
     }
     endRound();
@@ -832,6 +1256,8 @@ window.SHL = (function () {
   function endRound() {
     const c = S.combat;
     if (c.bleed > 0 && S.hp > 0) { S.hp -= 2; c.bleed--; log('流血 −2'); if (S.hp <= 0) S.stats.cause = '流血不止'; }
+    c.enemies.forEach((e) => { if (e.hp > 0 && e.bleed > 0) { e.hp -= 2; e.bleed--; if (e.hp <= 0) killEnemy(e); } });
+    if (c.stun > 0) c.stun--;
     if (S.skills.includes('xi') && S.hp > 0) S.hp = Math.min(maxHp(), S.hp + 2);
     if (c.cd > 0) c.cd--;
     if (checkDeath()) return commit();
@@ -849,13 +1275,18 @@ window.SHL = (function () {
     c.enemies.forEach((e) => {
       const E = D.ENEMIES[e.id];
       if (E.beast) {
-        let sk = ri(E.skin[0], E.skin[1]); let mt = ri(E.meat[0], E.meat[1]);
-        if (sk && profLv('lie') >= 3) sk += 1;
+        let sk = ri(E.skin[0], E.skin[1]); const mt = ri(E.meat[0], E.meat[1]);
+        if (sk && perk('bo', 25) && rnd() < 0.5) sk += 1;
         if (sk && rnd() < affixSum('skin') / 100) sk += 1;
+        // 剝皮 50：有機會剝出完整獸皮（異獸必出）
+        let fine = 0;
+        if (sk && perk('bo', 50) && (E.rare || rnd() < 0.5)) { fine = E.rare ? sk : 1; sk -= fine; }
         if (sk) gains.push({ k: 'hide', n: sk });
+        if (fine) gains.push({ k: 'hide_fine', n: fine });
         if (mt) gains.push({ k: 'meat', n: mt });
         if (E.extra) gains.push({ k: E.extra, n: 1 });
-        if (sk || mt) gainProf('lie', 2);
+        if (perk('bo', 75) && (E.rare || rnd() < 0.15)) gains.push({ k: 'beast_core', n: 1 });
+        if (sk || fine || mt) gainProf('bo', 6, E.lv);
       }
       if (E.silver) silver += ri(E.silver[0], E.silver[1]);
     });
@@ -869,27 +1300,33 @@ window.SHL = (function () {
         gains.push(lootEq(rollRarity(DG.boss.loot)));
         if (DG.boss.extra) gains.push({ k: DG.boss.extra[0], n: DG.boss.extra[1] });
         S.dungeon.floor = 0; S.dungeon.clearedDay = dayOf(S.t);
-        bountyProgress('clear', ctx.node);
+        questProgress('clear', ctx.node);
       } else {
         silver += ri(DG.silver[0], DG.silver[1]);
         if (rnd() < 0.6) gains.push(lootEq(rollRarity(DG.loot)));
         S.dungeon.floor = ctx.floor + 1;
       }
     }
+    let title = ctx.type === 'hunt' || c.enemies.some((e) => D.ENEMIES[e.id].beast) ? '狩獵剝皮' : '戰果';
+    if (ctx.type === 'rumor') {
+      const r = S.rumors.find((x) => x.id === ctx.rid);
+      if (r) { const rw = rumorReward(r, ctx.tier || 1); rw.gains.forEach((g) => gains.push(g)); silver += rw.silver; S.stats.rumors++; S.rumors = S.rumors.filter((x) => x.id !== r.id); title = '傳聞到手'; }
+    }
     S.silver += silver; S.stats.maxSilver = Math.max(S.stats.maxSilver, S.silver);
     const names = [];
     let grounded = 0;
     gains.forEach((g) => { names.push(itemName(g) + (g.k === 'eq' ? '' : ' ×' + g.n)); const before = S.ground.items.length; addItem(g); if (S.ground.items.length > before) grounded++; });
-    S.loot = { title: ctx.type === 'hunt' || c.enemies.some((e) => D.ENEMIES[e.id].beast) ? '狩獵剝皮' : '戰果', items: names, silver, grounded, ctx };
+    S.loot = { title, items: names, silver, grounded, ctx };
     log('戰鬥勝利' + (silver ? '，得銀 ' + silver + ' 兩' : '') + (names.length ? '；' + names.join('、') : ''), 'good');
     S.combat = null; S.retreatSel = [];
     S.scene = 'loot';
   }
+  // 掉寶：良品以上未鑑定
   function lootEq(rarity) {
     const pool = Object.keys(D.BASES).filter((k) => D.BASES[k].slot !== 'bag' && k !== 'blade_rust' && k !== 'robe');
     let base = pick(pool);
     if (rarity === 'legend') base = pick(['blade_short', 'saber', 'leather', 'mail', 'amulet']);
-    return newEq(base, rarity);
+    return newEq(base, rarity, true);
   }
   function endCombat(how) {
     const ctx = S.combat.ctx;
@@ -905,29 +1342,36 @@ window.SHL = (function () {
 
   // ================= 旅途事件 =================
   function startEvent(dest) {
-    const ev = pick(D.EVENTS);
+    const ev = tideOn() && rnd() < 0.6 ? D.EVENTS.find((e) => e.id === 'tracks') : pick(D.EVENTS);
     S.event = { id: ev.id, dest, result: null };
     S.scene = 'event';
   }
   function eventChoose(k) {
     const ev = S.event; if (!ev || ev.result) return;
-    const cai = profLv('cai');
+    if (ev.id === 'rumor') return rumorChoose(k);
+    const payFee = perk('shuo', 25) ? 8 : 15;
     const res = (t, cls) => { ev.result = t; log(t, cls); };
     switch (k) {
       case 'pick':
-        if (rnd() < 0.45 + cai * 0.1) { addItem({ k: 'herb_zx', n: 2 }); addItem({ k: 'leaf_qx', n: 1 }); gainProf('cai', 1); res('採得止血草 ×2、清心葉 ×1（採集 +1）', 'good'); }
+        if (rnd() < 0.45 + profLv('cai') * 0.01) { addItem({ k: 'herb_zx', n: 2 }); addItem({ k: 'leaf_qx', n: 1 }); gainProf('cai', 8, 15); res('採得止血草 ×2、清心葉 ×1', 'good'); }
         else { S.hp -= 6; res('腳下一滑，生命 −6', 'bad'); checkDeath('墜崖'); }
         break;
       case 'dig':
-        if (rnd() < 0.4 + cai * 0.1) { const g = rnd() < 0.3 ? 'ore_xs' : 'ore_cu'; addItem({ k: g, n: 1 }); gainProf('cai', 1); res('搜刮到' + D.ITEMS[g].name + ' ×1', 'good'); }
+        if (rnd() < 0.4 + profLv('kuang') * 0.01) { const g = rnd() < 0.3 ? 'ore_xs' : 'ore_cu'; addItem({ k: g, n: 1 }); gainProf('kuang', 8, 20); res('搜刮到' + D.ITEMS[g].name + ' ×1', 'good'); }
         else { S.hp -= 8; res('礦口再度崩塌，生命 −8', 'bad'); checkDeath('礦坑崩塌'); }
         break;
       case 'pay':
-        if (S.silver < 15) { res('銀兩不夠，劫匪拔刀了！', 'bad'); startCombat(['bandit'], { type: 'event', node: ev.dest, then: ev.dest }); S.event = null; return commit(); }
-        S.silver -= 15; res('交出 15 兩，劫匪放行。');
+        if (S.silver < payFee) { res('銀兩不夠，劫匪拔刀了！', 'bad'); startCombat(['bandit'], { type: 'event', node: ev.dest, then: ev.dest }); S.event = null; return commit(); }
+        S.silver -= payFee; res('交出 ' + payFee + ' 兩，劫匪放行。');
         break;
+      case 'talk': {
+        const p = clamp(0.3 + profLv('shuo') * 0.008 + (attrVal('kou') - 10) * 0.05, 0.05, 0.95);
+        gainProf('shuo', 8, 15);
+        if (rnd() < p) { res('你幾句話說得劫匪心裡發毛，他啐了一口，讓開了路。', 'good'); break; }
+        S.event = null; log('話不投機，劫匪拔刀了。', 'bad'); startCombat(['bandit'], { type: 'event', node: ev.dest, then: ev.dest }); return commit();
+      }
       case 'fight': S.event = null; startCombat(['bandit'], { type: 'event', node: ev.dest, then: ev.dest }); return commit();
-      case 'hunt': S.event = null; gainProf('lie', 1); startCombat([rnd() < 0.5 ? 'boar' : 'wolf'], { type: 'event', node: ev.dest, then: ev.dest }); return commit();
+      case 'hunt': S.event = null; gainProf('zong', 5, 10); startCombat([rnd() < 0.5 ? 'boar' : 'wolf'], { type: 'event', node: ev.dest, then: ev.dest }); return commit();
       case 'drop': {
         let bi = -1, bw = -1; S.pack.forEach((it, i) => { if (it && itemWt(it) > bw) { bw = itemWt(it); bi = i; } });
         if (bi >= 0) { const nm = itemName(S.pack[bi]); S.pack[bi] = null; res('丟下' + nm + '，趁亂逃脫。'); } else res('身無長物，劫匪啐了一口放你走。');
@@ -935,9 +1379,9 @@ window.SHL = (function () {
       }
       case 'detour': passTime(1); res('繞路多走了 1 小時。'); break;
       case 'study':
-        passTime(1); gainProf('xing', 3);
-        if (profLv('xing') >= 2 && !S.skills.includes('jixing')) { S.skills.push('jixing'); res('參悟口訣，習得「疾行」（行腳 +3）', 'good'); }
-        else res('參悟口訣，行腳 +3');
+        passTime(1); gainProf('jiao', 12);
+        if (!S.skills.includes('jixing')) { S.skills.push('jixing'); res('參悟口訣，習得「疾行」，腳力有所長進。', 'good'); }
+        else res('參悟口訣，腳力有所長進。');
         break;
       default: res('你離開了。');
     }
@@ -947,6 +1391,7 @@ window.SHL = (function () {
 
   // ================= 介面雜項 =================
   function setOverlay(o) { S.overlay = S.overlay === o ? null : o; emit(); }
+  function setProfTab(t) { S.profTab = t; emit(); }
   function sysCamp() {
     if (S.scene === 'wild') return camp();
     log('紮營只能在荒野採集區。', 'bad'); emit();
@@ -956,25 +1401,28 @@ window.SHL = (function () {
   function commit() { save(); emit(); }
   function emit() { listeners.forEach((f) => f(S)); }
   function on(f) { listeners.push(f); }
-  function restart(seed) { wipeSave(); newGame(seed === undefined ? (Date.now() & 0xffffffff) : seed); }
+  function restart(seed, origin) { wipeSave(); newGame(seed === undefined ? (Date.now() & 0xffffffff) : seed, origin); }
   function init(opts) {
     opts = opts || {};
-    if (opts.fresh || !load()) newGame(opts.seed !== undefined ? opts.seed : (Date.now() & 0xffffffff));
+    if (opts.fresh || !load()) newGame(opts.seed !== undefined ? opts.seed : (Date.now() & 0xffffffff), opts.origin);
     else emit();
   }
 
   return {
     get state() { return S; },
     init, on, restart, save, wipeSave, readRaw, SAVE_KEY,
-    fmtTime, fmtClock, dayOf, isNight,
-    maxHp, carryCap, totalWt, loadBand, speedMult, armor, weaponDmg, hitChance, profLv, profProgress, bagCap,
-    eqBase, eqValue, itemWt, itemName, itemGlyph, countItem, affixSum,
-    clickPack, unequip, useItem, pickupGround,
+    fmtTime, fmtClock, fmtDate, dayOf, isNight, seasonOf, ageOf,
+    maxHp, carryCap, totalWt, loadBand, speedMult, armor, weaponDmg, weaponType, hitChance, dodgeChance, bagCap,
+    attrVal, attrProgress, profLv, profProgress, perk,
+    eqBase, eqValue, itemWt, itemName, itemGlyph, itemIcon, countItem, affixSum, reqUnmet, slotFits,
+    clickPack, unequip, useItem, pickupGround, drag, identify, identifyFee, chooseOrigin,
     selectDest, travel, travelPreview, toMap, enterHere, route,
-    setTab, selectShop, setQty, buy, sell, sellPrice, townPrice, avgPrice, innRest, innSoup, claimBounty, trackedBounty,
-    craft, canCraftHere, gather, camp, nodeState, dungeonDelve,
+    setTab, selectShop, setQty, buy, sell, sellPrice, buyPrice, townPrice, avgPrice, innRest, innSoup, innCost, townHurt,
+    questAct, questsHere, questReady, questReward, trackedQuest, activeQuests,
+    hearRumor, rumorsHere, traceRumor, investigate, tideInfo,
+    craft, canCraftHere, gather, gatherFat, camp, nodeState, dungeonDelve,
     combatAction, combatOrder, toggleRetreat, toggleDrop, retreatChance, selWt, setTarget, playerSpeed, lootDone,
-    eventChoose, eventDone, setOverlay, sysCamp,
-    _debug: { passTime, addItem, die, startCombat, newEq },
+    eventChoose, eventDone, setOverlay, setProfTab, sysCamp,
+    _debug: { passTime, addItem, die, startCombat, newEq, gainProf, addRumor, worldTick, lootEq },
   };
 })();
