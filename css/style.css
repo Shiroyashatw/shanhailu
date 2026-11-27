@@ -1,0 +1,292 @@
+/* 《山海錄》灰盒 v0.1 — UIUX v2 緊湊三欄（1280×720，左 240／中 796／右 220）
+ * 白底灰框黑字；紅色只用於敵方重擊意圖、低血臨界、棄物撤退、價差↑。 */
+:root {
+  --bg: #ffffff;
+  --page: #e9e9e9;
+  --line: #9a9a9a;
+  --line-soft: #c9c9c9;
+  --ink: #111111;
+  --ink-2: #555555;
+  --ink-3: #8a8a8a;
+  --fill: #f2f2f2;
+  --fill-2: #e2e2e2;
+  --dark: #222222;
+  --red: #c62828;
+  --hatch: repeating-linear-gradient(135deg, #efefef 0 4px, #e0e0e0 4px 6px);
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; padding: 0; width: 1280px; height: 720px; overflow: hidden; background: var(--page); }
+body { font-family: "Noto Sans TC", "PingFang TC", "Microsoft JhengHei", "WenQuanYi Zen Hei", sans-serif; font-size: 12px; color: var(--ink); line-height: 1.35; }
+button { font: inherit; color: inherit; cursor: pointer; }
+#app { position: relative; width: 1280px; height: 720px; background: var(--page); overflow: hidden; }
+.col { position: absolute; top: 6px; height: 708px; background: var(--bg); border: 1px solid var(--line); overflow: hidden; }
+#col-left { left: 6px; width: 240px; }
+#col-center { left: 252px; width: 796px; }
+#col-right { left: 1054px; width: 220px; }
+.abs { position: absolute; }
+.hatch { background: var(--hatch); }
+.lbl { font-size: 11px; color: var(--ink-2); white-space: nowrap; }
+.sub { font-size: 11px; color: var(--ink-3); white-space: nowrap; }
+.red { color: var(--red); }
+
+/* ---------- 共用：ICON 格 ---------- */
+.cell { position: absolute; border: 1px solid var(--line); background: #fff; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 15px; user-select: none; }
+.cell.empty { border-style: dashed; border-color: var(--line-soft); color: #c4c4c4; font-weight: 400; }
+.cell.locked { border-style: dashed; border-color: var(--line-soft); background: var(--hatch); }
+.cell .n { position: absolute; right: 2px; bottom: 0; font-size: 10px; font-weight: 400; line-height: 12px; }
+.cell .tl { position: absolute; left: 2px; top: 1px; font-size: 9px; font-weight: 400; line-height: 10px; color: var(--ink-2); }
+.cell .rm { position: absolute; left: 2px; top: 2px; width: 6px; height: 6px; }
+.rm.blue { border: 1px solid #777; background: #bbb; }
+.rm.rare { border: 1px solid #000; background: #fff; box-shadow: inset 0 0 0 1px #000; }
+.rm.legend { background: #000; }
+.cell.r-blue { border-color: #000; }
+.cell.r-rare { border: 2px solid #000; }
+.cell.r-legend { border: 3px double #000; }
+.cell.click:hover { background: var(--fill); }
+.cell.sel { outline: 2px solid var(--ink); outline-offset: -3px; }
+.cell.drop { background: #fde8e8; border-color: var(--red); }
+
+/* ---------- 左欄 ---------- */
+.doll { position: absolute; left: 0; top: 0; width: 240px; height: 198px; }
+.slot-cart { cursor: not-allowed; color: #aaa; }
+.lhead { position: absolute; left: 8px; width: 224px; height: 16px; display: flex; justify-content: space-between; align-items: center; }
+.packgrid { position: absolute; left: 10px; top: 218px; width: 220px; height: 216px; }
+.groundgrid { position: absolute; left: 10px; top: 456px; width: 220px; height: 84px; }
+.minimap { position: absolute; left: 6px; top: 548px; width: 228px; height: 124px; border: 1px solid var(--line-soft); }
+.loadbar { position: absolute; left: 6px; top: 678px; width: 228px; height: 24px; border: 1px solid var(--line-soft); display: flex; align-items: center; gap: 6px; padding: 0 6px; }
+.loadbar .ic { font-weight: 700; }
+.thinbar { position: relative; height: 8px; border: 1px solid var(--ink); background: #fff; }
+.thinbar > i { position: absolute; left: 0; top: 0; bottom: 0; background: var(--dark); }
+.thinbar > b { position: absolute; top: -3px; bottom: -3px; width: 1px; background: var(--ink); }
+.thinbar.warn > i { background: var(--red); }
+
+/* 提示卡：只出現在左欄（x 10–242），永遠不跨進中欄 */
+#tip { position: absolute; left: 3px; width: 232px; z-index: 50; background: #fff; border: 1px solid #888; padding: 8px 10px; box-shadow: 0 2px 6px rgba(0,0,0,.18); pointer-events: none; }
+#tip.r-blue { border: 1px solid #000; }
+#tip.r-rare { border: 2px solid #000; }
+#tip.r-legend { border: 3px double #000; }
+.tip-h { display: flex; justify-content: space-between; align-items: center; gap: 6px; }
+.tip-name { font-size: 14px; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.tag { border: 1px solid var(--ink); font-size: 10px; padding: 0 4px; white-space: nowrap; }
+.tip-base { font-size: 15px; font-weight: 700; margin: 4px 0; }
+.tip-aff { margin: 2px 0; font-size: 12px; }
+.tip-aff::before { content: "■ "; font-size: 9px; }
+.tip-uni { border-top: 1px dashed #888; margin-top: 4px; padding-top: 4px; font-weight: 700; }
+.tip-foot { display: flex; justify-content: space-between; margin-top: 6px; color: var(--ink-2); font-size: 11px; }
+.tip-cmp { font-weight: 700; font-size: 11px; margin-top: 2px; }
+
+/* ---------- 右欄 ---------- */
+.portrait { position: absolute; left: 8px; top: 8px; width: 60px; height: 60px; border: 1px solid var(--line); background: var(--hatch); display: flex; align-items: center; justify-content: center; color: var(--ink-3); }
+.pname { position: absolute; left: 76px; top: 6px; font-size: 15px; font-weight: 700; }
+.pill { position: absolute; height: 20px; border: 1px solid var(--ink); font-size: 11px; display: flex; align-items: center; justify-content: center; white-space: nowrap; background: #fff; }
+.silver { position: absolute; left: 76px; top: 52px; height: 18px; display: flex; align-items: center; gap: 4px; font-weight: 700; font-size: 13px; }
+.silver .ic, .vit .ic, .prof .ic { border: 1px solid var(--ink); width: 16px; height: 16px; font-size: 10px; display: inline-flex; align-items: center; justify-content: center; font-weight: 700; }
+.vit { position: absolute; left: 8px; width: 204px; height: 16px; display: flex; align-items: center; gap: 6px; }
+.vit .bar { position: relative; width: 120px; height: 6px; border: 1px solid var(--ink); }
+.vit .bar > i { position: absolute; left: 0; top: 0; bottom: 0; background: var(--dark); }
+.vit .bar > b { position: absolute; top: -3px; bottom: -3px; width: 1px; background: var(--ink); }
+.vit.crit .ic { background: var(--red); color: #fff; border-color: var(--red); }
+.vit.crit .bar > i { background: var(--red); }
+.vit .num { width: 52px; text-align: right; font-size: 11px; }
+.vit.crit .num { color: var(--red); }
+.status { position: absolute; top: 140px; width: 22px; height: 22px; border: 1px dashed var(--line-soft); font-size: 11px; display: flex; align-items: center; justify-content: center; }
+.status.on { border: 1px solid var(--ink); font-weight: 700; }
+.status.on.bad { border-color: var(--red); color: var(--red); }
+.sep { position: absolute; left: 8px; width: 204px; height: 1px; background: var(--line-soft); }
+.prof { position: absolute; left: 8px; width: 204px; height: 20px; display: flex; align-items: center; gap: 6px; }
+.prof .nm { width: 26px; font-size: 11px; }
+.prof .lv { width: 14px; font-weight: 700; text-align: center; }
+.prof .pb { position: relative; flex: 1; height: 4px; border: 1px solid var(--line); }
+.prof .pb > i { position: absolute; left: 0; top: 0; bottom: 0; background: var(--dark); }
+.skillgrid { position: absolute; left: 8px; top: 308px; width: 204px; height: 150px; }
+.skillgrid .cell { width: 46px; height: 46px; font-size: 16px; }
+.bounty { position: absolute; left: 8px; top: 484px; width: 204px; height: 34px; border: 1px solid var(--line); display: flex; align-items: center; gap: 6px; padding: 0 6px; }
+.bounty .ic { width: 22px; height: 22px; border: 1px solid var(--ink); display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 11px; }
+.bounty .tt { flex: 1; white-space: nowrap; overflow: hidden; }
+.sysbtns { position: absolute; left: 8px; top: 660px; width: 204px; height: 40px; display: flex; gap: 2px; }
+.sysbtns button { width: 49.5px; height: 40px; border: 1px solid var(--line); background: #fff; font-size: 12px; }
+.sysbtns button:hover { background: var(--fill); }
+
+/* ---------- 中欄共用 ---------- */
+.btn { border: 1px solid var(--ink); background: #fff; height: 28px; padding: 0 10px; white-space: nowrap; }
+.btn:hover { background: var(--fill); }
+.btn.dark { background: var(--dark); color: #fff; }
+.btn.dark:hover { background: #000; }
+.btn.redb { border: 2px solid var(--red); color: var(--red); font-weight: 700; }
+.btn[disabled], .btn.dis { border-style: dashed; border-color: var(--line-soft); color: #aaa; background: #fff; cursor: not-allowed; }
+.logbox { position: absolute; left: 6px; width: 782px; border: 1px solid var(--line-soft); padding: 4px 8px; overflow: hidden; font-size: 12px; color: var(--ink-2); }
+.logbox div { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; height: 17px; }
+.logbox .good { color: var(--ink); font-weight: 700; }
+.logbox .bad { color: var(--red); }
+.tag-tr { position: absolute; right: 6px; bottom: 4px; border: 1px solid var(--ink); font-size: 10px; padding: 0 4px; background: #fff; font-weight: 700; }
+.stagehead { position: absolute; left: 6px; top: 6px; display: flex; gap: 6px; z-index: 2; }
+.stagehead .pill { position: static; padding: 0 10px; height: 24px; font-size: 12px; font-weight: 700; }
+
+/* ---------- 世界地圖 ---------- */
+.map { position: absolute; left: 0; top: 0; width: 796px; height: 560px; border-bottom: 1px solid var(--line-soft); overflow: hidden; background: #fbfbfb; }
+.map svg { position: absolute; left: 0; top: 0; }
+.mnode { position: absolute; width: 34px; height: 34px; border: 1px solid var(--ink); background: #fff; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 15px; cursor: pointer; z-index: 3; }
+.mnode:hover { background: var(--fill); }
+.mnode.cur { border: 3px solid var(--ink); }
+.mnode.dest { background: var(--dark); color: #fff; }
+.mlabel { position: absolute; height: 18px; border: 1px solid var(--ink); background: #fff; font-size: 11px; padding: 0 6px; display: flex; align-items: center; white-space: nowrap; z-index: 3; }
+.mway { position: absolute; width: 14px; height: 14px; border: 1px solid var(--ink); border-radius: 50%; background: #fff; z-index: 3; }
+.here { position: absolute; height: 18px; background: var(--dark); color: #fff; font-size: 11px; padding: 0 8px; display: flex; align-items: center; z-index: 4; white-space: nowrap; }
+.tipbubble { position: absolute; height: 24px; border: 1px solid var(--ink); background: #fff; font-size: 11px; padding: 0 8px; display: flex; align-items: center; z-index: 5; white-space: nowrap; }
+.region { position: absolute; font-size: 26px; font-weight: 700; color: #d6d6d6; letter-spacing: 4px; z-index: 1; white-space: nowrap; }
+.legend { position: absolute; left: 8px; top: 8px; height: 22px; border: 1px solid var(--ink); background: #fff; display: flex; align-items: center; gap: 10px; padding: 0 8px; font-size: 11px; z-index: 5; }
+.departbar { position: absolute; left: 6px; top: 566px; width: 782px; height: 56px; border: 1px solid var(--line); display: flex; align-items: center; gap: 8px; padding: 0 8px; }
+.departbar .dic { width: 40px; height: 40px; border: 1px solid var(--ink); display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 16px; }
+.departbar .dname { width: 120px; }
+.departbar .dname b { display: block; font-size: 14px; }
+.vpill { width: 84px; height: 28px; border: 1px solid var(--ink); display: flex; align-items: center; gap: 4px; padding: 0 4px; font-size: 12px; white-space: nowrap; }
+.vpill .ic { border: 1px solid var(--ink); width: 16px; height: 16px; font-size: 10px; display: inline-flex; align-items: center; justify-content: center; font-weight: 700; }
+.departbar .go { margin-left: auto; width: 104px; height: 36px; font-size: 14px; font-weight: 700; }
+
+/* ---------- 城鎮 ---------- */
+.townscene { position: absolute; left: 0; top: 0; width: 796px; height: 330px; background: var(--hatch); border-bottom: 1px solid var(--line-soft); }
+.tabs { position: absolute; left: 6px; top: 6px; display: flex; gap: 6px; z-index: 2; }
+.tabs button { width: 64px; height: 26px; border: 1px solid var(--ink); background: #fff; }
+.tabs button.on { border-width: 2px; font-weight: 700; background: var(--fill-2); }
+.townname { position: absolute; right: 6px; top: 6px; width: 100px; height: 26px; border: 1px solid var(--ink); background: #fff; font-weight: 700; display: flex; align-items: center; justify-content: center; }
+.leave { position: absolute; right: 6px; bottom: 6px; width: 82px; height: 26px; font-weight: 700; }
+.bld { position: absolute; height: 22px; border: 1px solid var(--ink); background: #fff; padding: 0 10px; font-size: 12px; display: flex; align-items: center; cursor: pointer; white-space: nowrap; }
+.bld:hover { background: var(--fill); }
+.bld::after { content: ""; position: absolute; left: 50%; top: 28px; width: 8px; height: 8px; margin-left: -4px; border-radius: 50%; background: var(--ink); }
+.tpanel { position: absolute; left: 6px; top: 336px; width: 784px; height: 300px; }
+.shelf { position: absolute; left: 0; top: 0; width: 470px; height: 300px; }
+.tpanel .cell { width: 48px; height: 48px; cursor: pointer; }
+.tpanel .cell .pr { position: absolute; right: 2px; bottom: 0; font-size: 10px; font-weight: 400; }
+.tpanel .cell .ar { position: absolute; right: 2px; top: 0; font-size: 10px; font-weight: 700; }
+.tpanel .cell .ar.up { color: var(--red); }
+.trade { position: absolute; left: 490px; top: 6px; width: 294px; height: 234px; border: 1px solid var(--line); padding: 8px; }
+.trade .tic { position: absolute; left: 8px; top: 8px; width: 44px; height: 44px; }
+.trade .tnm { position: absolute; left: 60px; top: 8px; right: 8px; font-size: 14px; font-weight: 700; white-space: nowrap; overflow: hidden; }
+.trade .tds { position: absolute; left: 60px; top: 30px; right: 8px; font-size: 11px; color: var(--ink-2); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.trade .tdet { position: absolute; left: 8px; top: 58px; right: 8px; height: 66px; font-size: 11px; overflow: hidden; }
+.trade .tdet div { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.trade .qty { position: absolute; left: 8px; top: 130px; display: flex; gap: 4px; align-items: center; }
+.trade .qty button { width: 28px; height: 26px; border: 1px solid var(--ink); background: #fff; }
+.trade .qty span { width: 42px; height: 26px; border: 1px solid var(--ink); display: flex; align-items: center; justify-content: center; }
+.trade .tprice { position: absolute; right: 8px; top: 128px; font-size: 18px; font-weight: 700; }
+.trade .tafter { position: absolute; right: 8px; top: 158px; font-size: 11px; }
+.trade .tbtns { position: absolute; left: 8px; right: 8px; top: 184px; display: flex; gap: 8px; }
+.trade .tbtns .btn { flex: 1; height: 36px; font-weight: 700; }
+.tnote { position: absolute; left: 490px; top: 246px; width: 294px; font-size: 11px; color: var(--ink-3); white-space: nowrap; overflow: hidden; }
+.ttl { position: absolute; font-size: 11px; font-weight: 700; white-space: nowrap; }
+.card { position: absolute; border: 1px solid var(--line); background: #fff; }
+.irow { position: absolute; display: flex; gap: 8px; }
+.ibox { width: 180px; height: 56px; border: 1px solid var(--line); display: flex; align-items: center; gap: 8px; padding: 0 8px; background: #fff; cursor: pointer; }
+.ibox:hover { background: var(--fill); }
+.ibox .ic { width: 36px; height: 36px; border: 1px solid var(--ink); display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 15px; }
+.ibox b { display: block; }
+.ibox.dis { border-style: dashed; color: #999; cursor: default; }
+.bcard { position: absolute; width: 250px; height: 64px; border: 1px solid var(--line); background: #fff; display: flex; align-items: center; gap: 8px; padding: 0 8px; }
+.bcard .ic { width: 36px; height: 36px; border: 1px solid var(--ink); display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 15px; }
+.bcard .bt { flex: 1; overflow: hidden; }
+.bcard .bt b, .bcard .bt span { display: block; white-space: nowrap; }
+.bcard .btn { height: 28px; padding: 0 8px; }
+
+/* ---------- 荒野 ---------- */
+.wildscene { position: absolute; left: 0; top: 0; width: 796px; height: 404px; background: var(--hatch); border-bottom: 1px solid var(--line-soft); }
+.gpt { position: absolute; width: 44px; height: 44px; border: 1px dashed var(--ink); border-radius: 50%; cursor: pointer; z-index: 2; background: rgba(255,255,255,.4); }
+.gpt:hover { background: #fff; }
+.gpt.done { border-color: #bbb; cursor: default; }
+.gpt.fire { border-style: solid; }
+.gpt.fire.lit { background: var(--dark); }
+.gptl { position: absolute; height: 20px; border: 1px solid var(--ink); background: #fff; font-size: 11px; padding: 0 6px; display: flex; align-items: center; white-space: nowrap; z-index: 2; }
+.gptl.done { border-color: #bbb; color: #999; }
+.gbtns { position: absolute; left: 6px; top: 410px; width: 784px; height: 52px; display: flex; gap: 6px; }
+.gbtn { width: 191.5px; height: 52px; border: 1px solid var(--ink); background: #fff; display: flex; align-items: center; gap: 8px; padding: 0 8px; text-align: left; }
+.gbtn:hover { background: var(--fill); }
+.gbtn .ic { width: 34px; height: 34px; border: 1px solid var(--ink); display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 15px; flex: none; }
+.gbtn b { display: block; font-size: 13px; }
+.gbtn span { display: block; font-size: 11px; color: var(--ink-2); white-space: nowrap; }
+.gbtn.hot { border-width: 2px; background: var(--fill-2); }
+.recipes { position: absolute; left: 6px; top: 468px; width: 784px; height: 168px; border: 1px solid var(--line); }
+.rcard { position: absolute; top: 24px; width: 250px; height: 136px; border: 1px solid var(--ink); background: #fff; }
+.rcard.dim { border-style: dashed; border-color: var(--line); }
+.rcard .ric { position: absolute; left: 8px; top: 8px; width: 40px; height: 40px; border: 1px solid var(--ink); display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 16px; }
+.rcard .rnm { position: absolute; left: 56px; top: 8px; font-weight: 700; font-size: 13px; }
+.rcard .ref { position: absolute; left: 56px; top: 28px; font-size: 11px; color: var(--ink-2); }
+.rcard .rmat { position: absolute; left: 8px; top: 62px; width: 36px; height: 36px; }
+.rcard .rarr { position: absolute; left: 52px; top: 70px; font-weight: 700; }
+.rcard .rout { position: absolute; left: 72px; top: 62px; width: 36px; height: 36px; border-style: dashed; }
+.rcard .rmk { position: absolute; right: 8px; top: 62px; width: 64px; height: 36px; font-weight: 700; }
+.rcard .rwh { position: absolute; left: 8px; top: 110px; font-size: 11px; color: var(--ink-2); }
+
+/* ---------- 地城 ---------- */
+.dgscene { position: absolute; left: 0; top: 0; width: 796px; height: 470px; background: var(--hatch); border-bottom: 1px solid var(--line-soft); }
+.floors { position: absolute; left: 140px; top: 120px; width: 516px; display: flex; gap: 18px; }
+.floor { width: 160px; height: 170px; border: 1px solid var(--ink); background: #fff; padding: 10px; position: relative; }
+.floor.cur { border-width: 3px; }
+.floor.done { color: #999; border-style: dashed; }
+.floor b { font-size: 15px; display: block; margin-bottom: 6px; }
+.floor .fe { font-size: 12px; white-space: nowrap; }
+.dgact { position: absolute; left: 6px; top: 476px; width: 784px; height: 60px; display: flex; gap: 8px; align-items: center; }
+.dgact .btn { height: 44px; font-size: 14px; font-weight: 700; padding: 0 18px; }
+
+/* ---------- 戰鬥（第一人稱：只畫敵人） ---------- */
+.cstage { position: absolute; left: 0; top: 0; width: 796px; height: 500px; background: var(--hatch); border-bottom: 1px solid var(--line-soft); }
+.chead { position: absolute; left: 6px; top: 6px; right: 6px; height: 24px; z-index: 3; }
+.chead .pill { height: 24px; padding: 0 10px; font-weight: 700; }
+.order { position: absolute; left: 300px; top: 0; height: 24px; display: flex; align-items: center; gap: 4px; }
+.order .o { width: 24px; height: 24px; border: 1px solid var(--ink); background: #fff; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 700; }
+.order .o.you { background: var(--dark); color: #fff; }
+.enemy { position: absolute; top: 76px; width: 200px; height: 400px; cursor: pointer; }
+.enemy .ename { position: absolute; left: 0; width: 200px; top: 0; text-align: center; font-weight: 700; font-size: 15px; }
+.enemy .ehp { position: absolute; left: 30px; top: 22px; width: 140px; height: 6px; border: 1px solid var(--ink); background: #fff; }
+.enemy .ehp > i { position: absolute; left: 0; top: 0; bottom: 0; background: var(--dark); }
+.enemy .ehpn { position: absolute; left: 0; width: 200px; top: 30px; text-align: center; font-size: 11px; }
+.enemy .intent { position: absolute; left: 30px; top: 48px; width: 140px; height: 24px; border: 1px solid var(--ink); background: #fff; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 700; white-space: nowrap; }
+.enemy .intent.heavy { border: 2px solid var(--red); color: var(--red); }
+.enemy .intent.guard { border-color: #888; color: #555; }
+.enemy .body { position: absolute; left: 10px; top: 86px; width: 180px; height: 280px; border: 2px dashed #777; border-radius: 90px 90px 6px 6px; background: rgba(255,255,255,.55); display: flex; align-items: center; justify-content: center; font-size: 44px; font-weight: 700; color: #666; }
+.enemy.tgt .body { border: 3px solid var(--ink); }
+.enemy.dead { opacity: .3; cursor: default; }
+.enemy .dmgf { position: absolute; right: -36px; top: 140px; font-size: 18px; font-weight: 700; }
+.rbar { position: absolute; left: 6px; top: 506px; width: 784px; height: 40px; border: 2px solid var(--red); display: flex; align-items: center; gap: 6px; padding: 0 6px; background: #fff; }
+.rbar .rt { color: var(--red); font-weight: 700; white-space: nowrap; }
+.rbar .ritems { display: flex; gap: 3px; width: 330px; overflow: hidden; }
+.rbar .ritems .cell { position: relative; width: 30px; height: 30px; font-size: 12px; flex: none; cursor: pointer; }
+.rbar .rp { width: 180px; white-space: nowrap; }
+.rbar .rp b { font-size: 13px; }
+.rbar .rp span { display: block; font-size: 10px; color: var(--ink-2); }
+.rbar .btn { height: 28px; }
+.abar { position: absolute; left: 6px; top: 552px; width: 784px; height: 52px; display: flex; gap: 6px; }
+.act { position: relative; width: 72px; height: 52px; border: 1px solid var(--ink); background: #fff; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+.act:hover { background: var(--fill); }
+.act b { font-size: 16px; line-height: 18px; }
+.act span { font-size: 10px; }
+.act .k { position: absolute; left: 3px; top: 1px; font-size: 9px; color: var(--ink-3); }
+.act .c { position: absolute; right: 3px; top: 1px; font-size: 10px; font-weight: 700; }
+.act[disabled] { border-style: dashed; border-color: var(--line-soft); color: #aaa; cursor: not-allowed; }
+.act.retreat { margin-left: auto; width: 120px; border: 2px solid var(--red); color: var(--red); }
+
+/* ---------- 戰果／事件／墓誌銘／覆蓋層 ---------- */
+.panel { position: absolute; border: 1px solid var(--ink); background: #fff; padding: 16px 20px; }
+.panel h2 { margin: 0 0 8px; font-size: 18px; }
+.panel .pl { margin: 4px 0; font-size: 13px; }
+.evopt { display: flex; align-items: center; gap: 10px; width: 100%; height: 44px; border: 1px solid var(--ink); background: #fff; margin-top: 8px; padding: 0 12px; text-align: left; font-size: 14px; font-weight: 700; }
+.evopt:hover { background: var(--fill); }
+.evopt span { margin-left: auto; font-size: 11px; font-weight: 400; color: var(--ink-2); }
+.epitaph { position: absolute; left: 148px; top: 60px; width: 500px; height: 540px; border: 3px double var(--ink); background: #fff; padding: 24px 32px; text-align: center; }
+.epitaph h1 { margin: 6px 0 2px; font-size: 26px; letter-spacing: 6px; }
+.epitaph .ep-sub { color: var(--ink-2); margin-bottom: 14px; }
+.epitaph .ep-line { margin: 6px 0; font-size: 13px; }
+.epitaph .ep-quote { margin: 16px 0; font-size: 14px; font-style: italic; border-top: 1px dashed #999; border-bottom: 1px dashed #999; padding: 10px 0; }
+.epitaph .btn { position: absolute; left: 50%; bottom: 24px; width: 180px; margin-left: -90px; height: 42px; font-size: 15px; font-weight: 700; }
+.overlay { position: absolute; left: 40px; top: 40px; width: 716px; height: 628px; z-index: 40; border: 2px solid var(--ink); background: #fff; padding: 16px 20px; }
+.overlay h2 { margin: 0 0 10px; font-size: 16px; }
+.overlay .close { position: absolute; right: 12px; top: 12px; }
+.overlay .olog { height: 560px; overflow-y: auto; font-size: 12px; }
+.overlay .olog div { margin: 1px 0; }
+.overlay .olog .bad { color: var(--red); }
+.overlay .olog .good { font-weight: 700; }
+.overlay p { margin: 6px 0; font-size: 13px; }
+
+/* 修正：40px 格內圖示上移，避免與右下堆疊數字重疊；中欄商品提示卡不攔截點擊 */
+.packgrid .cell, .groundgrid .cell { padding-bottom: 9px; }
+#shoptip { pointer-events: none; }
+[data-testid=slot-bag] { padding-bottom: 10px; }
+.rcard .rmat { padding-bottom: 12px; font-size: 13px; }
