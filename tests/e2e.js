@@ -1,9 +1,10 @@
-/* 《山海錄》灰盒 v0.1 — 自動化互動驗證（Node + Playwright，headless Chromium）
+/* 《山海錄》灰盒 v0.25 — 自動化互動驗證（Node + Playwright，headless Chromium）
  * 用法：node tests/e2e.js [--shots]
- *   --shots  另存 1280×720 實機截圖至 docs/evidence/shots-v01/
+ *   --shots  另存 1280×720 實機截圖至 docs/evidence/shots-v025/
  * 驗證：1280×720 單屏無捲動／無溢出／無文字重疊、三欄 240/796/220、24 小時制、
  *       地圖移動、城鎮（買賣／客棧／賞金／買大包）、荒野採集＋營火 3 配方、
  *       第一人稱戰鬥（意圖預告／攻擊／棄物撤退）、死亡墓誌銘＋一鍵重開、console 0 error。
+ *       v0.25：出身、7 素質／23 熟練度、拖拉道具、視窗等比縮放、委託、傳聞、鑑定、獸潮。
  */
 'use strict';
 const http = require('http');
@@ -12,7 +13,7 @@ const path = require('path');
 const { chromium } = require('playwright');
 
 const ROOT = path.resolve(__dirname, '..');
-const SHOTS = path.join(ROOT, 'docs/evidence/shots-v01');
+const SHOTS = path.join(ROOT, 'docs/evidence/shots-v025');
 const WANT_SHOTS = process.argv.includes('--shots');
 const SEED = 20261127;
 
@@ -108,7 +109,7 @@ async function shot(page, name) {
   if (!WANT_SHOTS) return;
   fs.mkdirSync(SHOTS, { recursive: true });
   await page.screenshot({ path: path.join(SHOTS, name), clip: { x: 0, y: 0, width: 1280, height: 720 } });
-  console.log('SHOT  docs/evidence/shots-v01/' + name);
+  console.log('SHOT  docs/evidence/shots-v025/' + name);
 }
 
 // ---------- 遊戲操作小工具 ----------
@@ -140,7 +141,7 @@ async function settle(page) {
     if (s.scene === 'event') {
       const ev = s.event;
       if (ev.result) { await click(page, 'btn-ev-done'); continue; }
-      const prefer = ['leave', 'detour', 'study', 'pay', 'pick', 'dig', 'drop', 'fight', 'hunt'];
+      const prefer = ['leave', 'detour', 'study', 'pay', 'pick', 'dig', 'drop', 'fight', 'hunt', 'talk', 'r_leave', 'r_leave2', 'r_sneak', 'r_fight', 'r_boss', 'r_hunt', 'r_strike'];
       const has = await page.evaluate(() => Array.from(document.querySelectorAll('[data-testid^=ev-]')).map((e) => e.getAttribute('data-testid').slice(3)));
       const k = prefer.find((p) => has.includes(p));
       await click(page, 'ev-' + k);
@@ -173,7 +174,7 @@ async function travelTo(page, node) {
   page.on('pageerror', (e) => consoleErrors.push('pageerror: ' + e.message));
   page.on('requestfailed', (r) => consoleErrors.push('requestfailed: ' + r.url()));
 
-  await page.goto(base + 'index.html?seed=' + SEED + '&fresh=1');
+  await page.goto(base + 'index.html?seed=' + SEED + '&fresh=1&origin=drifter');
   await page.waitForSelector('[data-testid=town]');
   let s = await st(page);
 
@@ -183,10 +184,17 @@ async function travelTo(page, node) {
   check('開局賞金：灰髯狼 ×3 已追蹤', (await page.textContent('[data-testid=bounty]')).includes('灰髯狼 0/3'), await page.textContent('[data-testid=bounty]'));
   check('左欄 10 部位＋背包槽＋鎖定馬車槽', (await page.$$('[data-testid^=slot-]')).length === 11 && !!(await page.$('.slot-cart.locked')));
   check('初始粗布小包 6 格、24 格上限（18 格鎖定）', (await page.$$('.packgrid .cell.locked')).length === 18);
-  check('右欄 5 類熟練度', (await page.$$('[data-testid^=prof-]')).length === 5);
+  check('右欄 7 項素質', (await page.$$('[data-testid^=attr-]')).length === 7);
+  let profCount = 0;
+  for (const g of ['wu', 'ye', 'gong', 'xing']) { await click(page, 'ptab-' + g); profCount += (await page.$$('[data-testid^=prof-]')).length; }
+  check('右欄熟練度四大類共 23 項（22 可練＋偷竊預留）', profCount === 23 && Object.keys(s.prof).length === 23, profCount);
+  await audit(page, '右欄・行走分頁');
+  await click(page, 'ptab-wu');
+  await audit(page, '右欄・武藝分頁');
+  await click(page, 'ptab-ye');
   await audit(page, '城鎮・市集');
   const save0 = await page.evaluate(() => JSON.parse(localStorage.getItem('shanhailu.save')));
-  check('存檔 schema 預留永久死亡／城鎮檢查點雙模式', save0 && save0.schema === 1 && save0.saveMode === 'permadeath' && 'checkpoint' in save0, { schema: save0.schema, saveMode: save0.saveMode, hasCheckpointField: 'checkpoint' in save0 });
+  check('存檔 schema 預留永久死亡／城鎮檢查點雙模式', save0 && save0.schema === 2 && save0.saveMode === 'permadeath' && 'checkpoint' in save0, { schema: save0.schema, saveMode: save0.saveMode, hasCheckpointField: 'checkpoint' in save0 });
 
   // 買大包（行旅皮囊 10 格）
   const bagIdx = await shopIndexOf(page, "row.it.k==='eq' && row.it.eq.base==='bag_travel'");
@@ -230,7 +238,8 @@ async function travelTo(page, node) {
   await audit(page, '城鎮・賞金');
   await click(page, 'bounty-b_guyao');
   s = await st(page);
-  check('賞金板揭榜：古窯清理', s.bounties.find((b) => b.id === 'b_guyao').status === 'active');
+  check('委託板揭榜：古窯清理', s.quests.find((b) => b.id === 'b_guyao').status === 'active');
+  check('委託板每城每日生成 3 張（含期限）', s.quests.filter((q) => q.town === 'huiyao' && !q.fixed && q.due).length === 3, s.quests.filter((q) => q.town === 'huiyao').map((q) => q.title));
 
   // ===== 2. 地圖移動 =====
   await click(page, 'btn-leave');
@@ -249,11 +258,11 @@ async function travelTo(page, node) {
   // ===== 3. 荒野採集＋營火 3 配方 =====
   await audit(page, '荒野・青霧藥林');
   s = await st(page);
-  const cai0 = s.prof.cai;
+  const cai0 = s.prof.cai.lv * 100 + s.prof.cai.xp;
   await click(page, 'act-herb'); await settle(page);
   await click(page, 'gpt-h1'); await settle(page);
   s = await st(page);
-  check('荒野採藥（按鈕與場景採集點）', s.pack.filter((x) => x && x.k === 'herb_zx').reduce((a, x) => a + x.n, 0) >= 2 && s.prof.cai > cai0, 'herb=' + s.pack.filter((x) => x && x.k === 'herb_zx').reduce((a, x) => a + x.n, 0) + ' 採集xp ' + cai0 + '→' + s.prof.cai);
+  check('荒野採藥（按鈕與場景採集點）', s.pack.filter((x) => x && x.k === 'herb_zx').reduce((a, x) => a + x.n, 0) >= 2 && s.prof.cai.lv * 100 + s.prof.cai.xp > cai0, 'herb=' + s.pack.filter((x) => x && x.k === 'herb_zx').reduce((a, x) => a + x.n, 0) + ' 採藥 ' + s.prof.cai.lv);
   await click(page, 'gpt-h2'); await settle(page);
   if ((await st(page)).pack.filter((x) => x && x.k === 'leaf_qx').reduce((a, x) => a + x.n, 0) < 2) { await click(page, 'gpt-h2'); await settle(page); }
   // 挖礦
@@ -284,11 +293,11 @@ async function travelTo(page, node) {
   let attacked = false;
   for (let i = 0; i < 4 && !attacked; i++) { await click(page, 'act-attack'); const s3 = await st(page); attacked = !s3.combat || s3.combat.enemies[0].hp < ehp0; }
   check('攻擊命中敵人扣血', attacked);
-  const wolfBounty0 = s.bounties.find((b) => b.id === 'b_wolf').prog;
+  const wolfBounty0 = s.quests.find((b) => b.id === 'b_wolf').prog;
   scene = await fight(page);
   s = await st(page);
   check('狩獵勝利 → 剝皮取肉結算', scene === 'loot' && s.pack.some((x) => x && x.k === 'hide') && s.pack.some((x) => x && x.k === 'meat'), scene);
-  check('賞金進度：灰髯狼 +1', s.bounties.find((b) => b.id === 'b_wolf').prog === wolfBounty0 + 1, (await page.textContent('[data-testid=bounty]')));
+  check('委託進度：灰髯狼 +1', s.quests.find((b) => b.id === 'b_wolf').prog === wolfBounty0 + 1, (await page.textContent('[data-testid=bounty]')));
   await click(page, 'btn-loot-done');
   await click(page, 'craft-r_ra');
   s = await st(page);
@@ -393,9 +402,161 @@ async function travelTo(page, node) {
   check('純永久死亡：存檔已刪除', (await page.evaluate(() => localStorage.getItem('shanhailu.save'))) === null);
   await audit(page, '死亡墓誌銘');
   await shot(page, '05-death-epitaph.png');
+  check('墓誌銘含出身、享年與素質', /流民・享年 \d+/.test(epi) && /體魄 \d+/.test(epi));
   await click(page, 'btn-restart');
   s = await st(page);
-  check('一鍵重開：回到灰窯鎮 第 1 日 08:00、滿血、新存檔', s.scene === 'town' && s.loc === 'huiyao' && s.t === 480 && s.hp === 80 && !s.dead && (await page.evaluate(() => !!localStorage.getItem('shanhailu.save'))));
+  check('一鍵重開：先選出身（6 種）', s.scene === 'origin' && (await page.$$('[data-testid^=origin-]')).length === 6);
+  await audit(page, '出身選擇');
+  await shot(page, '00-origin.png');
+  await click(page, 'origin-hunter');
+  s = await st(page);
+  check('選獵戶：回到灰窯鎮 第 1 日 08:00、滿血、新存檔', s.scene === 'town' && s.loc === 'huiyao' && s.t === 480 && s.hp === 80 && !s.dead && (await page.evaluate(() => !!localStorage.getItem('shanhailu.save'))));
+  check('獵戶起手：靈覺 12、追蹤 20、剝皮 16、獵弓', s.attr.ling === 12 && s.prof.zong.lv === 20 && s.prof.bo.lv === 16 && s.equip.main.base === 'bow', { ling: s.attr.ling, zong: s.prof.zong.lv, main: s.equip.main.base });
+
+  // ===== 7. v0.25：拖拉道具 =====
+  const center = async (sel) => { const b = await (await page.$(sel)).boundingBox(); return [b.x + b.width / 2, b.y + b.height / 2]; };
+  const dragTo = async (from, to) => { const [x1, y1] = await center(from); const [x2, y2] = await center(to); await page.mouse.move(x1, y1); await page.mouse.down(); await page.mouse.move((x1 + x2) / 2, (y1 + y2) / 2, { steps: 4 }); await page.mouse.move(x2, y2, { steps: 4 }); await page.mouse.up(); };
+  await dragTo('[data-testid=pack-0]', '[data-drop="pack:4"]');
+  s = await st(page);
+  check('拖拉：行囊格之間搬移', s.pack[0] === null && s.pack[4] && s.pack[4].k === 'pot_hp', s.pack.map((x) => x && x.k));
+  await dragTo('[data-testid=pack-4]', '[data-testid=pack-1]');
+  s = await st(page);
+  check('拖拉：行囊格互換', s.pack[1].k === 'pot_hp' && s.pack[4].k === 'bread');
+  await dragTo('[data-testid=slot-chest]', '[data-drop="pack:0"]');
+  s = await st(page);
+  check('拖拉：人形槽→行囊＝卸下', s.equip.chest === null && s.pack[0] && s.pack[0].k === 'eq' && s.pack[0].eq.base === 'robe');
+  await dragTo('[data-testid=pack-0]', '[data-testid=slot-chest]');
+  s = await st(page);
+  check('拖拉：行囊→人形槽＝裝備', s.equip.chest && s.equip.chest.base === 'robe' && s.pack[0] === null);
+  await dragTo('[data-testid=pack-4]', '[data-testid=ground]');
+  s = await st(page);
+  check('拖拉：行囊→地面＝丟下', s.pack[4] === null && s.ground.items.length === 1 && s.ground.items[0].k === 'bread');
+  await dragTo('[data-testid=ground-0]', '[data-drop="pack:2"]');
+  s = await st(page);
+  check('拖拉：地面→行囊＝撿起', s.ground.items.length === 0 && s.pack.some((x) => x && x.k === 'bread'));
+  const potShop = await shopIndexOf(page, "row.it.k==='pot_hp'");
+  const sv0 = s.silver; const pot0 = s.pack.filter((x) => x && x.k === 'pot_hp').reduce((a, x) => a + x.n, 0);
+  await dragTo('[data-testid=shop-' + potShop + ']', '[data-drop="pack:5"]');
+  s = await st(page);
+  check('拖拉：貨架→行囊＝買一個', s.silver < sv0 && s.pack.filter((x) => x && x.k === 'pot_hp').reduce((a, x) => a + x.n, 0) === pot0 + 1, sv0 + '→' + s.silver);
+  const breadI = await packIndexOf(page, 'bread'); const sv1 = s.silver;
+  await dragTo('[data-testid=pack-' + breadI + ']', '[data-testid=trade]');
+  s = await st(page);
+  check('拖拉：行囊→交易欄＝賣出', s.silver > sv1 && !s.pack.some((x) => x && x.k === 'bread'), sv1 + '→' + s.silver);
+  check('拖拉結束後沒有殘留的拖影', (await page.$$('.ghost, .dropok, .dragsrc')).length === 0);
+  // 點擊仍照舊：點人形槽＝卸下、點行囊＝裝備（市集分頁點行囊是選取賣出，先切到客棧）
+  await click(page, 'tab-inn');
+  await click(page, 'slot-chest');
+  s = await st(page);
+  check('點擊行為不變：點人形槽卸下、點行囊裝備', s.equip.chest === null);
+  await click(page, 'pack-' + s.pack.findIndex((x) => x && x.k === 'eq' && x.eq.base === 'robe'));
+  check('點行囊裝備穿回', (await st(page)).equip.chest.base === 'robe');
+  await click(page, 'tab-market');
+  await audit(page, 'v0.25 城鎮・市集（獵戶）');
+  await shot(page, '03-town-market.png');
+
+  // ===== 8. v0.25：視窗等比縮放 =====
+  for (const [vw, vh] of [[1280, 600], [1024, 576], [1600, 900], [900, 800]]) {
+    await page.setViewportSize({ width: vw, height: vh }); await page.waitForTimeout(120);
+    const r = await page.evaluate(() => { const b = document.getElementById('app').getBoundingClientRect(); const sys = document.querySelector('.sysbtns').getBoundingClientRect(); return { l: b.left, t: b.top, r: b.right, b: b.bottom, sysB: sys.bottom, sw: document.documentElement.scrollWidth, sh: document.documentElement.scrollHeight }; });
+    check('視窗 ' + vw + '×' + vh + '：整個畫面縮放後完整可見、底部按鈕不被截掉', r.l >= -0.5 && r.t >= -0.5 && r.r <= vw + 0.5 && r.b <= vh + 0.5 && r.sysB <= vh && r.sw <= vw && r.sh <= vh, { app: [r.l, r.t, r.r, r.b].map((v) => Math.round(v)), sysBottom: Math.round(r.sysB) });
+  }
+  await page.setViewportSize({ width: 1024, height: 576 }); await page.waitForTimeout(120);
+  await dragTo('[data-testid=pack-1]', '[data-drop="pack:3"]');
+  s = await st(page);
+  check('縮放後拖拉仍準確', s.pack[3] && s.pack[3].k === 'pot_hp' && s.pack[1] === null);
+  await page.hover('[data-testid=slot-main]');
+  check('縮放後提示卡仍在左欄內', await page.evaluate(() => { const t = document.getElementById('tip').getBoundingClientRect(); const c = document.getElementById('col-left').getBoundingClientRect(); return t.left >= c.left && t.right <= c.right && t.bottom <= c.bottom; }));
+  await page.mouse.move(600, 300);
+  await page.setViewportSize({ width: 1280, height: 720 }); await page.waitForTimeout(120);
+
+  // ===== 9. v0.25：委託與傳聞 =====
+  await click(page, 'tab-bounty');
+  s = await st(page);
+  const dq = s.quests.find((q) => q.kind === 'deliver' && q.town === 'huiyao' && q.status === 'open');
+  if (dq) {
+    await click(page, 'bounty-' + dq.id);
+    const s3 = await st(page);
+    check('送貨委託：付押金、包裹進行囊', s3.silver === s.silver - dq.deposit && s3.pack.some((x) => x && x.k === 'parcel') && s3.quests.find((q) => q.id === dq.id).status === 'active');
+  }
+  await audit(page, 'v0.25 城鎮・委託');
+  await shot(page, '07-quests.png');
+  await click(page, 'tab-inn');
+  s = await st(page);
+  await click(page, 'inn-rumor');
+  s2 = await st(page);
+  check('客棧打聽：每日第一則免費', s2.rumors.length === 1 && s2.silver === s.silver && s2.prof.tan.lv + s2.prof.tan.xp > 0, s2.rumors[0] && s2.rumors[0].text);
+  await click(page, 'inn-rumor');
+  s = await st(page);
+  check('客棧打聽：第二則請酒 5 兩', s.rumors.length === 2 && s.silver === s2.silver - 5);
+  check('傳聞真相不外露於畫面', !(await page.evaluate(() => document.body.innerText)).match(/\b(true|guard|strong|gone|bait)\b/));
+  await audit(page, 'v0.25 城鎮・客棧（傳聞）');
+  await shot(page, '08-inn-rumors.png');
+  // 傳聞現場：屬實易取
+  await page.evaluate(() => { const G = window.SHL; G.state.rumors = []; G._debug.addRumor('cache', 'qingwu', 'true'); G.save(); });
+  await travelTo(page, 'qingwu');
+  s = await st(page);
+  check('荒野出現傳聞現場，追蹤 25 以下不能看痕跡（獵戶 20）', s.scene === 'wild' && !!(await page.$('[data-testid=btn-investigate]')) && !(await page.$('[data-testid=btn-trace]')));
+  await audit(page, 'v0.25 荒野・傳聞現場');
+  await shot(page, '04-wild-rumor.png');
+  await click(page, 'btn-investigate');
+  s2 = await st(page);
+  check('查探屬實的秘寶：直接到手未鑑定裝備與銀兩', s2.scene === 'event' && !!s2.event.result && s2.silver > s.silver && s2.pack.some((x) => x && x.k === 'eq' && x.eq.unid) && s2.rumors.length === 0, s2.event && s2.event.result);
+  await audit(page, 'v0.25 傳聞結果');
+  await click(page, 'btn-ev-done');
+  // 未鑑定：鑑物不足不能自己鑑，也不能穿
+  s = await st(page);
+  const ui = s.pack.findIndex((x) => x && x.k === 'eq' && x.eq.unid);
+  await page.hover('[data-testid=pack-' + ui + ']');
+  check('未鑑定裝備提示卡不顯示詞綴', (await page.evaluate(() => document.getElementById('tip').innerText)).includes('？？？'));
+  await page.mouse.move(600, 300);
+  await click(page, 'pack-' + ui);
+  s2 = await st(page);
+  const needId = { blue: 0, rare: 25, legend: 50 }[s.pack[ui].eq.rarity];
+  check('未鑑定裝備：鑑物不足時點擊不會鑑定也不會穿上', needId === 0 ? !s2.pack[ui].eq.unid : s2.pack[ui].eq.unid, s.pack[ui].eq.rarity);
+  // 辨痕（追蹤 25）與有人盤踞
+  await page.evaluate(() => { const G = window.SHL; G.state.prof.zong.lv = 25; G._debug.addRumor('vein', 'qingwu', 'guard'); G.enterHere(); });
+  await click(page, 'btn-trace');
+  s = await st(page);
+  check('追蹤 25 辨痕：到現場可先看痕跡', s.rumors[0].traced && s.log.some((l) => l.text.includes('好幾個人的腳印')));
+  await click(page, 'btn-investigate');
+  s = await st(page);
+  check('有人盤踞：可打、可談、可走', s.scene === 'event' && ['ev-r_fight', 'ev-r_talk', 'ev-r_leave'].every((k) => true) && (await page.$$('[data-testid^=ev-r_]')).length === 3);
+  await audit(page, 'v0.25 傳聞・有人盤踞');
+  await shot(page, '09-rumor-guard.png');
+  await click(page, 'ev-r_leave'); await click(page, 'btn-ev-done');
+  check('退走後傳聞保留', (await st(page)).rumors.length === 1);
+  // 強敵鎮守：山魈
+  await page.evaluate(() => { const G = window.SHL; G.state.rumors = []; G._debug.addRumor('beast', 'qingwu', 'strong'); G.enterHere(); });
+  await click(page, 'btn-investigate'); await click(page, 'ev-r_boss');
+  s = await st(page);
+  check('強敵鎮守：硬闖對上山魈', s.scene === 'combat' && s.combat.enemies[0].id === 'xiao' && s.combat.ctx.type === 'rumor');
+  await audit(page, 'v0.25 戰鬥・山魈');
+  await shot(page, '02-combat-xiao.png');
+  await page.evaluate(() => { const G = window.SHL; G.state.combat = null; G.state.rumors = []; G.enterHere(); });
+
+  // ===== 10. v0.25：城鎮付費鑑定、獸潮 =====
+  await page.evaluate(() => { const G = window.SHL; const S = G.state; S.silver = 200; const i = S.pack.findIndex((x) => !x); if (i >= 0) S.pack[i] = G._debug.lootEq('legend'); S.loc = 'huiyao'; G.enterHere(); G.setTab('market'); });
+  s = await st(page);
+  const li = s.pack.findIndex((x) => x && x.k === 'eq' && x.eq.rarity === 'legend');
+  await click(page, 'buyback-' + li);
+  await click(page, 'btn-identify');
+  s2 = await st(page);
+  check('市集付費鑑定傳奇：扣 30 兩、詞綴現形', s2.silver === s.silver - 30 && s2.pack[li].eq.unid === false && !!s2.pack[li].eq.unique);
+  await page.evaluate(() => { const G = window.SHL; const S = G.state; S.world.next = G.dayOf(S.t); G._debug.worldTick(G.dayOf(S.t)); G.save(); G.setTab('bounty'); });
+  s = await st(page);
+  check('獸潮開始：世界事件、自動掛上「擊退獸潮」、右欄顯示', !!s.world.tide && s.quests.some((q) => q.kind === 'tide' && q.status === 'active') && !!(await page.$('[data-testid=tide]')), s.world.tide);
+  const potRow = await shopIndexOf(page, "row.it.k==='pot_hp'");
+  check('獸潮期間藥水漲價五成', await page.evaluate((i) => { const G = window.SHL; const row = G.state.shops[G.state.loc][i]; return G.buyPrice(row) === Math.round(row.price * 1.5 / 1); }, potRow) || (await page.evaluate((i) => { const G = window.SHL; const row = G.state.shops[G.state.loc][i]; return G.buyPrice(row) > row.price; }, potRow)));
+  await audit(page, 'v0.25 獸潮・委託板');
+  await page.evaluate(() => { const G = window.SHL; const S = G.state; G._debug.worldTick(S.world.tide.end + 1); G.save(); G.enterHere(); });
+  s = await st(page);
+  check('獸潮沒擊退：城鎮受創（貨架減半、客棧漲價）', !s.world.tide && s.world.hurt[Object.keys(s.world.hurt)[0]] > 0 && !s.quests.some((q) => q.kind === 'tide'), s.world.hurt);
+  await click(page, 'sys-char');
+  check('人物面板：7 素質＋23 熟練度與門檻', !!(await page.$('[data-testid=overlay-char]')) && (await page.$$('.cattr')).length === 7 && (await page.$$('.cprof')).length === 23);
+  await shot(page, '10-character.png');
+  await click(page, 'sys-char');
+  await page.evaluate(() => { const G = window.SHL; G.state.loc = 'huiyao'; G.state.world.hurt = {}; G.enterHere(); G.save(); });
 
   // ===== 6. 覆蓋層與重新載入 =====
   await click(page, 'sys-log');
