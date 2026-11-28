@@ -242,7 +242,7 @@ window.SHL_DATA = (function () {
   };
 
   WILDS.fuzhao = {
-    risk: '中高', scene: '退水的沼地，黑水底下全是骨頭。',
+    risk: '高', scene: '退水的沼地，黑水底下全是骨頭。',
     points: [
       { id: 'h1', kind: 'herb', item: 'vine_du', max: 2, x: 150, y: 230, label: '毒藤' },
       { id: 'm1', kind: 'ore', item: 'bog_iron', max: 2, x: 330, y: 270, label: '沼鐵' },
@@ -270,7 +270,7 @@ window.SHL_DATA = (function () {
       boss: { scroll: 'scroll_beng', loot: { blue: 0.6, rare: 0.4 }, silver: [20, 30] },
     },
     jiku: {
-      risk: '中高', scene: '沉在淵底的古祭窟，潮氣與血腥味混雜。',
+      risk: '高', scene: '沉在淵底的古祭窟，潮氣與血腥味混雜。',
       floors: [['serpent'], ['serpent', 'corpse'], ['shaman']],
       floorNames: ['一層', '二層', '祭壇'],
       loot: { blue: 0.5, rare: 0.4, legend: 0.1 }, silver: [16, 30],
