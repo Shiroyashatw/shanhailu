@@ -1,0 +1,18 @@
+PRE00 {"t":"第 3 日 00:00","raw":2880,"loc":"huiyao","scene":"town","ev":false,"tab":null,"ov":null}
+INN_BUTTONS "宿歇一夜8 兩・睡到 08:00・侵蝕 −10"
+SLEEP00 {"from":"第 3 日 00:00","to":"第 3 日 08:00","hours":8,"lastLogs":[480,480,1440,2880,2880,3360]}
+LAYOUT 01-log {"sw":1280,"sh":720,"cols":[240,796,220],"overlaps":1,"sample":["關閉｜日誌"]}
+SLEEP0810 {"from":"第 3 日 08:10","to":"第 3 日 21:10","hours":13}
+LAYOUT 02-log {"sw":1280,"sh":720,"cols":[240,796,220],"overlaps":1,"sample":["關閉｜日誌"]}
+WAKE_SWEEP_1min {"20:0":12,"3:0":6,"0:0":8,"8:10":13,"23:59":8.016666666666667,"12:0":13,"min":6,"max":13}
+DAY1 {"start":"第 1 日 08:00","now":"第 2 日 00:30","huiyao0":{"P":50,"O":55,"T":200},"huiyao":{"P":49,"O":55,"T":207.96,"In":23,"Out":15,"Net":8,"tier":"ok","trend":"down","why":"WHY_NONE","Geff":1,"Gname":"自衛隊"},"duyin":{"P":44,"O":60,"T":314.81,"In":55,"Out":40,"Net":15},"g3":"守備"}
+DAYS_P_O_T [[3,50.1,54.98,215.46,43.1,59.98,328.4],[4,50.09,54.98,223.46,44.29,59.94,340.89],[5,51.08,54.98,231.46,43.36,59.93,354.82],[6,49.97,55,239.91,44.52,59.9,367.61],[7,49.97,55,247.86,44.56,59.9,381.81],[8,50.97,55,255.81,44.6,59.9,396.06]]
+LAYOUT 03-town {"sw":1280,"sh":720,"cols":[240,796,220],"overlaps":0,"sample":[]}
+LAYOUT 04-day2-town {"sw":1280,"sh":720,"cols":[240,796,220],"overlaps":0,"sample":[]}
+SHOT04_STATE {"now":"第 2 日 08:00","In":23,"Out":15,"Net":8,"T":207.96}
+NO_SHICHEN {"hits":[],"hasHHMM":true}
+CFLASH natural {"classOn":11,"maxPerSec_classOn":3,"anim":11,"maxPerSec_anim":3,"minGapMs":483}
+CFLASH mash150 {"classOn":19,"maxPerSec_classOn":3,"anim":1,"maxPerSec_anim":1,"minGapMs":null}
+CFLASH mash200 {"classOn":18,"maxPerSec_classOn":2,"anim":17,"maxPerSec_anim":2,"minGapMs":583}
+CFLASH mash300 {"classOn":18,"maxPerSec_classOn":2,"anim":18,"maxPerSec_anim":2,"minGapMs":550}
+CONSOLE_ERRORS []
