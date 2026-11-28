@@ -1,0 +1,86 @@
+52758a01912a9d689094572a38f3635237106fca
+# cmd: node tests/e2e-dev01b.js
+PASS  nameErrors「ab｜衡」→ chars  — ["chars"]
+PASS  nameErrors「沈｜1」→ chars  — ["chars"]
+PASS  nameErrors「沈｜A衡」→ chars  — ["chars"]
+PASS  nameErrors「沈 ｜衡」→ chars  — ["chars"]
+PASS  nameErrors「沈｜衡!」→ chars  — ["chars"]
+PASS  nameErrors「沈｜　衡」→ chars  — ["chars"]
+PASS  nameErrors「沈｜」→ length  — ["length"]
+PASS  nameErrors「｜衡」→ length  — ["length"]
+PASS  nameErrors「歐陽｜明月月」→ length  — ["length"]
+PASS  nameErrors「歐陽司｜衡」→ length  — ["length"]
+PASS  nameErrors「司｜馬明月衡」→ length  — ["length"]
+PASS  nameErrors「虞｜九淵」→ taken  — ["taken"]
+PASS  nameErrors「明｜夷」→ taken  — ["taken"]
+PASS  nameErrors「鴉｜首」→ taken  — ["taken"]
+PASS  nameErrors「紅｜霧」→ taken  — ["taken"]
+PASS  nameErrors「腳｜程」→ taken  — ["taken"]
+PASS  nameErrors「撿骨｜師」→ taken  — ["taken"]
+PASS  nameErrors「破｜曉」→ taken  — ["taken"]
+PASS  nameErrors「掌｜櫃」→ taken  — ["taken"]
+PASS  nameErrors「沈｜衡」→ 不攔  — []
+PASS  nameErrors「張｜三」→ 不攔  — []
+PASS  nameErrors「李｜滿」→ 不攔  — []
+PASS  nameErrors「王｜衡」→ 不攔  — []
+PASS  nameErrors「釋｜明」→ 不攔  — []
+PASS  nameErrors「悟｜空」→ 不攔  — []
+PASS  nameErrors「李｜九淵」→ 不攔  — []
+PASS  nameErrors「虞｜九」→ 不攔  — []
+PASS  nameErrors「明｜夷光」→ 不攔  — []
+PASS  nameErrors「紅｜霧生」→ 不攔  — []
+PASS  nameErrors「沈｜七」→ 不攔  — []
+PASS  nameErrors「李｜九」→ 不攔  — []
+PASS  nameErrors「萬｜十」→ 不攔  — []
+PASS  nameErrors「翁｜娘」→ 不攔  — []
+PASS  nameErrors「趙｜鴉」→ 不攔  — []
+PASS  nameErrors「錢｜嫂」→ 不攔  — []
+PASS  1 字（只有姓或只有名）→ length
+PASS  5 字 → length
+PASS  英數、空白 → chars
+PASS  NAME_TAKEN 每一項整名輸入都回 taken  — 42 項
+PASS  NAME_TAKEN 含固定角色全名、定稿第 5 節起始表（12 稱謂詞＋20 遊戲名詞）與 8 項勢力全名
+PASS  NAME_TAKEN 共 42 項、無重複  — [42,42]
+PASS  勢力全名「四｜象軍」→ taken  — ["taken"]
+PASS  勢力全名「破曉｜軍團」→ taken  — ["taken"]
+PASS  勢力全名「天星｜商會」→ taken  — ["taken"]
+PASS  勢力全名「拜｜裂教」→ taken  — ["taken"]
+PASS  勢力全名「黑｜水盟」→ taken  — ["taken"]
+PASS  勢力全名「天｜工盟」→ taken  — ["taken"]
+PASS  勢力全名「萬｜神教」→ taken  — ["taken"]
+PASS  勢力全名「九｜幽殿」→ taken  — ["taken"]
+PASS  勢力全名「鴉｜衛」→ taken  — ["taken"]
+PASS  非全名「四｜象」→ taken（原規則）  — ["taken"]
+PASS  非全名「九｜幽」→ taken（原規則）  — ["taken"]
+PASS  非全名「四｜象兵」→ 不攔  — []
+PASS  非全名「四象｜軍團」→ 不攔  — []
+PASS  非全名「九幽｜殿主」→ 不攔  — []
+PASS  非全名「李｜九幽」→ 不攔  — []
+PASS  非全名「破｜曉軍」→ 不攔  — []
+PASS  非全名「天｜星會」→ 不攔  — []
+PASS  非全名「黑｜水幫」→ 不攔  — []
+PASS  非全名「萬｜神殿」→ 不攔  — []
+PASS  非全名「拜｜裂」→ taken（原規則）  — ["taken"]
+PASS  非全名「拜裂｜教主」→ 不攔  — []
+PASS  非全名「趙｜天工」→ 不攔  — []
+PASS  NAME_POOL 60 組全部通過 nameErrors  — []
+PASS  NAME_POOL 與 name-pool-v0.1.csv 逐組一致
+PASS  開局池：倪桃兒、甘菜頭在池內（第 56、57 組），倪招弟、甘細妹不在
+PASS  畫面 chars 提示「不可使用英數、空白或符號」（句尾無句號）  — {"ok":false,"rule":"不可使用英數、空白或符號","errs":["chars"]}
+PASS  畫面 length 提示「合計須為 2–4 個中文字」（句尾無句號）  — {"ok":false,"rule":"合計須為 2–4 個中文字","errs":["length"]}
+PASS  畫面「李九淵」不攔、確定可按  — {"ok":true,"rule":"只收中文，合計 2–4 字。預設「沈衡」，不想改也可以直接確定。","errs":[]}
+PASS  畫面 taken 提示「這個名字已經有人用了」、確定熄滅  — {"ok":false,"rule":"這個名字已經有人用了","errs":["taken"]}
+PASS  taken 時點確定不會開局
+PASS  畫面預設「沈衡」合法  — {"ok":true,"rule":"只收中文，合計 2–4 字。預設「沈衡」，不想改也可以直接確定。","errs":[]}
+PASS  實機：裝備 tooltip 顯示「+5% 腳程」、無「行動速度」  — 行旅靴凡品靴子・輕甲・重 2護甲 3+5% 腳程估價 7 兩點＝卸下
+PASS  實機：疲累 90 狀態提示「力竭：命中與腳程下降」  — ["力竭：命中與腳程下降"]
+PASS  實機：人物頁負重門檻顯示「常態重負的腳程懲罰減半」
+PASS  實機：人物頁仍有技能「腳力」
+PASS  實機頁面不再出現三條舊字串
+PASS  js/ 不再有「+{v}% 行動速度」「力竭：命中與速度下降」「常態重負的速度懲罰減半」
+PASS  js/ 有三條新字串
+PASS  技能「腳力」維持原名；身法說明「出手速度」與帶動列「腳力」不動  — {"jiao":"腳力","shen":"出手速度、閃避。帶動：閃躲、輕甲、弓弩、腳力。","spd":"+{v}% 腳程"}
+PASS  console 0 error  — []
+
+結果：81/81 PASS
+# exit: 0
