@@ -191,7 +191,7 @@ window.SHL = (function () {
   }
   function addCorrupt(n) {
     const before = S.corrupt; S.corrupt = clamp(S.corrupt + n, 0, 30);
-    if (S.corrupt > before) { log('血霧侵蝕 +' + (S.corrupt - before) + '（生命上限 −' + S.corrupt + '）', 'bad'); S.hp = Math.min(S.hp, maxHp()); }
+    if (S.corrupt > before) { log('紅霧侵蝕 +' + (S.corrupt - before) + '（生命上限 −' + S.corrupt + '）', 'bad'); S.hp = Math.min(S.hp, maxHp()); }
   }
   function bagCap() { return S.equip.bag ? eqBase(S.equip.bag).bag : 0; }
   function carryCap() {
@@ -357,7 +357,7 @@ window.SHL = (function () {
     restockShops();
     D.BOUNTIES.forEach((b) => S.quests.push({ id: b.id, town: b.town, g: b.g, ic: b.enemy || b.item || D.NODES[b.dungeon].ic, title: b.title, kind: b.kind, enemy: b.enemy, item: b.item, dungeon: b.dungeon, need: b.need, reward: b.reward, due: null, fixed: true, giver: b.giver || null, prog: 0, status: b.giver ? 'hidden' : b.start ? 'active' : 'open', taken: b.start ? dayOf(S.t) : null }));
     genQuests();
-    log(fullName() + '（' + O.name + '）在灰窯鎮醒來。鎮公所的「灰髯狼 ×3」已揭下。');
+    log(fullName() + '（' + O.name + '）在灰窯鎮醒來。鎮衙的「灰髯狼 ×3」已揭下。');
     log('點建築進去辦事，點路人交談。離鎮後每個地點都能探查。');
     save();
     emit();
@@ -1039,7 +1039,7 @@ window.SHL = (function () {
         S.fat = clamp(S.fat - 10, 0, 100); S.food = clamp(S.food + 10, 0, 100); passTime(0.5, { food: 0, fat: 0 }); log('喝了碗粗茶，疲累 −10、飽食 +10'); break;
       case 'nap': if (!inBld('tea') || !pay(c.nap)) return;
         passTime(2, { fat: -20 }); log('在茶攤的長凳上歇了兩個小時，疲累 −20'); break;
-      case 'heal': if (!inBld('medic')) return; if (S.hp >= maxHp()) { log('溫姑看了你一眼：「沒傷。」'); return emit(); } if (!pay(c.heal)) return;
+      case 'heal': if (!inBld('medic')) return; if (S.hp >= maxHp()) { log('破曉醫官看了你一眼：「沒傷。」'); return emit(); } if (!pay(c.heal)) return;
         passTime(1, { fat: 0 }); S.hp = maxHp(); log('傷口重新包過，生命回滿。', 'good'); break;
       case 'cleanse': if (!inBld('medic')) return; if (!S.corrupt) { log('你身上沒有侵蝕。'); return emit(); } if (!pay(c.cleanse)) return;
         passTime(2, { fat: 5 }); S.corrupt = 0; log('放血、敷藥、灌湯。侵蝕退了。', 'good'); break;
@@ -1056,7 +1056,7 @@ window.SHL = (function () {
       case 'offer': if (!inBld('shrine')) return;
         if (countItem('incense') < 1) { log('身上沒有線香。天星分號有賣。', 'bad'); return emit(); }
         removeItem('incense', 1); passTime(0.5, { fat: 0 });
-        log('你把線香插進冷灰裡，點了三次。香點不著。'); addCodex('c_question', '上香'); break;
+        log('你把線香插進冷灰裡，點了三次。香點不著。'); addCodex('c_question', '祭祀'); break;
       case 'look': {
         if (!inBld('tower')) return; passTime(0.5, { fat: 1 });
         const d = S.world.next - dayOf(S.t);
@@ -1066,20 +1066,20 @@ window.SHL = (function () {
       case 'report': {
         if (!inBld('crow')) return;
         const fresh = S.codex.filter((x) => !S.reported.includes(x));
-        if (!fresh.length) { log('赤鴉：「沒有新的，就別佔我的火。」'); return emit(); }
+        if (!fresh.length) { log('鴉首：「沒有新的，就別佔我的火。」'); return emit(); }
         fresh.forEach((x) => S.reported.push(x));
         const got = fresh.length * c.report; S.silver += got; S.stats.maxSilver = Math.max(S.stats.maxSilver, S.silver);
-        addRep('crow', fresh.length * 2); log('向赤鴉回報 ' + fresh.length + ' 條見聞，得銀 ' + got + ' 兩。', 'good'); break;
+        addRep('crow', fresh.length * 2); log('向鴉首回報 ' + fresh.length + ' 條見聞，得銀 ' + got + ' 兩。', 'good'); break;
       }
       case 'judge': {
         const r = S.rumors.find((x) => x.id === arg); if (!inBld('crow') || !r) return;
-        if (!repOk('crow', 6)) { log('赤鴉：「我不替生人看路。」（鴉衛聲望 6）', 'bad'); return emit(); } if (!pay(c.judge)) return;
+        if (!repOk('crow', 6)) { log('鴉首：「我不替生人看路。」（鴉衛聲望 6）', 'bad'); return emit(); } if (!pay(c.judge)) return;
         r.hint = D.RUMOR.hint[r.truth]; r.traced = true; r.judged = true;
-        log('赤鴉看了一眼：「' + D.RUMOR.trace[r.truth] + '」', 'good'); break;
+        log('鴉首看了一眼：「' + D.RUMOR.trace[r.truth] + '」', 'good'); break;
       }
       case 'yaying': if (!inBld('crow') || S.skills.includes('yaying')) return;
-        if (!repOk('crow', 14)) { log('赤鴉沒有回答。（鴉衛聲望 14）', 'bad'); return emit(); } if (!pay(c.yaying)) return;
-        passTime(3, { fat: 10 }); S.skills.push('yaying'); log('赤鴉教了你怎麼把自己藏進影子裡。習得〈鴉影〉。', 'good'); break;
+        if (!repOk('crow', 14)) { log('鴉首沒有回答。（鴉衛聲望 14）', 'bad'); return emit(); } if (!pay(c.yaying)) return;
+        passTime(3, { fat: 10 }); S.skills.push('yaying'); log('鴉首教了你怎麼把自己藏進影子裡。習得〈鴉影〉。', 'good'); break;
       default: return;
     }
     commit();
@@ -2029,7 +2029,7 @@ window.SHL = (function () {
     d = Math.max(1, Math.round(d));
     S.hp -= d;
     if (ac === 'light') gainProf('qing', 2, lv); else if (ac === 'heavy') gainProf('zhong', 2, lv);
-    const verb = { heavy: '重擊', bleed: '撕咬', poison: '毒咬', drain: '吸血', corrupt: '血霧撲面' }[it.k] || '攻擊';
+    const verb = { heavy: '重擊', bleed: '撕咬', poison: '毒咬', drain: '吸血', corrupt: '紅霧撲面' }[it.k] || '攻擊';
     log(e.name + verb + '，你受到 ' + d + ' 傷害', it.k === 'heavy' ? 'bad' : '');
     fx({ t: 'e_hit', i: e.idx, d, heavy: it.k === 'heavy', php: Math.max(0, S.hp) });
     if (S.hp <= 0) { S.stats.cause = e.name + (it.k === 'heavy' ? '的重擊' : '的攻擊'); return; }

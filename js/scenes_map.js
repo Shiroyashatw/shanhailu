@@ -928,7 +928,7 @@ function dgGuzhong() {
 }
 
 /* ---------- 產出 ---------- */
-// 區域圖左右翻轉：世界觀裡裂口與血霧在西邊（獸群往東逃），地點座標見 data.js（x 已換成 796 − x）
+// 區域圖左右翻轉：世界觀裡裂口與紅霧在西邊（獸群往東逃），地點座標見 data.js（x 已換成 796 − x）
 function mirrorX(w, h) {
   for (var y = 0; y < h; y++) for (var x = 0; x < (w >> 1); x++) {
     var a = (y * w + x) * 4, b = (y * w + (w - 1 - x)) * 4;

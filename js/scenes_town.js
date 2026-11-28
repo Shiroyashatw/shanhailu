@@ -444,7 +444,7 @@ function hySmith(x, y, r) {                   // 石記鐵鋪 86×60
   R(x + 34, y + 47, 9, 5, '#2f3338'); R(x + 34, y + 47, 9, 1, '#59616a'); R(x + 34, y + 52, 9, 1, KK, 0.4);    // 鐵料
   R(x + 36, y + 55, 12, 2, '#3a3f45'); P(x + 36, y + 55, A4);
 }
-function hyBoard(x, y, r) {                   // 鎮公所・委託板 68×66
+function hyBoard(x, y, r) {                   // 鎮衙・委託板 68×66
   var i, w = house(x + 3, y, 62, 25, 17, { ins: 10, rb: 6, pal: SLT });
   P(x + 12, y + 3, SLT[4]); P(x + 12, y + 4, SLT[3]); P(x + 55, y + 3, SLT[3]); P(x + 55, y + 4, SLT[2]);
   for (i = 0; i < 4; i++) post(w[0] + 1 + rd(i * (w[2] - 4) / 3), w[1], w[3], RD2, RD1);
