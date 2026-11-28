@@ -201,9 +201,11 @@
   function cut(t, n) { return t.length > n ? t.slice(0, n) + '…' : t; }
   function renderRight(S) {
     const mh = G.maxHp();
-    const O = D.ORIGINS.find((o) => o.id === S.origin);
+    const O = S.origin ? G.identity() : '';
     const face = 'pl_' + S.origin;
-    let h = '<div class="portrait">' + (IC.has(face) ? ico(face, '', 56) : (O ? O.name : '無名')) + '</div><div class="pname">' + esc(S.name) + '<span class="page" data-testid="age">' + (O ? O.name + '・' : '') + G.ageOf(S.t) + ' 歲</span></div>';
+    // 名字：取名頁時即時預覽草稿（UI-01 Q2 甲）；其餘時候為 S.name 全名。第二段為「身分・N 歲」
+    const nm = S.scene === 'naming' ? nameDraft.sur + nameDraft.given : G.fullName();
+    let h = '<div class="portrait">' + (IC.has(face) ? ico(face, '', 56) : (O || '無名')) + '</div><div class="pname"><span data-testid="pname">' + esc(nm) + '</span><span class="page" data-testid="age">' + (O ? O + '・' : '') + G.ageOf(S.t) + ' 歲</span></div>';
     h += '<div class="pill" style="left:76px;top:28px;width:82px" data-testid="loc">' + D.NODES[S.loc].name + '</div>';
     const td = G.tideInfo();
     h += '<div class="pill date' + (td ? ' hot' : '') + '" style="left:162px;top:28px;width:50px" data-testid="date"' + (td ? ' title="獸潮・' + D.NODES[td.town].name + '，剩 ' + td.left + ' 天"' : '') + '>' + (td ? '獸潮' : G.fmtDate(S.t)) + '</div>';
@@ -271,6 +273,7 @@
     let h = '';
     switch (S.scene) {
       case 'origin': h = sceneOrigin(S); break;
+      case 'naming': h = sceneNaming(S); break;
       case 'map': h = sceneMap(S); break;
       case 'town': h = sceneTown(S); break;
       case 'wild': h = sceneWild(S); break;
@@ -289,16 +292,52 @@
     return '<button class="btn gold' + (cls ? ' ' + cls : '') + '" data-a="explore" data-testid="btn-explore" title="花 1 小時在這裡四處翻找：可能找到東西、聽到見聞，或發現新的地方。靈覺與探幽越高越容易有收穫。">探查（1 小時）</button>';
   }
 
-  // ---------- 出身 ----------
+  // ---------- 標題頁：只放一張「平民」身分卡（DEV-01 開局平民化） ----------
   function sceneOrigin() {
-    let h = '<div class="origin' + scn('road') + '" data-testid="origin"><div class="otitle">山海錄</div><div class="osub">天裂後第三年。選一個出身，之後過什麼日子就長什麼本事。</div><div class="ogrid">';
+    // 假設：副標去掉「選一個出身，」，其餘沿用 v0.3 句子（UI-01 沒有另出標題頁圖）
+    let h = '<div class="origin' + scn('road') + '" data-testid="origin"><div class="otitle">山海錄</div><div class="osub">天裂後第三年。之後過什麼日子，就長什麼本事。</div><div class="ogrid one">';
     D.ORIGINS.forEach((o) => {
       const at = Object.keys(o.attr).map((k) => D.ATTRS.find((a) => a.id === k).name + ' ' + o.attr[k]).join('・') || '素質全 10';
       const pf = Object.keys(o.prof).map((k) => D.PROFS.find((p) => p.id === k).name + ' ' + o.prof[k]).join('・') || '無起手熟練度';
       const gear = o.gear.map((b) => D.BASES[b].name).concat((o.items || []).map(([k, n]) => D.ITEMS[k].name + ' +' + n)).join('、');
-      h += '<button class="ocard" data-a="origin" data-v="' + o.id + '" data-testid="origin-' + o.id + '">' + (IC.has('pl_' + o.id) ? '<span class="oface">' + ico('pl_' + o.id, '', 48) + '</span>' : '') + '<b>' + o.name + '</b><span class="od">' + o.desc + '</span><span class="oa">' + at + '</span><span class="op">' + pf + '</span><span class="og">' + gear + '・' + o.silver + ' 兩</span></button>';
+      h += '<button class="ocard" data-a="origin" data-v="' + o.id + '" data-testid="origin-' + o.id + '">' + (IC.has('pl_' + o.id) ? '<span class="oface">' + ico('pl_' + o.id, '', 48) + '</span>' : '') + '<span class="olabel">身分</span><b>' + o.name + '</b><span class="od">' + o.desc + '</span><span class="oa">' + at + '</span><span class="op">' + pf + '</span><span class="og">' + gear + '・' + o.silver + ' 兩</span></button>';
     });
     return h + '</div></div>';
+  }
+  // ---------- 取名頁（UI-01 SHL-UI01-01）：中欄專頁，不寫入名字直到「確定」 ----------
+  const NAME_MSG = { chars: '不可使用英數、空白或符號。', length: '合計須為 2–4 個中文字。' };
+  const NAME_RULE = '只收中文，合計 2–4 字。預設「沈衡」，不想改也可以直接確定。';
+  let nameDraft = { sur: D.NAME_DEFAULT.sur, given: D.NAME_DEFAULT.given };
+  function nameRuleHtml(errs) { return errs.length ? errs.map((e) => '<div class="red" data-testid="name-err-' + e + '">' + NAME_MSG[e] + '</div>').join('') : '<div>' + NAME_RULE + '</div>'; }
+  function sceneNaming(S) {
+    const errs = G.nameErrors(nameDraft.sur, nameDraft.given);
+    const face = 'pl_' + S.origin;
+    let h = '<div class="origin naming' + scn('road') + '" data-testid="naming"><div class="nm-title">取名</div>';
+    h += '<div class="nm-id" data-testid="name-identity"><span class="nm-face">' + (IC.has(face) ? ico(face, '', 48) : '民') + '</span><span class="nm-idl">身分</span><b>' + G.identity() + '</b></div>';
+    h += '<div class="nm-lead">這名字會寫進日誌與墓誌銘，鎮上的人也會這樣叫你。</div>';
+    h += '<label class="nm-lab" style="left:176px">姓</label><label class="nm-lab" style="left:340px">名</label>';
+    h += '<input class="nm-in" style="left:176px" data-testid="name-sur" data-name="sur" value="' + esc(nameDraft.sur) + '" autocomplete="off" spellcheck="false" aria-label="姓">';
+    h += '<input class="nm-in" style="left:340px" data-testid="name-given" data-name="given" value="' + esc(nameDraft.given) + '" autocomplete="off" spellcheck="false" aria-label="名">';
+    h += '<div class="nm-hint" style="left:176px">1–2 字</div><div class="nm-hint" style="left:340px">1–2 字</div>';
+    h += '<div class="nm-prev"><span>預覽</span><b data-testid="name-preview">' + esc(nameDraft.sur + nameDraft.given) + '</b></div>';
+    h += '<button class="btn nm-rand" data-a="nameRandom" data-testid="btn-name-random">隨機</button>';
+    h += '<button class="btn dark nm-ok" data-a="nameConfirm" data-testid="btn-name-confirm"' + (errs.length ? ' disabled' : '') + '>確定</button>';
+    h += '<div class="nm-pool">開局名池 ' + D.NAME_POOL.length + ' 組（整池抽）：郝朔、祁禾、柯磐、汪季航、包拴</div>';
+    h += '<div class="nm-rule" data-testid="name-rule">' + nameRuleHtml(errs) + '</div>';
+    h += '<button class="btn nm-back" data-a="nameBack" data-testid="btn-name-back">返回標題</button>';
+    return h + '</div>';
+  }
+  // 輸入時只更新取名頁與右欄預覽，不整頁重繪（保留輸入焦點與輸入法組字）
+  function syncNaming() {
+    const su = document.querySelector('[data-testid=name-sur]'), gi = document.querySelector('[data-testid=name-given]');
+    if (!su || !gi) return;
+    nameDraft = { sur: su.value, given: gi.value };
+    const errs = G.nameErrors(nameDraft.sur, nameDraft.given);
+    const full = nameDraft.sur + nameDraft.given;
+    document.querySelector('[data-testid=name-preview]').textContent = full;
+    document.querySelector('[data-testid=btn-name-confirm]').disabled = errs.length > 0;
+    document.querySelector('[data-testid=name-rule]').innerHTML = nameRuleHtml(errs);
+    const pn = document.querySelector('[data-testid=pname]'); if (pn) pn.textContent = full;
   }
 
   // ---------- 世界地圖：區域圖／大陸圖 ----------
@@ -757,7 +796,8 @@
   function sceneDead(S) {
     const d = S.dead;
     const quote = d.codex >= 10 ? '他撿了一路的碎片，沒來得及拼起來。' : d.rumors > 1 ? '聽信了太多傳聞，最後自己也成了傳聞。' : d.kills > 5 ? '刀下亡魂不少，終究也成了荒野一縷。' : d.gathers > 6 ? '識得百草，卻沒能醫好自己。' : '山海路遠，此生只走到這裡。';
-    let h = '<div class="epitaph" data-testid="epitaph"><div class="sub">墓誌銘</div><h1>沈衡之墓</h1><div class="ep-sub">' + d.origin + '・享年 ' + d.age + '・卒於' + d.when + '・' + d.where + '</div>';
+    // UI-01 §4：墓題「{全名}之墓」；副標「平民出身」四字固定（善惡段、所屬、終局三種寫法不在本包）
+    let h = '<div class="epitaph" data-testid="epitaph"><div class="sub">墓誌銘</div><h1 data-testid="epitaph-title">' + esc(d.name) + '之墓</h1><div class="ep-sub" data-testid="epitaph-sub">平民出身・享年 ' + d.age + '・卒於' + d.when + '・' + d.where + '</div>';
     h += '<div class="ep-line">死因：<b>' + esc(d.cause) + '</b></div>';
     h += '<div class="ep-line">行走 ' + d.hours + ' 小時，歷 ' + d.days + ' 日（' + d.date + '）</div>';
     h += '<div class="ep-line">擊殺 ' + d.kills + '・採集 ' + d.gathers + '・製作 ' + d.crafts + '・委託 ' + d.bounties + '・傳聞 ' + d.rumors + '</div>';
@@ -805,8 +845,7 @@
       if (all.length > fs.length) h += '<p class="sub">還有 ' + (all.length - fs.length) + ' 個勢力你還不知道。多聽、多看、多探查。</p>';
       h += '</div>';
     } else if (S.overlay === 'char') {
-      const O = D.ORIGINS.find((o) => o.id === S.origin);
-      h += '<h2>人物・' + esc(S.name) + '（' + (O ? O.name : '無名') + '・' + G.ageOf(S.t) + ' 歲）</h2><div class="jbody">';
+      h += '<h2 data-testid="char-title">人物・' + esc(G.fullName()) + '（' + G.identity() + '・' + G.ageOf(S.t) + ' 歲）</h2><div class="jbody">';
       h += '<div class="cattrs">' + D.ATTRS.map((a) => '<div class="cattr"><b>' + a.name + ' ' + G.attrVal(a.id) + '</b><div class="pb"><i style="width:' + (G.attrProgress(a.id) * 100).toFixed(0) + '%"></i></div><span>' + a.desc + '</span></div>').join('') + '</div>';
       h += '<h3>招式與技能</h3><div class="ctechs">';
       S.skills.forEach((k) => { const K = D.SKILLS[k]; h += '<div class="ctech got">' + ico(K.ic, K.g, 24) + '<div><b>' + K.name + '</b><em>' + (K.active ? '主動' : '被動') + '・' + K.src + '</em><span>' + K.desc + '</span></div></div>'; });
@@ -975,7 +1014,15 @@
     const S = G.state;
     hideTip();
     switch (a) {
-      case 'origin': return G.chooseOrigin(v);
+      case 'origin': nameDraft = { sur: D.NAME_DEFAULT.sur, given: D.NAME_DEFAULT.given }; return G.chooseOrigin(v);
+      case 'nameBack': return G.backToTitle();
+      case 'nameRandom': {
+        const n = G.randomName();
+        const su = document.querySelector('[data-testid=name-sur]'), gi = document.querySelector('[data-testid=name-given]');
+        if (su && gi) { su.value = n.sur; gi.value = n.given; syncNaming(); }
+        return;
+      }
+      case 'nameConfirm': syncNaming(); return G.confirmName(nameDraft.sur, nameDraft.given);
       case 'unequip': return G.unequip(v);
       case 'pack': return G.clickPack(+v);
       case 'pickup': return G.pickupGround(+v);
@@ -1022,6 +1069,8 @@
       case 'restartAsk': if (window.confirm('確定放棄此生？存檔將刪除。')) G.restart(); return;
     }
   });
+  document.addEventListener('input', (ev) => { if (ev.target.closest && ev.target.closest('.nm-in')) syncNaming(); });
+  document.addEventListener('compositionend', (ev) => { if (ev.target.closest && ev.target.closest('.nm-in')) syncNaming(); });
   document.addEventListener('contextmenu', (ev) => {
     const el = ev.target.closest('[data-a="pack"]');
     const S = G.state;
@@ -1048,7 +1097,7 @@
     else if (ev.key === 'r' || ev.key === 'R') { flushFx(); if (G.state.combat) G.toggleRetreat(!G.state.combat.retreatOpen); }
   });
 
-  // 啟動：?seed=數字 固定亂數；?fresh=1 強制新局；?origin=hunter 等直接指定出身；?fx=0 關閉戰鬥演出
+  // 啟動：?seed=數字 固定亂數；?fresh=1 強制新局；?origin=drifter 跳過標題與取名頁（預設名「沈衡」，身分平民；給 e2e 與截圖用）；?fx=0 關閉戰鬥演出
   const seed = Q.has('seed') ? parseInt(Q.get('seed'), 10) : undefined;
   G.init({ seed, fresh: Q.get('fresh') === '1', origin: Q.get('origin') || undefined });
 })();

@@ -224,7 +224,7 @@ window.SHL = (function () {
       schema: SCHEMA,
       seed: seed >>> 0, rng: seed >>> 0, uid: 0,
       meta: { saveMode: 'permadeath', createdAt: Date.now() },
-      name: '沈衡', origin: null,
+      name: null, origin: null, // name 由取名頁確定後寫入 { sur, given }（UI-01 §1）
       t: DAY_START, loc: 'huiyao', scene: 'origin', overlay: null,
       hp: 80, food: 80, fat: 10, silver: 60, corrupt: 0,
       attr, attrXp, prof, profTab: 'ye',
@@ -244,11 +244,53 @@ window.SHL = (function () {
     S.world.next = ri(D.TIDE.first[0], D.TIDE.first[1]);
     S.equip.bag = newEq('bag_cloth').eq;
     padPack();
-    if (originId) applyOrigin(originId);
+    if (originId) applyOrigin(originId, D.NAME_DEFAULT); // 開局捷徑（?origin=…）：跳過標題與取名頁，用預設名
     else emit();
   }
-  function applyOrigin(id) {
-    const O = D.ORIGINS.find((o) => o.id === id) || D.ORIGINS[D.ORIGINS.length - 1];
+  // ================= 取名（DEV-01／UI-01） =================
+  // 硬規則（UI-01 §4）：姓 1–2 字、名 1–2 字，合計 2–4 個中文字；只收 CJK 統一漢字；不收空白、符號、英數。
+  // 不做「不得與命名 NPC 同名」檢查；基本禁字表（三、七、九、滿、衡）本包不實作（與預設「沈衡」衝突，待裁）。
+  const CJK = /^[\u3400-\u4DBF\u4E00-\u9FFF\u{20000}-\u{2A6DF}\u{2A700}-\u{2EBEF}\u{30000}-\u{3134F}]$/u;
+  function nameErrors(sur, given) {
+    const a = Array.from(String(sur == null ? '' : sur)), b = Array.from(String(given == null ? '' : given));
+    const errs = [];
+    if (!a.concat(b).every((ch) => CJK.test(ch))) errs.push('chars');
+    if (a.length < 1 || a.length > 2 || b.length < 1 || b.length > 2) errs.push('length');
+    return errs;
+  }
+  // 全名：S.name = { sur, given }
+  function fullName(n) { n = n === undefined ? (S && S.name) : n; return n && n.sur && n.given ? n.sur + n.given : ''; }
+  // 身分：開局一律「平民」；找不到對應卡（例如舊存檔的已移除出身）時也顯示平民（假設）
+  function identity() { return (D.ORIGINS.find((o) => o.id === S.origin) || D.ORIGINS[0]).name; }
+  // 懸賞令只預留名字欄（UI-01 §2／§4；通緝令畫面不在本包）。告示榜、判決書、獵令之後一律從這裡讀 S.name。
+  function wantedPoster(silver) { return { name: fullName(), text: '緝拿 ' + fullName() + '，賞銀 ' + silver + ' 兩，死活不論' }; }
+  // 隨機鈕：整池 60 組抽一組，不依身分、性別或風格篩選。
+  // 假設：UI 層的隨機不使用 S.rng（避免改動遊戲內亂數序列），用 Math.random。
+  function randomName() { const p = D.NAME_POOL[Math.floor(Math.random() * D.NAME_POOL.length)]; return { sur: p[0], given: p[1] }; }
+  // 舊存檔後備名：以 S.seed 決定（同一存檔每次讀到同一組），不用 S.rng
+  function fallbackName(seed) { const p = D.NAME_POOL[(seed >>> 0) % D.NAME_POOL.length]; return { sur: p[0], given: p[1] }; }
+  function hasNameStruct(n) { return !!(n && typeof n === 'object' && typeof n.sur === 'string' && typeof n.given === 'string' && n.sur && n.given); }
+  // 標題頁點「平民」卡 → 中欄取名頁
+  function chooseOrigin(id) {
+    if (S.scene !== 'origin') return;
+    S.origin = (D.ORIGINS.find((o) => o.id === id) || D.ORIGINS[0]).id;
+    S.scene = 'naming';
+    emit();
+  }
+  // 返回標題：不寫入名字
+  function backToTitle() {
+    if (S.scene !== 'naming') return;
+    S.origin = null; S.scene = 'origin';
+    emit();
+  }
+  function confirmName(sur, given) {
+    if (S.scene !== 'naming' || nameErrors(sur, given).length) return false;
+    applyOrigin(S.origin, { sur, given });
+    return true;
+  }
+  function applyOrigin(id, name) {
+    S.name = { sur: name.sur, given: name.given };
+    const O = D.ORIGINS.find((o) => o.id === id) || D.ORIGINS[0];
     S.origin = O.id;
     Object.keys(O.attr).forEach((k) => (S.attr[k] = O.attr[k]));
     Object.keys(O.prof).forEach((k) => (S.prof[k].lv = O.prof[k]));
@@ -262,12 +304,11 @@ window.SHL = (function () {
     restockShops();
     D.BOUNTIES.forEach((b) => S.quests.push({ id: b.id, town: b.town, g: b.g, ic: b.enemy || b.item || D.NODES[b.dungeon].ic, title: b.title, kind: b.kind, enemy: b.enemy, item: b.item, dungeon: b.dungeon, need: b.need, reward: b.reward, due: null, fixed: true, giver: b.giver || null, prog: 0, status: b.giver ? 'hidden' : b.start ? 'active' : 'open' }));
     genQuests();
-    log('沈衡（' + O.name + '）在灰窯鎮醒來。鎮公所的「灰髯狼 ×3」已揭下。');
+    log(fullName() + '（' + O.name + '）在灰窯鎮醒來。鎮公所的「灰髯狼 ×3」已揭下。');
     log('點建築進去辦事，點路人交談。離鎮後每個地點都能探查。');
     save();
     emit();
   }
-  function chooseOrigin(id) { if (S.scene !== 'origin') return; applyOrigin(id); }
   // 貨架：每棟有貨的建築各自補貨；行商每天換貨；撿骨師賣未鑑定的撿來裝備
   function stockRow(row) {
     const [k, price, extra, rep] = row;
@@ -321,6 +362,8 @@ window.SHL = (function () {
     const w = readRaw();
     if (!w || w.schema !== SCHEMA || !w.state || w.state.dead) return false;
     S = w.state;
+    // DEV-01 舊存檔後備名（本批唯一的舊檔例外）：沒有姓名結構時，從名池以 seed 取一組並寫回
+    if (!hasNameStruct(S.name)) { S.name = fallbackName(S.seed); save(); }
     return true;
   }
 
@@ -451,7 +494,9 @@ window.SHL = (function () {
     S.dead = {
       cause, where: N.name, when: fmtTime(S.t),
       days: dayOf(S.t), hours: Math.round(S.stats.hours),
-      origin: (D.ORIGINS.find((o) => o.id === S.origin) || {}).name || '無名', age: ageOf(S.t), date: fmtDate(S.t),
+      name: fullName(), origin: identity(), age: ageOf(S.t), date: fmtDate(S.t),
+      // SPEC-02 §12.2 墓誌銘接口：本包只寫 name（玩家自取名字）；善惡、所屬、終局等欄位屬之後的包
+      epitaph: { name: fullName(), cause },
       attrs: D.ATTRS.map((a) => a.name + ' ' + S.attr[a.id]).join('・'),
       profs: D.PROFS.filter((p) => profLv(p.id) > 0).sort((a, b) => profLv(b.id) - profLv(a.id)).slice(0, 5).map((p) => p.name + ' ' + profLv(p.id)).join('・') || '一事無成',
       rumors: S.stats.rumors, finds: S.stats.finds, codex: S.codex.length,
@@ -461,7 +506,7 @@ window.SHL = (function () {
     };
     S.combat = null; S.event = null; S.loot = null; S.overlay = null;
     S.scene = 'dead';
-    log('沈衡死於' + N.name + '：' + cause, 'bad');
+    log(fullName() + '死於' + N.name + '：' + cause, 'bad');
     // 純永久死亡：刪檔（檢查點模式則保留 checkpoint 快照，本版介面不開放）
     if (S.meta.saveMode === 'permadeath') wipeSave();
   }
@@ -564,7 +609,7 @@ window.SHL = (function () {
   }
   // ---------- 拖拉：from／to 形如 pack:3、slot:main、ground:0、ground、shop:2、sell ----------
   function drag(from, to) {
-    if (S.dead || S.scene === 'origin' || from === to) return false;
+    if (S.dead || S.scene === 'origin' || S.scene === 'naming' || from === to) return false;
     const [fz, fv] = from.split(':'); const [tz, tv] = to.split(':');
     const inShop = S.scene === 'town' && !!S.shops[S.townTab]; const inMarket = S.scene === 'town' && !!(bld() && bld().buys);
     if (fz === 'pack') {
@@ -1166,7 +1211,7 @@ window.SHL = (function () {
     return clamp(0.55 + (attrVal('ling') - 10) * 0.04 + profLv('tanyou') * 0.006 - n * 0.08, 0.15, 0.95);
   }
   function explore() {
-    if (S.combat || S.dead || S.scene === 'origin' || S.scene === 'event' || S.scene === 'loot') return;
+    if (S.combat || S.dead || S.scene === 'origin' || S.scene === 'naming' || S.scene === 'event' || S.scene === 'loot') return;
     const id = S.loc; const list = D.EXPLORE[id] || []; const n = S.found[id] || 0;
     const hours = perk('tanyou', 50) ? 0.5 : 1;
     const p = exploreChance(id);
@@ -1769,6 +1814,7 @@ window.SHL = (function () {
     attrVal, attrProgress, profLv, profProgress, perk,
     eqBase, eqValue, itemWt, itemName, itemGlyph, itemIcon, countItem, affixSum, reqUnmet, slotFits,
     clickPack, unequip, useItem, pickupGround, drag, identify, identifyFee, chooseOrigin,
+    backToTitle, confirmName, nameErrors, fullName, identity, randomName, fallbackName, wantedPoster,
     place, bld, inBld, known, repOk, repOf, knownFactions, LORE,
     selectDest, travel, travelPreview, toMap, enterHere, route, setMapView,
     explore, exploreInfo, exploreChance, wildPoints,
