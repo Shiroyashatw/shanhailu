@@ -2,7 +2,7 @@
  * 用法：node tests/e2e-dev05.js [--shots]
  *   --shots  另存 1280×720 實機截圖（deviceScaleFactor 2）至 docs/evidence/shots-shanhailu-dev05-1128/（可用 SHOTS_DIR 覆寫）
  * fix1（1128）：依 SPEC-TIME v0.5 §7.1b／§7.2／B1、SPEC-01 v0.5 §4.9／§7、SPEC-02 驗收 34、decisions-producer-1128-1727、dev05-strings-v0.1。
- * 依據（初版）：docs/design/batch1/specs/SPEC-01.md v0.4 §7、§13；UI-02/README.md 與 UI-02-01／02／03／05／06；
+ * 依據（初版）：docs/specs/SPEC-01.md v0.4 §7、§13；UI-02/README.md 與 UI-02-01／02／03／05／06；
  *       UI-02/wording-map-commission.md；city-status-copy-v0.1.csv；decisions-producer-1128-1646.md 第 1 項；rollout-plan-v0.1.md 第 116 行。
  * 既有 tests/e2e.js、tests/e2e-dev02.js 不在此重複；本檔只放 DEV-05 的新斷言。
  */
@@ -279,7 +279,7 @@ function sameCity(dom, want) {
   await fresh(page, base);
   const qs = await page.evaluate(() => {
     const G = window.SHL; const S = G.state; const day = G.dayOf(S.t);
-    // 造齊四種單：長期獵殺（起手固定單）、有期限獵殺（腐骨沼＝中高）、收集（無險級）、送貨（押金）
+    // 造齊四種單：長期獵殺（起手固定單）、有期限獵殺（腐骨沼＝高）、收集（無險級）、送貨（押金）
     S.quests = S.quests.filter((q) => q.town !== 'huiyao' || q.fixed);
     S.quests.push({ id: 'tq_leech', town: 'huiyao', kind: 'kill', enemy: 'leech', need: 2, g: '蛭', ic: 'leech', title: '獵殺沼蛭 ×2', reward: 34, due: day + 1, fixed: false, prog: 0, status: 'open' });
     S.quests.push({ id: 'tq_col', town: 'huiyao', kind: 'collect', item: 'herb_zx', need: 4, g: '草', ic: 'herb_zx', title: '收購止血草 ×4', reward: 18, due: day + 1, fixed: false, prog: 0, status: 'open' });

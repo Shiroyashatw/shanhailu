@@ -428,7 +428,7 @@
   }
 
   // ---------- 城鎮：平面圖（街上）與建築內部 ----------
-  const TYPE_HINT = { market: '買賣', smith: '兵甲', apoth: '藥', inn: '歇腳・傳聞', board: '委託', shrine: '上香', tower: '遠望', drill: '操練', medic: '治傷', tea: '茶', bone: '撿來的', crow: '見聞' };
+  const TYPE_HINT = { market: '買賣', smith: '兵甲', apoth: '藥', inn: '歇腳・傳聞', board: '委託', shrine: '祭祀', tower: '遠望', drill: '操練', medic: '治傷', tea: '茶', bone: '撿來的', crow: '見聞' };
   function planBoxes(S) {
     const P = G.place(); const real = SC.buildings && SC.buildings[P.plan];
     const out = {};
@@ -452,7 +452,7 @@
       [[250, 236], [252, 340], [262, 470]],                     // 窯神廟與藥鋪之間的西巷
       [[320, 300], [480, 300], [480, 372], [320, 372], [320, 300]], // 井台一圈
       [[560, 240], [600, 280], [760, 290]],                     // 鐵鋪前東街
-      [[470, 236], [480, 150], [488, 70]],                      // 鎮公所與客棧之間的北巷
+      [[470, 236], [480, 150], [488, 70]],                      // 鎮衙與客棧之間的北巷
     ],
     plan_duyin: [
       [[398, 176], [398, 300], [398, 506]],                     // 關樓到關門的中軸大道
@@ -615,22 +615,22 @@
       }
       case 'board': h += tabBounty(S); break;
       case 'shrine':
-        h += '<div class="irow" style="left:0;top:8px">' + svc('offer', '香', '上香', '需要線香 ×1（持有 ' + G.countItem('incense') + '）') + '</div>';
+        h += '<div class="irow" style="left:0;top:8px">' + svc('offer', '香', '祭祀', '需要線香 ×1（持有 ' + G.countItem('incense') + '）') + '</div>';
         h += '<div class="note" style="top:84px">香爐是冷的。神像的臉裂成兩半。</div>';
         break;
       case 'tower':
         h += '<div class="irow" style="left:0;top:8px">' + svc('look', '望', '登樓遠望', '半小時・看得出獸潮還有幾天') + '</div>';
-        h += '<div class="note" style="top:84px">關門三年沒開過。門外是血霧起的方向。</div>';
+        h += '<div class="note" style="top:84px">關門三年沒開過。門外是紅霧起的方向。</div>';
         break;
       case 'medic':
         h += '<div class="irow" style="left:0;top:8px">' + svc('heal', '治', '治傷', c.heal + ' 兩・生命回滿') + svc('cleanse', '清', '清除侵蝕', c.cleanse + ' 兩・目前侵蝕 ' + S.corrupt) + svc('bunk', '鋪', '睡通鋪', (c.bunk ? c.bunk + ' 兩' : '免費') + '・' + sleepTxt()) + '</div>';
-        h += '<div class="note" style="top:84px">被血霧侵蝕的人，生命上限會一點一點掉。客棧歇一夜能退一些，這裡能清乾淨。</div>';
+        h += '<div class="note" style="top:84px">被紅霧侵蝕的人，生命上限會一點一點掉。客棧歇一夜能退一些，這裡能清乾淨。</div>';
         break;
       case 'drill': h += tabDrill(S, c); break;
       case 'crow': {
         const fresh = S.codex.filter((x) => !S.reported.includes(x)).length;
         h += '<div class="irow" style="left:0;top:8px">' + svc('report', '報', '回報見聞', fresh ? fresh + ' 條新的・共 ' + fresh * c.report + ' 兩' : '沒有新的見聞') + svc('yaying', '影', '學〈鴉影〉', S.skills.includes('yaying') ? '已習得' : c.yaying + ' 兩・鴉衛聲望 14', null, S.skills.includes('yaying')) + '</div>';
-        h += '<div class="ttl" style="left:0;top:84px">請赤鴉辨傳聞（' + c.judge + ' 兩一則・鴉衛聲望 6）</div>';
+        h += '<div class="ttl" style="left:0;top:84px">請鴉首辨傳聞（' + c.judge + ' 兩一則・鴉衛聲望 6）</div>';
         if (!S.rumors.length) h += '<div class="note" style="top:102px">你身上沒有記著的傳聞。</div>';
         S.rumors.forEach((r, i) => (h += '<div class="rrow" style="top:' + (102 + i * 34) + 'px"><span class="rtx">【' + D.RUMOR.kinds[r.kind].name + '・' + D.NODES[r.node].name + '】' + (r.judged ? '<span class="hint">' + D.RUMOR.trace[r.truth] + '</span>' : esc(cut(r.text, 30))) + '</span><button class="btn ' + (r.judged ? 'dis' : 'gold') + '" ' + (r.judged ? 'disabled' : '') + ' data-a="svc" data-v="judge:' + r.id + '" data-testid="btn-judge-' + i + '">' + (r.judged ? '已辨' : '辨') + '</button></div>'));
         break;
@@ -738,7 +738,7 @@
     });
     return h;
   }
-  // 鎮公所委託單（UI-02-06、wording-map §2）：目標／地點／報酬／時限／風險寫在單上，不另開確認窗
+  // 鎮衙委託單（UI-02-06、wording-map §2）：目標／地點／報酬／時限／風險寫在單上，不另開確認窗
   function tabBounty(S) {
     const Q = TX.quest;
     let h = '<div class="ttl" style="left:0;top:0">委託・' + D.NODES[S.loc].name + '</div>';
@@ -821,7 +821,7 @@
     const DG = D.DUNGEONS[S.loc]; const st = S.dungeon;
     const cleared = st.clearedDay === G.dayOf(S.t);
     let h = '<div class="dgscene' + scn('dg_' + S.loc) + '" data-testid="dungeon">';
-    h += '<div class="stagehead"><span class="pill">' + D.NODES[S.loc].name + '</span><span class="pill' + riskCls(DG.risk) + '" data-testid="head-risk">險 ' + DG.risk + '</span>' + (DG.mist ? '<span class="pill hot">血霧：每層侵蝕 +' + DG.mist + '</span>' : '') + '</div>';
+    h += '<div class="stagehead"><span class="pill">' + D.NODES[S.loc].name + '</span><span class="pill' + riskCls(DG.risk) + '" data-testid="head-risk">險 ' + DG.risk + '</span>' + (DG.mist ? '<span class="pill hot">紅霧：每層侵蝕 +' + DG.mist + '</span>' : '') + '</div>';
     h += rumorChips(S);
     h += '<div class="dgdesc">' + DG.scene + '</div>';
     h += '<div class="floors">';
@@ -840,7 +840,7 @@
   }
 
   // ---------- 戰鬥 ----------
-  const INTENT = { atk: ['⚔ 攻擊', ''], heavy: ['✕ 重擊', 'heavy'], bleed: ['撕咬・流血', ''], poison: ['毒咬・下毒', 'poison'], drain: ['吸血', 'poison'], corrupt: ['血霧・侵蝕', 'heavy'] };
+  const INTENT = { atk: ['⚔ 攻擊', ''], heavy: ['✕ 重擊', 'heavy'], bleed: ['撕咬・流血', ''], poison: ['毒咬・下毒', 'poison'], drain: ['吸血', 'poison'], corrupt: ['紅霧・侵蝕', 'heavy'] };
   function intentHtml(e, stun) {
     const it = e.intent; if (!it) return '';
     if (stun) return '<div class="intent guard">措手不及</div>';
@@ -1006,7 +1006,7 @@
         '地圖：每個地點都能走、都能「探查」。探查會找到見聞（世界觀碎片）、藏物、新的採集點，甚至地圖上原本沒有的地方。',
         '城鎮：點建築進去，裡面有老闆和服務；點路人交談。專門店（鐵匠收礦、藥鋪收藥草、軍需收獸皮）出價比商號高 15%，但只收自己那一類。',
         '戰鬥：行動都在下方那一條。武器招式靠熟練度解鎖，會增加疲累並有冷卻。也可以直接點左邊人形上的武器出手、點盾牌防禦。數字鍵 1–9 對應行動列，R 是棄物撤退。演出中再按一次會直接收尾。',
-        '狀態：流血與中毒每回合扣血；破甲使護甲歸零；失衡會跳過一次行動；侵蝕來自血霧，會降低生命上限，客棧歇一夜退一些，傷兵帳能清乾淨。',
+        '狀態：流血與中毒每回合扣血；破甲使護甲歸零；失衡會跳過一次行動；侵蝕來自紅霧，會降低生命上限，客棧歇一夜退一些，傷兵帳能清乾淨。',
         '勢力：完成委託漲破曉軍團聲望；在天星商號買賣漲天星聲望；把見聞回報給鴉衛漲鴉衛聲望。各有門檻好處，左欄下方看得到。',
         '委託有期限。傳聞可能屬實、有人盤踞、強敵鎮守、已被取走，或是餌，而且會過時。獸潮每隔幾天襲擊一座城鎮，不理會有後果。',
         '拖拉：行囊格互換或合併；行囊↔人形槽＝穿脫；拖到「地面」＝丟下；店裡拖到交易欄＝賣、貨架拖進行囊＝買一個。',

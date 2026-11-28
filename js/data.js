@@ -33,7 +33,7 @@ window.SHL_DATA = (function () {
     leech_gland: { name: '蛭腺', g: '腺', wt: 1, stack: 5, type: 'mat', desc: '沼蛭的毒腺，可製解毒丸。' },
     dogtag: { name: '軍牌', g: '牌', wt: 1, stack: 5, type: 'mat', desc: '遠征軍的軍牌。破曉營軍需帳與撿骨師都收。' },
     bone_relic: { name: '神骨碎片', g: '骨', wt: 2, stack: 3, type: 'mat', desc: '嵌在裂口岩壁裡、微微發光的骨頭。撿骨師重金收。' },
-    blood_moss: { name: '血苔', g: '苔', wt: 1, stack: 10, type: 'mat', desc: '長在血霧裡的苔，藥鋪收。' },
+    blood_moss: { name: '血苔', g: '苔', wt: 1, stack: 10, type: 'mat', desc: '長在紅霧裡的苔，藥鋪收。' },
     incense: { name: '線香', g: '香', wt: 0, stack: 5, type: 'quest', desc: '三炷線香。可以拿去窯神廟。' },
     parcel: { name: '委託包裹', g: '包', wt: 3, stack: 1, type: 'quest', desc: '送貨委託的包裹。送到指定城鎮的委託板交付。' },
     scroll_beng: { name: '崩岩擊殘卷', g: '卷', ic: 'scroll', wt: 1, stack: 1, type: 'scroll', skill: 'beng', desc: '點擊研讀：習得主動技「崩岩擊」。' },
@@ -156,7 +156,7 @@ window.SHL_DATA = (function () {
     leech: { name: '沼蛭', g: '蛭', lv: 20, hp: 24, dmg: [3, 5], spd: 9, armor: 0, beast: true, pat: ['drain', 'poison', 'atk'], skin: [0, 0], meat: [0, 0], extra: 'leech_gland' },
     bogcorpse: { name: '沼屍', g: '沼', lv: 30, hp: 42, dmg: [6, 9], heavy: [14, 18], spd: 5, armor: 3, pat: ['atk', 'poison', 'charge', 'atk'] },
     deserter: { name: '逃兵', g: '逃', lv: 20, hp: 30, dmg: [5, 8], heavy: [12, 16], spd: 10, armor: 4, pat: ['atk', 'guard', 'charge', 'atk'], silver: [6, 16], drop: ['dogtag', 0.4] },
-    wraith: { name: '血霧妖', g: '霧', lv: 45, hp: 34, dmg: [7, 10], spd: 13, armor: 0, pat: ['corrupt', 'atk', 'bleed'] },
+    wraith: { name: '紅霧妖', g: '霧', lv: 45, hp: 34, dmg: [7, 10], spd: 13, armor: 0, pat: ['corrupt', 'atk', 'bleed'] },
     soldier_dead: { name: '遠征亡卒', g: '卒', lv: 50, hp: 50, dmg: [8, 11], heavy: [18, 24], spd: 8, armor: 6, pat: ['atk', 'guard', 'charge', 'atk'], drop: ['dogtag', 0.6] },
     rooster: { name: '酉神殘影', g: '酉', lv: 80, hp: 160, dmg: [11, 15], heavy: [26, 34], spd: 12, armor: 5, boss: true, pat: ['atk', 'corrupt', 'charge', 'bleed', 'atk', 'guard'] },
     golem: { name: '守墓俑', g: '俑', lv: 40, hp: 55, dmg: [6, 9], heavy: [16, 20], spd: 5, armor: 9, pat: ['guard', 'atk', 'charge', 'atk'] },
@@ -205,7 +205,7 @@ window.SHL_DATA = (function () {
     { a: 'fuzhao', b: 'guzhong', h: 1 },
   ];
   // 區域圖上的淡色地名
-  const REGION_LABELS = [['灰窯原', 640, 250], ['青霧山', 250, 372], ['腐骨沼', 610, 512], ['血霧', 40, 420]];
+  const REGION_LABELS = [['灰窯原', 640, 250], ['青霧山', 250, 372], ['腐骨沼', 610, 512], ['紅霧', 40, 420]];
 
   // ---------- 3 類荒野採集區 ----------
   const WILDS = {
@@ -286,7 +286,7 @@ window.SHL_DATA = (function () {
     boss: { loot: { rare: 0.8, legend: 0.2 }, silver: [60, 90] },
   };
   DUNGEONS.liekou = {
-    risk: '極高', scene: '神墜之處。地層一層一層露在外面，血霧從底下往上湧。', mist: 2,
+    risk: '極高', scene: '神墜之處。地層一層一層露在外面，紅霧從底下往上湧。', mist: 2,
     floors: [['wraith'], ['soldier_dead', 'wraith'], ['soldier_dead', 'soldier_dead'], ['rooster']],
     floorNames: ['裂口', '霧層', '亡卒道', '神墜處'],
     loot: { rare: 0.7, legend: 0.3 }, silver: [20, 40], drops: '稀有／傳奇裝備、軍牌、神骨碎片',
@@ -305,7 +305,7 @@ window.SHL_DATA = (function () {
   // plan＝平面圖場景 id（js/scenes_town.js）；price＝引用哪套行情；board＝有委託板；tide＝會被獸潮襲擊
   const PLACES = {
     huiyao: { plan: 'plan_huiyao', price: 'huiyao', desc: '礦窯小鎮。煤灰落在每一片屋瓦上。', buildings: ['hy_market', 'hy_inn', 'hy_apoth', 'hy_smith', 'hy_board', 'hy_shrine'], street: ['np_aman', 'np_story', 'np_miner'], board: 'hy_board', tide: true },
-    duyin: { plan: 'plan_duyin', price: 'duyin', desc: '邊關。牆外就是血霧起的方向。', buildings: ['dy_market', 'dy_inn', 'dy_smith', 'dy_apoth', 'dy_board', 'dy_tower'], street: ['np_refugee'], board: 'dy_board', tide: true },
+    duyin: { plan: 'plan_duyin', price: 'duyin', desc: '邊關。牆外就是紅霧起的方向。', buildings: ['dy_market', 'dy_inn', 'dy_smith', 'dy_apoth', 'dy_board', 'dy_tower'], street: ['np_refugee'], board: 'dy_board', tide: true },
     poxiao: { plan: 'plan_poxiao', price: 'duyin', desc: '破曉軍團的營地。旗上繡著半個日頭。', buildings: ['px_drill', 'px_quarter', 'px_medic', 'px_board'], street: ['np_wounded', 'np_recruit'], board: 'px_board' },
     yizhan: { plan: 'plan_yizhan', price: 'huiyao', desc: '官道上的驛站。來往的人在這裡喝一碗茶。', buildings: ['yz_tea', 'yz_peddler'], street: [] },
     shigu: { plan: 'plan_shigu', price: 'duyin', desc: '裂口出口旁的營地。骨頭排得很整齊。', buildings: ['sg_tent'], street: [] },
@@ -321,7 +321,7 @@ window.SHL_DATA = (function () {
       stock: [['pot_hp', 9, 6], ['antidote', 8, 4], ['herb_zx', 5, 6]] },
     hy_smith: { place: 'huiyao', type: 'smith', name: '石記鐵鋪', npc: 'np_shigan', buys: ['ore', 'eq'],
       stock: [['blade_short', 30], ['hammer', 34], ['spear', 40], ['buckler', 18], ['leather', 34]] },
-    hy_board: { place: 'huiyao', type: 'board', name: '鎮公所', npc: 'np_zhou', faction: 'dawn' },
+    hy_board: { place: 'huiyao', type: 'board', name: '鎮衙', npc: 'np_zhou', faction: 'dawn' },
     hy_shrine: { place: 'huiyao', type: 'shrine', name: '窯神廟', npc: 'np_yabo' },
     dy_market: { place: 'duyin', type: 'market', name: '天星關市', npc: 'np_jia', faction: 'star', buys: 'all', identify: true,
       stock: [['bag_travel', 48], ['bag_trade', 96], ['bag_fine', 180, null, { star: 25 }], ['belt_wide', 28], ['amulet', 44, 'blue'], ['ring_jade', 40, 'blue'], ['jade', 46], ['bread', 3, 10], ['yam', 5, 8], ['smoked', 6, 6], ['tea', 2, 6]] },
@@ -353,20 +353,20 @@ window.SHL_DATA = (function () {
   };
   // NPC：頭像 ic＝npc id；fig＝站在平面圖上的小人；codex＝閒談會給的見聞錄條目（依序）
   const NPCS = {
-    np_qian: { name: '錢四海', title: '天星分號掌櫃' }, np_liu: { name: '柳三娘', title: '老窯客棧老闆娘' },
+    np_qian: { name: '錢四海', title: '天星分號掌櫃' }, np_liu: { name: '柳三娘', title: '老窯客棧老闆' },
     np_baizhu: { name: '白朮', title: '回春藥鋪藥師', codex: ['c_bloodrain'] }, np_shigan: { name: '石敢', title: '鐵匠' },
-    np_zhou: { name: '周里正', title: '灰窯鎮里正', codex: ['c_warlord'] }, np_yabo: { name: '啞伯', title: '守廟人' },
+    np_zhou: { name: '周里正', title: '里正', codex: ['c_warlord'] }, np_yabo: { name: '啞伯', title: '窯神廟祝' },
     np_jia: { name: '賈掌櫃', title: '天星商會大掌櫃', codex: ['c_star'] }, np_ge: { name: '老葛', title: '酒保', codex: ['c_army'] },
     np_yan: { name: '嚴鐵娘', title: '軍械匠' }, np_kushen: { name: '苦參', title: '遊方郎中', codex: ['c_qiqing'] },
     np_han: { name: '韓厲', title: '破曉軍團百夫長', codex: ['c_dawn'] }, np_ding: { name: '丁老七', title: '守關老卒', codex: ['c_night'] },
     np_huo: { name: '霍青', title: '破曉營教頭' }, np_suanpan: { name: '算盤', title: '軍需官' },
-    np_wen: { name: '溫姑', title: '醫官', codex: ['c_mist'] }, np_xiaoman: { name: '小滿', title: '傳令兵' },
+    np_wen: { name: '溫姑', title: '破曉醫官', codex: ['c_mist'] }, np_xiaoman: { name: '小滿', title: '傳令兵' },
     np_zhang: { name: '駝背張', title: '茶攤老闆' }, np_ma: { name: '馬六', title: '天星行商' },
-    np_bone: { name: '撿骨師', title: '', codex: ['c_bonepicker'] }, np_chiya: { name: '赤鴉', title: '鴉衛', codex: ['c_crow', 'c_chiya'] },
-    np_aman: { name: '阿滿', title: '乞兒', fig: 'fig_child', act: 'rumor' },
+    np_bone: { name: '撿骨師', title: '', codex: ['c_bonepicker'] }, np_chiya: { name: '赤鴉', title: '鴉首', codex: ['c_crow', 'c_chiya'] },
+    np_aman: { name: '阿滿', title: '賣傳聞的乞兒', fig: 'fig_child', act: 'rumor' },
     np_story: { name: '灰窯說書人', title: '', fig: 'fig_elder', codex: ['c_geo', 'c_gods'] },
     np_miner: { name: '老礦工', title: '', fig: 'fig_man', codex: ['c_fall'] },
-    np_refugee: { name: '難民婦人', title: '', fig: 'fig_woman', quest: 'b_refugee', codex: ['c_kiln'] },
+    np_refugee: { name: '難民婦人', title: '尋人難民', fig: 'fig_woman', quest: 'b_refugee', codex: ['c_kiln'] },
     np_wounded: { name: '傷兵', title: '破曉軍團', fig: 'fig_soldier', codex: ['c_army'] },
     np_recruit: { name: '新兵', title: '破曉軍團', fig: 'fig_soldier' },
   };
@@ -377,7 +377,7 @@ window.SHL_DATA = (function () {
   const FACTIONS = {
     dawn: { name: '破曉軍團', g: '曉', ic: 'f_dawn', desc: '冒險者、傭兵與亡國殘兵的聯合武裝，在各地建據點護民。', how: '完成委託、擊退獸潮、清空地城、上繳軍牌、資助巡邏', perks: [[10, '校場肯教〈破陣〉'], [20, '委託報酬 +15%']] },
     star: { name: '天星商會', g: '星', ic: 'f_star', desc: '天裂前就幾乎壟斷大陸經濟的金融帝國，災變後仍有辦法把貨運到。', how: '在天星商號與行商買賣、完成送貨、付費鑑定', perks: [[10, '商號九五折'], [25, '可買精工大囊、鑑定半價']] },
-    crow: { name: '鴉衛', g: '鴉', ic: 'f_crow', desc: '人數極少的情報組織，專門調查天裂之後的異象。', how: '向赤鴉回報見聞、查證傳聞', perks: [[6, '赤鴉肯替你辨傳聞'], [14, '傳授〈鴉影〉']] },
+    crow: { name: '鴉衛', g: '鴉', ic: 'f_crow', desc: '人數極少的情報組織，專門調查天裂之後的異象。', how: '向鴉首回報見聞、查證傳聞', perks: [[6, '鴉首肯替你辨傳聞'], [14, '傳授〈鴉影〉']] },
     warlord: { name: '鎮西將軍府', g: '將', reveal: 'c_warlord', desc: '當年護民的人，三年後在官道上收稅。灰窯原名義上歸他們管。', how: '（下一版開放）', perks: [] },
     cult: { name: '拜裂教', g: '裂', reveal: 'c_cult', desc: '他們拜的不是神，是裂口。沉淵祭窟的供桌是新的。', how: '（下一版開放）', perks: [] },
   };
@@ -510,7 +510,7 @@ window.SHL_DATA = (function () {
 
   // ===== 題材文字表（DEV-05；可替換資料檔） =====
   // 假設：分檔檔名與切點待 mumi（製作人 16:46 裁決第 1 項）；本包先集中放在這一處，ui.js 只讀這張表，不寫死句子。
-  // 來源：city.* ＝ docs/design/batch1/city-status-copy-v0.1.csv（字串 key 照 CSV）；map.* ＝ UI-02/wording-map-commission.md §1；
+  // 來源：city.* ＝ docs/loc/city-status-copy-v0.1.csv（字串 key 照 CSV）；map.* ＝ UI-02/wording-map-commission.md §1；
   //       quest.* ＝ wording-map §2；腳程懸浮＝mumi 原句（16:29 拍板、16:46 裁決第 1 項）。駐軍四檔名在 WORLD.GARRISON_NAMES（DEV-02），不在此重複。
   // {名稱} 為代入欄位，名稱對齊 brief 欄位（SPEC-01 §7.6）。
   const TEXT = {
@@ -650,7 +650,7 @@ window.SHL_DATA = (function () {
   const ORIGINS = [
     { id: 'drifter', name: '平民', desc: '什麼都不會，什麼都能學。', attr: {}, prof: {}, gear: ['blade_rust', 'robe'], silver: 60 },
   ];
-  // 開局取名：預設名（不在池內）與整池 60 組（姓、名），原樣取自 docs/design/batch1/name-pool-v0.1.csv，順序與用字不改
+  // 開局取名：預設名（不在池內）與整池 60 組（姓、名），原樣取自 docs/loc/name-pool-v0.1.csv，順序與用字不改
   const NAME_DEFAULT = { sur: '沈', given: '衡' };
   // 自訂名「已有人用」清單：整名完全相同才攔（取名禁字規則定稿 v1.0 §3、§5 起始表）。
   // 固定角色全名＋稱謂詞＋遊戲名詞＋九大勢力全名（共 42 項）。正式版可由 names-final 新名欄與勢力名產出後整批替換本常數。

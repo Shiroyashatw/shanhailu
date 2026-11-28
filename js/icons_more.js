@@ -157,7 +157,7 @@
     '..Bnn.nBbbn.nbbn.nbbnbbn'
   ]);
 
-  /* 血霧妖 — faceless figure condensing out of crimson mist */
+  /* 紅霧妖 — faceless figure condensing out of crimson mist */
   def('wraith', [
     '........................',
     '..........XXXX..........',

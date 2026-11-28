@@ -299,12 +299,12 @@ async function exploreUntil(page, pred, max) {
   check('委託板揭榜：古窯清理', s.quests.find((b) => b.id === 'b_guyao').status === 'active');
   check('委託板每日生成 3 張（含期限）；三個有板的地點都有', ['huiyao', 'duyin', 'poxiao'].every((t) => s.quests.filter((q) => q.town === t && !q.fixed && q.due).length === 3));
   check('路人的私人委託不上板', !(await has(page, 'bounty-b_refugee')));
-  await audit(page, '建築・鎮公所委託板');
+  await audit(page, '建築・鎮衙委託板');
   await shot(page, '06-building-board.png');
   await enter(page, 'hy_shrine');
   await click(page, 'svc-offer');
   s = await st(page);
-  check('窯神廟上香：香點不著，見聞錄記下那個問題', s.codex.includes('c_question') && cnt(s, 'incense') === 0 && s.log.some((l) => l.text.includes('香點不著')));
+  check('窯神廟祭祀：香點不著，見聞錄記下那個問題', s.codex.includes('c_question') && cnt(s, 'incense') === 0 && s.log.some((l) => l.text.includes('香點不著')));
   await audit(page, '建築・窯神廟');
   await click(page, 'btn-street');
   check('「回到街上」回平面圖', (await st(page)).townTab === null && !!(await page.$('.plan')));
@@ -386,12 +386,12 @@ async function exploreUntil(page, pred, max) {
   const fresh = s.codex.length;
   await click(page, 'svc-report');
   s2 = await st(page);
-  check('鴉巢：向赤鴉回報見聞換銀兩與鴉衛聲望', s2.silver === s.silver + fresh * 8 && s2.rep.crow >= fresh * 2 && s2.reported.length === fresh, { fresh, crow: s2.rep.crow });
+  check('鴉巢：向鴉首回報見聞換銀兩與鴉衛聲望', s2.silver === s.silver + fresh * 8 && s2.rep.crow >= fresh * 2 && s2.reported.length === fresh, { fresh, crow: s2.rep.crow });
   await page.evaluate(() => { window.SHL._debug.addRep('crow', 6); window.SHL.state.silver += 20; window.SHL.setTab('yc_nest'); });
   await click(page, 'btn-judge-0');
   s = await st(page);
-  check('鴉衛聲望 6：赤鴉替你辨傳聞', s.rumors[0].judged && s.rumors[0].traced && !!s.rumors[0].hint);
-  await audit(page, '鴉巢・赤鴉');
+  check('鴉衛聲望 6：鴉首替你辨傳聞', s.rumors[0].judged && s.rumors[0].traced && !!s.rumors[0].hint);
+  await audit(page, '鴉巢・鴉首');
   await shot(page, '10-crow-nest.png');
 
   // ===== 9. 荒野採集＋營火 =====
@@ -552,7 +552,7 @@ async function exploreUntil(page, pred, max) {
   await click(page, 'npc-np_refugee');
   await click(page, 'bounty-b_refugee');
   s = await st(page);
-  check('路人的私人委託：難民婦人託你找軍牌', s.quests.find((q) => q.id === 'b_refugee').status === 'active');
+  check('路人的私人委託：尋人難民託你找軍牌', s.quests.find((q) => q.id === 'b_refugee').status === 'active');
   await page.evaluate(() => { window.SHL._debug.addItem({ k: 'dogtag', n: 1 }); window.SHL.streetTalk('np_refugee'); });
   await click(page, 'bounty-b_refugee');
   s2 = await st(page);
@@ -619,18 +619,18 @@ async function exploreUntil(page, pred, max) {
   await shot(page, '18-character.png');
   await click(page, 'sys-char');
 
-  // ===== 17. 新地城：無名古塚（探查腐骨沼找到）與酉神裂口的血霧 =====
+  // ===== 17. 新地城：無名古塚（探查腐骨沼找到）與酉神裂口的紅霧 =====
   await page.evaluate(() => { const G = window.SHL; const S = G.state; S.loc = 'fuzhao'; S.visited.fuzhao = true; S.found.fuzhao = 1; G.enterHere(); });
   await audit(page, '荒野・腐骨沼');
   check('探查腐骨沼找出隱藏地城「無名古塚」', await exploreUntil(page, () => !!window.SHL.state.known.guzhong, 40));
   await settle(page);
   await page.evaluate(() => { const G = window.SHL; const S = G.state; S.loc = 'liekou'; S.visited.liekou = true; S.corrupt = 0; S.hp = G.maxHp(); G.enterHere(); G.save(); });
-  check('酉神裂口：4 層、標示血霧', (await page.$$('.floor')).length === 4 && (await page.textContent('.stagehead')).includes('血霧'));
+  check('酉神裂口：4 層、標示紅霧', (await page.$$('.floor')).length === 4 && (await page.textContent('.stagehead')).includes('紅霧'));
   await audit(page, '地城・酉神裂口');
   await shot(page, '19-rift.png');
   await click(page, 'btn-delve');
   s = await st(page);
-  check('深入裂口：血霧侵蝕 +2、進入戰鬥', s.corrupt === 2 && s.scene === 'combat' && s.combat.ctx.type === 'dungeon');
+  check('深入裂口：紅霧侵蝕 +2、進入戰鬥', s.corrupt === 2 && s.scene === 'combat' && s.combat.ctx.type === 'dungeon');
   await audit(page, '戰鬥・酉神裂口');
 
   // ===== 18. 戰至永久死亡 =====
@@ -663,7 +663,7 @@ async function exploreUntil(page, pred, max) {
   await noOrigin('標題頁');
   const odata = await page.evaluate(() => window.SHL_DATA.ORIGINS);
   check('ORIGINS 只剩一張「平民」，沿用流民數值（素質全 10、銀 60、鏽刃＋布衣、無熟練度）', odata.length === 1 && odata[0].name === '平民' && odata[0].id === 'drifter' && Object.keys(odata[0].attr).length === 0 && Object.keys(odata[0].prof).length === 0 && odata[0].silver === 60 && odata[0].gear.join() === 'blade_rust,robe', odata.map((o) => o.id + ':' + o.name));
-  const csvRows = fs.readFileSync(path.join(ROOT, 'docs/design/batch1/name-pool-v0.1.csv'), 'utf8').replace(/^\uFEFF/, '').trim().split(/\r?\n/).slice(1).map((l) => l.split(','));
+  const csvRows = fs.readFileSync(path.join(ROOT, 'docs/loc/name-pool-v0.1.csv'), 'utf8').replace(/^\uFEFF/, '').trim().split(/\r?\n/).slice(1).map((l) => l.split(','));
   const pool = await page.evaluate(() => window.SHL_DATA.NAME_POOL);
   check('NAME_POOL 與 name-pool-v0.1.csv 60 組（姓、名）逐組一致，且預設「沈衡」不在池內', csvRows.length === 60 && pool.length === 60 && csvRows.every((r, i) => pool[i][0] === r[2] && pool[i][1] === r[3] && r[2] + r[3] === r[4]) && !pool.some((p) => p[0] + p[1] === '沈衡'), pool.length);
   await click(page, 'origin-drifter');

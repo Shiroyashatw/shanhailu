@@ -1,0 +1,4 @@
+2ec6fb83edef87b6f2e906afd0cc0f4e9bb76fb5
+base=e03947e8531b9b00d1cadcd5ed8d67757cdde5a1 paths=js,tests hunks=50 pairs=54 changed-string-literals=51
+PASS：每對變更行去掉字串與註解後 token 相同；ASCII/id 字串與 NPC name 未變
+# exit=0

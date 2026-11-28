@@ -1,0 +1,43 @@
+4e33d71f11574c16f2b6eed664e6014f7aa6b25f
+# node tests/e2e-dev03.js  (2026-11-28T14:23:16Z)
+PASS  [§6] huiyao P=80 Geff=1：crowd() Nnamed=3、Npatrol=1、Nanon=6  — {"P":80,"Geff":1,"named":3,"patrol":1,"anon":6,"total":10}
+PASS  [§6] huiyao P=80 Geff=1：街上畫出匿名路人 6、巡邏 1、有職位者 3，同屏活動 NPC ≤ 10  — {"crowd":{"P":80,"Geff":1,"named":3,"patrol":1,"anon":6,"total":10},"anon":6,"patrol":1,"named":3,"onScreen":10}
+PASS  [§6] huiyao P=20 Geff=1：crowd() Nnamed=3、Npatrol=1、Nanon=2  — {"P":20,"Geff":1,"named":3,"patrol":1,"anon":2,"total":6}
+PASS  [§6] huiyao P=20 Geff=1：街上畫出匿名路人 2、巡邏 1、有職位者 3，同屏活動 NPC ≤ 10  — {"crowd":{"P":20,"Geff":1,"named":3,"patrol":1,"anon":2,"total":6},"anon":2,"patrol":1,"named":3,"onScreen":6}
+PASS  [§6] huiyao P=80 Geff=2：crowd() Nnamed=3、Npatrol=2、Nanon=5  — {"P":80,"Geff":2,"named":3,"patrol":2,"anon":5,"total":10}
+PASS  [§6] huiyao P=80 Geff=2：街上畫出匿名路人 5、巡邏 2、有職位者 3，同屏活動 NPC ≤ 10  — {"crowd":{"P":80,"Geff":2,"named":3,"patrol":2,"anon":5,"total":10},"anon":5,"patrol":2,"named":3,"onScreen":10}
+PASS  [§6] huiyao P=20 Geff=2：crowd() Nnamed=3、Npatrol=2、Nanon=2  — {"P":20,"Geff":2,"named":3,"patrol":2,"anon":2,"total":7}
+PASS  [§6] huiyao P=20 Geff=2：街上畫出匿名路人 2、巡邏 2、有職位者 3，同屏活動 NPC ≤ 10  — {"crowd":{"P":20,"Geff":2,"named":3,"patrol":2,"anon":2,"total":7},"anon":2,"patrol":2,"named":3,"onScreen":7}
+PASS  [§6] duyin P=80 Geff=3：crowd() Nnamed=1、Npatrol=3、Nanon=6  — {"P":80,"Geff":3,"named":1,"patrol":3,"anon":6,"total":10}
+PASS  [§6] duyin P=80 Geff=3：街上畫出匿名路人 6、巡邏 3、有職位者 1，同屏活動 NPC ≤ 10  — {"crowd":{"P":80,"Geff":3,"named":1,"patrol":3,"anon":6,"total":10},"anon":6,"patrol":3,"named":1,"onScreen":10}
+PASS  [§6] duyin P=20 Geff=3：crowd() Nnamed=1、Npatrol=3、Nanon=2  — {"P":20,"Geff":3,"named":1,"patrol":3,"anon":2,"total":6}
+PASS  [§6] duyin P=20 Geff=3：街上畫出匿名路人 2、巡邏 3、有職位者 1，同屏活動 NPC ≤ 10  — {"crowd":{"P":20,"Geff":3,"named":1,"patrol":3,"anon":2,"total":6},"anon":2,"patrol":3,"named":1,"onScreen":6}
+PASS  [AC-D2] 灰窯 Geff=1：P=20 與 P=80 路人 2 vs 6（比 3 倍，≥ 2）  — {"lo":2,"hi":6,"ratio":3}
+PASS  [AC-D2] 灰窯 Geff=2：2 vs 5（比 2.5 倍，仍 ≥ 2）  — 2.5
+PASS  [AC-D2] 渡陰 Geff=3、Nnamed=1：2 vs 6（3 倍）  — 3
+PASS  [§6 掃描] 兩鎮 P=0..100（步 1）× Geff=0..3 共 808 組：同屏 ≤ 10、巡邏＝Geff、Nanon 照公式  — {"n":808,"bad":[]}
+PASS  [§6] crowd() 與街景重繪不改 world、不改存檔；非兩鎮（破曉營）回 null  — {"same":true,"raw":true,"other":null}
+PASS  [走動] 灰窯巡邏 3 秒內累計路程 > 30px（不是靜止立繪）  — {"kind":"patrol","path":69,"distinct":31}
+PASS  [走動] 灰窯 7 個走動者 3 秒內每人累計路程都 > 30px  — ["69px/31點","52px/31點","68px/30點","56px/28點","78px/31點","63px/31點","84px/31點"]
+PASS  [走動・負向] 測試頁凍結第 4 個走動者，3 秒累計路程斷言只抓到它（其餘 6 人照走）  — [69,50,69,0,78,62,84]
+PASS  [走動] 走動者都在街景平面圖範圍內
+PASS  [走動] 重繪中欄後走動者位置連續（每人跳動 ≤ 4px）  — [0,1,0,0,1,0,1]
+PASS  [不擋點擊] 走動者 pointer-events:none，有職位者與建築中心點都點得到  — {"bld-hy_market":true,"bld-hy_inn":true,"bld-hy_apoth":true,"bld-hy_smith":true,"bld-hy_board":true,"bld-hy_shrine":true,"bld-gate":true,"npc-np_aman":true,"npc-np_story":true,"npc-np_miner":true}
+PASS  [不擋點擊] 點阿滿開對話框；走動者照樣在（對話框蓋在上面）
+PASS  [範圍] 進建築內沒有走動者  — 0
+PASS  [範圍] 破曉營（非兩鎮，§6 只給兩鎮）沒有新增走動者，維持現況  — 0
+PASS  [日結] 過一天後街上路人＝min(round(P/10), 10−3−Geff)、巡邏＝Geff（用日結後的值）  — {"P":49,"Geff":1,"c":{"P":49,"Geff":1,"named":3,"patrol":1,"anon":5,"total":9},"dom":5,"pat":1}
+PASS  [AC-J6] 十個活動 NPC 同屏（灰窯 P=80、Geff=1）影格不低於現況（容差 5%，無 >50ms 長幀）  — {"base":{"frames":182,"fps":60,"p95ms":16.8,"long":0,"onScreen":3},"dev03":{"frames":181,"fps":60,"p95ms":16.7,"long":0,"onScreen":10}}
+PASS  [dev03-01-huiyao-high-P80.png] 1280×720 單屏無捲動、三欄 240/796/220、街上標籤無重疊  — {"sw":1280,"sh":720,"c":[240,796,220],"overlap":0}
+PASS  [dev03-02-huiyao-low-P20.png] 1280×720 單屏無捲動、三欄 240/796/220、街上標籤無重疊  — {"sw":1280,"sh":720,"c":[240,796,220],"overlap":0}
+PASS  [dev03-03-huiyao-patrol-a.png] 1280×720 單屏無捲動、三欄 240/796/220、街上標籤無重疊  — {"sw":1280,"sh":720,"c":[240,796,220],"overlap":0}
+PASS  [dev03-04-huiyao-patrol-b-1500ms.png] 1280×720 單屏無捲動、三欄 240/796/220、街上標籤無重疊  — {"sw":1280,"sh":720,"c":[240,796,220],"overlap":0}
+PASS  [dev03-05-duyin-high-P80-G3.png] 1280×720 單屏無捲動、三欄 240/796/220、街上標籤無重疊  — {"sw":1280,"sh":720,"c":[240,796,220],"overlap":0}
+PASS  [dev03-06-duyin-low-P20-G3.png] 1280×720 單屏無捲動、三欄 240/796/220、街上標籤無重疊  — {"sw":1280,"sh":720,"c":[240,796,220],"overlap":0}
+PASS  [合併後] 街景右欄名字（DEV-01b）＝S.name，走動者照樣在  — {"name":"沈衡","shown":"沈衡","walkers":7}
+PASS  [合併後] 出鎮到荒野：標頭險級（DEV-02 四檔色 rk0–rk3）與 riskTier 一致，荒野無走動者  — {"town":{"name":"沈衡","shown":"沈衡","walkers":7},"tier":"低","head":"險 低","rk":true,"walkers":0}
+PASS  [dev03-07-wild-head-risk-chakou.png] 1280×720 單屏無捲動、三欄 240/796/220、街上標籤無重疊  — {"sw":1280,"sh":720,"c":[240,796,220],"overlap":0}
+PASS  console 0 error  — []
+
+結果：38/38 PASS
+EXIT_CODE=0
