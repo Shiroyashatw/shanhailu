@@ -350,7 +350,8 @@ async function exploreUntil(page, pred, max) {
   await click(page, 'btn-region');
   await click(page, 'node-yizhan');
   const tipTxt = await page.textContent('[data-testid=route-tip]');
-  check('#4 原本的路口（官道驛站）現在可以當目的地', (await st(page)).dest === 'yizhan' && /\d+ 小時・食 −\d+・疲 \+\d+・險 [低中高]/.test(tipTxt), tipTxt);
+  // DEV-05：地點詳情縮寫改全名（UI-02-05、wording-map §1），斷言由「N 小時・食 −N・疲 +N・險 X」改為完整用詞
+  check('#4 原本的路口（官道驛站）現在可以當目的地', (await st(page)).dest === 'yizhan' && /路程 \d+ 小時・飽食 −\d+\s*疲累 \+\d+・危險 [低中高]/.test(tipTxt), tipTxt);
   check('出發條顯示 5 個數值膠囊＋前往', (await page.$$('.departbar .vpill')).length === 5 && (await has(page, 'btn-travel')));
   await audit(page, '世界地圖');
   await shot(page, '08-worldmap.png');

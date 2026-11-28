@@ -1,0 +1,113 @@
+HEAD bd11bdbcbc5e2ac32d8ce990c9351cd35472d6dc
+PASS  [sleep/rest] 20:00 → 次日 08:00（12 小時）  — 第 5 日 20:00 → 第 6 日 08:00（12 小時）
+PASS  [sleep/rest] 03:00 → 09:00（6 小時）  — 第 5 日 03:00 → 第 5 日 09:00（6 小時）
+PASS  [sleep/rest] 00:00 → 08:00（8 小時，不是 32 小時）  — 第 5 日 00:00 → 第 5 日 08:00（8 小時）
+PASS  [sleep/rest] 08:10 → 21:10（13 小時上限，不是 23.8 小時）  — 第 5 日 08:10 → 第 5 日 21:10（13 小時）
+PASS  [sleep/rest] 邊界：恰 08:00 → 14:00（6 小時；「下一個 08:00」含當下）  — 第 5 日 08:00 → 第 5 日 14:00（6 小時）
+PASS  [sleep/rest] 邊界：恰 07:00 → 13:00（6 小時）  — 第 5 日 07:00 → 第 5 日 13:00（6 小時）
+PASS  [sleep/bunk] 20:00 → 次日 08:00（12 小時）  — 第 5 日 20:00 → 第 6 日 08:00（12 小時）
+PASS  [sleep/bunk] 03:00 → 09:00（6 小時）  — 第 5 日 03:00 → 第 5 日 09:00（6 小時）
+PASS  [sleep/bunk] 00:00 → 08:00（8 小時，不是 32 小時）  — 第 5 日 00:00 → 第 5 日 08:00（8 小時）
+PASS  [sleep/bunk] 08:10 → 21:10（13 小時上限，不是 23.8 小時）  — 第 5 日 08:10 → 第 5 日 21:10（13 小時）
+PASS  [sleep/bunk] 邊界：恰 08:00 → 14:00（6 小時；「下一個 08:00」含當下）  — 第 5 日 08:00 → 第 5 日 14:00（6 小時）
+PASS  [sleep/bunk] 邊界：恰 07:00 → 13:00（6 小時）  — 第 5 日 07:00 → 第 5 日 13:00（6 小時）
+PASS  [sleep] 一日 144 個就寢時刻：睡眠 6–13 小時、皆不長於舊規則  — {"lo":6,"hi":13,"bad":[]}
+PASS  [sleep] 客棧歇息 10 小時：飽食 80 → 67.5（整數存值 68）、疲累清零、生命回滿  — {"food":68,"fat":0,"hp":80,"max":80}
+PASS  [sleep/飽食] sleepFoodCost(h) 恰為 1.25×h（13→16.25、6→7.5、9.5→11.875、12→15、8→10）  — [{"h":13,"cost":16.25},{"h":6,"cost":7.5},{"h":9.5,"cost":11.875},{"h":12,"cost":15},{"h":8,"cost":10}]
+PASS  [sleep/飽食/rest] 08:10 就寢 13 小時（上限）：飽食 100 → 83.75（1.25×13）  — {"slept":13,"food":84,"want":83.75}
+PASS  [sleep/飽食/rest] 03:00 就寢 6 小時（下限）：飽食 100 → 92.5（1.25×6）  — {"slept":6,"food":93,"want":92.5}
+PASS  [sleep/飽食/rest] 22:30 就寢 9.5 小時（中間）：飽食 100 → 88.125（1.25×9.5）  — {"slept":9.5,"food":88,"want":88.125}
+PASS  [sleep/飽食/rest] 20:00 就寢 12 小時：飽食 100 → 85（1.25×12）  — {"slept":12,"food":85,"want":85}
+PASS  [sleep/飽食/bunk] 08:10 就寢 13 小時（上限）：飽食 100 → 83.75（1.25×13）  — {"slept":13,"food":84,"want":83.75}
+PASS  [sleep/飽食/bunk] 03:00 就寢 6 小時（下限）：飽食 100 → 92.5（1.25×6）  — {"slept":6,"food":93,"want":92.5}
+PASS  [sleep/飽食/bunk] 22:30 就寢 9.5 小時（中間）：飽食 100 → 88.125（1.25×9.5）  — {"slept":9.5,"food":88,"want":88.125}
+PASS  [sleep/飽食/bunk] 20:00 就寢 12 小時：飽食 100 → 85（1.25×12）  — {"slept":12,"food":85,"want":85}
+PASS  [sleep/飽食/rest] 冬季 10 小時：飽食 100 → 84.375（1.25×10×冬季 1.25）  — {"slept":10,"food":84}
+PASS  [sleep/Q7/rest] 飽食 0、hp 10 在客棧睡 10 小時（扣血 30）不會死，醒來生命回滿  — {"dead":false,"hp":80,"max":80,"slept":10}
+PASS  [sleep/Q7/bunk] 飽食 0、hp 10 在營帳通鋪睡 10 小時不會死，醒來 hp = 1 + 30 = 31  — {"dead":false,"hp":31,"max":80,"slept":10}
+PASS  [sleep/Q7 對照] 不經 rest／bunk 的 10 小時（飽食 0、hp 10）仍會死：保護只限客棧與營帳  — {"dead":true,"hp":0}
+PASS  §3 起手值：灰窯 P50／T200／O55／Gnom1／Geff1、渡陰 P45／T300／O60／Gnom2／Geff2；F、Lpat、debt、rescueCd、taxCut 皆 0  — {"h0":{"P":50,"T":200,"O":55,"Gnom":1,"Geff":1,"F":0,"Lpat":0,"debt":0,"rescueCd":0,"taxCut":0,"brief":{},"acc":{"tax":0,"fines":0,"bountyPaid":0},"remitLogDay":-99},"d0":{"P":45,"T":300,"O":60,"Gnom":2,"Geff":2,"F":0,"Lpat":0,"debt":0,"rescueCd":0,"taxCut":0,"brief":{},"acc":{"tax":0,"fines":0,"bountyPaid":0},"remitLogDay":-99}}
+PASS  §3.2 區域起手：B 30、crew 4、crewCtr 0、crewWiped false；heavyOps {0,0}；refugee camp 60  — {"region":{"B":30,"crew":4,"crewCtr":0,"crewWiped":false},"heavyOps":{"season":0,"n":0},"refugee":{"camp":60,"inTotal":0,"settledTotal":0,"soldTotal":0,"soldToday":0,"soldYday":0}}
+PASS  §1 預留欄位：S.wanted {}、S.hostility {}、S.jurisdiction null、S.influence {}  — {"wanted":{},"hostility":{},"jurisdiction":null,"influence":{}}
+PASS  AC-A1 灰窯第 1 天結算：T = 207.96、P／O 不變  — {"T":207.96,"P":50,"O":55,"B":30,"at":"第 2 日 00:00"}
+PASS  AC-A1 渡陰第 1 天結算：T = 314.81、P／O 不變  — {"T":314.81,"P":45,"O":60}
+PASS  AC-A7 灰窯第 1 天 brief：Inc 22.96、treasuryIn 23、Out 15、Net +8、tier ok、trend flat、whyCode null（已與最新 SPEC-01 AC-A7 一致；16:46 裁決第 4 項）  — {"day":2,"dP":0,"dO":0,"trend":"flat","whyCode":null,"T":207.96,"dT":7.96,"treasuryIn":23,"treasuryOut":15,"treasuryNet":8,"Inc":22.96,"tax":0,"fines":0,"rescueAmt":0,"upkeepPaid":15,"bountyPaid":0,"overflow":0,"treasuryTier":"ok","Geff":1,"debtToday":false,"debtDays":0,"aidToday":false,"aidDaysLeft":0,"aidFund":0,"rescueToday":false,"taxCutDays":0,"taxCutAmt":0}
+PASS  §7.6 brief 欄位齊全  — 27
+PASS  AC-A5 賣 100 兩 → 玩家得 95、灰窯 T +5、日誌附「（交易稅 5 兩）」  — {"got":95,"dT":5,"p1":1,"p0":1,"log":"賣出乾餅 ×100，得銀 95 兩（交易稅 5 兩）"}
+PASS  AC-A5 賣 19 兩 → 稅 0（得 19）；賣 39 兩 → 稅 1（得 38）  — {"s19":{"got":19,"dT":0,"p1":1,"p0":1,"log":"賣出乾餅 ×19，得銀 19 兩"},"s39":{"got":38,"dT":1,"p1":1,"p0":1,"log":"賣出乾餅 ×39，得銀 38 兩（交易稅 1 兩）"}}
+PASS  AC-J1 交易稅不改 sellPrice 顯示的行情價  — {"before":1,"after":1}
+PASS  AC-A7（§7.2）同日賣 100＋19＋39 兩：當日交易稅 6 進 brief.tax，treasuryIn = round(22.96+6) = 29、Net +14  — {"tax":6,"In":29,"Net":14}
+PASS  假設：破曉營（非兩鎮）賣出不課交易稅  — {"x":0,"same":true}
+PASS  AC-A4 日 1、2：Geff 0、T 維持 10、debt 1、2  — [{"d":2,"Geff":0,"T":10,"debt":1,"taxCut":0,"rescueCd":0,"b":{"rescueToday":false,"rescueAmt":0,"taxCutDays":0,"debtDays":1,"tier":"debt","debtToday":true}},{"d":3,"Geff":0,"T":10,"debt":2,"taxCut":0,"rescueCd":0,"b":{"rescueToday":false,"rescueAmt":0,"taxCutDays":0,"debtDays":2,"tier":"debt","debtToday":true}}]
+PASS  AC-A4 日 3：debt 3 觸發求援，T = 100、taxCut 10、rescueCd 20  — {"d":4,"Geff":0,"T":100,"debt":0,"taxCut":10,"rescueCd":20,"b":{"rescueToday":true,"rescueAmt":90,"taxCutDays":10,"debtDays":0,"tier":"debt","debtToday":true}}
+PASS  AC-A7 求援日 brief：rescueToday、rescueAmt 90、taxCutDays 10、debtDays 0  — {"rescueToday":true,"rescueAmt":90,"taxCutDays":10,"debtDays":0,"tier":"debt","debtToday":true}
+PASS  AC-A4 日 4 起付得起：Geff 回 1、T 85  — {"d":5,"Geff":1,"T":85,"debt":0,"taxCut":9,"rescueCd":19,"b":{"rescueToday":false,"rescueAmt":0,"taxCutDays":9,"debtDays":0,"tier":"ok","debtToday":false}}
+PASS  AC-A6 S_pub：灰窯起手 1.00、渡陰起手 1.21、O=30／Geff=0 時 0.65  — {"h":1,"d":1.2105263157894737,"low":0.6491228070175439}
+PASS  AC-A7 資助 100 兩（F=100）aidDaysLeft 日 1–5 為 4／3／2／1／0  — ["4@G2","3@G2","2@G2","1@G2","0@G1"]
+PASS  AC-A2（機制部分，F 直接設值）灰窯逐日 O：56.00、56.90、57.71（±0.01）；F 日 4 後 = 0  — ["56／F75","56.9／F50","57.71／F25","58.44／F0"]
+PASS  駐軍第 3 檔顯示名為「守備」（四檔：無／自衛隊／巡邏隊／守備，data.js 單一表）  — ["無","自衛隊","巡邏隊","守備"]
+PASS  渡陰資助加派到第 3 檔：brief.Geff = 3 → 「守備」  — {"names":["無","自衛隊","巡邏隊","守備"],"table":["無","自衛隊","巡邏隊","守備"],"Geff":3,"name":"守備"}
+PASS  兩鎮每天會變：6 個日結，兩鎮財庫每天都變、繁榮都有起伏  — D1 灰50/200 渡45/300；D2 灰49/207.96 渡44/314.81；D3 灰50.1/215.46 渡43.1/328.4；D4 灰50.09/223.46 渡44.29/340.89；D5 灰51.08/231.46 渡43.36/354.82；D6 灰49.97/239.91 渡44.52/367.61；D7 灰49.97/247.86 渡44.56/381.81
+PASS  e2e 走過一天結算：客棧 22:00 歇息 → 次日 08:00，日結 brief.day 逐日遞增  — ["1:-","2:2","3:3","4:4","5:5","6:6","7:7"]
+PASS  日誌時間 24 小時制（新的一天在 00:00，起床 08:00）  — ["第 6 日 00:00 第 6 日 00:00，新的一天：採集點與貨架已回補。","第 6 日 08:00 歇了一夜，疲累清零、生命回滿。","第 7 日 00:00 第 7 日 00:00，新的一天：採集點與貨架已回補。","第 7 日 08:00 歇了一夜，疲累清零、生命回滿。"]
+PASS  一次 passTime 跨 3 個日界：逐日補算 3 次，結果與 8 小時 ×8 逐段推進完全一致  — {"same":true,"n1":3,"day":4,"bday":4}
+PASS  防失控：極端起點跑 120 天，P 15–80、O 0–100、T 0–T_CAP、每日變動 ≤ 3  — {"worst":3,"viol":[],"remitLogs":12,"hT":1350}
+PASS  §5.5 上繳：灰窯 T 灌到 99999 → 夾回 T_CAP 1350；「上繳」日誌 120 天 ≤ 12 次（每 10 天最多一次）  — {"worst":3,"viol":[],"remitLogs":12,"hT":1350}
+PASS  起手 R_road = R_wild = 1（遇險率與現況相同）  — {"road":1,"wild":1,"risk":0.22}
+PASS  R_wild：B=45、Ō=50 → 1.255（AC-E3 的 R 部分）  — 1.255
+PASS  遇險封頂 0.85 在所有乘項之後（最壞組合 R_wild=1.8、夜、獸潮、多段野徑 → 0.85）  — {"road0":1,"wild0":1,"prevWild":{"edges":[{"a":"huiyao","b":"chakou","h":1}],"hours":1,"fat":3,"food":4,"risk":0.22,"shown":0.22,"riskName":"中","mult":1,"pace":"輕快","via":"野徑","wild":true,"R":1},"wildE3":1.255,"wildMax":1.8,"cap":0.85,"capId":"qingwu","allCap":true}
+PASS  AC-J2 日結後存檔、讀檔：world.towns、region、F（77 兩，日結加派後餘 52）、Lpat、debt、預留欄位完全一致  — 1375 字元
+PASS  AC-J5 讀到沒有 world.towns 的存檔：以起手值補、可照常日結、不丟錯  — {"ok1":true,"t":"第 3 日 00:00","T":207.96,"day":3}
+PASS  AC-J3 同 seed 同操作兩次：整份狀態 100% 相同（含世界擲骰）  — 14645 字元
+PASS  AC-J4（wrnd 隔離部分）worldTick／townTick 不消耗 S.rng；wrnd 同參數同值  — true
+PASS  AC-J4（wrnd 隔離部分）每天多耗 37 次 S.rng：40 天內獸潮開始日、結束日、目標鎮與 PNOISE 結果完全相同（有無資助的完整比較待 DEV-04）  — [[4,5,"huiyao"],[13,14,"huiyao"],[22,23,"duyin"],[31,32,"huiyao"],[39,40,"duyin"]]
+PASS  [cflash/等演出播完再出手] 任意 1 秒滑動視窗內 cflash ≤ 3 次（X12）  — {"total":19,"maxPerSec":3,"minGapMs":483,"sampleGaps":[483,500,2751,500,483,484]}
+PASS  [cflash/等演出播完再出手] 相鄰兩次 cflash 間隔 ≥ 400ms（17:26 裁決，由 350ms 改）  — {"total":19,"maxPerSec":3,"minGapMs":483,"sampleGaps":[483,500,2751,500,483,484]}
+PASS  [cflash/連按鍵盤（每 200ms）] 任意 1 秒滑動視窗內 cflash ≤ 3 次（X12）  — {"total":0,"maxPerSec":0,"minGapMs":null,"sampleGaps":[]}
+PASS  [cflash/連按鍵盤（每 200ms）] 相鄰兩次 cflash 間隔 ≥ 400ms（17:26 裁決，由 350ms 改）  — {"total":0,"maxPerSec":0,"minGapMs":null,"sampleGaps":[]}
+PASS  [cflash/連按鍵盤（每 250ms）] 任意 1 秒滑動視窗內 cflash ≤ 3 次（X12）  — {"total":15,"maxPerSec":3,"minGapMs":483,"sampleGaps":[483,483,500,483,483,483]}
+PASS  [cflash/連按鍵盤（每 250ms）] 相鄰兩次 cflash 間隔 ≥ 400ms（17:26 裁決，由 350ms 改）  — {"total":15,"maxPerSec":3,"minGapMs":483,"sampleGaps":[483,483,500,483,483,483]}
+PASS  [cflash/連按鍵盤（每 300ms）] 任意 1 秒滑動視窗內 cflash ≤ 3 次（X12）  — {"total":13,"maxPerSec":2,"minGapMs":583,"sampleGaps":[600,583,583,600,583,583]}
+PASS  [cflash/連按鍵盤（每 300ms）] 相鄰兩次 cflash 間隔 ≥ 400ms（17:26 裁決，由 350ms 改）  — {"total":13,"maxPerSec":2,"minGapMs":583,"sampleGaps":[600,583,583,600,583,583]}
+PASS  [cflash/連按鍵盤（每 350ms）] 任意 1 秒滑動視窗內 cflash ≤ 3 次（X12）  — {"total":12,"maxPerSec":2,"minGapMs":683,"sampleGaps":[683,683,700,683,683,683]}
+PASS  [cflash/連按鍵盤（每 350ms）] 相鄰兩次 cflash 間隔 ≥ 400ms（17:26 裁決，由 350ms 改）  — {"total":12,"maxPerSec":2,"minGapMs":683,"sampleGaps":[683,683,700,683,683,683]}
+PASS  [cflash/連按鍵盤（每 400ms）] 任意 1 秒滑動視窗內 cflash ≤ 3 次（X12）  — {"total":10,"maxPerSec":2,"minGapMs":783,"sampleGaps":[800,783,783,784,783,783]}
+PASS  [cflash/連按鍵盤（每 400ms）] 相鄰兩次 cflash 間隔 ≥ 400ms（17:26 裁決，由 350ms 改）  — {"total":10,"maxPerSec":2,"minGapMs":783,"sampleGaps":[800,783,783,784,783,783]}
+CFLASH [{"mode":"natural","total":19,"maxPerSec":3,"minGapMs":483},{"mode":"mash200","total":0,"maxPerSec":0,"minGapMs":null},{"mode":"mash250","total":15,"maxPerSec":3,"minGapMs":483},{"mode":"mash300","total":13,"maxPerSec":2,"minGapMs":583},{"mode":"mash350","total":12,"maxPerSec":2,"minGapMs":683},{"mode":"mash400","total":10,"maxPerSec":2,"minGapMs":783}]
+PASS  D.TIME.RISK_CUTS = [0.15, 0.35, 0.60]  — [0.15,0.35,0.6]
+PASS  AC 20 測點 0.149／0.150／0.349／0.350／0.599／0.600／0.85 → 低／中／中／高／高／極高／極高  — [[0.149,"低"],[0.15,"中"],[0.349,"中"],[0.35,"高"],[0.599,"高"],[0.6,"極高"],[0.85,"極高"]]
+PASS  取三位 half-up：0.1495 → 中、0.3495 → 高、0.5995 → 極高  — [[0.1495,"中"],[0.3495,"高"],[0.5995,"極高"]]
+PASS  超過 0.85 先封頂：0.9、1.5 → 極高  — [[0.9,"極高"],[1.5,"極高"]]
+PASS  等長情境成立：拿掉灰窯–驛站官道後，灰窯↔渡陰仍 4 小時、灰窯↔破曉營仍 6 小時，且改走含野徑路線  — [{"h":4,"wild":true},{"h":4,"wild":true},{"h":6,"wild":true},{"h":6,"wild":true}]
+PASS  AC 20 等長官道優先（正常 EDGES）：灰窯↔渡陰、灰窯↔破曉營四個方向全走官道  — [{"a":"huiyao","b":"duyin","h":4,"allRoad":true,"n":2},{"a":"duyin","b":"huiyao","h":4,"allRoad":true,"n":2},{"a":"huiyao","b":"poxiao","h":6,"allRoad":true,"n":3},{"a":"poxiao","b":"huiyao","h":6,"allRoad":true,"n":3}]
+PASS  AC 20 等長官道優先（EDGES 反轉）：四個方向仍全走官道  — [{"a":"huiyao","b":"duyin","h":4,"allRoad":true,"n":2},{"a":"duyin","b":"huiyao","h":4,"allRoad":true,"n":2},{"a":"huiyao","b":"poxiao","h":6,"allRoad":true,"n":3},{"a":"poxiao","b":"huiyao","h":6,"allRoad":true,"n":3}]
+PASS  AC 20 等長官道優先（EDGES 與 NODES 皆反轉）：四個方向仍全走官道  — [{"a":"huiyao","b":"duyin","h":4,"allRoad":true,"n":2},{"a":"duyin","b":"huiyao","h":4,"allRoad":true,"n":2},{"a":"huiyao","b":"poxiao","h":6,"allRoad":true,"n":3},{"a":"poxiao","b":"huiyao","h":6,"allRoad":true,"n":3}]
+PASS  送貨路程 travelPreview(渡陰) 白天官道 0.040「低」，EDGES 反轉後不變  — {"normal":{"wild":false,"risk":0.04,"tier":"低"},"reversed":{"wild":false,"risk":0.04,"tier":"低"}}
+PASS  測後 EDGES／NODES 順序已還原
+PASS  AC 20 自造等長情境（平行官道／野徑、雙段官道／野徑）× EDGES 正常與反轉 × NODES 正常與反轉 × 端點對調：一律走官道  — {"甲・EDGES 正常":true,"甲・EDGES 正常・端點對調":true,"甲・EDGES 正常・NODES 反轉":true,"甲・EDGES 正常・NODES 反轉・端點對調":true,"甲・EDGES 反轉":true,"甲・EDGES 反轉・端點對調":true,"甲・EDGES 反轉・NODES 反轉":true,"甲・EDGES 反轉・NODES 反轉・端點對調":true,"乙・EDGES 正常":true,"乙・EDGES 正常・端點對調":true,"乙・EDGES 正常・NODES 反轉":true,"乙・EDGES 正常・NODES 反轉・端點對調":true,"乙・EDGES 反轉":true,"乙・EDGES 反轉・端點對調":true,"乙・EDGES 反轉・NODES 反轉":true,"乙・EDGES 反轉・NODES 反轉・端點對調":true,"restored":true}
+PASS  自造情境測後 EDGES／NODES 已還原
+PASS  [AC 21] 資料 WILDS／DUNGEONS／NODES／TIME 不含「中高」
+PASS  [AC 21] 逐一進入全部荒野 5 處、地城 4 處，畫面不出現「中高」  — {"bad":[],"pills":{"qingwu":"險 低","chishi":"險 中","kugu":"險 中","fuzhao":"險 高","chakou":"險 低","guyao":"險 低","jiku":"險 高","guzhong":"險 中","liekou":"險 極高"}}
+PASS  [AC 21] 原「中高」的腐骨沼（荒野）、沉淵祭窟（地城）現顯示「險 高」  — {"fuzhao":"險 高","jiku":"險 高"}
+PASS  [AC 21] 日誌（含趕路、露宿、進地城共 13 行）與日誌畫面不出現「中高」  — ["山坡上一排舊窯，窯口都朝著鎮子的方向。每個窯口都用磚封過，有幾處的磚是從裡面被推開的。風從窯裡吹到你臉上，是溫的。","你站在洞口。洞向下斜，像一張朝地底張開的嘴。石階被踩得發亮，潮氣裡混著血腥味。洞外沒有鳥叫。洞口的火盆裡，炭還是紅的。","石板道走到底是一座土丘。墓門半開，門楣上原本刻字的地方被鑿平了。墓道裡沒有積水，也沒有蟲。你的腳步聲傳進去，隔了很久才傳回來。","地在這裡斷了。裂口寬得看不見對岸，紅霧從底下往上湧，湧到邊緣就停住。斷面一層一層露著。你站的地方，草全是朝外倒的。","自灰窯鎮出發，經野徑，2 小時後抵達腐骨沼。","生起營火。可調和藥水、烤製乾糧，或露宿到天亮。"]
+PASS  自造情境丙成立：兩條候選時數、野徑段數相同（2h、1 段），險值不同  — {"go":"huiyao,duyin","back":"duyin,huiyao","cand":[[2,1,220],[2,1,300]]}
+PASS  route() 第三層：時數、野徑段數相同 → 選險值低的（直達野徑）；× EDGES 正常／反轉 × NODES 正常／反轉 × 端點對調，來回 8 組全同  — {"丙":{"go":"huiyao,duyin","back":"duyin,huiyao","cand":[[2,1,220],[2,1,300]]},"丁":{"go":"huiyao,chakou,duyin","back":"duyin,chakou,huiyao","cand":[[2,1,300],[2,1,300]]}}
+PASS  自造情境丁成立：兩條候選時數、野徑段數、險值三位全同  — {"go":"huiyao,chakou,duyin","back":"duyin,chakou,huiyao","cand":[[2,1,300],[2,1,300]]}
+PASS  route() 第四層：三項全同 → 選節點 id 序列字典序小的（經 chakou）；× EDGES 正常／反轉 × NODES 正常／反轉 × 端點對調，來回 8 組全同  — {"丙":{"go":"huiyao,duyin","back":"duyin,huiyao","cand":[[2,1,220],[2,1,300]]},"丁":{"go":"huiyao,chakou,duyin","back":"duyin,chakou,huiyao","cand":[[2,1,300],[2,1,300]]}}
+PASS  fix4 自造情境測後 EDGES／NODES 已還原
+PASS  [AC 21] 荒野／地城四檔各有一處（低／中／高／極高）  — {"低":"qingwu","中":"chishi","高":"fuzhao","極高":"liekou"}
+PASS  [AC 21] travelPreview 四檔各找到一條路線  — {"低":"12:00・yizhan","中":"12:00・chakou","高":"23:00・chakou","極高":"23:00・qingwu"}
+PASS  [AC 21] 四檔顏色互不相同  — {"低":"rgb(160, 150, 127)","中":"rgb(201, 162, 74)","高":"rgb(224, 112, 102)","極高":"rgb(216, 207, 189)"}
+PASS  [AC 21] 「低」：所有荒野、地城標頭顏色與 travelPreview 同檔一致（rgb(160, 150, 127)）  — {"route":{"at":"12:00・yizhan","text":"危險低","color":"rgb(160, 150, 127)","border":"rgb(75, 67, 54)","hot":false,"cls":"vpill rk0"},"heads":{"qingwu":"rgb(160, 150, 127)","chakou":"rgb(160, 150, 127)","guyao":"rgb(160, 150, 127)"}}
+PASS  [AC 21] 「中」：所有荒野、地城標頭顏色與 travelPreview 同檔一致（rgb(201, 162, 74)）  — {"route":{"at":"12:00・chakou","text":"危險中","color":"rgb(201, 162, 74)","border":"rgb(75, 67, 54)","hot":false,"cls":"vpill rk1"},"heads":{"chishi":"rgb(201, 162, 74)","kugu":"rgb(201, 162, 74)","guzhong":"rgb(201, 162, 74)"}}
+PASS  [AC 21] 「高」：所有荒野、地城標頭顏色與 travelPreview 同檔一致（rgb(224, 112, 102)）  — {"route":{"at":"23:00・chakou","text":"危險高","color":"rgb(224, 112, 102)","border":"rgb(224, 112, 102)","hot":true,"cls":"vpill rk2 hot"},"heads":{"fuzhao":"rgb(224, 112, 102)","jiku":"rgb(224, 112, 102)"}}
+PASS  [AC 21] 「極高」：所有荒野、地城標頭顏色與 travelPreview 同檔一致（rgb(216, 207, 189)）  — {"route":{"at":"23:00・qingwu","text":"危險極高","color":"rgb(216, 207, 189)","border":"rgb(200, 70, 58)","hot":true,"cls":"vpill rk3 hot"},"heads":{"liekou":"rgb(216, 207, 189)"}}
+PASS  hot 只在「高」「極高」：荒野、地城標頭 9 處  — {"qingwu":"低","chishi":"中","kugu":"中","fuzhao":"高・hot","chakou":"低","guyao":"低","jiku":"高・hot","guzhong":"中","liekou":"極高・hot"}
+PASS  hot 只在「高」「極高」：travelPreview 四檔  — {"低":false,"中":false,"高":true,"極高":true}
+PASS  腐骨沼（荒野）、沉淵祭窟（地城）標頭為「高」色且 hot  — {"fuzhao":{"tier":"高","kind":"wild","text":"險 高","color":"rgb(224, 112, 102)","border":"rgb(224, 112, 102)","hot":true,"cls":"pill rk2 hot"},"jiku":{"tier":"高","kind":"dungeon","text":"險 高","color":"rgb(224, 112, 102)","border":"rgb(224, 112, 102)","hot":true,"cls":"pill rk2 hot"}}
+PASS  [dev02-01-inn-rest-log.png] 1280×720 單屏無捲動、三欄 240/796/220  — {"sw":1280,"sh":720,"c":[240,796,220]}
+PASS  [dev02-02-next-day-town.png] 1280×720 單屏無捲動、三欄 240/796/220  — {"sw":1280,"sh":720,"c":[240,796,220]}
+PASS  [dev02-03-combat.png] 1280×720 單屏無捲動、三欄 240/796/220  — {"sw":1280,"sh":720,"c":[240,796,220]}
+PASS  console 0 error  — []
+
+結果：109/109 PASS

@@ -455,7 +455,16 @@ window.SHL_DATA = (function () {
   const TIDE = { towns: ['huiyao', 'duyin'], first: [3, 4], gap: [5, 7], days: 2, need: 4, reward: 50, potMult: 1.5, hurtDays: 2 };
   // 歇息起床（SPEC-TIME v0.4 §11 B1）：起床＝min(max(現在+minH, 下一個 wakeMin), 現在+maxH)；maxH 13 為建議值、未經模擬（Q-T7 乙）
   // SPEC-TIME 7.1b 險級分檔：路程險級門檻（半開區間；比較前 risk 先封頂 0.85、再 half-up 取三位）→ 低／中／高／極高
-  const TIME = { RISK_CUTS: [0.15, 0.35, 0.60], RISK_TIERS: ['低', '中', '高', '極高'] };
+  const TIME = {
+    RISK_CUTS: [0.15, 0.35, 0.60], RISK_TIERS: ['低', '中', '高', '極高'],
+    // SPEC-TIME 2.2 夜暗度 w（清晨 05–08 0.25／白天 08–17 0／黃昏 17–20 0.5／黑夜 1.0）與 3.1 天候遇險倍率 wxRisk
+    DARK: { dawn: 0.25, day: 0, dusk: 0.5, night: 1 },
+    WX_RISK: { clear: 1, rain: 1.1, fog: 1.2, snow: 1.15 },
+    // SPEC-TIME 7.2 腳程檔：M 取兩位小數後 ≥1.00 輕快、≥0.67 平常、≥0.50 沉重、其餘蹣跚
+    PACE_CUTS: [1.00, 0.67, 0.50], PACE_NAMES: ['輕快', '平常', '沉重', '蹣跚'],
+    // SPEC-01 4.9 長期委託軟期限：報酬 <100 兩 30 日、≥100 兩 60 日；聲望門檻（不跌破）
+    LONGQUEST: { cut: 100, short: 30, long: 60, repFloors: [20, 10, 0] },
+  };
   const SLEEP = { wakeMin: 8 * 60, minH: 6, maxH: 13 };
   // ===== 兩鎮循環（SPEC-01 v0.4 §3、§4；單一來源，DEV-02） =====
   // 標記沿用規格：〔LW〕living-world、〔新〕規格補值、〔既有〕現況。數字全部照 SPEC-01 v0.4，未經本包調整。
@@ -497,6 +506,76 @@ window.SHL_DATA = (function () {
     GARRISON_NAMES: ['無', '自衛隊', '巡邏隊', '守備'],
     // §3.2／§5.10 難民棚起手（只存欄位；§5.10 規則無人認領，本包不結算）
     REFUGEE0: { camp: 60, inTotal: 0, settledTotal: 0, soldTotal: 0, soldToday: 0, soldYday: 0 },
+  };
+
+  // ===== 題材文字表（DEV-05；可替換資料檔） =====
+  // 假設：分檔檔名與切點待 mumi（製作人 16:46 裁決第 1 項）；本包先集中放在這一處，ui.js 只讀這張表，不寫死句子。
+  // 來源：city.* ＝ docs/design/batch1/city-status-copy-v0.1.csv（字串 key 照 CSV）；map.* ＝ UI-02/wording-map-commission.md §1；
+  //       quest.* ＝ wording-map §2；腳程懸浮＝mumi 原句（16:29 拍板、16:46 裁決第 1 項）。駐軍四檔名在 WORLD.GARRISON_NAMES（DEV-02），不在此重複。
+  // {名稱} 為代入欄位，名稱對齊 brief 欄位（SPEC-01 §7.6）。
+  const TEXT = {
+    city: {
+      title: '城況', collapse: '收合',
+      label: { prosperity: '繁榮', order: '治安', treasury: '財庫', garrison: '駐軍', bandit: '匪勢' },
+      // §7.1 換算：值 < 上界即落在該檔（最後一檔上界 Infinity）
+      prosperity: [[25, '荒涼'], [40, '冷清'], [60, '平常'], [75, '熱鬧'], [Infinity, '繁華']],
+      order: [[25, '混亂'], [45, '不安'], [65, '尚可'], [85, '安穩'], [Infinity, '太平']],
+      bandit: [[15, '絕跡'], [35, '零星'], [60, '猖獗'], [Infinity, '橫行']],
+      trend: { up: '較昨日升', down: '較昨日降', flat: '與昨日持平' },
+      delta: { up: '較昨日+{N}', down: '較昨日−{N}', flat: '與昨日持平' },
+      arrow: { up: '↑', down: '↓', flat: '' },
+      treasury: { debt: '欠餉', full: '滿庫', tight: '吃緊', ok: '足餉' },
+      treasuryIn: '今日收入{treasuryIn}兩', treasuryOut: '今日支出{treasuryOut}兩', treasuryNet: '今日淨額{treasuryNet}兩',
+      treasuryAmount: '現額{T}兩', taxcut: '稅收抽成，餘{taxCutDays}天',
+      rescue: '已求援，得銀{rescueAmt}兩',
+      garrisonAid: '資助加派中，餘{aidDaysLeft}天', garrisonDebt: '欠餉，降一檔',
+      why: {
+        WHY_TIDE: '繁榮{trend}，因獸潮壓境', WHY_HURT: '繁榮{trend}，因獸潮過後鎮上受創', WHY_REPEL: '繁榮{trend}，因擊退獸潮',
+        WHY_DEBT: '繁榮{trend}，因欠餉，駐軍降一檔', WHY_BANDIT: '繁榮{trend}，因匪勢{bandit}', WHY_RENLU: '繁榮{trend}，因難民被販走',
+        WHY_AID: '繁榮{trend}，因資助巡邏加派駐軍', WHY_ORDER_UP: '繁榮{trend}，因治安轉好', WHY_ORDER_DOWN: '繁榮{trend}，因治安轉差',
+        WHY_REVERT: '繁榮{trend}，因市面回穩', WHY_NONE: '繁榮{trend}，因市面小起落',
+      },
+      // 交易稅率顯示（SPEC-01 §4.3 5%；草稿 UI-02-02 展開末行）。數字由 WORLD.TRADE_TAX 代入
+      tradeTax: '交易稅 {pct}%',
+      // 假設：第一次日結（00:00）之前 brief 還是空的；SPEC 未定這時要顯示什麼，本包不自行補算，只顯示這兩句
+      // dev05-strings 1a／1b（本地化 17:50）：第一次日結（00:00）前的狀態字與說明
+      pendingTier: '尚無消息', pending: '過了午夜才有各鎮消息',
+      // 出城路險（SPEC-TIME 7.1b briefDanger；dev05-strings 3a／3b）
+      danger: '出城路險', dangerHint: '出城最險那條路的險級，隨時段和天候變',
+      // 原本放在鎮上說明列的兩句（沿用原文，只搬位置到平面圖頂端警示條，對照 UI-02-03）
+      hurt: '獸潮過後一片狼藉：貨架剩一半、客棧漲價。', tide: '獸潮期間，藥水漲價五成。',
+      toggleHint: '點開看收支、駐軍與匪勢',
+    },
+    // 地圖趕路（底列與圖上氣泡同一套詞；wording-map §1）
+    map: {
+      hours: '路程', food: '飽食', fat: '疲累', risk: '危險', speed: '腳程',
+      hoursVal: '{hours} 小時', foodVal: '−{food}', fatVal: '+{fat}', speedVal: '{pace} ×{mult}',
+      bubble1: '路程 {hours} 小時・飽食 −{food}', bubble2: '疲累 +{fat}・危險 {riskName}',
+      // 懸浮說明：腳程為 mumi 原句；其餘四句為 wording-map §1 擬案（路程一句把「時辰」改「時數」，見 PR 說明）
+      hint: {
+        hours: '這次出發會耗掉的時間，依路線與目前腳程算出',
+        food: '趕路會消耗飽食，過低時生命不再回復',
+        fat: '趕路會累積疲累，過高時命中與腳程都會變慢',
+        risk: '這條路遇襲機會的高低，夜間、負重過高或走野徑時較易遇險',
+        speed: '趕路速度受負重、裝備與疲累影響',
+      },
+    },
+    // 鎮衙委託單（wording-map §2）
+    quest: {
+      target: '目標', reward: '報酬', whereHere: '送到此地交付', whereBring: '帶回此地交付', due: '時限', risk: '風險',
+      rewardVal: '{reward} 兩', depositVal: '・押金 {deposit} 兩',
+      dueLong: '長期', dueToday: '今日截止', dueLeft: '剩 {n} 天',
+      riskVal: '危險 {level}', riskNone: '危險 未定',
+      failDeadline: '逾期則撕榜', failDeposit: '逾期押金沒收', failNone: '失敗罰則未定',
+      take: '揭榜', deliver: '交付', claimed: '已交付', delivering: '送達', progress: '進度 {a}/{b}',
+      dueLongLeft: '長期・剩 {n} 天', failLong: '逾期撕榜，破曉聲望 −1',
+      // 1727 第 3 項腳註原文（數字與「張」之間不留空白，句尾不加句號）
+      foot: '每天補滿3張，過期撕榜，完成提高破曉聲望',
+    },
+    // 客棧／通鋪（dev05-strings 2a／2b）：{wake} 由 G.wakeLabel() 代入（與實際起床同一個 wakeTime）
+    inn: {
+      sleep: '睡到 {wake}', sleepNext: '睡到明日 {wake}', sleepHint: '睡到早上 08:00，至少 6 小時、最多 13 小時',
+    },
   };
 
   // ---------- 營火／藥爐配方 ----------
@@ -598,5 +677,5 @@ window.SHL_DATA = (function () {
   const SLOT_NAMES = { main: '主手', off: '副手', head: '頭盔', chest: '胸甲', gloves: '手套', boots: '靴子', amulet: '護身符', ring1: '左戒', ring2: '右戒', belt: '腰帶', bag: '背包', cart: '馬車' };
   const SLOT_GLYPH = { main: '刃', off: '盾', head: '冠', chest: '甲', gloves: '手', boots: '靴', amulet: '符', ring1: '戒', ring2: '戒', belt: '帶', bag: '囊', cart: '車' };
 
-  return { ITEMS, SKILLS, TECHS, BASES, AFFIXES, UNIQUES, LEGENDS, RARITY, ENEMIES, NODES, EDGES, REGION_LABELS, WILDS, DUNGEONS, PRICES, PLACES, BUILDINGS, ITEM_CLASS, NPCS, FACTIONS, EXPLORE, CODEX_CATS, BOUNTIES, QUEST_GEN, RUMOR, TIDE, SLEEP, TIME, WORLD, RECIPES, EVENTS, ATTRS, PROFS, PROF_GROUPS, WTYPE_NAMES, ORIGINS, NAME_DEFAULT, NAME_TAKEN, NAME_POOL, SEASONS, YEAR_NAMES, EQ_SLOTS, SLOT_NAMES, SLOT_GLYPH };
+  return { ITEMS, SKILLS, TECHS, BASES, AFFIXES, UNIQUES, LEGENDS, RARITY, ENEMIES, NODES, EDGES, REGION_LABELS, WILDS, DUNGEONS, PRICES, PLACES, BUILDINGS, ITEM_CLASS, NPCS, FACTIONS, EXPLORE, CODEX_CATS, BOUNTIES, QUEST_GEN, RUMOR, TIDE, SLEEP, TIME, WORLD, TEXT, RECIPES, EVENTS, ATTRS, PROFS, PROF_GROUPS, WTYPE_NAMES, ORIGINS, NAME_DEFAULT, NAME_TAKEN, NAME_POOL, SEASONS, YEAR_NAMES, EQ_SLOTS, SLOT_NAMES, SLOT_GLYPH };
 })();

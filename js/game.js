@@ -59,6 +59,25 @@ window.SHL = (function () {
   function dayOf(t) { return Math.floor(t / 1440) + 1; }
   function hourOf(t) { return Math.floor((t % 1440) / 60); }
   function isNight(t) { const h = hourOf(t); return h >= 20 || h < 5; }
+  // SPEC-TIME 2.2：四時段（半開區間）；夜暗度 w 見 D.TIME.DARK（7.1）
+  function phaseOf(t) { const m = ((t % 1440) + 1440) % 1440; return m >= 300 && m < 480 ? 'dawn' : m >= 480 && m < 1020 ? 'day' : m >= 1020 && m < 1200 ? 'dusk' : 'night'; }
+  // 天候：DEV-TIME 尚未落地（weatherAt 不在程式裡），目前一律晴。
+  // TODO(DEV-TIME)：weatherNow() 必須改為呼叫 weatherAt(t)；不要在別處另寫一套天氣邏輯（數值裁定：本輪維持晴）。
+  function weatherNow(/* t */) { return 'clear'; }
+  // SPEC-TIME 7.1b briefDanger 用的當下倍率 (1 + w_now) × wxRisk(當下)
+  function dangerMult(t, wx) { return (1 + D.TIME.DARK[phaseOf(t)]) * D.TIME.WX_RISK[wx || weatherNow(t)]; }
+  // SPEC-TIME 7.1 行走倍率 (1 + mean(w)) × wxRisk：取行走期間 [t0, t0+mins)，mean(w) 按每段分鐘數加權，
+  // wxRisk 取期間最大值。時段邊界都在整點，逐整點切片即可（每片落在單一時段內）。
+  function walkMult(t0, mins) {
+    let t = t0, sumW = 0, wx = 0;
+    while (t < t0 + mins) {
+      const next = Math.min(t0 + mins, Math.floor(t / 60) * 60 + 60);
+      sumW += D.TIME.DARK[phaseOf(t)] * (next - t);
+      wx = Math.max(wx, D.TIME.WX_RISK[weatherNow(t)]);
+      t = next;
+    }
+    return (1 + sumW / mins) * wx;
+  }
   // 曆法：一季 30 天、一年 120 天；開局元年春第 1 日、20 歲
   function seasonOf(t) { return Math.floor((dayOf(t) - 1) / 30) % 4; }
   function yearOf(t) { return Math.floor((dayOf(t) - 1) / 120); }
@@ -199,6 +218,13 @@ window.SHL = (function () {
     if (S.fat >= 80) m *= 0.85;
     return m;
   }
+  // SPEC-TIME 7.2 腳程：M 以整數百分點 half-up 取兩位，判檔與算時間都用這個值（倍率公式本身不變）
+  function paceMult() { return Math.floor(speedMult() * 100 + 0.5 + 1e-9) / 100; }
+  function paceName(m) {
+    const k = Math.round((m === undefined ? paceMult() : m) * 100), cuts = D.TIME.PACE_CUTS; let i = 0;
+    while (i < cuts.length && k < Math.round(cuts[i] * 100)) i++;
+    return D.TIME.PACE_NAMES[i];
+  }
   function armor() {
     let a = 0;
     allEquipped().forEach((eq) => {
@@ -329,7 +355,7 @@ window.SHL = (function () {
     S.hp = maxHp();
     S.scene = 'town'; S.townTab = null; S.visited.huiyao = true;
     restockShops();
-    D.BOUNTIES.forEach((b) => S.quests.push({ id: b.id, town: b.town, g: b.g, ic: b.enemy || b.item || D.NODES[b.dungeon].ic, title: b.title, kind: b.kind, enemy: b.enemy, item: b.item, dungeon: b.dungeon, need: b.need, reward: b.reward, due: null, fixed: true, giver: b.giver || null, prog: 0, status: b.giver ? 'hidden' : b.start ? 'active' : 'open' }));
+    D.BOUNTIES.forEach((b) => S.quests.push({ id: b.id, town: b.town, g: b.g, ic: b.enemy || b.item || D.NODES[b.dungeon].ic, title: b.title, kind: b.kind, enemy: b.enemy, item: b.item, dungeon: b.dungeon, need: b.need, reward: b.reward, due: null, fixed: true, giver: b.giver || null, prog: 0, status: b.giver ? 'hidden' : b.start ? 'active' : 'open', taken: b.start ? dayOf(S.t) : null }));
     genQuests();
     log(fullName() + '（' + O.name + '）在灰窯鎮醒來。鎮公所的「灰髯狼 ×3」已揭下。');
     log('點建築進去辦事，點路人交談。離鎮後每個地點都能探查。');
@@ -699,9 +725,9 @@ window.SHL = (function () {
     D.EDGES.forEach((e) => { if (!known(e.a) || !known(e.b)) return; if (e.a === id) out.push([e.b, e]); else if (e.b === id) out.push([e.a, e]); });
     return out;
   }
-  function route(from, to) {
+  function route(from, to, roadOnly) {
     // Dijkstra 先求（總時數, 野徑段數）字典序最短，只走已知的地點；再在所有並列最短路線中依序比
-    // (3) 路線險值 risk3(routeRisk)（以呼叫當下的時段、負重、獸潮、R 計）較低者，(4) 節點 id 序列字典序較小者。
+    // (3) 路線險值 risk3(routeRisk)（以呼叫當下出發的整段路程、負重、獸潮、R 計）較低者，(4) 節點 id 序列字典序較小者。
     // SPEC-TIME 7.1b／AC 20、數值 18:14 裁定：結果不隨 NODES／EDGES 的排列順序或邊的端點寫法改變。
     const dist = {}, wild = {}, Q = Object.keys(D.NODES).filter(known);
     Q.forEach((k) => { dist[k] = Infinity; wild[k] = Infinity; }); dist[from] = 0; wild[from] = 0;
@@ -711,6 +737,7 @@ window.SHL = (function () {
       let u = null; left.forEach((k) => { if (u === null || better(dist[k], wild[k], dist[u], wild[u])) u = k; });
       left.delete(u);
       neighbors(u).forEach(([v, e]) => {
+        if (roadOnly && !e.road) return;
         const h = dist[u] + e.h, w = wild[u] + (e.road ? 0 : 1);
         if (better(h, w, dist[v], wild[v])) { dist[v] = h; wild[v] = w; }
       });
@@ -720,28 +747,32 @@ window.SHL = (function () {
     const walk = (c, edges, nodes) => {
       if (c === from) { paths.push({ edges, nodes: [from].concat(nodes) }); return; }
       neighbors(c).forEach(([u, e]) => {
-        if (nodes.includes(u) || dist[u] + e.h !== dist[c] || wild[u] + (e.road ? 0 : 1) !== wild[c]) return;
+        if ((roadOnly && !e.road) || nodes.includes(u) || dist[u] + e.h !== dist[c] || wild[u] + (e.road ? 0 : 1) !== wild[c]) return;
         walk(u, [e].concat(edges), [c].concat(nodes));
       });
     };
     if (from !== to && dist[to] < Infinity) walk(to, [], []);
     const seq = (x, y) => { for (let i = 0; i < Math.min(x.length, y.length); i++) if (x[i] !== y[i]) return x[i] < y[i] ? -1 : 1; return x.length - y.length; };
-    paths.forEach((p) => (p.r = risk3(routeRisk(p.edges))));
+    paths.forEach((p) => (p.r = risk3(routeRisk(p.edges, S.t))));
     paths.sort((x, y) => x.r - y.r || seq(x.nodes, y.nodes));
     const edges = paths.length ? paths[0].edges : [];
     edges.stops = paths.length ? paths[0].nodes.slice(1) : [];
     return edges;
   }
-  // 路線險值：封頂 RISK_CAP 後的值（未取位）。travelPreview 與 route() 的第三層 tie-break 共用。
-  function routeRisk(edges) {
+  // risk_base：全程官道 0.04、含野徑單段 0.22、含野徑多段 0.30（遇襲、顯示、簡報、委託單共用）
+  function riskBase(edges) { return edges.some((e) => !e.road) ? (edges.length > 1 ? 0.3 : 0.22) : 0.04; }
+  // 趕路時數：ceil(Σh ÷ M)，至少 1（判檔與算時間用同一個 M）
+  function walkHours(edges) { return Math.max(1, Math.ceil(edges.reduce((a, e) => a + e.h, 0) / paceMult())); }
+  // 路線險值（唯一公式；遇襲判定、travelPreview、route() 第三層都只呼叫這一個）：
+  // SPEC-TIME 7.1：risk_base × (1 + mean(w)) × wxRisk（整段路程），再乘超載、輕功、獸潮、R（SPEC-01 §4.8），
+  // 0.85 封頂在所有乘項之後只做一次。t0＝出發時刻；不再看出發當下 isNight（SPEC-01 第 2 節）。
+  function routeRisk(edges, t0) {
     const band = loadBand();
     const wild = edges.some((e) => !e.road);
-    let risk = wild ? (edges.length > 1 ? 0.3 : 0.22) : 0.04;
-    if (isNight(S.t)) risk *= 2;
+    let risk = riskBase(edges) * walkMult(t0, walkHours(edges) * 60);
     if (band.id === 'heavy' || band.id === 'over') risk *= 1.4;
     if (wild && perk('jiao', 25)) risk *= 0.8;
     if (wild && tideOn()) risk *= 1.5;
-    // SPEC-01 §4.8「套用」：多乘治安／匪勢修正 R，封頂 0.85 在所有乘項之後做一次（夜間仍用現況 isNight；SPEC-TIME 7.1 屬 DEV-TIME）
     return Math.min(D.WORLD.RISK_CAP, risk * riskR(wild));
   }
   // SPEC-TIME 7.1b：先封頂 RISK_CAP，再 half-up 取三位，回傳千分位整數（防浮點：0.1495 → 150）
@@ -754,19 +785,69 @@ window.SHL = (function () {
   }
   function travelPreview(to) {
     const edges = route(S.loc, to);
-    const base = edges.reduce((a, e) => a + e.h, 0);
-    const sm = speedMult();
-    const hours = Math.max(1, Math.ceil(base / sm));
+    const sm = paceMult();
+    const hours = walkHours(edges);
     const band = loadBand();
     const xingRed = clamp(1 - profLv('jiao') * 0.003 - (S.skills.includes('jixing') ? 0.1 : 0), 0.4, 1);
     const fat = Math.round(3 * hours * band.fat * xingRed * (1 - affixSum('fatred') / 100));
     const food = 4 * hours;
     const wild = edges.some((e) => !e.road);
     const R = riskR(wild);
-    const risk = routeRisk(edges);
+    const risk = routeRisk(edges, S.t); // 畫面險級與 travel() 遇襲判定用同一個值
     const riskName = riskTier(risk);
     const via = edges.length > 1 ? D.NODES[edges.stops[0]].name : (edges[0] && edges[0].road ? '官道' : '野徑');
-    return { edges, hours, fat, food, risk, riskName, mult: sm, via, wild, R };
+    return { edges, hours, fat, food, risk, riskName, mult: sm, pace: paceName(sm), via, wild, R };
+  }
+  // SPEC-TIME 7.1b briefDanger「出城路險」：本鎮到每個已知目的地照 route() 的路線各算一次，取最高。
+  // risk_base × R × (1 + w_now) × wxRisk × 獸潮 1.5（只乘含野徑的路線）；不含超載、詞綴；封頂後取三位分檔。
+  // opts.t／opts.wx／opts.tide 只給測試覆寫，省略即當下。
+  function briefDanger(tid, opts) {
+    const o = opts || {}, t = o.t === undefined ? S.t : o.t, tide = o.tide === undefined ? tideOn() : o.tide;
+    const all = [];
+    Object.keys(D.NODES).filter((id) => id !== tid && known(id)).forEach((id) => {
+      const e = route(tid, id); if (!e.length) return;
+      const wild = e.some((x) => !x.road);
+      const risk = Math.min(D.WORLD.RISK_CAP, riskBase(e) * riskR(wild) * dangerMult(t, o.wx) * (wild && tide ? 1.5 : 1));
+      all.push({ dest: id, wild, risk: risk3(risk) / 1000 });
+    });
+    const top = all.reduce((a, b) => (!a || b.risk > a.risk ? b : a), null);
+    return top && { risk: top.risk, tier: riskTier(top.risk), dest: top.dest, all };
+  }
+  // 地點險級 siteTier（7.1b）：舊稱「中高」在畫面一律顯示「高」
+  function siteTier(r) { return r === '中高' ? '高' : r; }
+  function tierMax(a, b) { const T = D.TIME.RISK_TIERS; return T[Math.max(T.indexOf(a), T.indexOf(b))]; }
+  // 委託單基準路程級（7.1b）：白天（w=0）、不超載、無獸潮、天候取當日、R 取現值
+  function baseRouteTier(edges) {
+    const wild = edges.some((e) => !e.road);
+    return riskTier(riskBase(edges) * riskR(wild) * D.TIME.WX_RISK[weatherNow(S.t)]);
+  }
+  // 收集單「已知來源」只算採集點與獸跡產地（SPEC-01 4.9、Q-v5-3）；獵殺單看 QUEST_GEN.where 與該獸的獸跡
+  function questSources(q) {
+    const out = [];
+    Object.keys(D.WILDS).forEach((id) => D.WILDS[id].points.forEach((p) => {
+      const E = p.kind === 'track' && D.ENEMIES[p.enemy];
+      const hit = q.kind === 'collect' ? p.item === q.item || (E && ((q.item === 'hide' && E.skin && E.skin[1] > 0) || (q.item === 'meat' && E.meat && E.meat[1] > 0) || E.extra === q.item))
+        : q.kind === 'kill' && p.kind === 'track' && p.enemy === q.enemy;
+      if (hit && !out.includes(id)) out.push(id);
+    }));
+    if (q.kind === 'kill') {
+      const names = (D.QUEST_GEN.where[q.enemy] || '').split('・');
+      Object.keys(D.NODES).forEach((id) => { if (names.includes(D.NODES[id].name) && !out.includes(id)) out.push(id); });
+    }
+    return out.filter(known);
+  }
+  // questTier = max(routeTier, siteTier)（SPEC-01 4.9）；多個來源取最低者；送貨只走官道（即使野徑更短）
+  function questTier(q) {
+    if (q.kind === 'deliver') { const e = route(q.town, q.to, true); return e.length ? baseRouteTier(e) : null; }
+    const nodes = q.kind === 'clear' ? [q.dungeon] : q.kind === 'collect' || q.kind === 'kill' ? questSources(q) : [];
+    const T = D.TIME.RISK_TIERS; let best = null;
+    nodes.forEach((id) => {
+      const e = route(q.town, id); if (!e.length) return;
+      const site = siteTier((D.WILDS[id] || D.DUNGEONS[id] || {}).risk) || '低';
+      const t = tierMax(baseRouteTier(e), site);
+      if (!best || T.indexOf(t) < T.indexOf(best)) best = t;
+    });
+    return best;
   }
   function selectDest(id) {
     if (S.dead || !known(id)) return;
@@ -791,6 +872,7 @@ window.SHL = (function () {
     if (bandId !== 'light') gainProf('fuz', (bandId === 'normal' ? 4 : 6) * p.hours);
     log('自' + fromName + '出發，經' + p.via + '，' + p.hours + ' 小時後抵達' + D.NODES[to].name + '。');
     if (S.dead) return commit();
+    HOOKS.lastEncRisk = p.risk; // 只給測試讀：本趟遇襲判定實際用的 risk
     if (rnd() < p.risk) { startEvent(to); return commit(); }
     enterNode(to);
     commit();
@@ -928,6 +1010,12 @@ window.SHL = (function () {
     return Math.min(Math.max(now + D.SLEEP.minH * 60, n8), now + D.SLEEP.maxH * 60);
   }
   // SPEC-TIME §6.2：睡眠（客棧、傷兵帳）飽食 1.25／小時（取代整夜固定 10）；冬季 ×1.25 仍由 passTime 照現況套用
+  // 客棧按鈕字「睡到 {wake}」：與 sleepToMorning 同一個 wakeTime；起床在隔天用「睡到明日 {wake}」
+  function wakeLabel(now) {
+    if (now === undefined) now = S.t;
+    const w = wakeTime(now), I = D.TEXT.inn;
+    return (dayOf(w) > dayOf(now) ? I.sleepNext : I.sleep).replace('{wake}', fmtClock(w));
+  }
   function sleepFoodCost(hours) { return 1.25 * hours; }
   function sleepToMorning(opts) {
     const now = S.t; const hours = (wakeTime(now) - now) / 60; // 起床公式不變（wakeTime）
@@ -1050,8 +1138,27 @@ window.SHL = (function () {
       }
     });
   }
+  // SPEC-01 4.9 長期委託軟期限：固定懸賞（非私人委託）報酬 <100 兩 30 日、≥100 兩 60 日；其餘回 0（不適用）
+  function longDays(q) { const L = D.TIME.LONGQUEST; return q.fixed && !q.giver && q.kind !== 'tide' ? (q.reward < L.cut ? L.short : L.long) : 0; }
+  // 接單日 d：第 d+N 日 00:00 日結仍未完成即逾期（d+N−1 日仍可完成）；回傳剩餘天數（含今日），不適用回 null
+  function longLeft(q, day) { const N = longDays(q); return N && q.status === 'active' && q.taken ? q.taken + N - (day === undefined ? dayOf(S.t) : day) : null; }
+  // 遊戲事件（SPEC-02 3.2 事件 ID）：目前只有 longquest_expire；監聽者不存檔
+  const evFns = [];
+  function onEvent(f) { evFns.push(f); }
+  function gameEvent(id, data) { evFns.forEach((f) => f(id, data)); }
+  function longquestExpire(q) {
+    // 破曉聲望 −1，下限 0 且不跌破已達門檻（10／20）；不罰銀、K 0、W 0
+    const rep = repOf('dawn'), floor = D.TIME.LONGQUEST.repFloors.find((th) => rep >= th) || 0;
+    S.rep.dawn = Math.max(rep - 1, floor);
+    log('長期委託「' + q.title + '」逾期，已被撕榜。破曉聲望 ' + rep + ' → ' + S.rep.dawn + '。', 'bad');
+    gameEvent('longquest_expire', { id: q.id, k: 0, w: 0, rep: [rep, S.rep.dawn] });
+  }
   function questTick(day) {
     S.quests = S.quests.filter((q) => {
+      if (longDays(q) && q.status === 'active') {
+        if (!q.taken) q.taken = day; // 舊存檔沒有接單日：從今天起算，不回溯
+        else if (day >= q.taken + longDays(q)) { longquestExpire(q); return false; }
+      }
       if (q.status === 'claimed' && !q.fixed) return false;
       if (q.due && day > q.due && (q.status === 'open' || q.status === 'active')) {
         if (q.status === 'active') {
@@ -1082,7 +1189,7 @@ window.SHL = (function () {
         if (!canAdd({ k: 'parcel', n: 1 })) { log('行囊沒有空格放包裹。', 'bad'); return emit(); }
         S.silver -= q.deposit; addItem({ k: 'parcel', n: 1 });
       }
-      q.status = 'active';
+      q.status = 'active'; q.taken = dayOf(S.t); q.tier = questTier(q);
       log('接下委託：' + q.title + (q.due ? '（第 ' + q.due + ' 日前）' : '') + (q.kind === 'deliver' ? '，押金 ' + q.deposit + ' 兩' : ''));
       return commit();
     }
@@ -1525,6 +1632,30 @@ window.SHL = (function () {
     const x = Math.floor(got * D.WORLD.TRADE_TAX);
     if (x > 0) { t.T = r2(t.T + x); t.acc.tax += x; }
     return x;
+  }
+  // ================= 城況簡報（DEV-05；SPEC-01 §7） =================
+  // 只讀 brief 與日結後的 P、O、B，照 §7.1 門檻（D.TEXT.city）對成檔名；不重算任何稅、收支、趨勢或主因。
+  // 待裁：§7.6 brief 沒有 P、O、B 欄位，§7.1 卻要顯示繁榮／治安／匪勢的檔名與數字；本包讀 towns[tid].P／O 與 region.B
+  // （UI-02 README §3 的資料來源欄同此），它們只在日結時更新，與同次 brief 一致。
+  function tierIdx(tab, v) { const i = tab.findIndex((r) => v < r[0]); return i < 0 ? tab.length - 1 : i; }
+  function cityView(tid) {
+    const t = townOf(tid || S.loc); if (!t) return null;
+    const C = D.TEXT.city, b = t.brief || {}, has = b.day !== undefined, B = S.world.region.B;
+    const pi = tierIdx(C.prosperity, t.P), oi = tierIdx(C.order, t.O), bi = tierIdx(C.bandit, B);
+    return {
+      tid: tid || S.loc, has, brief: b,
+      P: Math.round(t.P), O: Math.round(t.O), B: Math.round(B),
+      pIdx: pi, pName: C.prosperity[pi][1], oIdx: oi, oName: C.order[oi][1], bIdx: bi, bName: C.bandit[bi][1],
+      // 第一次日結前 brief 為空：駐軍檔讀起手的 Geff（＝Gnom），其餘收支不顯示
+      gName: garrisonName(has ? b.Geff : t.Geff),
+      danger: briefDanger(tid || S.loc), // 出城路險：即時算（不讀 brief）
+    };
+  }
+  // 委託單風險塊（UI-02 wording-map §2）：險級＝questTier（接單後固定在 q.tier）；罰則：送貨押金、一般單撕榜、長期單撕榜＋聲望 −1
+  function questRisk(q) {
+    const lv = q.tier || questTier(q);
+    const fail = q.kind === 'deliver' ? 'deposit' : q.due ? 'deadline' : longDays(q) ? 'long' : null;
+    return { level: lv, high: lv === '高' || lv === '極高', fail };
   }
   function tideInfo() {
     const td = S.world.tide; if (!td || !tideOn()) return null;
@@ -2145,7 +2276,7 @@ window.SHL = (function () {
   return {
     get state() { return S; },
     init, on, restart, save, wipeSave, readRaw, SAVE_KEY,
-    fmtTime, fmtClock, fmtDate, dayOf, isNight, seasonOf, ageOf, wakeTime, garrisonName, sPub, riskR, crowd,
+    fmtTime, fmtClock, fmtDate, dayOf, isNight, seasonOf, ageOf, wakeTime, garrisonName, sPub, riskR, crowd, cityView, questRisk, questTier, briefDanger, dangerMult, phaseOf, paceMult, paceName, wakeLabel, longLeft, onEvent,
     maxHp, carryCap, totalWt, loadBand, speedMult, armor, weaponDmg, weaponType, hitChance, dodgeChance, critChance, bagCap,
     attrVal, attrProgress, profLv, profProgress, perk,
     eqBase, eqValue, itemWt, itemName, itemGlyph, itemIcon, countItem, affixSum, reqUnmet, slotFits,

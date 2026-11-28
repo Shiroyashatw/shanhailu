@@ -522,7 +522,7 @@ async function fresh(page, base, q) {
         if (!er && !nr && !sw) {
           // 對照：兩條候選的（時數, 野徑段數, 險值三位）
           const cand = c === '丙' ? [[list[0]], [list[1], list[2]]] : [[list[0], list[1]], [list[2], list[3]]];
-          info[c] = { go: seq('huiyao', go), back: seq('duyin', back), cand: cand.map((p) => [p.reduce((x, y) => x + y.h, 0), p.filter((y) => !y.road).length, Math.floor(G.routeRisk(p) * 1000 + 0.5 + 1e-9)]) };
+          info[c] = { go: seq('huiyao', go), back: seq('duyin', back), cand: cand.map((p) => [p.reduce((x, y) => x + y.h, 0), p.filter((y) => !y.road).length, Math.floor(G.routeRisk(p, G.state.t) * 1000 + 0.5 + 1e-9)]) };
         } else if (!out[k]) info[k] = { go: seq('huiyao', go), back: seq('duyin', back) };
       }))));
       D.EDGES.length = 0; keep.forEach((e) => D.EDGES.push(e)); setN(0);

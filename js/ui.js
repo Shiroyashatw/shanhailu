@@ -39,6 +39,15 @@
   function itIco(it, size) { return it.k === 'eq' && it.eq.unid ? ico(G.itemIcon(it), G.itemGlyph(it), size) + '<span class="unid">?</span>' : ico(G.itemIcon(it), G.itemGlyph(it), size); }
   function rcls(it) { return it.k === 'eq' ? ' ' + RAR_CLS[it.eq.rarity] : ''; }
   function scn(id) { return SC.has(id) ? ' sc-' + id : ''; }
+  // 題材文字表代入：{名稱} → vars[名稱]（DEV-05；句子都在 D.TEXT，不在這裡寫死）
+  const TX = D.TEXT;
+  function tx(str, vars) { return String(str).replace(/\{(\w+)\}/g, (m, k) => (vars && vars[k] !== undefined ? vars[k] : m)); }
+  // 整數帶符號：正數半形 +、負數 U+2212、0 不帶號（city-status-copy CSV city.treasury.net 備註）
+  // 腳程「檔名 ×M」（SPEC-TIME 7.2：M 取兩位後判檔，與算時間同一個值）
+  function paceTxt(m) { m = m === undefined ? G.paceMult() : m; return tx(TX.map.speedVal, { pace: G.paceName(m), mult: m.toFixed(2) }); }
+  // 客棧／通鋪「睡到 {wake}」：時間由 G.wakeLabel()（＝實際起床的 wakeTime）給，hover 定稿句
+  function sleepTxt() { return '<span title="' + TX.inn.sleepHint + '" data-testid="sleep-to">' + G.wakeLabel() + '</span>'; }
+  function sgn(n) { return n > 0 ? '+' + n : n < 0 ? '\u2212' + -n : '0'; }
 
   // ======================= 左欄 =======================
   function renderLeft(S) {
@@ -101,7 +110,7 @@
     // 負重底條
     const w = G.totalWt(), cc = G.carryCap();
     const pct = Math.min(1, w / cc);
-    h += '<div class="loadbar" data-testid="loadbar">' + ico('ui_load', '負', 16) + '<div class="thinbar' + (pct > 0.75 ? ' warn' : pct > 0.4 ? ' mid' : '') + '" style="width:104px"><i style="width:' + (pct * 100).toFixed(1) + '%"></i><b style="left:40%"></b><b style="left:75%"></b></div><span>' + Math.round(w) + '/' + cc + '</span><span class="spd">×' + G.speedMult().toFixed(2) + '</span></div>';
+    h += '<div class="loadbar" data-testid="loadbar">' + ico('ui_load', '負', 16) + '<div class="thinbar' + (pct > 0.75 ? ' warn' : pct > 0.4 ? ' mid' : '') + '" style="width:56px"><i style="width:' + (pct * 100).toFixed(1) + '%"></i><b style="left:40%"></b><b style="left:75%"></b></div><span>' + Math.round(w) + '/' + cc + '</span><span class="spd" data-tip="spd" data-testid="speed">' + TX.map.speed + ' ' + paceTxt() + '</span></div>';
     h += '<div id="tip" style="display:none"></div>';
     $L.innerHTML = h;
   }
@@ -173,7 +182,8 @@
     if (!tip || dragState) return;
     const key = el.getAttribute('data-tip'); const [kind, v] = key.split(':');
     let html = '', rc = '';
-    if (kind === 'cart') { html = '<div class="tip-h"><span class="tip-name">馬車槽</span><span class="tag">預留</span></div><div class="sub">架構預留・本版不可用</div><div class="tip-aff" style="white-space:normal">完整版可於城鎮雇用或購買馬車，提供大型貨倉、分擔負重，限走官道。</div>'; }
+    if (kind === 'spd') { html = '<div class="tip-h"><span class="tip-name">' + TX.map.speed + ' ' + paceTxt() + '</span></div><div class="tip-aff" data-testid="speed-hint" style="white-space:normal">' + TX.map.hint.speed + '</div>'; }
+    else if (kind === 'cart') { html = '<div class="tip-h"><span class="tip-name">馬車槽</span><span class="tag">預留</span></div><div class="sub">架構預留・本版不可用</div><div class="tip-aff" style="white-space:normal">完整版可於城鎮雇用或購買馬車，提供大型貨倉、分擔負重，限走官道。</div>'; }
     else if (kind === 'slot') {
       const eq = S.equip[v];
       if (!eq) html = '<div class="tip-h"><span class="tip-name">' + D.SLOT_NAMES[v] + '</span><span class="tag">空</span></div><div class="sub">尚未裝備・可把行囊裡的裝備拖過來</div>';
@@ -391,10 +401,11 @@
       });
       if (p) {
         const n = D.NODES[dest];
-        const txt = p.hours + ' 小時・食 −' + p.food + '・疲 +' + p.fat + '・險 ' + p.riskName;
-        const w = 184; let x = n.x - w / 2; x = Math.max(6, Math.min(796 - w - 6, x));
-        h += '<div class="tipbubble" style="left:' + x + 'px;top:' + (n.y - 52) + 'px;width:' + w + 'px;justify-content:center" data-testid="route-tip">' + txt + '</div>';
+        const txt = tx(TX.map.bubble1, p) + '<br>' + tx(TX.map.bubble2, p);
+        const w = 196; let x = n.x - w / 2; x = Math.max(6, Math.min(796 - w - 6, x));
+        h += '<div class="tipbubble two" style="left:' + x + 'px;top:' + Math.max(4, n.y - 68) + 'px;width:' + w + 'px" data-testid="route-tip">' + txt + '</div>';
       }
+      h += '<div class="hintbox" id="hintbox" data-testid="hintbox" style="display:none"></div>';
       h += '</div>';
     }
     // 出發條
@@ -402,7 +413,9 @@
     if (p) {
       const n = D.NODES[dest];
       h += '<div class="dic">' + ico(n.ic, n.g, 32) + '</div><div class="dname"><b>' + n.name + '</b><span class="sub">經 ' + p.via + '</span></div>';
-      h += '<div class="vpill"><span class="ic">時</span>' + p.hours + ' 小時</div><div class="vpill"><span class="ic">食</span>−' + p.food + '</div><div class="vpill"><span class="ic">疲</span>+' + p.fat + '</div><div class="vpill' + riskCls(p.riskName) + '" data-testid="route-risk"><span class="ic">險</span>' + p.riskName + '</div><div class="vpill"><span class="ic">負</span>×' + p.mult.toFixed(2) + '</div>';
+      // 底列五格：完整用詞＋懸浮說明（UI-02-05、wording-map §1）；險級走共用四檔色表 riskCls（SPEC-TIME 7.1b／AC 21）
+      const vp = (k, val, cls, tid) => '<div class="vpill' + (cls || '') + '" data-hint="' + k + '" data-testid="' + (tid || 'vp-' + k) + '"><span class="vl">' + TX.map[k] + '</span><b>' + val + '</b></div>';
+      h += vp('hours', tx(TX.map.hoursVal, p)) + vp('food', tx(TX.map.foodVal, p)) + vp('fat', tx(TX.map.fatVal, p)) + vp('risk', p.riskName, riskCls(p.riskName), 'route-risk') + vp('speed', paceTxt(p.mult));
       h += '<button class="btn dark go" data-a="travel" data-testid="btn-travel">前往</button>';
     } else {
       const n = D.NODES[S.loc];
@@ -503,6 +516,7 @@
     let h = '<div class="plan' + scn(P.plan) + (S.street ? ' mute' : '') + '" data-testid="town">';
     h += '<div class="pname2">' + N.name + '</div>';
     h += '<button class="btn leave" data-a="toMap" data-testid="btn-leave">離開・地圖</button>';
+    if (hurt || td) h += '<div class="cwarn" data-testid="city-warn">' + (hurt ? TX.city.hurt : TX.city.tide) + '</div>';
     P.buildings.forEach((bid) => {
       const B = D.BUILDINGS[bid]; const b = boxes[bid];
       const mark = B.type === 'board' && G.questsHere().some((q) => G.questReady(q)) ? '<i class="bmark">!</i>' : '';
@@ -520,10 +534,49 @@
     h += walkersHtml(S, P.plan);
     if (S.street) h += streetDialog(S);
     h += '</div>';
-    h += '<div class="townbar"><span class="tdesc">' + (hurt ? '<span class="red">獸潮過後一片狼藉：貨架剩一半、客棧漲價。</span>' : td ? '<span class="red">獸潮期間，藥水漲價五成。</span>' : P.desc) + '<span class="sub">　點建築進去，點路人交談。</span></span>' + exploreBtn(S) + '</div>';
-    h += '<div class="logbox" style="top:572px;height:130px" data-testid="log">' + logLines(S, 7) + '</div>';
+    h += cityBar(S, hurt, td);
+    h += '<div class="logbox" style="top:588px;height:114px" data-testid="log">' + logLines(S, 6) + '</div>';
     return h;
   }
+  // ---------- 城況簡報（DEV-05；UI-02-01 收合／02 展開／03 受創求援；SPEC-01 §7） ----------
+  // 只讀 G.cityView()（brief＋日結後的 P、O、B 對檔名），不重算任何數字。展開與否只是畫面狀態，不存檔。
+  let cityOpen = false;
+  function cityBar(S, hurt, td) {
+    const v = G.cityView(S.loc);
+    if (!v) return '<div class="citybox" data-testid="citybar"><div class="crow"><span class="cnone"></span>' + exploreBtn(S, 'cexp') + '</div></div>';
+    const C = TX.city, b = v.brief;
+    const tierKey = v.has ? b.treasuryTier : null;
+    const tName = tierKey ? C.treasury[tierKey] : C.pendingTier;
+    const arrow = v.has ? C.arrow[b.trend] : '';
+    const pBad = v.pIdx === 0, oBad = v.oIdx === 0, tBad = tierKey === 'debt' || tierKey === 'tight';
+    const tile = (k, label, name, bad, sub, ar) => '<div class="ctile' + (bad ? ' bad' : '') + '" data-testid="city-' + k + '"><span class="cl">' + label + '</span><b class="cv">' + name + (ar ? '<i class="car">' + ar + '</i>' : '') + '</b>' + (cityOpen ? '<span class="cs">' + sub + '</span>' : '') + '</div>';
+    let delta = '';
+    if (v.has) { const n = Math.round(Math.abs(b.dP)); delta = b.trend === 'flat' ? C.delta.flat : tx(C.delta[b.trend], { N: n }); }
+    let h = '<div class="citybox' + (cityOpen ? ' open' : '') + (rescueOn(v) ? ' alarm' : '') + '" data-testid="citybar">';
+    h += '<div class="crow">';
+    h += '<button class="btn ctog" data-a="cityToggle" data-testid="city-toggle" title="' + C.toggleHint + '">' + C.title + '</button>';
+    h += tile('prosperity', C.label.prosperity, v.pName, pBad, v.P + (delta ? '　' + delta : ''), arrow);
+    h += tile('order', C.label.order, v.oName, oBad, String(v.O), '');
+    h += tile('treasury', C.label.treasury, tName, tBad, v.has ? tx(C.treasuryAmount, { T: Math.round(b.T) }) : '', '');
+    h += cityOpen ? '<button class="btn cclose" data-a="cityToggle" data-testid="city-collapse">' + C.collapse + '</button>' : exploreBtn(S, 'cexp');
+    h += '</div>';
+    if (cityOpen) {
+      h += '<div class="cdetail" data-testid="city-detail">';
+      if (rescueOn(v)) h += '<div class="crescue" data-testid="city-rescue">' + tx(C.rescue, { rescueAmt: Math.round(b.rescueAmt) }) + '</div>';
+      if (v.has) {
+        // 因果句：flat 時不出句，只寫「與昨日持平」（§7.5）
+        const why = b.trend === 'flat' || !b.whyCode ? C.trend.flat : tx(C.why[b.whyCode], { trend: C.trend[b.trend], bandit: v.bName });
+        h += '<div class="cline cwhy" data-testid="city-why">' + why + '</div>';
+        h += '<div class="cline" data-testid="city-money"><span>' + tx(C.treasuryIn, b) + '</span><span>' + tx(C.treasuryOut, b) + '</span><span>' + tx(C.treasuryNet, { treasuryNet: sgn(b.treasuryNet) }) + '</span><span data-testid="city-amount">' + tx(C.treasuryAmount, { T: Math.round(b.T) }) + '</span></div>';
+        if (b.taxCutDays > 0) h += '<div class="cline" data-testid="city-taxcut">' + tx(C.taxcut, b) + '</div>';
+      } else h += '<div class="cline cwhy" data-testid="city-why">' + C.pending + '</div>';
+      const gs = v.has && b.aidToday ? '（' + tx(C.garrisonAid, b) + '）' : v.has && b.debtToday ? '（' + C.garrisonDebt + '）' : '';
+      h += '<div class="cline dim" data-testid="city-misc"><span data-testid="city-garrison">' + C.label.garrison + ' ' + v.gName + gs + '</span><span data-testid="city-bandit">' + C.label.bandit + ' ' + v.bName + ' ' + v.B + '</span><span class="cdanger" title="' + C.dangerHint + '" data-testid="city-danger">' + C.danger + ' <b class="' + riskCls(v.danger.tier) + '">' + v.danger.tier + '</b></span><span>' + tx(C.tradeTax, { pct: Math.round(D.WORLD.TRADE_TAX * 100) }) + '</span></div>';
+      h += '</div>';
+    }
+    return h + '</div>';
+  }
+  function rescueOn(v) { return !!(v && v.has && v.brief.rescueToday); }
   function streetDialog(S) {
     const npc = S.street; const NP = D.NPCS[npc];
     const q = S.quests.find((x) => x.giver === npc);
@@ -550,7 +603,7 @@
       case 'apoth': h += tabShop(S, B, 0) + '<div class="ttl" style="left:0;top:280px">藥爐（煉藥 ' + G.profLv('yao') + '）</div>' + recipeCards(S, 0, 298); break;
       case 'inn': {
         const free = S.freeRumor[S.loc] !== G.dayOf(S.t);
-        h += '<div class="irow" style="left:0;top:8px">' + svc('rest', '宿', '歇一夜', c.rest + ' 兩・睡到 08:00・侵蝕 −10', 'inn-rest') + svc('soup', '食', '熱湯', c.soup + ' 兩・飽食 +30', 'inn-soup') + '<div class="ibox" data-a="hearRumor" data-testid="inn-rumor"><span class="ic">聞</span><span><b>打聽傳聞</b>' + (free ? '今日第一則免費' : '請酒 ' + c.rumor + ' 兩') + '</span></div></div>';
+        h += '<div class="irow" style="left:0;top:8px">' + svc('rest', '宿', '歇一夜', c.rest + ' 兩・' + sleepTxt() + '・侵蝕 −10', 'inn-rest') + svc('soup', '食', '熱湯', c.soup + ' 兩・飽食 +30', 'inn-soup') + '<div class="ibox" data-a="hearRumor" data-testid="inn-rumor"><span class="ic">聞</span><span><b>打聽傳聞</b>' + (free ? '今日第一則免費' : '請酒 ' + c.rumor + ' 兩') + '</span></div></div>';
         h += rumorList(S, 84);
         break;
       }
@@ -570,7 +623,7 @@
         h += '<div class="note" style="top:84px">關門三年沒開過。門外是血霧起的方向。</div>';
         break;
       case 'medic':
-        h += '<div class="irow" style="left:0;top:8px">' + svc('heal', '治', '治傷', c.heal + ' 兩・生命回滿') + svc('cleanse', '清', '清除侵蝕', c.cleanse + ' 兩・目前侵蝕 ' + S.corrupt) + svc('bunk', '鋪', '睡通鋪', (c.bunk ? c.bunk + ' 兩' : '免費') + '・睡到 08:00') + '</div>';
+        h += '<div class="irow" style="left:0;top:8px">' + svc('heal', '治', '治傷', c.heal + ' 兩・生命回滿') + svc('cleanse', '清', '清除侵蝕', c.cleanse + ' 兩・目前侵蝕 ' + S.corrupt) + svc('bunk', '鋪', '睡通鋪', (c.bunk ? c.bunk + ' 兩' : '免費') + '・' + sleepTxt()) + '</div>';
         h += '<div class="note" style="top:84px">被血霧侵蝕的人，生命上限會一點一點掉。客棧歇一夜能退一些，這裡能清乾淨。</div>';
         break;
       case 'drill': h += tabDrill(S, c); break;
@@ -685,26 +738,39 @@
     });
     return h;
   }
+  // 鎮公所委託單（UI-02-06、wording-map §2）：目標／地點／報酬／時限／風險寫在單上，不另開確認窗
   function tabBounty(S) {
+    const Q = TX.quest;
     let h = '<div class="ttl" style="left:0;top:0">委託・' + D.NODES[S.loc].name + '</div>';
     const day = G.dayOf(S.t);
     const ord = { done: 0, active: 1, open: 2, claimed: 3 };
     const list = G.questsHere().slice().sort((a, b) => (G.questReady(b) ? 1 : 0) - (G.questReady(a) ? 1 : 0) || ord[a.status] - ord[b.status]).slice(0, 12);
-    list.forEach((q, i) => {
-      const x = (i % 3) * 262, y = 18 + Math.floor(i / 3) * 70;
+    h += '<div class="qgrid" data-testid="quest-grid">';
+    list.forEach((q) => {
       const ready = G.questReady(q);
       let btn;
-      if (q.status === 'open') btn = '<button class="btn" data-a="bounty" data-v="' + q.id + '" data-testid="bounty-' + q.id + '">揭榜</button>';
-      else if (ready) btn = '<button class="btn dark" data-a="bounty" data-v="' + q.id + '" data-testid="bounty-' + q.id + '">交付</button>';
-      else if (q.status === 'claimed') btn = '<button class="btn dis" disabled>已交付</button>';
-      else btn = '<button class="btn dis" disabled>' + (q.kind === 'collect' ? Math.min(q.need, G.countItem(q.item)) + '/' + q.need : q.kind === 'deliver' ? '送達' : q.prog + '/' + q.need) + '</button>';
-      const where = q.kind === 'deliver' ? (q.to === S.loc ? '送到此地交付' : '押金 ' + q.deposit + ' 兩') : q.kind === 'collect' ? '帶回此地交付' : G.questWhere(q);
-      const due = q.due ? (q.due - day <= 0 ? '今日截止' : '剩 ' + (q.due - day) + ' 天') : '長期';
-      h += '<div class="bcard' + (ready ? ' ready' : '') + '" style="left:' + x + 'px;top:' + y + 'px"><span class="ic">' + ico(q.ic, q.g, 32) + '</span><span class="bt"><b>' + q.title + '・' + G.questReward(q) + '兩</b><span class="sub">' + where + '・<span class="' + (q.due && q.due - day <= 0 ? 'red' : '') + '">' + due + '</span></span></span>' + btn + '</div>';
+      if (q.status === 'open') btn = '<button class="btn qbtn" data-a="bounty" data-v="' + q.id + '" data-testid="bounty-' + q.id + '">' + Q.take + '</button>';
+      else if (ready) btn = '<button class="btn dark qbtn" data-a="bounty" data-v="' + q.id + '" data-testid="bounty-' + q.id + '">' + Q.deliver + '</button>';
+      else if (q.status === 'claimed') btn = '<button class="btn dis qbtn" disabled>' + Q.claimed + '</button>';
+      else btn = '<button class="btn dis qbtn" disabled>' + (q.kind === 'deliver' ? Q.delivering : tx(Q.progress, { a: q.kind === 'collect' ? Math.min(q.need, G.countItem(q.item)) : q.prog, b: q.need })) + '</button>';
+      const where = q.kind === 'deliver' ? (q.to === S.loc ? Q.whereHere : G.questWhere(q)) : q.kind === 'collect' ? Q.whereBring : G.questWhere(q);
+      const left = q.due ? q.due - day : null, ll = G.longLeft(q);
+      const due = left === null ? (ll === null ? Q.dueLong : tx(Q.dueLongLeft, { n: ll })) : left <= 0 ? Q.dueToday : tx(Q.dueLeft, { n: left });
+      const urgent = left !== null && left <= 1;
+      const rk = G.questRisk(q);
+      const fail = rk.fail === 'deposit' ? Q.failDeposit : rk.fail === 'deadline' ? Q.failDeadline : rk.fail === 'long' ? Q.failLong : Q.failNone;
+      h += '<div class="qsheet' + (ready ? ' ready' : '') + '" data-testid="qsheet-' + q.id + '">';
+      h += '<div class="qtar"><span class="ql">' + Q.target + '</span><b>' + q.title + '</b></div>';
+      h += '<div class="qwhere">' + where + '</div>';
+      h += '<div class="qrow"><span class="ql">' + Q.reward + '</span><b class="gold">' + tx(Q.rewardVal, { reward: G.questReward(q) }) + '</b>' + (q.deposit ? '<span>' + tx(Q.depositVal, q) + '</span>' : '') + '</div>';
+      h += '<div class="qrow' + (urgent ? ' urgent' : '') + '" data-testid="qdue-' + q.id + '"><span class="ql">' + Q.due + '</span><b>' + due + '</b></div>';
+      h += '<div class="qrisk' + (rk.high ? ' high' : rk.level ? '' : ' none') + '" data-testid="qrisk-' + q.id + '"><div><span class="ql">' + Q.risk + '</span><b class="' + (rk.level ? riskCls(rk.level) : '') + '">' + (rk.level ? tx(Q.riskVal, { level: rk.level }) : Q.riskNone) + '</b></div><div class="qfail">' + fail + '</div></div>';
+      h += btn + '</div>';
     });
+    h += '</div>';
     if (!list.length) h += '<div class="note" style="top:24px">板上空空如也，明天再來看看。</div>';
     const act = G.activeQuests().filter((q) => q.town !== S.loc && !(q.kind === 'deliver' && q.to === S.loc)).map((q) => q.title + '（' + D.NODES[q.town].name + '）').join('、');
-    h += '<div class="note" style="top:306px">每天補到 3 張，過期撕榜。完成委託會提高破曉軍團的聲望。' + (act ? '你在別處還有：' + cut(act, 40) : '') + '</div>';
+    h += '<div class="note" style="top:474px" data-testid="quest-foot">' + Q.foot + (act ? '　你在別處還有：' + cut(act, 40) : '') + '</div>';
     return h;
   }
   // DEV-04 資助巡邏：函式在 game.js（aidInfo／aidPatrol）；按鈕位置在 DEV-05 城況簡報（製作人 17:52），由較晚進 main 的那包接線，本包不放鈕
@@ -829,7 +895,7 @@
       const m0 = G.loadBand().mult, m1 = G.loadBand(G.totalWt() - dw).mult;
       h += '<div class="rbar" data-testid="retreat-bar"><span class="rt">棄物撤退</span><div class="ritems">';
       S.pack.forEach((it, i) => { if (!it) return; h += '<div class="cell' + (S.retreatSel.includes(i) ? ' drop' : '') + '" data-a="toggleDrop" data-v="' + i + '" data-testid="drop-' + i + '">' + ico(G.itemIcon(it), G.itemGlyph(it), 24) + (it.k !== 'eq' && it.n > 1 ? '<span class="n">' + it.n + '</span>' : '') + '</div>'; });
-      h += '</div><div class="rp"><b data-testid="retreat-rate">撤退率 ' + Math.round(p0 * 100) + '% → ' + Math.round(p1 * 100) + '%</b><span>負重 ×' + m0.toFixed(2) + ' → ×' + m1.toFixed(2) + '・丟下的落在地面</span></div>';
+      h += '</div><div class="rp"><b data-testid="retreat-rate">撤退率 ' + Math.round(p0 * 100) + '% → ' + Math.round(p1 * 100) + '%</b><span>' + TX.map.speed + ' ×' + m0.toFixed(2) + ' → ×' + m1.toFixed(2) + '・丟下的落在地面</span></div>';
       h += '<button class="btn redb" data-a="retreatGo" data-testid="btn-retreat-confirm">確認撤退</button><button class="btn" data-a="retreatClose">取消</button></div>';
     } else {
       h += '<div class="chint" id="adesc" data-testid="adesc">滑過行動看說明。點敵人換目標。招式會增加疲累。也可以直接點左邊人形上的武器出手。</div>';
@@ -1125,6 +1191,7 @@
       case 'toMap': return G.toMap();
       case 'mapView': return G.setMapView(v);
       case 'explore': return G.explore();
+      case 'cityToggle': cityOpen = !cityOpen; return renderAll(S);
       case 'tab': return G.setTab(v || null);
       case 'street': return G.streetTalk(v);
       case 'streetClose': return G.streetClose();
@@ -1173,6 +1240,13 @@
   $L.addEventListener('mouseout', (ev) => { const el = ev.target.closest('[data-tip]'); if (el && !el.contains(ev.relatedTarget)) hideTip(); });
   // 中欄：商品提示卡錨定在交易欄位置；戰鬥行動列滑過顯示說明
   $C.addEventListener('mouseover', (ev) => {
+    // 地圖底列懸浮說明（wording-map §1；腳程為 mumi 原句）
+    const hb = document.getElementById('hintbox');
+    if (hb) {
+      const hv = ev.target.closest('[data-hint]');
+      if (hv) { const k = hv.getAttribute('data-hint'); hb.innerHTML = '<b>' + TX.map[k] + '</b><span data-testid="hint-text">' + TX.map.hint[k] + '</span>'; hb.style.display = 'block'; }
+      else hb.style.display = 'none';
+    }
     const ad = ev.target.closest('[data-desc]'); const line = document.getElementById('adesc');
     if (ad && line) line.textContent = ad.getAttribute('data-desc');
     const el = ev.target.closest('[data-shop]'); const box = document.getElementById('shoptip');
