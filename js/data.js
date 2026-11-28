@@ -148,7 +148,7 @@ window.SHL_DATA = (function () {
     boar: { name: '山豬', g: '豬', lv: 15, hp: 30, dmg: [5, 7], heavy: [12, 16], spd: 8, armor: 2, beast: true, pat: ['atk', 'charge', 'guard', 'atk'], skin: [1, 2], meat: [1, 2] },
     bug: { name: '毒蟲', g: '蟲', lv: 0, hp: 12, dmg: [2, 4], spd: 14, armor: 0, beast: true, pat: ['atk', 'bleed'], skin: [0, 0], meat: [0, 0], extra: 'vine_du' },
     redboar: { name: '赤鬃異豬', g: '異', ic: 'boar', lv: 40, hp: 58, dmg: [7, 10], heavy: [16, 21], spd: 10, armor: 3, beast: true, rare: true, pat: ['atk', 'charge', 'bleed', 'atk', 'guard'], skin: [2, 3], meat: [2, 2] },
-    bandit: { name: '劫匪', g: '匪', lv: 15, hp: 26, dmg: [5, 8], heavy: [12, 15], spd: 10, armor: 3, pat: ['atk', 'charge', 'guard', 'atk'], silver: [8, 20] },
+    bandit: { name: '劫匪', g: '匪', lv: 15, hp: 26, dmg: [5, 8], heavy: [12, 15], spd: 10, armor: 3, pat: ['atk', 'charge', 'guard', 'atk'], silver: [3, 7] }, // DEV-04：掉落 8–20→3–7（SPEC-01 v0.4 §4.9、S4c）
     corpse: { name: '窯屍', g: '屍', lv: 15, hp: 26, dmg: [4, 7], heavy: [12, 16], spd: 6, armor: 2, pat: ['atk', 'charge', 'atk', 'guard'] },
     corpse_king: { name: '窯屍王', g: '王', lv: 35, hp: 60, dmg: [6, 9], heavy: [16, 22], spd: 7, armor: 4, boss: true, pat: ['atk', 'charge', 'bleed', 'atk', 'guard'] },
     serpent: { name: '沉淵祭蛇', g: '蛇', lv: 35, hp: 40, dmg: [7, 10], spd: 13, armor: 2, pat: ['atk', 'bleed', 'atk', 'guard'] },
@@ -375,7 +375,7 @@ window.SHL_DATA = (function () {
   // ---------- 勢力與聲望門檻 ----------
   // 勢力會越來越多：reveal＝讀到這條見聞才知道有這個勢力；how＝怎麼漲聲望（介面說明用）
   const FACTIONS = {
-    dawn: { name: '破曉軍團', g: '曉', ic: 'f_dawn', desc: '冒險者、傭兵與亡國殘兵的聯合武裝，在各地建據點護民。', how: '完成委託、擊退獸潮、清空地城、上繳軍牌', perks: [[10, '校場肯教〈破陣〉'], [20, '委託報酬 +15%']] },
+    dawn: { name: '破曉軍團', g: '曉', ic: 'f_dawn', desc: '冒險者、傭兵與亡國殘兵的聯合武裝，在各地建據點護民。', how: '完成委託、擊退獸潮、清空地城、上繳軍牌、資助巡邏', perks: [[10, '校場肯教〈破陣〉'], [20, '委託報酬 +15%']] },
     star: { name: '天星商會', g: '星', ic: 'f_star', desc: '天裂前就幾乎壟斷大陸經濟的金融帝國，災變後仍有辦法把貨運到。', how: '在天星商號與行商買賣、完成送貨、付費鑑定', perks: [[10, '商號九五折'], [25, '可買精工大囊、鑑定半價']] },
     crow: { name: '鴉衛', g: '鴉', ic: 'f_crow', desc: '人數極少的情報組織，專門調查天裂之後的異象。', how: '向赤鴉回報見聞、查證傳聞', perks: [[6, '赤鴉肯替你辨傳聞'], [14, '傳授〈鴉影〉']] },
     warlord: { name: '鎮西將軍府', g: '將', reveal: 'c_warlord', desc: '當年護民的人，三年後在官道上收稅。灰窯原名義上歸他們管。', how: '（下一版開放）', perks: [] },
@@ -419,6 +419,7 @@ window.SHL_DATA = (function () {
     collect: { days: 3, pool: [['herb_zx', 4], ['leaf_qx', 3], ['vine_du', 2], ['hide', 3], ['meat', 3], ['ore_fe', 2], ['ore_cu', 2], ['bog_iron', 2], ['leech_gland', 2]] },
     kill: { days: 4, pool: [['wolf', 2, 26], ['wolf', 3, 38], ['boar', 1, 22], ['boar', 2, 40], ['bug', 2, 16], ['leech', 2, 34], ['deserter', 1, 30], ['bogcorpse', 1, 44]] },
     where: { wolf: '枯骨獸徑・青霧藥林', boar: '枯骨獸徑', bug: '青霧藥林', leech: '腐骨沼', deserter: '野徑岔口', bogcorpse: '腐骨沼' },
+    // 剿匪委託（SPEC-01 §4.9）延後到第 4 期匪窩（v0.5 18:19）；第一批不出剿匪單
     deliver: { days: 2, reward: 24, deposit: 10 },
   };
 
@@ -474,6 +475,16 @@ window.SHL_DATA = (function () {
     RESCUE_DEBT: 3, RESCUE_UPKEEP_DAYS: 6, RESCUE_TAX_CUT: 10, RESCUE_CD: 20,
     // §4.6（只留資料，資助與巡邏所的玩家行動屬 DEV-04）
     PATROL: [0, 5, 9, 12], F_CAP: 500,
+    // §4.6 資助巡邏（DEV-04；玩家行動見 game.js aidPatrol）：單位 50／100／200 兩；破曉聲望 +N/100，每日合計 ≤ 3。巡邏所購買不在第一批（16:46 裁決第 5 項）
+    AID_UNITS: [50, 100, 200], AID_REP_PER: 0.01, AID_REP_DAY: 3,
+    // §4.7 獸潮連動（DEV-04）：自衛擊退機率、獸潮日／受創日／擊退日的 P、O 變動、受創天數、目標鎮權重
+    P_DEF: [0, 0.30, 0.55, 0.80], TIDE_DAY: { p: -2, o: -1 }, HURT_DAY: { p: -2, o: -1 }, REPEL: { p: 3, o: 2 },
+    HURT_DAYS_G2: 1, TIDE_W_O: 80, TIDE_W_SPAN: 20,
+    // §4.8 斷路幫（DEV-04）：擊殺劫匪、人手回補、crewCap、據點被端；§5.6 B* 係數
+    KILL_B: 2.5, KILL_CREW: 0.5, CREW_MAX: 6, CREW_PERIOD: 5, CREW_CAP_O: 40, CREW_CAP: [6, 4], WIPE_REP: 2,
+    B_OF_O: 0.5, B_OF_P: 0.2, B_HIGH_O: 80, B_HIGH_K: 0.5, B_PER_CREW: 5, CREW_REF: 4,
+    // §4.9 傳聞「有人盤踞」權重 ×min(crew, 4)/4；查探時 crew < 1 視為「已被取走」
+    GUARD_CREW_FULL: 4,
     // §3.2 區域起手
     REGION0: { B: 30, crew: 4, crewCtr: 0, crewWiped: false },
     // §4.8 遇險率的治安／匪勢修正 R 與封頂（封頂在所有乘項之後做一次）

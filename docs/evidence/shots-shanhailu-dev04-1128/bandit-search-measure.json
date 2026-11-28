@@ -1,0 +1,62 @@
+{
+ "evShare": 0.2,
+ "routes": [
+  {
+   "from": "huiyao",
+   "to": "野徑岔口",
+   "h": 1,
+   "riskDay": 0.22,
+   "riskNight": 0.44,
+   "hPerBanditDay": 22.7,
+   "hPerBanditNight": 11.4
+  },
+  {
+   "from": "huiyao",
+   "to": "腐骨沼",
+   "h": 2,
+   "riskDay": 0.22,
+   "riskNight": 0.44,
+   "hPerBanditDay": 45.5,
+   "hPerBanditNight": 22.7
+  }
+ ],
+ "sim": {
+  "trips": 4000,
+  "hours": 4003,
+  "events": 932,
+  "nightTrips": 1501,
+  "nightEv": 515,
+  "bandits": 169,
+  "hPerBandit": 23.69,
+  "banditsPerHour": 0.0422
+ },
+ "rumor": {
+  "guard": 0.25,
+  "bait": 0.15,
+  "banditsPerRumor": 0.8,
+  "cost": 5,
+  "freePerDayPerInn": 1,
+  "investigateH": 1,
+  "hearH": 0.5,
+  "nodes": {
+   "cache": [
+    "guyao",
+    "jiku",
+    "chishi",
+    "kugu",
+    "chakou",
+    "fuzhao"
+   ],
+   "vein": [
+    "chishi",
+    "qingwu",
+    "fuzhao"
+   ],
+   "beast": [
+    "kugu",
+    "qingwu",
+    "fuzhao"
+   ]
+  }
+ }
+}
