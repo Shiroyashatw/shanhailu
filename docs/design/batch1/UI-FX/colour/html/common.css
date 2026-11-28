@@ -1,0 +1,163 @@
+/* UI-FX 色彩稿：token 取自 shanhailu main@de91435 css/style.css :root
+   舞台模擬實機；註解層（legend／圖板說明）正文 --fs-body 16px。 */
+:root{
+  --page:#0b0a08; --bg:#171512; --cell:#1d1a16; --cell-2:#26221c;
+  --line:#4b4336; --line-soft:#332e26;
+  --ink:#d8cfbd; --ink-2:#a0967f; --ink-3:#6e6656;
+  --gold:#c9a24a; --gold-d:#7d6328;
+  --red:#c8463a; --red-d:#5a1f1a;
+  --red-text:#e07066; /* 衍生：16px 危險字 5.80:1 on --bg。--red 只用於條／邊／填，不用在字上 */
+  --jade:#6aa585;
+  --r-blue:#5b8fc9; --r-rare:#d6b24a; --r-legend:#e07a2e;
+  --hp:#b5382c; --food:#c9a24a; --fat:#6b7fa8;
+  --bar-track:#0f0e0c; --pill:#100f0c;
+  --hatch:repeating-linear-gradient(135deg,#191714 0 4px,#14120f 4px 6px);
+  --serif:"Noto Serif CJK TC","Noto Serif TC","Songti TC",serif;
+  --sans:"Noto Sans CJK TC","Noto Sans TC","Noto Sans",sans-serif;
+  --fs-body:16px;
+  --fx-float-s-border:1px dashed var(--ink-2);
+  --fx-float-k-border:1px solid var(--gold);
+  --fx-toast-m-border:2px solid var(--gold);
+  --fx-danger-border:2px solid var(--red);
+  --fx-tint-0:rgba(90,140,180,.10);
+  --fx-tint-1:rgba(0,0,0,0);
+  --fx-tint-2:rgba(180,90,30,.18);
+  --fx-tint-3:rgba(8,10,28,.45);
+}
+*{box-sizing:border-box}
+html,body{margin:0;padding:0;background:var(--page);color:var(--ink);font:400 var(--fs-body)/24px var(--sans);-webkit-font-smoothing:antialiased}
+.page{display:flex;gap:16px;padding:20px;width:2336px;align-items:flex-start;background:var(--page)}
+.wrap{width:1280px;flex:0 0 1280px}
+.cont,.stage{position:relative;width:1280px;overflow:hidden;background:var(--page);outline:1px solid var(--line)}
+.stage,#stage{height:720px;flex:none}
+#board{margin-top:12px;outline:1px solid var(--line);background:var(--bg)}
+
+.b{position:absolute;border:1px solid var(--line-soft);background:var(--cell)}
+.b.z{background:var(--bg);border-color:var(--line)}
+.b.p{background:var(--cell);border-color:var(--line)}
+.b.in{background:var(--cell-2)}
+.b.sel{border:2px solid var(--gold);background:var(--cell-2)}
+.b.dash{border-style:dashed;background:var(--cell)}
+.b.off{border-style:dashed;background:var(--bg);border-color:var(--line-soft)}
+.b.pri{background:var(--gold);border-color:var(--gold)}
+.b.scrim{background:rgba(11,10,8,.55);border:none}
+.b.tip{background:var(--pill);border:1px solid var(--ink-3);box-shadow:0 4px 12px rgba(0,0,0,.7)}
+.b.modal{background:var(--bg);border:2px solid var(--gold)}
+.b.warn{border:2px solid var(--red);background:var(--red-d)}
+.b.ic{background:var(--cell);border:1px solid var(--line)}
+.b.round{border-radius:50%}
+.b.fill{background:var(--gold);border-color:var(--gold)}
+.b.fill2{background:var(--gold-d);border-color:var(--gold-d)}
+.b.fill-hp{background:var(--hp);border-color:var(--hp)}
+.b.fill-food{background:var(--food);border-color:var(--food)}
+.b.fill-fat{background:var(--fat);border-color:var(--fat)}
+.b.fill-jade{background:var(--jade);border-color:var(--jade)}
+.b.art{background:var(--hatch);border:1px solid var(--line-soft)}
+.b.art-town,.b.art-wild,.b.art-map,.b.art-shop,.b.art-face{
+  border:1px solid var(--line-soft);
+  background-color:#100f0c;background-size:100% 100%;background-repeat:no-repeat;image-rendering:pixelated
+}
+.b.art-town{background-image:url(../assets/town-plan.png)}
+.b.art-wild{background-image:url(../assets/wild-qingwu.png)}
+.b.art-map{background-image:url(../assets/world-map.png)}
+.b.art-shop{background-image:url(../assets/shop-header.png)}
+.b.art-face{background-image:url(../assets/portrait.png)}
+.hr{position:absolute;height:1px;background:var(--line-soft)}
+.vr{position:absolute;width:1px;background:var(--line-soft)}
+.ln{position:absolute;background:var(--line);transform-origin:0 50%;pointer-events:none}
+.tx{position:absolute;white-space:nowrap;overflow:hidden;color:var(--ink);z-index:3}
+.tx.ml{white-space:normal}
+.tx.c{text-align:center}.tx.r{text-align:right}
+.dim{color:var(--ink-2)}.off{color:var(--ink-2)}.red{color:var(--red-text)}.wh{color:var(--ink)}
+.gold{color:var(--gold)}.jade{color:var(--jade)}.on-gold{color:var(--page)}
+.term{text-decoration:underline dotted var(--gold);text-underline-offset:3px}
+
+.f9{font:400 9px/12px var(--sans)}.f9b{font:700 9px/12px var(--sans)}
+.f10{font:400 10px/14px var(--sans)}.f10b{font:700 10px/14px var(--sans)}
+.f11{font:400 11px/15px var(--sans)}.f11b{font:700 11px/15px var(--sans)}
+.f12{font:400 12px/16px var(--sans)}.f12b{font:700 12px/16px var(--sans)}
+.f13{font:400 13px/18px var(--sans)}
+.f14{font:400 14px/20px var(--sans)}.f14b{font:700 14px/20px var(--serif)}
+.f16{font:400 16px/22px var(--sans)}.f16b{font:700 16px/22px var(--sans)}
+.f16bs{font:700 16px/22px var(--serif)}
+.f18b{font:700 18px/24px var(--serif)}
+.f20b{font:700 20px/26px var(--serif)}
+.big{font:700 28px/34px var(--serif);color:rgba(216,207,189,.18);letter-spacing:6px}
+
+.bd{position:absolute;z-index:60;min-width:18px;height:14px;padding:0 3px;background:var(--red-d);border:1px solid var(--red);color:var(--ink);font:700 10px/12px "Noto Sans Mono CJK TC",var(--sans);text-align:center}
+.stamp{position:absolute;right:8px;bottom:10px;z-index:70;border:1px solid var(--line);background:rgba(16,15,12,.92);padding:0 6px;font:700 11px/16px var(--sans);color:var(--ink-2)}
+
+/* 圖層與演出 */
+.b.tint{border:none;background:rgba(0,0,0,.18)}
+.b.tint0{border:none;background:var(--fx-tint-0)}
+.b.tint1{border:none;background:var(--fx-tint-1)}
+.b.tint2{border:none;background:var(--fx-tint-2)}
+.b.tint3{border:none;background:var(--fx-tint-3)}
+.b.fS{background:var(--pill);border:var(--fx-float-s-border);box-shadow:0 2px 8px rgba(0,0,0,.55)}
+.b.fK{background:var(--pill);border:var(--fx-float-k-border);box-shadow:0 2px 8px rgba(0,0,0,.6)}
+.b.fM{background:var(--pill);border:var(--fx-toast-m-border);box-shadow:0 4px 16px rgba(0,0,0,.75)}
+.b.fD{background:var(--red-d);border:var(--fx-danger-border);box-shadow:0 2px 10px rgba(0,0,0,.6)}
+.b.bar{background:var(--gold-d);border:1px solid var(--gold)}
+.b.bar2{background:var(--cell-2);border:1px solid var(--line)}
+.b.trk{background:var(--bar-track);border:1px solid var(--line)}
+.b.kf{background:var(--bg);border:1px solid var(--line)}
+.b.kfh{background:var(--cell);border:1px solid var(--line)}
+.b.dia{background:var(--gold);border:none;transform:rotate(45deg)}
+.b.sh{background:var(--cell-2);border:1px solid var(--line)}
+.b.ph0{background:#8aa0b8;border:1px solid var(--line)}
+.b.ph1{background:var(--gold);border:1px solid var(--gold-d)}
+.b.ph2{background:var(--r-legend);border:1px solid #8a4a20}
+.b.ph3{background:#2a2d44;border:1px solid #1a1c28}
+.b.mk{background:var(--ink);border:1px solid var(--page)}
+.b.redge{border:3px solid var(--red);background:transparent}
+.b.dot{background:var(--red);border:1px solid var(--red);border-radius:50%}
+.b.glow{border:2px solid var(--gold);background:transparent;box-shadow:0 0 0 4px rgba(201,162,74,.35),0 0 16px rgba(201,162,74,.45)}
+.b.cap{background:var(--pill);border:1px solid var(--gold);border-radius:12px}
+.b.ell{border:1px solid var(--gold);background:rgba(16,15,12,.72);border-radius:50%}
+.b.tick{background:var(--ink);border:none}
+.b.terr{border:1px dashed var(--line-soft);background:transparent;border-radius:46%}
+.b.map{background:#100f0c;border:1px solid var(--line-soft)}
+.b.ghost{background:transparent;border:1px dashed var(--line)}
+.b.chip{background:var(--pill);border:1px solid var(--line);border-radius:2px}
+.b.rd{background:var(--red-d);border:1px solid var(--red)}
+.b.rfill{background:var(--red);border-color:var(--red)}
+.b.lock{border:1px dashed var(--line-soft);background:var(--hatch)}
+.b.dk{background:var(--gold-d);border-color:var(--gold)}
+.b.enemy{border:2px dashed var(--line);background:var(--cell);border-radius:40% 40% 8px 8px}
+.ln.road{height:3px!important;background:var(--ink-2)}
+.ln.trail{height:0!important;background:transparent;border-top:2px dashed var(--ink-2)}
+.ln.selr{height:5px!important;background:var(--gold);box-shadow:0 0 6px rgba(201,162,74,.6)}
+.ln.river{height:6px!important;background:#2a3a44}
+
+/* 像素 ICON（由 icons.js 注入 background-image） */
+.px{display:block;position:absolute;flex:none;width:32px;height:32px;background-size:100% 100%;background-repeat:no-repeat;image-rendering:pixelated;pointer-events:none;z-index:4}
+
+/* legend：正文 16px，7 欄 */
+.legend{width:1000px;flex:0 0 1000px;text-wrap:pretty;font:400 16px/24px var(--sans);color:var(--ink);background:var(--bg);border:1px solid var(--line);padding:12px 14px}
+.legend h1{font:700 20px/28px var(--serif);margin:0 0 4px;color:var(--gold);letter-spacing:1px}
+.legend h1 .tag{border:1px solid var(--gold);color:var(--gold);padding:0 6px;font:700 14px/20px var(--sans);margin-left:8px;vertical-align:middle}
+.legend table{border-collapse:collapse;width:100%;table-layout:fixed;margin-top:8px}
+.legend th{font:700 16px/22px var(--sans);text-align:left;border-bottom:1px solid var(--gold-d);padding:6px 4px;background:var(--cell);color:var(--ink)}
+.legend td{vertical-align:top;border-bottom:1px solid var(--line-soft);padding:6px 4px;word-break:normal;overflow-wrap:break-word;text-wrap:pretty;font:400 16px/24px var(--sans);color:var(--ink)}
+.legend td.n b{border:1px solid var(--red);background:var(--red-d);color:var(--ink);font:700 16px/20px "Noto Sans Mono CJK TC",var(--sans);padding:0 3px;display:inline-block;min-width:22px;text-align:center}
+.legend td.nm{font-weight:700;color:var(--ink)}
+.legend .sub{margin:0 0 8px;color:var(--ink-2);font:400 16px/24px var(--sans)}
+.legend .note{border-top:1px solid var(--line);margin-top:10px;padding-top:8px}
+.legend .note p{margin:0 0 8px;font:400 16px/24px var(--sans);color:var(--ink)}
+.legend .g{color:var(--gold)}
+
+.legend td.n{white-space:nowrap}
+.legend .note p{text-wrap:pretty}
+
+/* 危險四檔（低／中／高／極高；「中高」併入「高」）— 顏色之外另有形狀與文字 */
+.b.risk-low{background:var(--pill);border:1px solid var(--jade)}
+.b.risk-mid{background:var(--pill);border:1px solid var(--gold-d)}
+.b.risk-high{background:var(--red-d);border:2px solid var(--red)}
+.b.risk-xhigh{background:var(--red-d);border:3px solid var(--red)}
+.rk-low{color:var(--jade)}.rk-mid{color:var(--gold)}.rk-high,.rk-xhigh{color:var(--ink)}
+.b.mk-low{border:2px solid var(--jade);background:transparent;transform:rotate(45deg)}
+.b.mk-mid{width:0!important;height:0!important;border:0!important;border-left:7px solid transparent!important;border-right:7px solid transparent!important;border-bottom:12px solid var(--gold)!important;background:transparent}
+.b.mk-high,.b.mk-xhigh{background:var(--red);border:1px solid var(--ink);transform:rotate(45deg)}
+.b.mk-xin{background:var(--ink);border:none;transform:rotate(45deg)}
+.b.dot-g{background:var(--gold);border:1px solid var(--page);border-radius:50%}
+.tx.stampx{color:var(--ink-2);background:var(--page);text-align:left}

@@ -1,0 +1,16 @@
+PASS  [cflash/等演出播完再出手] 任意 1 秒滑動視窗內 cflash ≤ 3 次（X12）  — {"total":19,"maxPerSec":3,"minGapMs":483,"sampleGaps":[484,483,2750,500,483,483]}
+PASS  [cflash/等演出播完再出手] 相鄰兩次 cflash 間隔 ≥ 400ms（17:26 裁決，由 350ms 改）  — {"total":19,"maxPerSec":3,"minGapMs":483,"sampleGaps":[484,483,2750,500,483,483]}
+PASS  [cflash/連按鍵盤（每 200ms）] 任意 1 秒滑動視窗內 cflash ≤ 3 次（X12）  — {"total":0,"maxPerSec":0,"minGapMs":null,"sampleGaps":[]}
+PASS  [cflash/連按鍵盤（每 200ms）] 相鄰兩次 cflash 間隔 ≥ 400ms（17:26 裁決，由 350ms 改）  — {"total":0,"maxPerSec":0,"minGapMs":null,"sampleGaps":[]}
+PASS  [cflash/連按鍵盤（每 250ms）] 任意 1 秒滑動視窗內 cflash ≤ 3 次（X12）  — {"total":15,"maxPerSec":3,"minGapMs":483,"sampleGaps":[500,484,500,483,500,483]}
+PASS  [cflash/連按鍵盤（每 250ms）] 相鄰兩次 cflash 間隔 ≥ 400ms（17:26 裁決，由 350ms 改）  — {"total":15,"maxPerSec":3,"minGapMs":483,"sampleGaps":[500,484,500,483,500,483]}
+PASS  [cflash/連按鍵盤（每 300ms）] 任意 1 秒滑動視窗內 cflash ≤ 3 次（X12）  — {"total":13,"maxPerSec":2,"minGapMs":583,"sampleGaps":[600,583,583,583,600,583]}
+PASS  [cflash/連按鍵盤（每 300ms）] 相鄰兩次 cflash 間隔 ≥ 400ms（17:26 裁決，由 350ms 改）  — {"total":13,"maxPerSec":2,"minGapMs":583,"sampleGaps":[600,583,583,583,600,583]}
+PASS  [cflash/連按鍵盤（每 350ms）] 任意 1 秒滑動視窗內 cflash ≤ 3 次（X12）  — {"total":12,"maxPerSec":2,"minGapMs":680,"sampleGaps":[683,683,700,683,703,680]}
+PASS  [cflash/連按鍵盤（每 350ms）] 相鄰兩次 cflash 間隔 ≥ 400ms（17:26 裁決，由 350ms 改）  — {"total":12,"maxPerSec":2,"minGapMs":680,"sampleGaps":[683,683,700,683,703,680]}
+PASS  [cflash/連按鍵盤（每 400ms）] 任意 1 秒滑動視窗內 cflash ≤ 3 次（X12）  — {"total":10,"maxPerSec":2,"minGapMs":781,"sampleGaps":[781,803,781,800,800,783]}
+PASS  [cflash/連按鍵盤（每 400ms）] 相鄰兩次 cflash 間隔 ≥ 400ms（17:26 裁決，由 350ms 改）  — {"total":10,"maxPerSec":2,"minGapMs":781,"sampleGaps":[781,803,781,800,800,783]}
+CFLASH [{"mode":"natural","total":19,"maxPerSec":3,"minGapMs":483},{"mode":"mash200","total":0,"maxPerSec":0,"minGapMs":null},{"mode":"mash250","total":15,"maxPerSec":3,"minGapMs":483},{"mode":"mash300","total":13,"maxPerSec":2,"minGapMs":583},{"mode":"mash350","total":12,"maxPerSec":2,"minGapMs":680},{"mode":"mash400","total":10,"maxPerSec":2,"minGapMs":781}]
+PASS  console 0 error  — []
+
+結果：13/13 PASS
