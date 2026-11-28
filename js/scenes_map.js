@@ -731,13 +731,219 @@ function wildChakou() {
   for (i = 0; i < 5; i++) Dz(0, i * 2, W, 2, '#0a0908', 2, 0.5 - i * 0.1);
 }
 
+/* ================= 戰鬥背景：酉神裂口 ================= */
+function quill(r, x0, y0, x1, y1, wid, pal, cut) {     // 巨羽：羽軸＋兩側羽枝，cut<1 為折斷；pal=[暗, 中, 亮, 軸, 底光]
+  var dx = x1 - x0, dy = y1 - y0, len = sqrt(dx * dx + dy * dy), ux = dx / len, uy = dy / len, nx = -uy, ny = ux, n = fl(len * (cut || 1)), gap = 0, i, s, t, px, py, cv;
+  for (i = 0; i < n; i++) {
+    t = i / len; cv = sin(t * PI) * len * 0.05; px = x0 + ux * i + nx * cv; py = y0 + uy * i + ny * cv;
+    var pf = t < 0.13 ? 0 : min(1, (t - 0.13) / 0.16) * Math.pow(max(0, 1 - max(0, (t - 0.45) / 0.55)), 0.55);
+    if (gap > 0) { gap--; continue; } if (r() < 0.04) { gap = 1 + fl(r() * 3); continue; }
+    if (pf <= 0) continue;
+    for (s = -1; s <= 1; s += 2) {
+      var upper = ny * s < 0, bl = wid * pf * (upper ? 1 : 0.78) * (0.82 + r() * 0.25), bx = px + (nx * s * 0.78 + ux * 0.62) * bl, by = py + (ny * s * 0.78 + uy * 0.62) * bl;
+      L(px, py, bx, by, upper ? ((i & 1) ? pal[1] : pal[2]) : ((i & 1) ? pal[0] : pal[1]));
+      if (!upper && (i % 3) === 0) L(px + (bx - px) * 0.55, py + (by - py) * 0.55, bx, by, pal[4]);
+      P(bx, by, upper ? pal[1] : pal[0]);
+    }
+  }
+  for (i = 0; i < n; i++) {
+    t = i / len; cv = sin(t * PI) * len * 0.05; px = x0 + ux * i + nx * cv; py = y0 + uy * i + ny * cv;
+    var th = t < 0.35 ? 3 : t < 0.75 ? 2 : 1; R(px - (th >> 1), py - (th >> 1), th, th, pal[3]); if (th > 1) P(px - (th >> 1), py + th - 1 - (th >> 1), pal[1]);
+  }
+  if (cut && cut < 1) { P(px + ux * 2 + nx, py + uy * 2 + ny, pal[3]); P(px + ux * 3 - nx, py + uy * 3 - ny, pal[2]); P(px + ux, py + uy - 1, pal[3]); }
+}
+function strataOf(r, n, kinds) { var a = [], k = 0, c = 0; for (var y = 0; y < n; y++) { if (k-- <= 0) { k = 1 + fl(r() * 7); c = fl(r() * kinds); } a.push(c); } return a; }
+function wallPlane(r, side, baseFn, amp, pal, rim, st, tilt, dark) {     // 一層崖壁：水平地層＋內緣血光
+  var off = 0, k = 0, ph = r() * 6, e = [], rc = rgb(rim);
+  for (var y = 0; y < H; y++) {
+    if (k-- <= 0) { k = 3 + fl(r() * 11); off = (r() - 0.5) * amp; }
+    var xe = rd(baseFn(y) + off + sin(y / 17 + ph) * 3); e.push(xe);
+    for (var i = 0; i < xe && i < W; i++) {
+      var x = side < 0 ? i : W - 1 - i, dd = xe - 1 - i, seg = fl((i + ph * 9) / 15), yy = y + rd(sin(i / 21 + ph) * 2.5 + dd * tilt) + 60;
+      var s = st[yy % st.length], c = pal[s], m = dark * (hsh(seg, 7) > 0.55 ? 0.84 : 1) * (s !== st[(yy + 1) % st.length] ? 0.6 : 1) * ((i + ph * 9) % 15 < 1 ? 0.7 : 1);
+      if (hsh(x, y) > 0.9) m *= 1.18;
+      var q = (y * W + x) * 4;
+      if (dd === 0 || (dd === 1 && (y & 1))) { D[q] = rc[0]; D[q + 1] = rc[1]; D[q + 2] = rc[2]; }
+      else if (dd < 5 && ((x + y) & 1)) { D[q] = c[0] * m * 0.6 + rc[0] * 0.4; D[q + 1] = c[1] * m * 0.6 + rc[1] * 0.4; D[q + 2] = c[2] * m * 0.6 + rc[2] * 0.4; }
+      else { D[q] = c[0] * m; D[q + 1] = c[1] * m; D[q + 2] = c[2] * m; }
+    }
+  }
+  return e;
+}
+function dgLiekou() {
+  var r = rng(1505), x, y, i, k, t;
+  R(0, 0, W, H, '#080607');
+  /* 深淵血光 */
+  E(199, 150, 124, 132, '#0d0708'); E(199, 160, 94, 106, '#130809'); E(199, 170, 68, 82, '#1a0a0a'); E(199, 182, 44, 58, '#210c0b'); E(199, 192, 26, 36, '#2a0e0c');
+  /* 極高處的天裂 */
+  for (x = 118; x < 284; x++) { var d = abs(x - 203) / 80, hh = rd(36 * (1 - d * d) + sin(x / 5) * 2 + (hsh(x, 9) - 0.5) * 5); if (hh > 0) { R(x, 0, 1, hh, '#1c0a0a'); R(x, 0, 1, hh * 0.72, '#2b0d0c'); R(x, 0, 1, hh * 0.44, '#45120f'); R(x, 0, 1, hh * 0.2, '#6e1c16'); } }
+  var sk = jag(r, [[146, 4], [176, 8], [204, 3], [230, 9], [264, 3]], 5, 2.6); crack(sk, [[RD1, 1, 3], [RED, 1, 1]]); crack(sk.slice(4, sk.length - 4), [[EMB, 1, 1]]);
+  /* 深處的巨門 */
+  var DR = '#2c1210', DR2 = '#421a15';
+  T(96, 184, 160, 198, 171, 198, '#150909', 0.6); T(96, 184, 200, 239, 200, 228, '#150909', 0.6);
+  R(148, 92, 103, 3, DR); R(144, 89, 111, 3, DR); R(141, 87, 6, 2, DR); R(252, 87, 6, 2, DR); P(140, 86, DR); P(258, 86, DR); R(152, 95, 4, 3, DR); R(243, 95, 4, 3, DR);
+  for (y = 95; y < 186; y++) {
+    t = (y - 95) / 91; var l = rd(159 + t * 12), rr = rd(239 - t * 12);
+    P(l, y, DR); P(l + 1, y, DR, 0.5); P(rr, y, DR); P(rr - 1, y, DR, 0.5); if (y % 2) P(199, y, RD1, 0.85 - t * 0.5); else P(199, y, RD2, 0.6);
+    if ((y - 101) % 13 === 0) for (x = l + 7; x < rr - 5; x += 9) if (abs(x - 199) > 4) P(x, y, DR2);
+  }
+  R(198, 95, 3, 90, RD2, 0.22); E(191, 142, 2, 2, DR2); E(207, 142, 2, 2, DR2); P(191, 142, '#150909'); P(207, 142, '#150909');
+  /* 三層崖壁（遠→近） */
+  var S1 = strataOf(r, 173, 4), S2 = strataOf(r, 211, 6), S3 = strataOf(r, 257, 9);
+  var P1 = pals([['#130b0a', '#180d0b', '#1d0f0c', '#150a09']])[0], P2 = pals([['#160e0c', '#1e130f', '#261812', '#2c1a13', '#1a1412', '#2e1511']])[0];
+  var P3 = pals([['#17100d', '#221610', '#2e1d13', '#3a251a', '#2a2420', '#40201a', '#44341f', '#100d0c', '#4c4638']])[0];
+  function b1(y) { return 146 + 10 * Math.pow(max(0, (64 - y) / 64), 1.4) + (y > 150 ? (y - 150) * 0.3 : 0); }
+  function b2(y) { return 106 + 20 * Math.pow(max(0, (62 - y) / 62), 1.5) + (y > 150 ? (y - 150) * 0.5 : 0); }
+  function b3(y) { return 56 + 30 * Math.pow(max(0, (72 - y) / 72), 1.5) + (y > 168 ? (y - 168) * 0.9 : 0); }
+  wallPlane(r, -1, b1, 8, P1, '#3a1512', S1, 0.05, 1); wallPlane(r, 1, b1, 8, P1, '#3a1512', S1, 0.05, 1);
+  mist(r, 40, 9, RD1, 0.12, 110, 290); mist(r, 120, 8, RD1, 0.08, 120, 280);
+  wallPlane(r, -1, b2, 12, P2, '#5e1f19', S2, 0.07, 0.95); wallPlane(r, 1, b2, 12, P2, '#5e1f19', S2, 0.07, 0.95);
+  /* 上湧的赤霧 */
+  for (i = 0; i < 34; i++) { x = 104 + r() * 190; var y0 = 150 + r() * 34, len = 60 + r() * 120, w = 2 + fl(r() * 6), ph = r() * 6; for (y = y0; y > y0 - len && y >= 0; y--) { t = (y0 - y) / len; R(x + sin(y / 17 + ph) * 5 * t - w / 2, y, w * (1 + t), 1, RD1, 0.055 * (1 - t) + 0.012); } }
+  var QP = ['#3d382f', '#5e5848', '#807863', '#a59c88', '#5a3028'], QD = ['#2c2823', '#443f35', '#5c5647', '#756e5c', '#40221d'];
+  quill(r, 124, -6, 146, 44, 9, QD, 0.8); quill(r, 300, -8, 276, 50, 10, QD, 0.85);
+  var eL = wallPlane(r, -1, b3, 16, P3, '#8c2c22', S3, 0.1, 1), eR = wallPlane(r, 1, b3, 16, P3, '#8c2c22', S3, 0.1, 1);
+  for (i = 0; i < 40; i++) { x = r() < 0.5 ? fl(r() * 60) : W - 1 - fl(r() * 60); y = fl(r() * 180); k = 4 + fl(r() * 16); R(x, y, 1, k, '#0c0908', 0.7); if (r() < 0.4) R(x + 1, y + 1, 1, k - 2, '#4a3324', 0.4); }
+  for (i = 0; i < 16; i++) { x = r() < 0.5 ? 4 + fl(r() * 44) : W - 5 - fl(r() * 44); y = 20 + fl(r() * 150); P(x, y, BN1); P(x + 1, y, BN0); if (i % 3 === 0) { P(x + 1, y - 1, BN2); P(x + 2, y - 1, BN0); } }
+  /* 自崖壁刺出的巨羽殘骸 */
+  quill(r, 6, 108, 134, 36, 18, QP, 1); quill(r, -6, 160, 86, 122, 12, QP, 0.74); quill(r, 30, 30, 96, 4, 9, QD, 0.9);
+  quill(r, 392, 84, 258, 26, 20, QP, 1); quill(r, 404, 176, 318, 138, 12, QP, 0.7); quill(r, 372, 22, 322, -4, 8, QD, 1);
+  for (i = 0; i < 6; i++) { var qb = [[6, 108], [0, 158], [30, 30], [392, 84], [397, 174], [372, 22]][i]; E(qb[0], qb[1], 7, 6, '#0c0908'); E(qb[0], qb[1], 5, 4, '#17100d', 1, 2); }
+  /* 立足的岩臺 */
+  var ft = [], wv = 0;
+  for (x = 0; x < W; x++) { wv = (wv + (r() - 0.5) * 2.4) * 0.85; ft[x] = rd(183 - max(0, abs(x - 199) - 112) * 0.24 + sin(x / 31) * 2.5 + wv); R(x, ft[x], 1, H - ft[x], '#100c0a'); P(x, ft[x], hsh(x, 3) > 0.45 ? '#5e1f19' : '#2a1512'); P(x, ft[x] + 1, '#21140f'); if (x & 1) P(x, ft[x] + 2, '#1a100d'); }
+  Dz(0, 204, W, 2, '#0c0908', 2); R(0, 206, W, 20, '#0c0908'); Dz(0, 226, W, 2, '#090707', 2); R(0, 228, W, 22, '#090707');
+  for (i = 0; i < 420; i++) { x = fl(r() * W); y = ft[x] + 3 + fl(r() * (H - ft[x] - 3)); P(x, y, r() < 0.5 ? '#1c130f' : '#060505'); }
+  for (i = 0; i < 30; i++) { x = fl(r() * W); y = ft[x] + 6 + fl(r() * 50); R(x, y, 6 + fl(r() * 16), 1, '#19110e'); }
+  var fc = [[[20, 206], [58, 214], [96, 210]], [[300, 212], [340, 206], [384, 216]], [[120, 236], [160, 242]], [[236, 240], [282, 234]]];
+  for (i = 0; i < fc.length; i++) { var cj = jag(r, fc[i], 5, 2); crack(cj, [['#050404', 1, 1]]); if (i < 2) for (k = 2; k < cj.length - 1; k += 3) P(cj[k][0], cj[k][1], RD2); }
+  var FRK = ['#070505', '#17100e', '#2a1a15'];
+  for (i = 0; i < 14; i++) { x = i % 2 ? 4 + r() * 70 : W - 4 - r() * 70; rock(x, ft[rd(x)] + 4 + r() * 54, 6 + r() * 12, 3 + r() * 6, FRK); }
+  quill(r, 10, 238, 96, 224, 8, QP, 0.82); quill(r, 394, 230, 334, 240, 7, QP, 0.6);
+  for (i = 0; i < 12; i++) { x = i % 2 ? 20 + r() * 90 : 300 + r() * 90; y = 212 + r() * 34; L(x, y, x + 3 + r() * 3, y - 1 - r() * 2, QP[1]); P(x, y, QP[2]); }
+  S(52, 208, ['.lll.', 'lllll', 'ldldl', '.lml.'], { l: BN0, d: '#070505', m: '#34302a' }); bone(338, 222, 6, 0.3); bone(64, 232, 5, 2.8);
+  /* 崖緣翻湧的霧與餘燼 */
+  mist(r, 174, 12, RD1, 0.16, 50, 350); mist(r, 168, 6, RED, 0.06, 90, 310);
+  for (i = 0; i < 70; i++) { x = 60 + r() * 280; y = r() * 180; P(x, y, r() < 0.25 ? EMB : RD1, 0.35 + r() * 0.4); }
+  crag(r, 10, H + 2, 70, 30, ['#060505', '#120d0b', '#231612']); crag(r, 390, H + 2, 74, 32, ['#060505', '#120d0b', '#231612']);
+  vignette(9, 0.6);
+}
+
+/* ================= 戰鬥背景：無名古塚 ================= */
+function warrior(cx, yb, h, w, s, pal, broken) {       // 俑：s 為受光側（朝墓室中央）；pal=[暗, 中, 亮, 綠緣]
+  for (var j = 0; j < h; j++) {
+    var t = j / h, hw, off = 0, gap = 0;
+    if (t < 0.045) { hw = 0.1; off = -0.1 * s; }
+    else if (t < 0.16) hw = 0.19 * sqrt(max(0.05, 1 - Math.pow((t - 0.1) / 0.062, 2))) + 0.02;
+    else if (t < 0.19) hw = 0.12;
+    else if (t < 0.25) hw = 0.26 + (t - 0.19) / 0.06 * 0.24;
+    else if (t < 0.56) hw = 0.5 - (t - 0.25) * 0.12;
+    else if (t < 0.76) hw = 0.42 + (t - 0.56) * 0.5;
+    else if (t < 0.95) { hw = 0.36; gap = 0.07; }
+    else hw = 0.46;
+    if (broken === 1 && t < 0.175) continue;
+    if (broken === 2 && t > 0.25 && t < 0.5) hw *= 0.78;
+    var y = yb - h + j, half = hw * w, l = rd(cx + off * w - half), rr = rd(cx + off * w + half), ww = max(1, rr - l), lw = max(1, rd(ww * 0.22)), dw = rd(ww * 0.3);
+    R(l, y, ww, 1, pal[1]);
+    if (s > 0) { R(rr - lw, y, lw, 1, pal[2]); R(l, y, dw, 1, pal[0]); if (j % 2) P(rr - 1, y, pal[3]); } else { R(l, y, lw, 1, pal[2]); R(rr - dw, y, dw, 1, pal[0]); if (j % 2) P(l, y, pal[3]); }
+    if (gap) R(rd(cx - gap * w), y, max(1, rd(gap * 2 * w)), 1, '#050404');
+    if (t > 0.26 && t < 0.56 && ww > 5 && (j % max(2, rd(h / 24))) === 0) R(l + 1, y, ww - 2, 1, pal[0]);
+    if (abs(t - 0.56) < 0.012 || abs(t - 0.19) < 0.01) R(l, y, ww, 1, pal[0]);
+  }
+  if (h > 70 && broken !== 1) { var hy = rd(yb - h + h * 0.1); R(cx - 0.11 * w, hy, 0.22 * w, max(1, h * 0.014), pal[0]); R(cx - 0.02 * w, hy + h * 0.014, max(1, 0.04 * w), h * 0.022, pal[0]); }
+  R(cx - w * 0.56, yb, w * 1.12, max(1, h * 0.035), pal[0]);
+}
+function glamp(x, y, h, lit) {                        // 青焰銅燈：x 中心、y 腳底
+  if (lit) { glow(x, y - h - 4, 16 + lit * 8, '#4f9a6a', 0.035 + lit * 0.02); glow(x, y - h - 3, 6 + lit * 2, '#7fd08a', 0.08); }
+  R(x - 4, y - 1, 9, 1, BZ0); R(x - 3, y - 2, 7, 1, BZ1); R(x - 1, y - h, 2, h - 2, BZ0); R(x - 1, y - h, 1, h - 2, BZ1); R(x - 2, y - rd(h * 0.5), 4, 2, BZ1); P(x - 2, y - rd(h * 0.5), BZ2);
+  R(x - 4, y - h - 1, 9, 2, BZ1); R(x - 4, y - h - 1, 4, 1, BZ3); R(x - 3, y - h + 1, 7, 1, BZ0);
+  if (lit) { R(x - 1, y - h - 3, 3, 2, '#3f8d57'); P(x, y - h - 3, '#d8f2c8'); P(x, y - h - 4, '#7fd08a'); if (lit > 0.5) { P(x, y - h - 5, '#7fd08a'); P(x + 1, y - h - 6, '#3f8d57'); P(x - 1, y - h - 4, '#3f8d57'); P(x, y - h - 2, '#d8f2c8'); } }
+  else P(x, y - h - 2, '#2a4a3c');
+}
+function dgGuzhong() {
+  var r = rng(1606), x, y, i, k, q, c, VX = 199, VY = 110, BW = 62, BT = 40, BB = 38;
+  var SP = pals([['#090807', '#131210', '#1a1815', '#22201c', '#2b2823', '#34302a']])[0], NI = [[0.31, 0.42], [0.49, 0.6], [0.67, 0.78], [0.85, 0.96]];
+  var MO = rgb('#3a2e18'), MR = rgb('#3d1a15'), MT = rgb('#17322b'), NB = rgb('#050404'), CE = [rgb('#080706'), rgb('#0e0d0b')];
+  for (y = 0; y < H; y++) for (x = 0; x < W; x++) {
+    var dx = x - VX, dy = y - VY, kx = abs(dx) / BW, ky = dy > 0 ? dy / BB : -dy / BT, kk = max(kx, ky), lv, v, w, u, jt, m = 1;
+    c = null;
+    if (kk <= 1) {                                             // 後壁
+      var by = y - (VY - BT), bx = x - (VX - BW), row = fl(by / 13), ox = bx + (row & 1) * 10;
+      lv = (by % 13 === 12 || ox % 21 === 20) ? 0 : 2 + (hsh(fl(ox / 21), row + 40) > 0.65 ? 1 : 0); m = 0.62;
+    } else if (kx >= ky) {                                     // 側壁：w=深度(1=後壁)，v=高度
+      w = 1 / kx; v = dy / kx; var inN = -1;
+      for (k = 0; k < 4; k++) if (w > NI[k][0] && w < NI[k][1]) inN = k;
+      if (inN >= 0 && v > -23 && v < 30) {
+        if (w > NI[inN][1] - 0.022) { lv = 3; m = 0.5 + 0.5 * min(1, (kx - 1) / 1.6); } else if (v > 27.5) { lv = 2; m = 0.8; } else c = NB;
+      } else {
+        var cs = v < -28 ? 0 : v < -8 ? 1 : v < 12 ? 2 : v < 31 ? 3 : 4, ww = w * 9 + (cs & 1) * 0.5;
+        jt = (ww - fl(ww)) < 11 / (BW * kx * kx) || abs(v + 28) < 0.5 / kx + 0.3 || abs(v + 8) < 0.5 / kx + 0.3 || abs(v - 12) < 0.5 / kx + 0.3 || abs(v - 31) < 0.5 / kx + 0.3;
+        lv = jt ? 0 : 2 + (hsh(fl(ww), cs + 9) > 0.6 ? 1 : 0) + (cs === 4 ? -1 : 0);
+        m = 0.5 + 0.5 * min(1, (kx - 1) / 1.6);
+        if (!jt && v > -38.5 && v < -29.5 && hsh(fl(w * 120), fl(v * 2)) > 0.38) c = (v < -37 || v > -31) ? MO : (((fl(w * 44) & 1) ^ (v > -34 ? 1 : 0)) ? MR : MT);     // 壁頂彩繪帶
+        else if (!jt && cs > 0 && cs < 4 && inN < 0) { var pg = fbm(w * 420, v * 4 + 300, 16); if (pg > 0.64 && hsh(x, y) > 0.3) c = MR; else if (pg < 0.3 && hsh(x, y) > 0.4) c = MT; else if (abs(v - 2) < 1.2 && hsh(x >> 1, 3) > 0.3) c = MO; }
+      }
+    } else if (dy > 0) {                                       // 地面
+      w = 1 / ky; u = dx / ky + 62; var col = fl(u / 20.67), wz = w * 6 + (col & 1) * 0.5;
+      jt = (u - col * 20.67) < 1.15 / ky || (wz - fl(wz)) < 7.5 / (BB * ky * ky);
+      lv = jt ? 0 : 2 + (hsh(col, fl(wz) + 70) > 0.6 ? 1 : 0); m = 0.45 + 0.4 * min(1, (ky - 1) / 1.9);
+    } else {                                                   // 頂
+      w = 1 / ky; u = dx / ky; c = ((w * 5 - fl(w * 5)) < 0.2 || abs(((u + 300) % 31) - 15) > 13.6) ? CE[1] : CE[0];
+    }
+    q = (y * W + x) * 4;
+    if (c && (c === NB || c === CE[0] || c === CE[1])) { D[q] = c[0]; D[q + 1] = c[1]; D[q + 2] = c[2]; continue; }
+    m = min(1, fl(m * 7 + bay(x, y) * 0.9) / 7);
+    if (!c) c = SP[max(0, min(5, lv))];
+    D[q] = c[0] * m; D[q + 1] = c[1] * m; D[q + 2] = c[2] * m;
+  }
+  /* 後壁：壁畫殘帶、龕、石槨臺 */
+  for (x = 138; x < 261; x++) for (y = 72; y < 80; y++) if (hsh(x, y) > 0.42) P(x, y, (y < 73 || y > 78) ? '#2a2112' : (((x >> 2) & 1) ^ (y > 75 ? 1 : 0)) ? '#2a1310' : '#11241f');
+  for (i = 0; i < 2; i++) for (x = 0; x < 20; x++) for (y = 86; y < 140; y++) { var mx = (i ? 239 : 141) + x; if (hsh(mx, y) > 0.5) { k = fl((y - 86) / 6); P(mx, y, (x < 2 || x > 17) ? '#2a2112' : (k % 3 === 0) ? '#2a1310' : (k % 3 === 1 && (x + k) % 6 < 3) ? '#11241f' : '#1a1815'); } }
+  R(163, 82, 73, 66, '#0e0d0b'); R(165, 84, 69, 64, '#080706'); R(163, 82, 73, 1, '#24221e'); R(163, 82, 1, 66, '#1c1a17');
+  for (y = 86; y < 116; y++) for (x = 184; x < 215; x++) { var rr = sqrt((x - 199) * (x - 199) + (y - 101) * (y - 101)); if (hsh(x, y) > 0.4) { if (rr < 14 && rr >= 11) P(x, y, '#2a1310'); else if (rr < 8 && rr >= 5) P(x, y, '#2a2112'); else if (rr < 2.5) P(x, y, '#2a1310'); } }
+  for (i = 0; i < 4; i++) for (x = 170; x < 229; x++) if (hsh(x, i) > 0.35 && abs(x - 199) > 16 - i * 4) P(x, 96 + i * 4, i % 2 ? '#11241f' : '#2a1310');
+  R(164, 141, 70, 7, '#151311'); R(164, 141, 70, 1, '#2b2823'); R(170, 136, 58, 5, '#181614'); R(170, 136, 58, 1, '#2e2b26'); R(204, 137, 24, 4, '#100f0d'); R(210, 142, 24, 6, '#0e0d0b');
+  R(178, 124, 42, 12, '#14120f'); R(178, 124, 14, 12, '#1c1a16'); T(119, 124, 183, 216, 177, 221, '#1d1a16'); R(183, 119, 33, 1, '#38342c'); R(179, 123, 40, 1, '#2a2620'); R(206, 120, 12, 4, '#141210');
+  R(186, 119, 2, 17, BZ0); R(210, 119, 2, 17, BZ0); P(186, 119, BZ2); P(210, 119, BZ1); P(186, 124, BZ1); R(197, 128, 4, 4, '#1f0f0d'); P(198, 129, RD2); P(199, 130, RD2);
+  /* 側龕中的陶俑 */
+  var WP = ['#0d0907', '#1d1510', '#2b1f17', '#2c4436'];
+  for (i = 3; i >= 0; i--) for (k = -1; k <= 1; k += 2) {
+    var xa = VX + k * BW / NI[i][0], xb = VX + k * BW / NI[i][1], wcx = (xa + xb) / 2, kc = abs(wcx - VX) / BW;
+    warrior(wcx + k * abs(xa - xb) * 0.04, VY + 28.5 * kc, 45 * kc, abs(xa - xb) * 0.6, -k, WP, (k > 0 && i === 2) ? 1 : (k < 0 && i === 1) ? 2 : 0);
+  }
+  R(250, 150, 4, 3, WP[1]); P(250, 150, WP[2]);                                   // 墮地的俑首
+  /* 燈：懸燈、槨前小燈、前景立燈 */
+  for (k = -1; k <= 1; k += 2) for (y = 0; y < 27; y++) P(199 + k * 11 + ((y >> 1) & 1), y, (y & 1) ? '#3a3020' : '#1d180f');
+  R(186, 27, 27, 2, BZ1); R(186, 27, 12, 1, BZ3); R(187, 29, 25, 1, BZ0); R(198, 29, 3, 3, BZ0);
+  glow(199, 24, 26, '#4f9a6a', 0.04);
+  for (k = -1; k <= 1; k++) { x = 199 + k * 10; glow(x, 24, 5, '#7fd08a', 0.08); R(x - 1, 24, 3, 2, '#3f8d57'); P(x, 24, '#d8f2c8'); P(x, 23, '#7fd08a'); if (k) P(x, 22, '#3f8d57'); }
+  glamp(157, 149, 10, 0.3); glamp(241, 149, 10, 0);
+  glamp(64, 238, 58, 1); glamp(334, 240, 60, 0.45);
+  /* 地面：塵、碎陶、殘俑 */
+  for (i = 0; i < 260; i++) { x = fl(r() * W); y = 150 + fl(r() * 100); if (abs(x - VX) / BW < (y - VY) / BB) P(x, y, r() < 0.5 ? '#24211d' : '#070605'); }
+  for (i = 0; i < 16; i++) { x = i % 2 ? 6 + r() * 96 : 296 + r() * 96; y = 214 + r() * 32; R(x, y, 2 + fl(r() * 4), 1 + fl(r() * 2), WP[1]); P(x, y, WP[2]); }
+  E(26, 240, 9, 7, WP[1]); E(24, 238, 6, 4, WP[2]); R(22, 239, 3, 1, WP[0]); R(28, 240, 2, 1, WP[0]); R(20, 232, 5, 3, WP[1]); R(17, 246, 20, 2, KK, 0.5);
+  T(232, 246, 352, 372, 346, 392, WP[1]); T(232, 246, 352, 358, 346, 362, WP[2]); R(346, 247, 46, 2, KK, 0.5); for (y = 235; y < 246; y += 3) R(350, y, 36, 1, WP[0]);
+  vignette(9, 0.62);
+}
+
 /* ---------- 產出 ---------- */
+// 區域圖左右翻轉：世界觀裡裂口與血霧在西邊（獸群往東逃），地點座標見 data.js（x 已換成 796 − x）
+function mirrorX(w, h) {
+  for (var y = 0; y < h; y++) for (var x = 0; x < (w >> 1); x++) {
+    var a = (y * w + x) * 4, b = (y * w + (w - 1 - x)) * 4;
+    for (var c = 0; c < 4; c++) { var t = D[a + c]; D[a + c] = D[b + c]; D[b + c] = t; }
+  }
+  // 翻轉後左上角圖例區要保持暗、安靜
+  for (var yy = 0; yy < 17; yy++) for (var xx = 0; xx < 135; xx++) { var q = (yy * w + xx) * 4; D[q] = D[q] * 0.45 | 0; D[q + 1] = D[q + 1] * 0.45 | 0; D[q + 2] = D[q + 2] * 0.45 | 0; }
+}
 function scene(id, w, h, fn) {
   var cv = document.createElement('canvas'); cv.width = w; cv.height = h;
   var ctx = cv.getContext('2d'), img = ctx.createImageData(w, h);
   W = w; H = h; D = img.data;
   for (var i = 3; i < D.length; i += 4) D[i] = 255;
   R(0, 0, w, h, K0); fn();
+  if (id === 'map_region') mirrorX(w, h);
   ctx.putImageData(img, 0, 0);
   URLS[id] = cv.toDataURL('image/png'); SIZES[id] = [w * 2, h * 2];
   D = null; M = null;
@@ -746,6 +952,8 @@ scene('map_region', 398, 280, mapRegion);
 scene('map_continent', 340, 270, mapContinent);
 scene('wild_fuzhao', 398, 202, wildFuzhao);
 scene('wild_chakou', 398, 202, wildChakou);
+scene('dg_liekou', 398, 250, dgLiekou);
+scene('dg_guzhong', 398, 250, dgGuzhong);
 
 var css = '', ids = Object.keys(URLS);
 for (var n = 0; n < ids.length; n++) css += '.sc-' + ids[n] + '{background-image:url(' + URLS[ids[n]] + ');background-size:100% 100%;image-rendering:pixelated}\n';
