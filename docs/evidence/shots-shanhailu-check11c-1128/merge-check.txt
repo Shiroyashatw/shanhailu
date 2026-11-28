@@ -1,0 +1,16 @@
+merge-base(57a5b83, adbb161) = 8c8beb61a03df0ad81256c478574763d1e328edb
+# main 相對 merge-base 改動檔：
+A	docs/design/phase4-map/ART-DEPS.md
+A	docs/design/phase4-map/OPEN-QUESTIONS.md
+A	docs/design/phase4-map/README.md
+A	docs/design/phase4-map/SPEC-DYN.md
+A	docs/design/phase4-map/SPEC-MAP.md
+A	docs/design/phase4-map/TECH.md
+
+# git merge-tree --write-tree 57a5b83 adbb161
+5ad2bdac1f19f2fffa519c4f9f4161d12a80e1a3
+exit=0（0＝無衝突；未提交合併）
+
+# b9f1118 是否為 57a5b83 祖先
+yes
+# git diff b9f1118 57a5b83 -- docs/design/batch1/（空＝與 b9f1118 完全相同）
