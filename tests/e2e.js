@@ -1,6 +1,6 @@
 /* 《山海錄》灰盒 v0.3 — 自動化互動驗證（Node + Playwright，headless Chromium）
  * 用法：node tests/e2e.js [--shots]
- *   --shots  另存 1280×720 實機截圖至 docs/evidence/shots-v03/（可用環境變數 SHL_SHOTS_DIR 改寫到別的資料夾，路徑相對 repo 根目錄）
+ *   --shots  另存 1280×720 實機截圖至 docs/evidence/shots-v03/（可用環境變數 SHL_SHOTS_DIR 或 SHOTS_DIR 改寫到別的資料夾，路徑相對 repo 根目錄）
  * 驗證：1280×720 單屏無捲動／無溢出／無文字重疊、三欄 240/796/220、24 小時制；
  *       城鎮平面圖（建築、路人、老闆、各種服務）、每個地點可走可探查、隱藏地點、大陸圖、見聞錄、勢力聲望；
  *       戰鬥行動列（武器／招式／技能／道具）、點人形武器出手、狀態、演出佇列、棄物撤退；
@@ -13,8 +13,9 @@ const path = require('path');
 const { chromium } = require('playwright');
 
 const ROOT = path.resolve(__dirname, '..');
-const SHOTS_REL = process.env.SHL_SHOTS_DIR || 'docs/evidence/shots-v03';
-const SHOTS = path.join(ROOT, SHOTS_REL);
+// SHL_SHOTS_DIR（DEV-01）或 SHOTS_DIR（DEV-02）環境變數可改寫截圖目錄，路徑相對 repo 根目錄；預設 shots-v03
+const SHOTS_REL = process.env.SHL_SHOTS_DIR || process.env.SHOTS_DIR || 'docs/evidence/shots-v03';
+const SHOTS = path.resolve(ROOT, SHOTS_REL);
 const WANT_SHOTS = process.argv.includes('--shots');
 const SEED = 20261127;
 
@@ -110,7 +111,7 @@ async function shot(page, name) {
   if (!WANT_SHOTS) return;
   fs.mkdirSync(SHOTS, { recursive: true });
   await page.screenshot({ path: path.join(SHOTS, name), clip: { x: 0, y: 0, width: 1280, height: 720 } });
-  console.log('SHOT  ' + SHOTS_REL.replace(/\/$/, '') + '/' + name);
+  console.log('SHOT  ' + path.relative(ROOT, path.join(SHOTS, name)));
 }
 
 

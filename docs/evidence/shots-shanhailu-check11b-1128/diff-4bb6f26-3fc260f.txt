@@ -1,0 +1,32 @@
+# git diff --numstat 4bb6f26..3fc260f
+8	2	docs/design/batch1/README.md
+87	0	docs/design/batch1/dev-string-replace-batch1-v0.1.csv
+127	0	docs/design/batch1/dev-string-replace-batch1-v0.1.md
+14	0	docs/design/batch1/dev05-strings-v0.1.md
+97	0	docs/design/batch1/naming-banned-chars-final-v1.0.md
+179	0	docs/design/batch1/specs/CHANGELOG.md
+63	2	docs/design/batch1/specs/SPEC-01.md
+17	2	docs/design/batch1/specs/SPEC-02.md
+572	0	docs/design/batch1/specs/SPEC-03.md
+160	12	docs/design/batch1/specs/SPEC-TIME.md
+3	1	js/data.js
+21	6	js/game.js
+1	1	js/ui.js
+71	0	tests/e2e-dev02.js
+
+# 睡眠相關識別字在 js diff 的命中（空＝未動）
+9:-  return { ITEMS, SKILLS, TECHS, BASES, AFFIXES, UNIQUES, LEGENDS, RARITY, ENEMIES, NODES, EDGES, REGION_LABELS, WILDS, DUNGEONS, PRICES, PLACES, BUILDINGS, ITEM_CLASS, NPCS, FACTIONS, EXPLORE, CODEX_CATS, BOUNTIES, QUEST_GEN, RUMOR, TIDE, SLEEP, WORLD, RECIPES, EVENTS, ATTRS, PROFS, PROF_GROUPS, WTYPE_NAMES, ORIGINS, NAME_DEFAULT, NAME_POOL, SEASONS, YEAR_NAMES, EQ_SLOTS, SLOT_NAMES, SLOT_GLYPH };
+10:+  return { ITEMS, SKILLS, TECHS, BASES, AFFIXES, UNIQUES, LEGENDS, RARITY, ENEMIES, NODES, EDGES, REGION_LABELS, WILDS, DUNGEONS, PRICES, PLACES, BUILDINGS, ITEM_CLASS, NPCS, FACTIONS, EXPLORE, CODEX_CATS, BOUNTIES, QUEST_GEN, RUMOR, TIDE, SLEEP, TIME, WORLD, RECIPES, EVENTS, ATTRS, PROFS, PROF_GROUPS, WTYPE_NAMES, ORIGINS, NAME_DEFAULT, NAME_POOL, SEASONS, YEAR_NAMES, EQ_SLOTS, SLOT_NAMES, SLOT_GLYPH };
+(end)
+
+# js diff hunk 標頭
+@@ -455,0 +456,2 @@ window.SHL_DATA = (function () {
+@@ -579 +581 @@ window.SHL_DATA = (function () {
+@@ -700,2 +700,5 @@ window.SHL = (function () {
+@@ -704 +707 @@ window.SHL = (function () {
+@@ -706 +709,4 @@ window.SHL = (function () {
+@@ -712,0 +719,9 @@ window.SHL = (function () {
+@@ -731 +746 @@ window.SHL = (function () {
+@@ -2011 +2026 @@ window.SHL = (function () {
+@@ -400 +400 @@
+註：唯一命中是 data.js 匯出列加入 TIME（SLEEP 本身與 sleepToMorning／wakeTime／service rest／bunk 均無 hunk）。e2e.js 在此區間未變。

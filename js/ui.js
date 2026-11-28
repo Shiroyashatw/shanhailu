@@ -27,6 +27,9 @@
 
   function pos(x, y, w, h) { return 'left:' + x + 'px;top:' + y + 'px;width:' + w + 'px;height:' + h + 'px;'; }
   // 像素 ICON；沒有圖就退回文字代號
+  // SPEC-TIME 7.1b／AC 21：四檔險級（D.TIME.RISK_TIERS，即 riskTier() 的值域）共用一張色表 rk0–rk3（css），
+  // 路程 travelPreview 與荒野、地城標頭都走這裡；hot 只在「高」「極高」。
+  function riskCls(tier) { return ' rk' + D.TIME.RISK_TIERS.indexOf(tier) + (tier === '高' || tier === '極高' ? ' hot' : ''); }
   function ico(id, glyph, size) {
     if (id && IC.has(id)) return '<i class="px ic-' + id + '"' + (size ? ' style="width:' + size + 'px;height:' + size + 'px"' : '') + '></i>';
     return '<span class="gl">' + (glyph || '') + '</span>';
@@ -397,7 +400,7 @@
     if (p) {
       const n = D.NODES[dest];
       h += '<div class="dic">' + ico(n.ic, n.g, 32) + '</div><div class="dname"><b>' + n.name + '</b><span class="sub">經 ' + p.via + '</span></div>';
-      h += '<div class="vpill"><span class="ic">時</span>' + p.hours + ' 小時</div><div class="vpill"><span class="ic">食</span>−' + p.food + '</div><div class="vpill"><span class="ic">疲</span>+' + p.fat + '</div><div class="vpill' + (p.riskName === '高' ? ' hot' : '') + '"><span class="ic">險</span>' + p.riskName + '</div><div class="vpill"><span class="ic">負</span>×' + p.mult.toFixed(2) + '</div>';
+      h += '<div class="vpill"><span class="ic">時</span>' + p.hours + ' 小時</div><div class="vpill"><span class="ic">食</span>−' + p.food + '</div><div class="vpill"><span class="ic">疲</span>+' + p.fat + '</div><div class="vpill' + riskCls(p.riskName) + '" data-testid="route-risk"><span class="ic">險</span>' + p.riskName + '</div><div class="vpill"><span class="ic">負</span>×' + p.mult.toFixed(2) + '</div>';
       h += '<button class="btn dark go" data-a="travel" data-testid="btn-travel">前往</button>';
     } else {
       const n = D.NODES[S.loc];
@@ -654,7 +657,7 @@
   function sceneWild(S) {
     const W = D.WILDS[S.loc]; const ns = G.nodeState(S.loc);
     let h = '<div class="wildscene' + scn('wild_' + S.loc) + '" data-testid="wild">';
-    h += '<div class="stagehead"><span class="pill">' + D.NODES[S.loc].name + '</span><span class="pill">險 ' + W.risk + '</span>' + (G.tideInfo() ? '<span class="pill hot">獸潮</span>' : '') + '</div>';
+    h += '<div class="stagehead"><span class="pill">' + D.NODES[S.loc].name + '</span><span class="pill' + riskCls(W.risk) + '" data-testid="head-risk">險 ' + W.risk + '</span>' + (G.tideInfo() ? '<span class="pill hot">獸潮</span>' : '') + '</div>';
     h += '<button class="btn" style="position:absolute;right:6px;top:6px;font-weight:700" data-a="toMap" data-testid="btn-leave">離開・地圖</button>';
     h += rumorChips(S);
     G.wildPoints(S.loc).forEach((p) => {
@@ -683,7 +686,7 @@
     const DG = D.DUNGEONS[S.loc]; const st = S.dungeon;
     const cleared = st.clearedDay === G.dayOf(S.t);
     let h = '<div class="dgscene' + scn('dg_' + S.loc) + '" data-testid="dungeon">';
-    h += '<div class="stagehead"><span class="pill">' + D.NODES[S.loc].name + '</span><span class="pill' + (DG.risk === '極高' ? ' hot' : '') + '">險 ' + DG.risk + '</span>' + (DG.mist ? '<span class="pill hot">血霧：每層侵蝕 +' + DG.mist + '</span>' : '') + '</div>';
+    h += '<div class="stagehead"><span class="pill">' + D.NODES[S.loc].name + '</span><span class="pill' + riskCls(DG.risk) + '" data-testid="head-risk">險 ' + DG.risk + '</span>' + (DG.mist ? '<span class="pill hot">血霧：每層侵蝕 +' + DG.mist + '</span>' : '') + '</div>';
     h += rumorChips(S);
     h += '<div class="dgdesc">' + DG.scene + '</div>';
     h += '<div class="floors">';
@@ -906,6 +909,25 @@
     el.appendChild(f);
   }
   function pulse(el, cls) { if (!el) return; el.classList.remove(cls); void el.offsetWidth; el.classList.add(cls); }
+  // 全屏閃光預算（呈現層節流，不綁回合結構）：17:26 裁決＋FX-LIST X12——每秒 ≤ 3 次、相鄰間隔 ≥ 400ms（原為 350ms），超過則收。
+  // 只決定「這一下要不要亮」，不碰戰鬥規則層（傷害、行動佇列、命中判定都不經過這裡）；被收掉的那次只略過閃光，震動與數字照播。
+  // 日後行動條或其他非命中的全屏閃光要沿用時，共用同一個 flashBudget 即可（同一預算、同一計數）。
+  // gap 另加約一影格（17ms）餘裕：閃光在下一個繪製影格才真正開播，加餘裕後玩家實際看到的開播間隔仍 ≥ 400ms。
+  function makeFlashBudget(opt) {
+    const gap = opt.gap + (opt.frameSlack || 0), perSec = opt.perSec; let hist = [];
+    return function allow() {
+      const now = performance.now();
+      hist = hist.filter((t) => now - t < 1000);
+      if (hist.length && now - hist[hist.length - 1] < gap) return false;
+      if (hist.length >= perSec) return false;
+      hist.push(now); return true;
+    };
+  }
+  const flashBudget = makeFlashBudget({ gap: 400, perSec: 3, frameSlack: 17 });
+  function flashOnce(stage) {
+    if (!flashBudget()) return;
+    pulse(stage.querySelector('.cflash'), 'on');
+  }
   function setEhp(el, hp) { if (!el) return; const max = +el.getAttribute('data-max') || 1; const bar = el.querySelector('.ehp > i'); const num = el.querySelector('.ehpn'); if (bar) bar.style.width = (Math.max(0, hp / max) * 100).toFixed(1) + '%'; if (num) num.textContent = Math.max(0, hp) + '/' + max; }
   function setPhp(el, hp) { if (!el) return; const max = +el.getAttribute('data-max') || 1; const bar = el.querySelector('.php > i'); const num = el.querySelector('.phpn'); if (bar) bar.style.width = (Math.max(0, hp / max) * 100).toFixed(1) + '%'; if (num) num.textContent = Math.max(0, hp) + '/' + max; }
   function showFx(e) {
@@ -925,7 +947,7 @@
       case 'e_dot': pulse(en, 'hit'); setEhp(en, e.hp); floatOn(en, '−' + e.d, 'dot'); break;
       case 'e_act': pulse(en, 'lunge'); break;
       case 'e_hit': {
-        pulse(stage, e.heavy ? 'shake2' : 'shake'); pulse(stage.querySelector('.cflash'), 'on'); setPhp(plate, e.php); floatOn(plate, '−' + e.d, e.heavy ? 'crit bad' : 'dmg bad');
+        pulse(stage, e.heavy ? 'shake2' : 'shake'); flashOnce(stage); setPhp(plate, e.php); floatOn(plate, '−' + e.d, e.heavy ? 'crit bad' : 'dmg bad');
         if (IC.has('fx_claw')) { const s = document.createElement('i'); s.className = 'px fxc ic-fx_claw'; stage.appendChild(s); }
         break;
       }
