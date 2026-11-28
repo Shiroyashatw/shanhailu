@@ -1,0 +1,85 @@
+6c88bd50d6d1dba7a2fb736880ed366770c3fbf0
+# cmd: node docs/evidence/shots-shanhailu-check15b-1128/check15b.js
+      {"hhmm":"00:00","hours":2,"R":1,"meanW":1,"preview":0.6,"roll":0.6,"expect":0.6,"tier":"極高"}
+      {"hhmm":"00:30","hours":2,"R":1,"meanW":1,"preview":0.6,"roll":0.6,"expect":0.6,"tier":"極高"}
+      {"hhmm":"01:00","hours":2,"R":1,"meanW":1,"preview":0.6,"roll":0.6,"expect":0.6,"tier":"極高"}
+      {"hhmm":"01:30","hours":2,"R":1,"meanW":1,"preview":0.6,"roll":0.6,"expect":0.6,"tier":"極高"}
+      {"hhmm":"02:00","hours":2,"R":1,"meanW":1,"preview":0.6,"roll":0.6,"expect":0.6,"tier":"極高"}
+      {"hhmm":"02:30","hours":2,"R":1,"meanW":1,"preview":0.6,"roll":0.6,"expect":0.6,"tier":"極高"}
+      {"hhmm":"03:00","hours":2,"R":1,"meanW":1,"preview":0.6,"roll":0.6,"expect":0.6,"tier":"極高"}
+      {"hhmm":"03:30","hours":2,"R":1,"meanW":0.8125,"preview":0.54375,"roll":0.54375,"expect":0.54375,"tier":"高"}
+      {"hhmm":"04:00","hours":2,"R":1,"meanW":0.625,"preview":0.4875,"roll":0.4875,"expect":0.4875,"tier":"高"}
+      {"hhmm":"04:30","hours":2,"R":1,"meanW":0.4375,"preview":0.43124999999999997,"roll":0.43124999999999997,"expect":0.43124999999999997,"tier":"高"}
+      {"hhmm":"05:00","hours":2,"R":1,"meanW":0.25,"preview":0.375,"roll":0.375,"expect":0.375,"tier":"高"}
+      {"hhmm":"05:30","hours":2,"R":1,"meanW":0.25,"preview":0.375,"roll":0.375,"expect":0.375,"tier":"高"}
+      {"hhmm":"06:00","hours":2,"R":1,"meanW":0.25,"preview":0.375,"roll":0.375,"expect":0.375,"tier":"高"}
+      {"hhmm":"06:30","hours":2,"R":1,"meanW":0.1875,"preview":0.35625,"roll":0.35625,"expect":0.35625,"tier":"高"}
+      {"hhmm":"07:00","hours":2,"R":1,"meanW":0.125,"preview":0.33749999999999997,"roll":0.33749999999999997,"expect":0.33749999999999997,"tier":"中"}
+      {"hhmm":"07:30","hours":2,"R":1,"meanW":0.0625,"preview":0.31875,"roll":0.31875,"expect":0.31875,"tier":"中"}
+      {"hhmm":"08:00","hours":2,"R":1,"meanW":0,"preview":0.3,"roll":0.3,"expect":0.3,"tier":"中"}
+      {"hhmm":"08:30","hours":2,"R":1,"meanW":0,"preview":0.3,"roll":0.3,"expect":0.3,"tier":"中"}
+      {"hhmm":"09:00","hours":2,"R":1,"meanW":0,"preview":0.3,"roll":0.3,"expect":0.3,"tier":"中"}
+      {"hhmm":"09:30","hours":2,"R":1,"meanW":0,"preview":0.3,"roll":0.3,"expect":0.3,"tier":"中"}
+      {"hhmm":"10:00","hours":2,"R":1,"meanW":0,"preview":0.3,"roll":0.3,"expect":0.3,"tier":"中"}
+      {"hhmm":"10:30","hours":2,"R":1,"meanW":0,"preview":0.3,"roll":0.3,"expect":0.3,"tier":"中"}
+      {"hhmm":"11:00","hours":2,"R":1,"meanW":0,"preview":0.3,"roll":0.3,"expect":0.3,"tier":"中"}
+      {"hhmm":"11:30","hours":2,"R":1,"meanW":0,"preview":0.3,"roll":0.3,"expect":0.3,"tier":"中"}
+      {"hhmm":"12:00","hours":2,"R":1,"meanW":0,"preview":0.3,"roll":0.3,"expect":0.3,"tier":"中"}
+      {"hhmm":"12:30","hours":2,"R":1,"meanW":0,"preview":0.3,"roll":0.3,"expect":0.3,"tier":"中"}
+      {"hhmm":"13:00","hours":2,"R":1,"meanW":0,"preview":0.3,"roll":0.3,"expect":0.3,"tier":"中"}
+      {"hhmm":"13:30","hours":2,"R":1,"meanW":0,"preview":0.3,"roll":0.3,"expect":0.3,"tier":"中"}
+      {"hhmm":"14:00","hours":2,"R":1,"meanW":0,"preview":0.3,"roll":0.3,"expect":0.3,"tier":"中"}
+      {"hhmm":"14:30","hours":2,"R":1,"meanW":0,"preview":0.3,"roll":0.3,"expect":0.3,"tier":"中"}
+      {"hhmm":"15:00","hours":2,"R":1,"meanW":0,"preview":0.3,"roll":0.3,"expect":0.3,"tier":"中"}
+      {"hhmm":"15:30","hours":2,"R":1,"meanW":0.125,"preview":0.33749999999999997,"roll":0.33749999999999997,"expect":0.33749999999999997,"tier":"中"}
+      {"hhmm":"16:00","hours":2,"R":1,"meanW":0.25,"preview":0.375,"roll":0.375,"expect":0.375,"tier":"高"}
+      {"hhmm":"16:30","hours":2,"R":1,"meanW":0.375,"preview":0.4125,"roll":0.4125,"expect":0.4125,"tier":"高"}
+      {"hhmm":"17:00","hours":2,"R":1,"meanW":0.5,"preview":0.44999999999999996,"roll":0.44999999999999996,"expect":0.44999999999999996,"tier":"高"}
+      {"hhmm":"17:30","hours":2,"R":1,"meanW":0.5,"preview":0.44999999999999996,"roll":0.44999999999999996,"expect":0.44999999999999996,"tier":"高"}
+      {"hhmm":"18:00","hours":2,"R":1,"meanW":0.5,"preview":0.44999999999999996,"roll":0.44999999999999996,"expect":0.44999999999999996,"tier":"高"}
+      {"hhmm":"18:30","hours":2,"R":1,"meanW":0.625,"preview":0.4875,"roll":0.4875,"expect":0.4875,"tier":"高"}
+      {"hhmm":"19:00","hours":2,"R":1,"meanW":0.75,"preview":0.525,"roll":0.525,"expect":0.525,"tier":"高"}
+      {"hhmm":"19:30","hours":2,"R":1,"meanW":0.875,"preview":0.5625,"roll":0.5625,"expect":0.5625,"tier":"高"}
+      {"hhmm":"20:00","hours":2,"R":1,"meanW":1,"preview":0.6,"roll":0.6,"expect":0.6,"tier":"極高"}
+      {"hhmm":"20:30","hours":2,"R":1,"meanW":1,"preview":0.6,"roll":0.6,"expect":0.6,"tier":"極高"}
+      {"hhmm":"21:00","hours":2,"R":1,"meanW":1,"preview":0.6,"roll":0.6,"expect":0.6,"tier":"極高"}
+      {"hhmm":"21:30","hours":2,"R":1,"meanW":1,"preview":0.6,"roll":0.6,"expect":0.6,"tier":"極高"}
+      {"hhmm":"22:00","hours":2,"R":1,"meanW":1,"preview":0.6,"roll":0.6,"expect":0.6,"tier":"極高"}
+      {"hhmm":"22:30","hours":2,"R":1,"meanW":1,"preview":0.6,"roll":0.6,"expect":0.6,"tier":"極高"}
+      {"hhmm":"23:00","hours":2,"R":1,"meanW":1,"preview":0.6,"roll":0.6,"expect":0.6,"tier":"極高"}
+      {"hhmm":"23:30","hours":2,"R":1,"meanW":1,"preview":0.6,"roll":0.6,"expect":0.6,"tier":"極高"}
+PASS  [preview==roll] 24h×每 30 分（48 趟灰窯→青霧）：preview.risk 與 travel() 遇襲判定 risk 完全相等
+PASS  [preview==獨立重算] 48 趟皆等於 risk_base×(1+逐分鐘平均 w)×wxRisk×R（誤差 <1e-9）  — []
+PASS  [清晨出發 06:00] 0.375 高、preview==roll  — {"hhmm":"06:00","hours":2,"R":1,"meanW":0.25,"preview":0.375,"roll":0.375,"expect":0.375,"tier":"高"}
+PASS  [黃昏出發 17:00] 0.45 高、preview==roll  — {"hhmm":"17:00","hours":2,"R":1,"meanW":0.5,"preview":0.44999999999999996,"roll":0.44999999999999996,"expect":0.44999999999999996,"tier":"高"}
+PASS  [黃昏→黑夜 19:00] mean(w)=0.75 → 0.525、preview==roll  — {"hhmm":"19:00","hours":2,"R":1,"meanW":0.75,"preview":0.525,"roll":0.525,"expect":0.525,"tier":"高"}
+PASS  [黃昏→黑夜 19:30] mean(w)=0.875 → 0.5625、preview==roll  — {"hhmm":"19:30","hours":2,"R":1,"meanW":0.875,"preview":0.5625,"roll":0.5625,"expect":0.5625,"tier":"高"}
+PASS  [黑夜→清晨 04:00] mean(w)=0.625 → 0.4875（不再是出發當下 isNight×2=0.60）  — {"hhmm":"04:00","hours":2,"R":1,"meanW":0.625,"preview":0.4875,"roll":0.4875,"expect":0.4875,"tier":"高"}
+PASS  [白天→黃昏 16:00] mean(w)=0.25 → 0.375（不再是出發當下 isNight 白天 ×1=0.30）  — {"hhmm":"16:00","hours":2,"R":1,"meanW":0.25,"preview":0.375,"roll":0.375,"expect":0.375,"tier":"高"}
+PASS  [非 isNight×2] 黃昏 18:00 出發 roll=0.45（舊 isNight 判定會是 0.30）  — {"hhmm":"18:00","hours":2,"R":1,"meanW":0.5,"preview":0.44999999999999996,"roll":0.44999999999999996,"expect":0.44999999999999996,"tier":"高"}
+PASS  [preview==roll] 灰窯出發到所有可達已知地點 × 06/18/19/23 時：皆相等（48 趟）  — []
+PASS  [輕功] 委託單 questTier：腳力 25 與 0 完全相同（17 張）  — {"no":[["b_wolf","中"],["b_guyao","中"],["b_jiku","高"],["b_liekou","極高"],["q42","低"],["q44","高"],["q45","中"],["q46","中"],["q47","中"],["q48","低"],["q52","中"],["q53","高"],["q54","中"],["cq_leech","高"],["cq_col","中"],["cq_dlv","低"],["cq_des","中"]],"yes":[["b_wolf","中"],["b_guyao","中"],["b_jiku","高"],["b_liekou","極高"],["q42","低"],["q44","高"],["q45","中"],["q46","中"],["q47","中"],["q48","低"],["q52","中"],["q53","高"],["q54","中"],["cq_leech","高"],["cq_col","中"],["cq_dlv","低"],["cq_des","中"]]}
+PASS  [輕功] 委託單風險塊 questRisk().level（baseRouteTier 未匯出，經 questTier 間接驗；原始碼 baseRouteTier 不含 perk）：腳力 25 與 0 相同、perk 確實生效  — {"perk":true,"no":[["b_wolf","中"],["b_guyao","中"],["b_jiku","高"],["b_liekou","極高"],["q42","低"],["q44","高"],["q45","中"],["q46","中"],["q47","中"],["q48","低"],["q52","中"],["q53","高"],["q54","中"],["cq_leech","高"],["cq_col","中"],["cq_dlv","低"],["cq_des","中"]],"yes":[["b_wolf","中"],["b_guyao","中"],["b_jiku","高"],["b_liekou","極高"],["q42","低"],["q44","高"],["q45","中"],["q46","中"],["q47","中"],["q48","低"],["q52","中"],["q53","高"],["q54","中"],["cq_leech","高"],["cq_col","中"],["cq_dlv","低"],["cq_des","中"]]}
+PASS  [輕功] 時數不受腳力影響（同一趟 hours 相同）
+PASS  [輕功] 野徑路線 preview risk ＝ 無輕功 ×0.8（未封頂，45 趟）  — [["chakou",6,0.275,0.22000000000000003],["chakou",12,0.22,0.17600000000000002],["chakou",18,0.33,0.264],["chakou",19,0.33,0.264],["chakou",22,0.44,0.35200000000000004],["qingwu",6,0.375,0.30000000000000004],["qingwu",12,0.3,0.24],["qingwu",18,0.44999999999999996,0.36],["qingwu",19,0.525,0.42000000000000004],["qingwu",22,0.6,0.48],["guyao",6,0.33749999999999997,0.26999999999999996],["guyao",12,0.3,0.24],["guyao",18,0.525,0.42000000000000004],["guyao",19,0.5625,0.45],["guyao",22,0.6,0.48],["kugu",6,0.35000000000000003,0.28],["kugu",12,0.3,0.24],["kugu",18,0.49999999999999994,0.39999999999999997],["kugu",19,0.55,0.44000000000000006],["kugu",22,0.6,0.48],["chishi",6,0.35000000000000003,0.28],["chishi",12,0.3,0.24],["chishi",18,0.49999999999999994,0.39999999999999997],["chishi",19,0.55,0.44000000000000006],["chishi",22,0.6,0.48],["fuzhao",6,0.275,0.22000000000000003],["fuzhao",12,0.22,0.17600000000000002],["fuzhao",18,0.33,0.264],["fuzhao",19,0.385,0.30800000000000005],["fuzhao",22,0.44,0.35200000000000004],["jiku",6,0.35000000000000003,0.28],["jiku",12,0.3,0.24],["jiku",18,0.49999999999999994,0.39999999999999997],["jiku",19,0.55,0.44000000000000006],["jiku",22,0.6,0.48],["shigu",6,0.33749999999999997,0.26999999999999996],["shigu",12,0.3,0.24],["shigu",18,0.525,0.42000000000000004],["shigu",19,0.5625,0.45],["shigu",22,0.6,0.48],["liekou",6,0.33,0.264],["liekou",12,0.3,0.24],["liekou",18,0.54,0.43200000000000005],["liekou",19,0.57,0.45599999999999996],["liekou",22,0.6,0.48]]
+PASS  [輕功] 官道路線不打折（只限野徑，15 趟）  — [["yizhan",6,0.05,0.05],["yizhan",12,0.04,0.04],["yizhan",18,0.06,0.06],["yizhan",19,0.07,0.07],["yizhan",22,0.08,0.08],["duyin",6,0.045,0.045],["duyin",12,0.04,0.04],["duyin",18,0.07,0.07],["duyin",19,0.075,0.075],["duyin",22,0.08,0.08],["poxiao",6,0.04333333333333333,0.04333333333333333],["poxiao",12,0.04333333333333333,0.04333333333333333],["poxiao",18,0.07333333333333335,0.07333333333333335],["poxiao",19,0.07666666666666666,0.07666666666666666],["poxiao",22,0.08,0.08]]
+PASS  [輕功] 有／無輕功遇襲判定 roll 皆＝各自 preview
+PASS  [輕功] 範例 灰窯→青霧 白天：0.30 → 0.24  — {"id":"qingwu","h":12,"no":{"risk":0.3,"roll":0.3,"wild":true,"hours":2,"pace":1},"yes":{"risk":0.24,"roll":0.24,"wild":true,"hours":2,"pace":1}}
+PASS  [對照] 6:00 出城路險 0.375 高（R=1、晴、無獸潮；畫面同）  — {"risk":0.375,"tier":"高","R":1,"tide":false,"dom":"出城路險 高"}
+SHOT  c15b-03-city-brief-dawn.png
+PASS  [對照] 12:00 出城路險 0.300 中（R=1、晴、無獸潮；畫面同）  — {"risk":0.3,"tier":"中","R":1,"tide":false,"dom":"出城路險 中"}
+PASS  [對照] 18:00 出城路險 0.450 高（R=1、晴、無獸潮；畫面同）  — {"risk":0.45,"tier":"高","R":1,"tide":false,"dom":"出城路險 高"}
+PASS  [對照] 22:00 出城路險 0.600 極高（R=1、晴、無獸潮；畫面同）  — {"risk":0.6,"tier":"極高","R":1,"tide":false,"dom":"出城路險 極高"}
+PASS  [DEV-04 獸潮] 野徑 preview ×1.5（0.30→0.45）、briefDanger 同步 0.45、tideInfo 有值  — {"a":0.3,"b":0.44999999999999996,"bd":0.45,"ti":true,"fns":["regionTick","banditKilled","tideDelta","tideTarget"],"banditSrc":false}
+PASS  [DEV-04 劫匪] 夜行野徑可觸發「劫匪攔路」事件，應戰後入戰且敵人為 bandit  — {"i":11,"ev":"bandit","combat":true,"banditInCombat":true}
+PASS  [DEV-04] 委託板無剿匪單、畫面無「剿匪」鈕  — {"kinds":["kill","clear","clear","clear","collect","deliver","collect","kill","collect","collect","deliver","kill","kill","kill"]}
+SHOT  c15b-04-board-risk.png
+SHOT  c15b-05-town-walkers-citybrief.png
+PASS  [DEV-03] 城鎮畫面有路人與巡邏且 1.5 秒內有移動，城況簡報同屏  — {"p1":[["patrol",338,203],["patrol",487,212],["anon",666,248],["anon",487,211],["anon",557,290],["anon",837,254],["anon",719,108]],"p2":[["patrol",373,204],["patrol",488,243],["anon",685,231],["anon",488,246],["anon",557,318],["anon",877,256],["anon",715,140]]}
+PASS  [截圖] 地圖 6:00 出發條險級「高」＝travelPreview 高（0.375）  — {"risk":0.375,"tier":"高"}
+SHOT  c15b-01-map-preview-dawn.png
+PASS  [截圖] 地圖 18:00 出發條險級「高」＝travelPreview 高（0.44999999999999996）  — {"risk":0.44999999999999996,"tier":"高"}
+SHOT  c15b-02-map-preview-dusk.png
+PASS  無頁面錯誤  — []
+RESULT ALL PASS
+# exit: 0
