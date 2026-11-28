@@ -250,8 +250,10 @@ async function fresh(page, base, q) {
     // 一次 passTime 跨 ≥2 個日界：逐日補算，與逐日推進的結果完全一致（SPEC-01 §2）
     const multi = await page.evaluate(() => {
       const G = window.SHL; const pick = (S) => JSON.stringify({ towns: S.world.towns, region: S.world.region, tide: S.world.tide, next: S.world.next, hurt: S.world.hurt });
-      G.restart(777, 'drifter'); G._debug.passTime(64); const a = pick(G.state); const n1 = G.state.log.filter((l) => l.text.includes('新的一天')).length;
-      G.restart(777, 'drifter'); for (let i = 0; i < 8; i++) G._debug.passTime(8); const b = pick(G.state);
+      // DEV-TIME：passTime 改為逐切片結算，hp ≤ 0 時中止後續切片（SPEC-TIME 5.2 第 7 步）。原情境 64 小時不吃東西會在第 3 日
+      // 晚上餓死、不再有第 3 次日結；這裡只驗「跨多個日界的逐日補算」，所以兩邊都不扣飽食（food: 0），其餘不變。
+      G.restart(777, 'drifter'); G._debug.passTime(64, { food: 0 }); const a = pick(G.state); const n1 = G.state.log.filter((l) => l.text.includes('新的一天')).length;
+      G.restart(777, 'drifter'); for (let i = 0; i < 8; i++) G._debug.passTime(8, { food: 0 }); const b = pick(G.state);
       return { same: a === b, n1, day: G.dayOf(G.state.t), bday: G.state.world.towns.huiyao.brief.day };
     });
     check('一次 passTime 跨 3 個日界：逐日補算 3 次，結果與 8 小時 ×8 逐段推進完全一致', multi.same && multi.n1 === 3 && multi.bday === 4, multi);

@@ -464,6 +464,87 @@ window.SHL_DATA = (function () {
     PACE_CUTS: [1.00, 0.67, 0.50], PACE_NAMES: ['輕快', '平常', '沉重', '蹣跚'],
     // SPEC-01 4.9 長期委託軟期限：報酬 <100 兩 30 日、≥100 兩 60 日；聲望門檻（不跌破）
     LONGQUEST: { cut: 100, short: 30, long: 60, repFloors: [20, 10, 0] },
+    // ===== DEV-TIME（SPEC-TIME v0.5 第 2–8 節）：以下常數全部照規格初值，本包不調 =====
+    // 2.1 曆法：S.t 為自開局起算的整數分鐘
+    DAY_MIN: 1440, DAY_START: 480, SEASON_DAYS: 30, YEAR_DAYS: 120,
+    // 2.2 四時段（半開區間、寫死、四季不變）
+    PHASES: [{ id: 'dawn', from: 300, to: 480 }, { id: 'day', from: 480, to: 1020 }, { id: 'dusk', from: 1020, to: 1200 }, { id: 'night', from: 1200, to: 300 }],
+    // 3.2 天候：天候日 05:00 起算；權重依 晴→雨→霧→雪 累加（每列和 100）；霧只到 10:00
+    WX_ORDER: ['clear', 'rain', 'fog', 'snow'],
+    WX_WEIGHT: [[50, 35, 15, 0], [65, 30, 5, 0], [55, 20, 25, 0], [45, 0, 15, 40]],
+    WX_DAY_START: 300, FOG_END: 600,
+    // 3.1 雪的速度倍率（進入腳程 M；官道懲罰為野外的一半）
+    WX_SPEED: { snow: { wild: 0.85, road: 0.925 } },
+    // 4 季節：寒意基準 S、糧耗倍率；換季過渡為每季第 26–30 日
+    SEASON_COLD: [0, -2, 1, 3], FOOD_MULT: [1, 1, 1, 1.25], EVE_DAY: 26,
+    // 6.4 寒意：時段 P、天候 W、緩解（每小時）；禦寒點數上限 4（裝備數值歸 SPEC-SEASON）
+    COLD: { PHASE: { dawn: 1, day: -1, dusk: 0, night: 2 }, WX: { clear: 0, rain: 1, fog: 0, snow: 2 },
+      RELIEF: { town: -3, indoor: -6, camp: { clear: -4, fog: -4, rain: -2, snow: -2 } }, WARM_MAX: 4 },
+    // 6.4 營火燃燒時數（以點火時天候為準）
+    FIRE_DUR: { clear: 8, fog: 8, rain: 4, snow: 4 },
+    // 6.5 生命結算：自然回復、三項扣血（每小時）與合計上限
+    REGEN: 1, DRAIN: { food: 3, fat: 2, cold90: 1, cold100: 3, cap: 6 },
+    // 7.1 露宿遇險：0.12 + (0.25 − 0.12) × mean(w)
+    CAMP_RISK: { lo: 0.12, hi: 0.25 },
+    // 7.2 等待（waitUntil）：最短 30 分、最長 12 小時
+    WAIT: { min: 30, max: 720 },
+    // 8.1 營業時間（分鐘，[開, 關)）；表上沒有的 type 視為 24 小時（inn／medic／shrine／tower 等）；建築 hours 欄位可覆寫
+    HOURS: { market: [420, 1200], apoth: [420, 1200], smith: [420, 1200], tea: [300, 1200], board: [480, 1020], drill: [300, 1200] },
+    SHOP_WARN: 30,
+    // 6.2／Q3：熱湯 +30 → +35（價格不變）；10.2：熱湯寒意 −15
+    SOUP: { food: 35, cold: -15 },
+  };
+  // SPEC-TIME 6.1：三條生存條的警示階段（UI 與日誌共用同一份）。
+  // food 由好到壞：值 ≥ from（open:true 為 > from）即落在該階；fat／cold 由好到壞：值 < to 即落在該階。
+  // fx 只列寒意的新效果（speed 速度倍率、hit 命中加減、noRegen 停止自然回復、drain 每小時扣血、fatMult 疲累累積倍率）；
+  // 飽食與疲累的效果沿用 game.js 現況寫法（數值相同），這裡只列出供對照。
+  // 假設：凍斃（100）沿用凍僵的速度與命中懲罰（規格表只寫扣血；取較保守者，見 DEV-TIME 回報）。
+  const SURVIVAL_STAGES = {
+    food: [
+      { id: 'full', name: '充足', from: 30, color: '' },
+      { id: 'hungry', name: '餓了', from: 20, color: 'yellow', fx: { noRegen: true } },
+      { id: 'starving', name: '飢餓', from: 0, open: true, color: 'orange', fx: { noRegen: true, hit: -0.05 } },
+      { id: 'out', name: '斷糧', from: -Infinity, color: 'red', fx: { noRegen: true, hit: -0.05, drain: 3 } },
+    ],
+    fat: [
+      { id: 'awake', name: '清醒', to: 60, color: '' },
+      { id: 'tired', name: '累了', to: 80, color: 'yellow', fx: {} },
+      { id: 'weary', name: '疲憊', to: 100, color: 'orange', fx: { speed: 0.85, hit: -0.15 } },
+      { id: 'spent', name: '力竭', to: Infinity, color: 'red', fx: { speed: 0.85, hit: -0.15, drain: 2 } },
+    ],
+    cold: [
+      { id: 'warm', name: '暖和', to: 30, color: '', fx: {} },
+      { id: 'chilly', name: '發冷', to: 60, color: 'yellow', fx: { fatMult: 1.2 } },
+      { id: 'shiver', name: '寒顫', to: 90, color: 'orange', fx: { fatMult: 1.2, speed: 0.9, hit: -0.10, noRegen: true } },
+      { id: 'numb', name: '凍僵', to: 100, color: 'red', fx: { fatMult: 1.2, speed: 0.8, hit: -0.15, noRegen: true, drain: 1 } },
+      { id: 'frozen', name: '凍斃', to: Infinity, color: 'red', blink: true, fx: { fatMult: 1.2, speed: 0.8, hit: -0.15, noRegen: true, drain: 3 } },
+    ],
+  };
+  // SPEC-TIME 9.3：曆法事件資料格式（十二神祭、地方祭、獸潮共用）。十二神祭只留 4 筆空殼：
+  // 神位已填；dayOfSeason／startMin／durationH 為 null（場次歸 SPEC-SEASON），所以目前不會觸發。
+  const CAL_EVENTS = [
+    { id: 'fest_12_spring', kind: 'festival', season: 0, dayOfSeason: null, startMin: null, durationH: null, name: '十二神祭・春', gods: ['yin', 'mao', 'chen'], hooks: [] },
+    { id: 'fest_12_summer', kind: 'festival', season: 1, dayOfSeason: null, startMin: null, durationH: null, name: '十二神祭・夏', gods: ['si', 'wu', 'wei'], hooks: [] },
+    { id: 'fest_12_autumn', kind: 'festival', season: 2, dayOfSeason: null, startMin: null, durationH: null, name: '十二神祭・秋', gods: ['shen', 'you', 'xu'], hooks: [] },
+    { id: 'fest_12_winter', kind: 'festival', season: 3, dayOfSeason: null, startMin: null, durationH: null, name: '十二神祭・冬', gods: ['hai', 'zi', 'chou'], hooks: [] },
+  ];
+  // SPEC-TIME 第 13 節：時間骨幹的顯示字串全部集中在這裡（暫定名，待 LOC）。全程不用「時辰」。
+  const TIME_STR = {
+    phase: { dawn: '清晨', day: '白天', dusk: '黃昏', night: '黑夜' },
+    weather: { clear: '晴', rain: '雨', fog: '霧', snow: '雪' },
+    stat: { food: '飽食', fat: '疲累', cold: '寒意' },
+    cause: { cold: '凍死荒野', food: '餓死荒野', fat: '力竭倒地' },
+    stamp: '{date}・第 {day} 日・{phase} {clock}',
+    clockTip: '{stamp}・天候 {weather}',
+    stageUp: '{stat}到了「{stage}」。', stageDown: '{stat}回到「{stage}」。',
+    closed: '打烊', open: '開門', closedTag: '打烊・{time} 開門', closedLine: '{name}打烊了，{time} 開門。', soon: '{names}快打烊了。',
+    fireOut: '營火熄了。',
+    seasonEve: '再過五天就入{next}了。', winterEve: '再過五天就入冬了，該囤些乾糧、想想怎麼禦寒。',
+    wildCap: '{phase}・{weather}', dangerUp: '，遇險上升。',
+    enRoute: '{from}往{to}的途中',
+    deathWarn: '照這樣下去，約 {h} 小時內會死。再按一次才動身。',
+    coldHint: '寒意：野外天冷、夜裡更冷；進城、進屋、守著營火會退',
+    soupSub: '{cost} 兩・飽食 +{food}・寒意 {cold}',
   };
   const SLEEP = { wakeMin: 8 * 60, minH: 6, maxH: 13 };
   // ===== 兩鎮循環（SPEC-01 v0.4 §3、§4；單一來源，DEV-02） =====
@@ -677,5 +758,6 @@ window.SHL_DATA = (function () {
   const SLOT_NAMES = { main: '主手', off: '副手', head: '頭盔', chest: '胸甲', gloves: '手套', boots: '靴子', amulet: '護身符', ring1: '左戒', ring2: '右戒', belt: '腰帶', bag: '背包', cart: '馬車' };
   const SLOT_GLYPH = { main: '刃', off: '盾', head: '冠', chest: '甲', gloves: '手', boots: '靴', amulet: '符', ring1: '戒', ring2: '戒', belt: '帶', bag: '囊', cart: '車' };
 
-  return { ITEMS, SKILLS, TECHS, BASES, AFFIXES, UNIQUES, LEGENDS, RARITY, ENEMIES, NODES, EDGES, REGION_LABELS, WILDS, DUNGEONS, PRICES, PLACES, BUILDINGS, ITEM_CLASS, NPCS, FACTIONS, EXPLORE, CODEX_CATS, BOUNTIES, QUEST_GEN, RUMOR, TIDE, SLEEP, TIME, WORLD, TEXT, RECIPES, EVENTS, ATTRS, PROFS, PROF_GROUPS, WTYPE_NAMES, ORIGINS, NAME_DEFAULT, NAME_TAKEN, NAME_POOL, SEASONS, YEAR_NAMES, EQ_SLOTS, SLOT_NAMES, SLOT_GLYPH };
+  return { ITEMS, SKILLS, TECHS, BASES, AFFIXES, UNIQUES, LEGENDS, RARITY, ENEMIES, NODES, EDGES, REGION_LABELS, WILDS, DUNGEONS, PRICES, PLACES, BUILDINGS, ITEM_CLASS, NPCS, FACTIONS, EXPLORE, CODEX_CATS, BOUNTIES, QUEST_GEN, RUMOR, TIDE, SLEEP, TIME, WORLD, TEXT, RECIPES, EVENTS, ATTRS, PROFS, PROF_GROUPS, WTYPE_NAMES, ORIGINS, NAME_DEFAULT, NAME_TAKEN, NAME_POOL, SEASONS, YEAR_NAMES, EQ_SLOTS, SLOT_NAMES, SLOT_GLYPH,
+    SURVIVAL_STAGES, CAL_EVENTS, TIME_STR };
 })();

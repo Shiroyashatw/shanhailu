@@ -101,7 +101,8 @@ async function audit(page, label) {
 const DIZHI = /[子丑寅卯辰巳午未申酉戌亥]時|時辰|更天|[0-9]+更/;
 async function check24h(page, label) {
   const { clock, body } = await page.evaluate(() => ({ clock: (document.querySelector('[data-testid=clock]') || {}).textContent || '', body: document.body.innerText }));
-  check('[' + label + '] 24 小時制時間', /^第 \d+ 日 ([01]\d|2[0-3]):[0-5]\d$/.test(clock), clock);
+  // DEV-TIME（SPEC-TIME 2.3 fmtStamp、AC 16）：右欄時間改為「第 N 日・時段 HH:MM 天候」，時段名為主、鐘點仍是 24 小時制
+  check('[' + label + '] 24 小時制時間', /^第 \d+ 日・(清晨|白天|黃昏|黑夜) ([01]\d|2[0-3]):[0-5]\d (晴|雨|霧|雪)$/.test(clock), clock);
   check('[' + label + '] 無十二地支時辰', !DIZHI.test(body), (body.match(DIZHI) || [''])[0]);
 }
 

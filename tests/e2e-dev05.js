@@ -471,6 +471,8 @@ function sameCity(dom, want) {
   // 接單後險級固定
   const fixed = await page.evaluate(() => {
     const G = window.SHL, S = G.state, W = S.world; S.scene = 'town'; S.loc = 'huiyao'; G.enterHere(); G.setTab('hy_board');
+    // DEV-TIME：委託板（board）只在 08:00–17:00 營業（SPEC-TIME 8.1）；上一段把時間設在 22:00，這裡改回當日 12:00 再揭榜
+    S.t = Math.floor(S.t / 1440) * 1440 + 12 * 60;
     const q = { id: 'tq_fix', town: 'huiyao', kind: 'kill', enemy: 'deserter', need: 1, g: '兵', ic: 'deserter', title: '獵殺逃兵 ×1', reward: 30, due: G.dayOf(S.t) + 4, fixed: false, prog: 0, status: 'open' };
     S.quests.push(q); G.questAct('tq_fix');
     const t0 = q.tier; W.region.B = 100; W.towns.huiyao.O = 0; W.towns.duyin.O = 0; const now = G.questTier(q); const shown = G.questRisk(q).level;

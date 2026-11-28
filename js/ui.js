@@ -226,17 +226,24 @@
     const td = G.tideInfo();
     h += '<div class="pill date' + (td ? ' hot' : '') + '" style="left:162px;top:35px;width:50px" data-testid="date"' + (td ? ' title="獸潮・' + D.NODES[td.town].name + '，剩 ' + td.left + ' 天"' : '') + '>' + (td ? '獸潮' : G.fmtDate(S.t)) + '</div>';
     h += '<div class="silver">' + ico('ui_coin', '銀', 16) + '<span data-testid="silver">' + S.silver + '</span></div>';
-    h += '<div class="pill" style="left:122px;top:57px;width:90px;font-weight:700" data-testid="clock">' + G.fmtTime(S.t) + '</div>';
-    const vit = (ic, gl, v, max, y, crit, tid, cls, marks) => '<div class="vit ' + cls + (crit ? ' crit' : '') + '" style="top:' + y + 'px" data-testid="' + tid + '">' + ico(ic, gl, 16) + '<div class="bar"><i style="width:' + Math.max(0, Math.min(100, (v / max) * 100)).toFixed(1) + '%"></i>' + (marks || '') + '</div><span class="num">' + Math.max(0, Math.round(v)) + '/' + max + '</span></div>';
+    // SPEC-TIME 2.3 fmtStamp／AC 16：時段名為主（粗體）、日數與鐘點為次級；年號與季在上方日期框。全程不用「時辰」
+    const TS = D.TIME_STR, wx = G.weatherAt(S.t), stamp = G.fmtStamp(S.t);
+    h += '<div class="pill clock" style="left:76px;top:57px;width:136px" data-testid="clock" title="' + TS.clockTip.replace('{stamp}', stamp).replace('{weather}', TS.weather[wx]) + '"><span class="ckd">第 ' + G.dayOf(S.t) + ' 日・</span><b class="ckp" data-testid="phase">' + G.fmtPhase(S.t) + '</b><span class="ckm"> ' + G.fmtClock(S.t) + '</span><span class="ckw wx-' + wx + '" data-testid="weather"> ' + TS.weather[wx] + '</span></div>';
+    const vit = (ic, gl, v, max, y, crit, tid, cls, marks, tip) => '<div class="vit ' + cls + (crit ? ' crit' : '') + '" style="top:' + y + 'px" data-testid="' + tid + '"' + (tip ? ' title="' + tip + '"' : '') + '>' + ico(ic, gl, 16) + '<div class="bar"><i style="width:' + Math.max(0, Math.min(100, (v / max) * 100)).toFixed(1) + '%"></i>' + (marks || '') + '</div><span class="num">' + Math.max(0, Math.round(v)) + '/' + max + '</span></div>';
+    // 寒意條（Q2 甲）：只在寒意 > 0 或秋冬顯示；顯示時四條改 17px 間距，狀態列下移 5px，仍在分隔線之上
+    const cold = S.cold || 0, showCold = cold > 0 || G.seasonOf(S.t) >= 2, gap = showCold ? 17 : 20;
     h += vit('ui_hp', '命', S.hp, mh, 78, S.hp / mh <= 0.3, 'hp', 'v-hp');
-    h += vit('ui_food', '食', S.food, 100, 98, S.food <= 20, 'food', 'v-food', '<b style="left:20%"></b>');
-    h += vit('ui_fat', '疲', S.fat, 100, 118, S.fat >= 80, 'fat', 'v-fat', '<b style="left:80%"></b>');
+    h += vit('ui_food', '食', S.food, 100, 78 + gap, S.food <= 20, 'food', 'v-food', '<b style="left:20%"></b>');
+    h += vit('ui_fat', '疲', S.fat, 100, 78 + gap * 2, S.fat >= 80, 'fat', 'v-fat', '<b style="left:80%"></b>');
+    if (showCold) h += vit('ui_cold', '寒', cold, 100, 78 + gap * 3, cold >= 60, 'cold', 'v-cold', '<b style="left:30%"></b><b style="left:60%"></b><b style="left:90%"></b>', TS.coldHint + '（' + G.stageOf('cold', cold).name + '）');
     const band = G.loadBand(); const c = S.combat;
+    const cst = G.stageOf('cold', cold);
     const sts = [
       ['st_bleed', '血', c && c.bleed > 0, '流血'], ['st_poison', '毒', c && c.poison > 0, '中毒'], ['', '餓', S.food < 20, '飢餓：回復停滯'], ['', '倦', S.fat >= 80, '力竭：命中與腳程下降'],
       ['', '重', band.id === 'heavy' || band.id === 'over', '超載'], ['st_corrupt', '蝕', S.corrupt > 0, '侵蝕 ' + S.corrupt + '：生命上限 −' + S.corrupt],
+      ['', '寒', cold >= 30, TS.stat.cold + '：' + cst.name, ' wc-' + cst.color + (cst.blink ? ' blink' : '')],
     ].filter((x) => x[2]);
-    h += '<div class="strow" data-testid="statuses">' + sts.map((x) => '<span class="stc" title="' + x[3] + '">' + ico(x[0], x[1], 16) + '</span>').join('') + '<span class="stt">護甲 ' + G.armor() + '・傷 ' + G.weaponDmg().join('–') + '</span></div>';
+    h += '<div class="strow" style="top:' + (showCold ? 146 : 141) + 'px;height:' + (showCold ? 20 : 22) + 'px" data-testid="statuses">' + sts.map((x) => '<span class="stc' + (x[4] || '') + '" title="' + x[3] + '"' + (x[1] === '寒' ? ' data-testid="st-cold"' : '') + '>' + ico(x[0], x[1], 16) + '</span>').join('') + '<span class="stt">護甲 ' + G.armor() + '・傷 ' + G.weaponDmg().join('–') + '</span></div>';
     h += '<div class="sep" style="top:168px"></div>';
     // 7 素質
     h += '<div class="attrs" data-testid="attrs">';
@@ -520,7 +527,9 @@
     P.buildings.forEach((bid) => {
       const B = D.BUILDINGS[bid]; const b = boxes[bid];
       const mark = B.type === 'board' && G.questsHere().some((q) => G.questReady(q)) ? '<i class="bmark">!</i>' : '';
-      h += '<div class="bld" data-a="tab" data-v="' + bid + '" data-testid="bld-' + bid + '" style="' + pos(b[0], b[1], b[2], b[3]) + '" title="' + B.name + '：' + D.NPCS[B.npc].name + '"><span>' + B.name + '<em>' + TYPE_HINT[B.type] + '</em>' + mark + '</span></div>';
+      // 打烊的店在招牌上把類別字換成「打烊」（SPEC-TIME 8.1；字串在 TIME_STR）
+      const shut = !G.isOpen(bid, S.t);
+      h += '<div class="bld" data-a="tab" data-v="' + bid + '" data-testid="bld-' + bid + '" style="' + pos(b[0], b[1], b[2], b[3]) + '" title="' + B.name + '：' + D.NPCS[B.npc].name + (shut ? '・' + G.closedTag(bid) : '') + '"><span>' + B.name + (shut ? '<em class="shut" data-testid="shut-' + bid + '">' + D.TIME_STR.closed + '</em>' : '<em>' + TYPE_HINT[B.type] + '</em>') + mark + '</span></div>';
     });
     const g = boxes.gate;
     h += '<div class="bld gate" data-a="toMap" data-testid="bld-gate" style="' + pos(g[0], g[1], g[2], g[3]) + '"><span>' + (N.hidden ? '小徑' : S.loc === 'duyin' ? '關門' : '出口') + '</span></div>';
@@ -592,10 +601,12 @@
   function sceneBuilding(S) {
     const B = G.bld(); const NP = D.NPCS[B.npc]; const F = B.faction ? D.FACTIONS[B.faction] : null;
     let h = '<div class="bhead" data-testid="town"><div class="bface">' + npcFace(B.npc, 96) + '</div>';
-    h += '<div class="btitle"><b data-testid="bld-name">' + B.name + '</b><span>' + NP.name + (NP.title ? '・' + NP.title : '') + '</span>' + (F ? '<span class="bfac">' + ico(F.ic, F.g, 16) + F.name + ' ' + Math.floor(G.repOf(B.faction)) + '</span>' : '') + '</div>';
+    // SPEC-TIME 8.1／B7：打烊只停用服務、不踢人；標頭顯示「打烊・HH:MM 開門」，對話與回到街上照常
+    const shut = !G.isOpen(S.townTab, S.t);
+    h += '<div class="btitle"><b data-testid="bld-name">' + B.name + '</b><span>' + NP.name + (NP.title ? '・' + NP.title : '') + '</span>' + (F ? '<span class="bfac">' + ico(F.ic, F.g, 16) + F.name + ' ' + Math.floor(G.repOf(B.faction)) + '</span>' : '') + (shut ? '<span class="bshut" data-testid="shop-shut">' + G.closedTag(S.townTab) + '</span>' : '') + '</div>';
     h += '<div class="bsay" data-testid="say">' + esc((S.say && S.say.text) || '……') + '</div>';
     h += '<div class="bbtns"><button class="btn" data-a="talk" data-v="' + B.npc + '" data-testid="btn-talk">閒談</button><button class="btn dark" data-a="tab" data-v="" data-testid="btn-street">回到街上</button></div></div>';
-    h += '<div class="tpanel">';
+    h += '<div class="tpanel' + (shut ? ' shut' : '') + '">';
     const c = G.innCost();
     const svc = (k, g, name, sub, tid, dis) => '<div class="ibox' + (dis ? ' dis' : '') + '" data-a="svc" data-v="' + k + '" data-testid="' + (tid || 'svc-' + k.split(':')[0]) + '"><span class="ic">' + g + '</span><span><b>' + name + '</b>' + sub + '</span></div>';
     switch (B.type) {
@@ -603,7 +614,7 @@
       case 'apoth': h += tabShop(S, B, 0) + '<div class="ttl" style="left:0;top:280px">藥爐（煉藥 ' + G.profLv('yao') + '）</div>' + recipeCards(S, 0, 298); break;
       case 'inn': {
         const free = S.freeRumor[S.loc] !== G.dayOf(S.t);
-        h += '<div class="irow" style="left:0;top:8px">' + svc('rest', '宿', '歇一夜', c.rest + ' 兩・' + sleepTxt() + '・侵蝕 −10', 'inn-rest') + svc('soup', '食', '熱湯', c.soup + ' 兩・飽食 +30', 'inn-soup') + '<div class="ibox" data-a="hearRumor" data-testid="inn-rumor"><span class="ic">聞</span><span><b>打聽傳聞</b>' + (free ? '今日第一則免費' : '請酒 ' + c.rumor + ' 兩') + '</span></div></div>';
+        h += '<div class="irow" style="left:0;top:8px">' + svc('rest', '宿', '歇一夜', c.rest + ' 兩・' + sleepTxt() + '・侵蝕 −10', 'inn-rest') + svc('soup', '食', '熱湯', tx(D.TIME_STR.soupSub, { cost: c.soup, food: D.TIME.SOUP.food, cold: '\u2212' + -D.TIME.SOUP.cold }), 'inn-soup') + '<div class="ibox" data-a="hearRumor" data-testid="inn-rumor"><span class="ic">聞</span><span><b>打聽傳聞</b>' + (free ? '今日第一則免費' : '請酒 ' + c.rumor + ' 兩') + '</span></div></div>';
         h += rumorList(S, 84);
         break;
       }
@@ -801,7 +812,9 @@
       h += '<div class="gptl' + (done ? ' done' : '') + '" style="left:' + (p.x - 34) + 'px;top:' + (p.y + 26) + 'px;width:68px;justify-content:center">' + p.label + ' ' + n + '</div>';
     });
     h += '<div class="gpt fire' + (S.fire ? ' lit' : '') + '" data-a="camp" style="left:' + (W.fire.x - 22) + 'px;top:' + (W.fire.y - 22) + 'px">' + ico('ui_fire', '', 32) + '</div><div class="gptl" style="left:' + (W.fire.x - 34) + 'px;top:' + (W.fire.y + 26) + 'px;width:68px;justify-content:center">' + (S.fire ? '營火・燃' : '營火位') + '</div>';
-    h += '<div class="scap">' + W.scene + (G.isNight(S.t) ? '　夜裡，遇險上升。' : '') + '</div>';
+    // SPEC-TIME 10.2：野外說明改為「時段・天候」，夜暗度或天候讓遇險倍率 > 1 時加「遇險上升」（字串在 TIME_STR）
+    const TS = D.TIME_STR, wx = G.weatherAt(S.t);
+    h += '<div class="scap" data-testid="wild-cap">' + W.scene + '　' + tx(TS.wildCap, { phase: G.fmtPhase(S.t), weather: TS.weather[wx] }) + (G.dangerMult(S.t) > 1 ? TS.dangerUp : '。') + '</div>';
     h += '</div>';
     const herbF = Math.round(G.gatherFat('herb')), oreF = Math.round(G.gatherFat('ore'));
     h += '<div class="gbtns">';
