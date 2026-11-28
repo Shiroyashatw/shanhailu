@@ -113,7 +113,7 @@ window.SHL_DATA = (function () {
     armor: { t: '+{v} 護甲', r: [2, 6] },
     bleedres: { t: '+{v}% 流血抗性', r: [8, 20] },
     fatred: { t: '疲累累積 −{v}%', r: [4, 8] },
-    spd: { t: '+{v}% 行動速度', r: [3, 8] },
+    spd: { t: '+{v}% 腳程', r: [3, 8] },
     cap: { t: '+{v} 負重上限', r: [4, 10] },
     gather: { t: '+{v}% 採集收成', r: [10, 25] },
     skin: { t: '+{v}% 剝皮收成', r: [10, 25] },
@@ -242,7 +242,7 @@ window.SHL_DATA = (function () {
   };
 
   WILDS.fuzhao = {
-    risk: '中高', scene: '退水的沼地，黑水底下全是骨頭。',
+    risk: '高', scene: '退水的沼地，黑水底下全是骨頭。',
     points: [
       { id: 'h1', kind: 'herb', item: 'vine_du', max: 2, x: 150, y: 230, label: '毒藤' },
       { id: 'm1', kind: 'ore', item: 'bog_iron', max: 2, x: 330, y: 270, label: '沼鐵' },
@@ -270,7 +270,7 @@ window.SHL_DATA = (function () {
       boss: { scroll: 'scroll_beng', loot: { blue: 0.6, rare: 0.4 }, silver: [20, 30] },
     },
     jiku: {
-      risk: '中高', scene: '沉在淵底的古祭窟，潮氣與血腥味混雜。',
+      risk: '高', scene: '沉在淵底的古祭窟，潮氣與血腥味混雜。',
       floors: [['serpent'], ['serpent', 'corpse'], ['shaman']],
       floorNames: ['一層', '二層', '祭壇'],
       loot: { blue: 0.5, rare: 0.4, legend: 0.1 }, silver: [16, 30],
@@ -364,7 +364,7 @@ window.SHL_DATA = (function () {
     np_zhang: { name: '駝背張', title: '茶攤老闆' }, np_ma: { name: '馬六', title: '天星行商' },
     np_bone: { name: '撿骨師', title: '', codex: ['c_bonepicker'] }, np_chiya: { name: '赤鴉', title: '鴉衛', codex: ['c_crow', 'c_chiya'] },
     np_aman: { name: '阿滿', title: '乞兒', fig: 'fig_child', act: 'rumor' },
-    np_story: { name: '說書人', title: '', fig: 'fig_elder', codex: ['c_geo', 'c_gods'] },
+    np_story: { name: '灰窯說書人', title: '', fig: 'fig_elder', codex: ['c_geo', 'c_gods'] },
     np_miner: { name: '老礦工', title: '', fig: 'fig_man', codex: ['c_fall'] },
     np_refugee: { name: '難民婦人', title: '', fig: 'fig_woman', quest: 'b_refugee', codex: ['c_kiln'] },
     np_wounded: { name: '傷兵', title: '破曉軍團', fig: 'fig_soldier', codex: ['c_army'] },
@@ -453,6 +453,8 @@ window.SHL_DATA = (function () {
   // ---------- 世界事件：獸潮 ----------
   const TIDE = { towns: ['huiyao', 'duyin'], first: [3, 4], gap: [5, 7], days: 2, need: 4, reward: 50, potMult: 1.5, hurtDays: 2 };
   // 歇息起床（SPEC-TIME v0.4 §11 B1）：起床＝min(max(現在+minH, 下一個 wakeMin), 現在+maxH)；maxH 13 為建議值、未經模擬（Q-T7 乙）
+  // SPEC-TIME 7.1b 險級分檔：路程險級門檻（半開區間；比較前 risk 先封頂 0.85、再 half-up 取三位）→ 低／中／高／極高
+  const TIME = { RISK_CUTS: [0.15, 0.35, 0.60], RISK_TIERS: ['低', '中', '高', '極高'] };
   const SLEEP = { wakeMin: 8 * 60, minH: 6, maxH: 13 };
   // ===== 兩鎮循環（SPEC-01 v0.4 §3、§4；單一來源，DEV-02） =====
   // 標記沿用規格：〔LW〕living-world、〔新〕規格補值、〔既有〕現況。數字全部照 SPEC-01 v0.4，未經本包調整。
@@ -544,7 +546,7 @@ window.SHL_DATA = (function () {
     { id: 'peng', grp: 'gong', attr: 'wu', name: '烹食', how: '烤乾糧', perks: { 25: '30% 一肉兩糧' } },
     { id: 'jian', grp: 'gong', attr: 'wu', name: '鑑物', how: '鑑定裝備', perks: { 25: '可鑑稀有', 50: '可鑑傳奇' } },
     { id: 'jiao', grp: 'xing', attr: 'shen', name: '腳力', how: '趕路', perks: { 25: '野徑遇險 −20%' } },
-    { id: 'fuz', grp: 'xing', attr: 'ti', name: '負重', how: '背重趕路', perks: { 25: '常態重負的速度懲罰減半', 50: '超載懲罰減輕' } },
+    { id: 'fuz', grp: 'xing', attr: 'ti', name: '負重', how: '背重趕路', perks: { 25: '常態重負的腳程懲罰減半', 50: '超載懲罰減輕' } },
     { id: 'yi', grp: 'xing', attr: 'kou', name: '議價', how: '買賣', perks: { 25: '委託報酬 +10%' } },
     { id: 'tan', grp: 'xing', attr: 'kou', name: '探聞', how: '打聽傳聞', perks: { 25: '聽傳聞時多一句判斷', 50: '打聽半價' } },
     { id: 'shuo', grp: 'xing', attr: 'kou', name: '說服', how: '事件中開口', perks: { 25: '劫匪買路錢減半' } },
@@ -552,14 +554,30 @@ window.SHL_DATA = (function () {
   ];
   const WTYPE_NAMES = { dao: '刀劍', qiang: '長兵', fu: '斧錘', gong: '弓弩' };
 
-  // ---------- 出身 ----------
+  // ---------- 身分（DEV-01 開局平民化：出身只剩「平民」一張卡，沿用舊「流民」數值） ----------
+  // 假設：內部 id 保留 'drifter'（存檔欄位 S.origin、頭像 pl_drifter 都沿用），畫面顯示「平民」。
+  // 假設：卡片說明沿用舊流民說明（UI-01 草稿只畫「身分／平民」，沒有給卡片說明文字）。
   const ORIGINS = [
-    { id: 'hunter', name: '獵戶', desc: '山裡長大，認得獸跡。', attr: { ling: 12, shen: 11, kou: 8 }, prof: { zong: 20, bo: 16, gong: 12 }, gear: ['bow', 'robe'], silver: 50 },
-    { id: 'herbalist', name: '藥童', desc: '跟過藥鋪師傅，識得百草。', attr: { wu: 12, ling: 11, li: 8 }, prof: { cai: 20, yao: 16, jian: 10 }, gear: ['blade_rust', 'robe'], silver: 50, items: [['pot_hp', 2]] },
-    { id: 'miner', name: '礦工', desc: '灰窯鎮的苦力，一身蠻力。', attr: { li: 12, ti: 12, kou: 8, wu: 8 }, prof: { kuang: 20, fuz: 16, fu: 12 }, gear: ['hammer', 'robe'], silver: 50 },
-    { id: 'deserter', name: '逃兵', desc: '從渡陰關逃下來，只會打仗。', attr: { li: 11, ti: 11, xin: 11, kou: 8, wu: 9 }, prof: { dao: 20, dun: 14, zhong: 10 }, gear: ['blade_short', 'buckler', 'robe'], silver: 25 },
-    { id: 'peddler', name: '行商', desc: '挑擔走街，嘴上功夫了得。', attr: { kou: 13, wu: 11, li: 8, ti: 9 }, prof: { yi: 20, jiao: 14, tan: 12 }, gear: ['blade_rust', 'robe'], silver: 110 },
-    { id: 'drifter', name: '流民', desc: '什麼都不會，什麼都能學。', attr: {}, prof: {}, gear: ['blade_rust', 'robe'], silver: 60 },
+    { id: 'drifter', name: '平民', desc: '什麼都不會，什麼都能學。', attr: {}, prof: {}, gear: ['blade_rust', 'robe'], silver: 60 },
+  ];
+  // 開局取名：預設名（不在池內）與整池 60 組（姓、名），原樣取自 docs/design/batch1/name-pool-v0.1.csv，順序與用字不改
+  const NAME_DEFAULT = { sur: '沈', given: '衡' };
+  // 自訂名「已有人用」清單：整名完全相同才攔（取名禁字規則定稿 v1.0 §3、§5 起始表）。
+  // 固定角色全名＋稱謂詞＋遊戲名詞＋九大勢力全名（共 42 項）。正式版可由 names-final 新名欄與勢力名產出後整批替換本常數。
+  const NAME_TAKEN = [
+    '虞九淵', '明夷',
+    '撿骨師', '傀母', '蠱母', '里正', '鴉首', '路人', '兇煞', '良民', '平民', '掌櫃', '先生', '客官',
+    '守備', '紅霧', '腳程', '輕快', '平常', '沉重', '蹣跚', '鎮衙', '祭祀', '侵蝕', '破曉', '天星', '鴉衛', '拜裂', '九幽', '飲霧', '四象', '黑水', '天工', '萬神',
+    // 九大勢力全名（定稿第 5 節末段；本地化 2026-11-28 18:09 裁定收入；鴉衛已在上列）
+    '四象軍', '破曉軍團', '天星商會', '拜裂教', '黑水盟', '天工盟', '萬神教', '九幽殿',
+  ];
+  const NAME_POOL = [
+    ['郝', '朔'], ['柏', '戎'], ['巢', '岩'], ['岳', '樵'], ['滕', '莽'], ['莘', '月'], ['茅', '葦'], ['紀', '谷'], ['卜', '雁'], ['芮', '秋'],
+    ['祁', '禾'], ['韋', '溪'], ['岑', '苗'], ['舒', '苓'], ['管', '沐'], ['譚', '荷'], ['尹', '若'], ['宓', '芹'], ['蒲', '穗'], ['杭', '柔'],
+    ['柯', '磐'], ['盧', '炭'], ['卓', '錘'], ['鈕', '魁'], ['裴', '厚'], ['井', '秀'], ['鄒', '桂'], ['竇', '香'], ['池', '蘭'], ['萬', '菊'],
+    ['賀', '固'], ['常', '垣'], ['靳', '北'], ['尚', '嶺'], ['解', '戈'], ['藺', '棠'], ['尤', '晴'], ['涂', '素'], ['步', '南'], ['成', '映'],
+    ['汪', '季航'], ['駱', '載行'], ['傅', '津渡'], ['盛', '車馬'], ['奚', '瀾舟'], ['鮑', '綺羅'], ['練', '晚泊'], ['邢', '繡織'], ['俞', '市南'], ['梅', '書柬'],
+    ['包', '拴'], ['黎', '河'], ['史', '陌'], ['安', '麥'], ['喬', '路'], ['倪', '桃兒'], ['甘', '菜頭'], ['戴', '盼兒'], ['宋', '芋頭'], ['翁', '阿彩'],
   ];
 
   const SEASONS = ['春', '夏', '秋', '冬'];
@@ -569,5 +587,5 @@ window.SHL_DATA = (function () {
   const SLOT_NAMES = { main: '主手', off: '副手', head: '頭盔', chest: '胸甲', gloves: '手套', boots: '靴子', amulet: '護身符', ring1: '左戒', ring2: '右戒', belt: '腰帶', bag: '背包', cart: '馬車' };
   const SLOT_GLYPH = { main: '刃', off: '盾', head: '冠', chest: '甲', gloves: '手', boots: '靴', amulet: '符', ring1: '戒', ring2: '戒', belt: '帶', bag: '囊', cart: '車' };
 
-  return { ITEMS, SKILLS, TECHS, BASES, AFFIXES, UNIQUES, LEGENDS, RARITY, ENEMIES, NODES, EDGES, REGION_LABELS, WILDS, DUNGEONS, PRICES, PLACES, BUILDINGS, ITEM_CLASS, NPCS, FACTIONS, EXPLORE, CODEX_CATS, BOUNTIES, QUEST_GEN, RUMOR, TIDE, SLEEP, WORLD, RECIPES, EVENTS, ATTRS, PROFS, PROF_GROUPS, WTYPE_NAMES, ORIGINS, SEASONS, YEAR_NAMES, EQ_SLOTS, SLOT_NAMES, SLOT_GLYPH };
+  return { ITEMS, SKILLS, TECHS, BASES, AFFIXES, UNIQUES, LEGENDS, RARITY, ENEMIES, NODES, EDGES, REGION_LABELS, WILDS, DUNGEONS, PRICES, PLACES, BUILDINGS, ITEM_CLASS, NPCS, FACTIONS, EXPLORE, CODEX_CATS, BOUNTIES, QUEST_GEN, RUMOR, TIDE, SLEEP, TIME, WORLD, RECIPES, EVENTS, ATTRS, PROFS, PROF_GROUPS, WTYPE_NAMES, ORIGINS, NAME_DEFAULT, NAME_TAKEN, NAME_POOL, SEASONS, YEAR_NAMES, EQ_SLOTS, SLOT_NAMES, SLOT_GLYPH };
 })();

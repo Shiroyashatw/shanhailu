@@ -1,0 +1,43 @@
+PASS  [靜態] ui.js 中「=== 高／極高」這類險級字串比較只出現在 riskCls() 一處  — ["ui.js:32 function riskCls(tier) { return ' rk' + D.TIME.RISK_TIERS.indexOf(tier) + (tier === '高' ||"]
+PASS  [靜態] ui.js 沒有另寫的險級數值門檻（risk < 0.x、0.15／0.35／0.60）  — []
+PASS  [靜態] game.js 分檔只走 riskTier()／D.TIME.RISK_CUTS，沒有另寫門檻  — []
+PASS  [靜態] travelPreview 的 riskName 直接取自 riskTier(risk)  — ["game.js:765 const riskName = riskTier(risk);"]
+PASS  [靜態] ui.js 所有「險」pill／vpill 都用 riskCls()  — ["ui.js:403","ui.js:660","ui.js:689"]
+PASS  [靜態] css 沒有舊三檔險級色類別殘留  — []
+PASS  [靜態] css 有 rk0–rk3 四條，各同時套 .pill 與 .vpill  — [2,2,4,6]
+PASS  [靜態] 極高暫定色 --risk-x: #ff3b5c
+PASS  [靜態] js 內無「中高」
+標頭：青霧藥林=低 rgb(106, 165, 133)；赤石廢礦=中 rgb(201, 162, 74)；枯骨獸徑=中 rgb(201, 162, 74)；腐骨沼=高・hot rgb(200, 70, 58)；野徑岔口=低 rgb(106, 165, 133)；亂葬古窯=低 rgb(106, 165, 133)；沉淵祭窟=高・hot rgb(200, 70, 58)；無名古塚=中 rgb(201, 162, 74)；酉神裂口=極高・hot rgb(255, 59, 92)
+PASS  [標頭] 9 處荒野＋地城都進得去並有 head-risk  — []
+PASS  [標頭] 標頭檔名都在四檔內
+travelPreview 取樣 40320 筆；負重檔 light／heavy；各檔筆數 低 2304、中 7740、高 11520、極高 18756
+PASS  [路程] 每筆畫面都是該目的地的出發條（dname 與目的地相符）且有 route-risk  — []
+PASS  [路程] riskName ＝ G.riskTier(p.risk) ＝ 參考實作（三位 half-up、0.15／0.35／0.60 半開）  — []
+PASS  [路程] 四檔各至少出現一次
+PASS  [路程] risk ≤ 0.85  — 0.85
+各檔顏色：{"低":["rgb(106, 165, 133)"],"中":["rgb(201, 162, 74)"],"高":["rgb(200, 70, 58)"],"極高":["rgb(255, 59, 92)"]}
+PASS  [色] 「低」在所有標頭與 travelPreview 只有一種顏色  — ["rgb(106, 165, 133)"]
+PASS  [色] 「中」在所有標頭與 travelPreview 只有一種顏色  — ["rgb(201, 162, 74)"]
+PASS  [色] 「高」在所有標頭與 travelPreview 只有一種顏色  — ["rgb(200, 70, 58)"]
+PASS  [色] 「極高」在所有標頭與 travelPreview 只有一種顏色  — ["rgb(255, 59, 92)"]
+PASS  [色] 四檔顏色互異  — ["rgb(106, 165, 133)","rgb(201, 162, 74)","rgb(200, 70, 58)","rgb(255, 59, 92)"]
+PASS  [色] 極高 ＝ #ff3b5c（rgb(255, 59, 92)）  — "rgb(255, 59, 92)"
+PASS  [色] 四檔都不是未上色的預設 pill／vpill 字色  — {"plain":["rgb(216, 207, 189)","rgb(216, 207, 189)"],"four":["rgb(106, 165, 133)","rgb(201, 162, 74)","rgb(200, 70, 58)","rgb(255, 59, 92)"]}
+PASS  [hot] travelPreview：hot 只在「高」「極高」（40320 筆）  — []
+PASS  [hot] 標頭：hot 只在「高」「極高」（9 處）  — []
+PASS  [hot] travelPreview 的 hot 與 riskTier(p.risk) 結果一致
+PASS  [hot] hot 的框色＝該檔字色；非 hot 的框不是該檔字色  — []
+PASS  [hot] 低／中沒有 hot class
+PASS  [指定] 腐骨沼（荒野）標頭「險 高」、高色、hot  — {"id":"fuzhao","name":"腐骨沼","kind":"wild","tier":"高","scene":true,"text":"險 高","color":"rgb(200, 70, 58)","border":"rgb(200, 70, 58)","weight":"700","hot":true,"cls":"pill rk2 hot"}
+PASS  [指定] 沉淵祭窟（地城）標頭「險 高」、高色、hot  — {"id":"jiku","name":"沉淵祭窟","kind":"dungeon","tier":"高","scene":true,"text":"險 高","color":"rgb(200, 70, 58)","border":"rgb(200, 70, 58)","weight":"700","hot":true,"cls":"pill rk2 hot"}
+SHOT  docs/evidence/shots-shanhailu-check11d-1128/1-wild-head-low-chakou.png
+SHOT  docs/evidence/shots-shanhailu-check11d-1128/2-wild-head-mid-kugu.png
+SHOT  docs/evidence/shots-shanhailu-check11d-1128/3-dungeon-head-high-jiku.png
+SHOT  docs/evidence/shots-shanhailu-check11d-1128/4-dungeon-head-extreme-liekou.png
+SHOT  docs/evidence/shots-shanhailu-check11d-1128/5a-travelpreview-huiyao-to-fuzhao.png
+SHOT  docs/evidence/shots-shanhailu-check11d-1128/5b-head-fuzhao.png
+PASS  [對照] travelPreview（huiyao→fuzhao 0:00，高）與目的地標頭同色  — {"preview":"rgb(200, 70, 58)","head":"rgb(200, 70, 58)"}
+PASS  console 0 error  — []
+
+結果：31/31 PASS
+exit 0

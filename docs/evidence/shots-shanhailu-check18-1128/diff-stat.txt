@@ -1,0 +1,17 @@
+$ git diff 8c8beb6..b2744a3 --stat
+ docs/design/batch1/name-pool-v0.1.csv                               |   4 ++--
+ docs/evidence/shots-shanhailu-dev01b-names-1128/01-naming-taken.png | Bin 0 -> 168030 bytes
+ js/data.js                                                          |  17 +++++++++----
+ js/game.js                                                          |   4 +++-
+ js/ui.js                                                            |   4 ++--
+ tests/e2e-dev01b.js                                                 | 162 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ tests/e2e.js                                                        |   4 ++--
+ 7 files changed, 184 insertions(+), 11 deletions(-)
+
+$ git diff 8c8beb6..b2744a3 | grep -nE "migrate|SCHEMA"  (無輸出＝未碰)
+grep exit=1
+
+$ git diff 8c8beb6..b2744a3 --numstat -- js/
+13	4	js/data.js
+3	1	js/game.js
+2	2	js/ui.js

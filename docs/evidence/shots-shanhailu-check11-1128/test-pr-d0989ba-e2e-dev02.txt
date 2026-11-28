@@ -1,0 +1,65 @@
+d0989ba447ff9c9ab9337841db398b9d82173a9a
+PASS  [sleep/rest] 20:00 → 次日 08:00（12 小時）  — 第 5 日 20:00 → 第 6 日 08:00（12 小時）
+PASS  [sleep/rest] 03:00 → 09:00（6 小時）  — 第 5 日 03:00 → 第 5 日 09:00（6 小時）
+PASS  [sleep/rest] 00:00 → 08:00（8 小時，不是 32 小時）  — 第 5 日 00:00 → 第 5 日 08:00（8 小時）
+PASS  [sleep/rest] 08:10 → 21:10（13 小時上限，不是 23.8 小時）  — 第 5 日 08:10 → 第 5 日 21:10（13 小時）
+PASS  [sleep/rest] 邊界：恰 08:00 → 14:00（6 小時；「下一個 08:00」含當下）  — 第 5 日 08:00 → 第 5 日 14:00（6 小時）
+PASS  [sleep/rest] 邊界：恰 07:00 → 13:00（6 小時）  — 第 5 日 07:00 → 第 5 日 13:00（6 小時）
+PASS  [sleep/bunk] 20:00 → 次日 08:00（12 小時）  — 第 5 日 20:00 → 第 6 日 08:00（12 小時）
+PASS  [sleep/bunk] 03:00 → 09:00（6 小時）  — 第 5 日 03:00 → 第 5 日 09:00（6 小時）
+PASS  [sleep/bunk] 00:00 → 08:00（8 小時，不是 32 小時）  — 第 5 日 00:00 → 第 5 日 08:00（8 小時）
+PASS  [sleep/bunk] 08:10 → 21:10（13 小時上限，不是 23.8 小時）  — 第 5 日 08:10 → 第 5 日 21:10（13 小時）
+PASS  [sleep/bunk] 邊界：恰 08:00 → 14:00（6 小時；「下一個 08:00」含當下）  — 第 5 日 08:00 → 第 5 日 14:00（6 小時）
+PASS  [sleep/bunk] 邊界：恰 07:00 → 13:00（6 小時）  — 第 5 日 07:00 → 第 5 日 13:00（6 小時）
+PASS  [sleep] 一日 144 個就寢時刻：睡眠 6–13 小時、皆不長於舊規則  — {"lo":6,"hi":13,"bad":[]}
+PASS  [sleep] 客棧歇息：飽食 −10、疲累清零、生命回滿（沿用現況）  — {"food":70,"fat":0,"hp":80,"max":80}
+PASS  §3 起手值：灰窯 P50／T200／O55／Gnom1／Geff1、渡陰 P45／T300／O60／Gnom2／Geff2；F、Lpat、debt、rescueCd、taxCut 皆 0  — {"h0":{"P":50,"T":200,"O":55,"Gnom":1,"Geff":1,"F":0,"Lpat":0,"debt":0,"rescueCd":0,"taxCut":0,"brief":{},"acc":{"tax":0,"fines":0,"bountyPaid":0},"remitLogDay":-99},"d0":{"P":45,"T":300,"O":60,"Gnom":2,"Geff":2,"F":0,"Lpat":0,"debt":0,"rescueCd":0,"taxCut":0,"brief":{},"acc":{"tax":0,"fines":0,"bountyPaid":0},"remitLogDay":-99}}
+PASS  §3.2 區域起手：B 30、crew 4、crewCtr 0、crewWiped false；heavyOps {0,0}；refugee camp 60  — {"region":{"B":30,"crew":4,"crewCtr":0,"crewWiped":false},"heavyOps":{"season":0,"n":0},"refugee":{"camp":60,"inTotal":0,"settledTotal":0,"soldTotal":0,"soldToday":0,"soldYday":0}}
+PASS  §1 預留欄位：S.wanted {}、S.hostility {}、S.jurisdiction null、S.influence {}  — {"wanted":{},"hostility":{},"jurisdiction":null,"influence":{}}
+PASS  AC-A1 灰窯第 1 天結算：T = 207.96、P／O 不變  — {"T":207.96,"P":50,"O":55,"B":30,"at":"第 2 日 00:00"}
+PASS  AC-A1 渡陰第 1 天結算：T = 314.81、P／O 不變  — {"T":314.81,"P":45,"O":60}
+PASS  AC-A7 灰窯第 1 天 brief：Inc 22.96、treasuryIn 23、Out 15、Net +8、tier ok、trend flat、whyCode null（已與最新 SPEC-01 AC-A7 一致；16:46 裁決第 4 項）  — {"day":2,"dP":0,"dO":0,"trend":"flat","whyCode":null,"T":207.96,"dT":7.96,"treasuryIn":23,"treasuryOut":15,"treasuryNet":8,"Inc":22.96,"tax":0,"fines":0,"rescueAmt":0,"upkeepPaid":15,"bountyPaid":0,"overflow":0,"treasuryTier":"ok","Geff":1,"debtToday":false,"debtDays":0,"aidToday":false,"aidDaysLeft":0,"aidFund":0,"rescueToday":false,"taxCutDays":0,"taxCutAmt":0}
+PASS  §7.6 brief 欄位齊全  — 27
+PASS  AC-A5 賣 100 兩 → 玩家得 95、灰窯 T +5、日誌附「（交易稅 5 兩）」  — {"got":95,"dT":5,"p1":1,"p0":1,"log":"賣出乾餅 ×100，得銀 95 兩（交易稅 5 兩）"}
+PASS  AC-A5 賣 19 兩 → 稅 0（得 19）；賣 39 兩 → 稅 1（得 38）  — {"s19":{"got":19,"dT":0,"p1":1,"p0":1,"log":"賣出乾餅 ×19，得銀 19 兩"},"s39":{"got":38,"dT":1,"p1":1,"p0":1,"log":"賣出乾餅 ×39，得銀 38 兩（交易稅 1 兩）"}}
+PASS  AC-J1 交易稅不改 sellPrice 顯示的行情價  — {"before":1,"after":1}
+PASS  AC-A7（§7.2）同日賣 100＋19＋39 兩：當日交易稅 6 進 brief.tax，treasuryIn = round(22.96+6) = 29、Net +14  — {"tax":6,"In":29,"Net":14}
+PASS  假設：破曉營（非兩鎮）賣出不課交易稅  — {"x":0,"same":true}
+PASS  AC-A4 日 1、2：Geff 0、T 維持 10、debt 1、2  — [{"d":2,"Geff":0,"T":10,"debt":1,"taxCut":0,"rescueCd":0,"b":{"rescueToday":false,"rescueAmt":0,"taxCutDays":0,"debtDays":1,"tier":"debt","debtToday":true}},{"d":3,"Geff":0,"T":10,"debt":2,"taxCut":0,"rescueCd":0,"b":{"rescueToday":false,"rescueAmt":0,"taxCutDays":0,"debtDays":2,"tier":"debt","debtToday":true}}]
+PASS  AC-A4 日 3：debt 3 觸發求援，T = 100、taxCut 10、rescueCd 20  — {"d":4,"Geff":0,"T":100,"debt":0,"taxCut":10,"rescueCd":20,"b":{"rescueToday":true,"rescueAmt":90,"taxCutDays":10,"debtDays":0,"tier":"debt","debtToday":true}}
+PASS  AC-A7 求援日 brief：rescueToday、rescueAmt 90、taxCutDays 10、debtDays 0  — {"rescueToday":true,"rescueAmt":90,"taxCutDays":10,"debtDays":0,"tier":"debt","debtToday":true}
+PASS  AC-A4 日 4 起付得起：Geff 回 1、T 85  — {"d":5,"Geff":1,"T":85,"debt":0,"taxCut":9,"rescueCd":19,"b":{"rescueToday":false,"rescueAmt":0,"taxCutDays":9,"debtDays":0,"tier":"ok","debtToday":false}}
+PASS  AC-A6 S_pub：灰窯起手 1.00、渡陰起手 1.21、O=30／Geff=0 時 0.65  — {"h":1,"d":1.2105263157894737,"low":0.6491228070175439}
+PASS  AC-A7 資助 100 兩（F=100）aidDaysLeft 日 1–5 為 4／3／2／1／0  — ["4@G2","3@G2","2@G2","1@G2","0@G1"]
+PASS  AC-A2（機制部分，F 直接設值）灰窯逐日 O：56.00、56.90、57.71（±0.01）；F 日 4 後 = 0  — ["56／F75","56.9／F50","57.71／F25","58.44／F0"]
+PASS  駐軍第 3 檔顯示名為「守備」（四檔：無／自衛隊／巡邏隊／守備，data.js 單一表）  — ["無","自衛隊","巡邏隊","守備"]
+PASS  渡陰資助加派到第 3 檔：brief.Geff = 3 → 「守備」  — {"names":["無","自衛隊","巡邏隊","守備"],"table":["無","自衛隊","巡邏隊","守備"],"Geff":3,"name":"守備"}
+PASS  兩鎮每天會變：6 個日結，兩鎮財庫每天都變、繁榮都有起伏  — D1 灰50/200 渡45/300；D2 灰49/207.96 渡44/314.81；D3 灰50.1/215.46 渡43.1/328.4；D4 灰50.09/223.46 渡44.29/340.89；D5 灰51.08/231.46 渡43.36/354.82；D6 灰49.97/239.91 渡44.52/367.61；D7 灰49.97/247.86 渡44.56/381.81
+PASS  e2e 走過一天結算：客棧 22:00 歇息 → 次日 08:00，日結 brief.day 逐日遞增  — ["1:-","2:2","3:3","4:4","5:5","6:6","7:7"]
+PASS  日誌時間 24 小時制（新的一天在 00:00，起床 08:00）  — ["第 6 日 00:00 第 6 日 00:00，新的一天：採集點與貨架已回補。","第 6 日 08:00 歇了一夜，疲累清零、生命回滿。","第 7 日 00:00 第 7 日 00:00，新的一天：採集點與貨架已回補。","第 7 日 08:00 歇了一夜，疲累清零、生命回滿。"]
+PASS  一次 passTime 跨 3 個日界：逐日補算 3 次，結果與 8 小時 ×8 逐段推進完全一致  — {"same":true,"n1":3,"day":4,"bday":4}
+PASS  防失控：極端起點跑 120 天，P 15–80、O 0–100、T 0–T_CAP、每日變動 ≤ 3  — {"worst":3,"viol":[],"remitLogs":12,"hT":1350}
+PASS  §5.5 上繳：灰窯 T 灌到 99999 → 夾回 T_CAP 1350；「上繳」日誌 120 天 ≤ 12 次（每 10 天最多一次）  — {"worst":3,"viol":[],"remitLogs":12,"hT":1350}
+PASS  起手 R_road = R_wild = 1（遇險率與現況相同）  — {"road":1,"wild":1,"risk":0.22}
+PASS  R_wild：B=45、Ō=50 → 1.255（AC-E3 的 R 部分）  — 1.255
+PASS  遇險封頂 0.85 在所有乘項之後（最壞組合 R_wild=1.8、夜、獸潮、多段野徑 → 0.85）  — {"road0":1,"wild0":1,"prevWild":{"edges":[{"a":"huiyao","b":"chakou","h":1}],"hours":1,"fat":3,"food":4,"risk":0.22,"riskName":"中","mult":1,"via":"野徑","wild":true,"R":1},"wildE3":1.255,"wildMax":1.8,"cap":0.85,"capId":"qingwu","allCap":true}
+PASS  AC-J2 日結後存檔、讀檔：world.towns、region、F（77 兩，日結加派後餘 52）、Lpat、debt、預留欄位完全一致  — 1375 字元
+PASS  AC-J5 讀到沒有 world.towns 的存檔：以起手值補、可照常日結、不丟錯  — {"ok1":true,"t":"第 3 日 00:00","T":207.96,"day":3}
+PASS  AC-J3 同 seed 同操作兩次：整份狀態 100% 相同（含世界擲骰）  — 14513 字元
+PASS  AC-J4（wrnd 隔離部分）worldTick／townTick 不消耗 S.rng；wrnd 同參數同值  — true
+PASS  AC-J4（wrnd 隔離部分）每天多耗 37 次 S.rng：40 天內獸潮開始日、結束日、目標鎮與 PNOISE 結果完全相同（有無資助的完整比較待 DEV-04）  — [[4,5,"huiyao"],[13,14,"huiyao"],[22,23,"duyin"],[31,32,"huiyao"],[39,40,"duyin"]]
+PASS  [cflash/等演出播完再出手] 任意 1 秒滑動視窗內 cflash ≤ 3 次  — {"total":19,"maxPerSec":3,"minGapMs":483,"sampleGaps":[485,498,2750,500,483,483]}
+PASS  [cflash/連按鍵盤（每 200ms）] 任意 1 秒滑動視窗內 cflash ≤ 3 次  — {"total":0,"maxPerSec":0,"minGapMs":null,"sampleGaps":[]}
+PASS  [cflash/連按鍵盤（每 250ms）] 任意 1 秒滑動視窗內 cflash ≤ 3 次  — {"total":15,"maxPerSec":3,"minGapMs":483,"sampleGaps":[500,483,483,483,483,500]}
+PASS  [cflash/連按鍵盤（每 300ms）] 任意 1 秒滑動視窗內 cflash ≤ 3 次  — {"total":13,"maxPerSec":2,"minGapMs":583,"sampleGaps":[583,583,600,583,583,584]}
+PASS  [cflash/連按鍵盤（每 350ms）] 任意 1 秒滑動視窗內 cflash ≤ 3 次  — {"total":12,"maxPerSec":2,"minGapMs":683,"sampleGaps":[683,683,683,700,684,683]}
+PASS  [dev02-01-inn-rest-log.png] 1280×720 單屏無捲動、三欄 240/796/220  — {"sw":1280,"sh":720,"c":[240,796,220]}
+SHOT  ../../..<scratch>/dev02shots/dev02-01-inn-rest-log.png
+PASS  [dev02-02-next-day-town.png] 1280×720 單屏無捲動、三欄 240/796/220  — {"sw":1280,"sh":720,"c":[240,796,220]}
+SHOT  ../../..<scratch>/dev02shots/dev02-02-next-day-town.png
+PASS  [dev02-03-combat.png] 1280×720 單屏無捲動、三欄 240/796/220  — {"sw":1280,"sh":720,"c":[240,796,220]}
+SHOT  ../../..<scratch>/dev02shots/dev02-03-combat.png
+PASS  console 0 error  — []
+
+結果：58/58 PASS
+exit 0

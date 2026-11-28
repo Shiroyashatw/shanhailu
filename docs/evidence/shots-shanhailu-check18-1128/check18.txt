@@ -1,0 +1,46 @@
+INFO  規格解析：固定角色 2、稱謂詞 12、遊戲名詞 20、勢力全名 9（去重後共 42）
+INFO  規格提示句：{"chars":"不可使用英數、空白或符號","length":"合計須為 2–4 個中文字","taken":"這個名字已經有人用了"}
+PASS  NAME_TAKEN 共 42 項  — 42
+PASS  NAME_TAKEN 無重複
+PASS  規格期望（第 5 節起始表＋固定角色＋九大勢力全名）去重後 42 項  — 42
+PASS  NAME_TAKEN 與規格逐項一致（無缺、無多）  — {"missing":[],"extra":[]}
+PASS  每項整名（所有合法姓名切法）回 taken；切法超長只報 length  — []
+PASS  整名「平民」→ taken
+PASS  整名「先生」→ taken
+PASS  整名「客官」→ taken
+PASS  整名「路人」→ taken
+PASS  「鴉 ｜首」（含空白）只報 chars
+PASS  「破曉軍｜團」只報 length（不報 taken）
+PASS  「沈｜衡」不攔  — []
+PASS  「張｜三」不攔  — []
+PASS  「萬｜十」不攔  — []
+PASS  「李｜滿」不攔  — []
+PASS  「王｜衡」不攔  — []
+PASS  「釋｜明」不攔  — []
+PASS  「悟｜空」不攔  — []
+PASS  「李｜九淵」不攔  — []
+PASS  英文「Li｜衡」→ chars  — ["chars"]
+PASS  數字「沈｜9」→ chars  — ["chars"]
+PASS  半形空白「沈｜衡 」→ chars  — ["chars"]
+PASS  全形空白「沈｜　衡」→ chars  — ["chars"]
+PASS  1 字「沈｜」→ length  — ["length"]
+PASS  1 字（無姓）「｜衡」→ length  — ["length"]
+PASS  5 字「歐陽｜明月衡」→ length  — ["length"]
+PASS  5 字（姓 3）「司馬明｜月衡」→ length  — ["length"]
+PASS  ui.js NAME_MSG 三句與定稿字面一致  — ["不可使用英數、空白或符號","合計須為 2–4 個中文字","這個名字已經有人用了"]
+PASS  三句句尾皆無句號
+PASS  NAME_POOL 60 組、CSV 60 列、逐組一致  — []
+PASS  含倪桃兒、甘菜頭；不含倪招弟、甘細妹
+PASS  NAME_POOL 全部通過 nameErrors  — []
+PASS  新字串存在：+{v}% 腳程／力竭：命中與腳程下降／常態重負的腳程懲罰減半
+PASS  舊字串不存在：+{v}% 行動速度／力竭：命中與速度下降／常態重負的速度懲罰減半
+PASS  技能「腳力」未改（name、how、perk）  — {"id":"jiao","grp":"xing","attr":"shen","name":"腳力","how":"趕路","perks":{"25":"野徑遇險 −20%"}}
+PASS  身法說明「出手速度、閃避。帶動：閃躲、輕甲、弓弩、腳力。」未改  — 出手速度、閃避。帶動：閃躲、輕甲、弓弩、腳力。
+PASS  負重 50 級「超載懲罰減輕」未動  — 超載懲罰減輕
+PASS  畫面「四象軍」：確定熄滅，提示「這個名字已經有人用了」  — {"ok":false,"rule":"這個名字已經有人用了"}
+PASS  畫面「張三」：確定可按、無錯誤提示  — {"ok":true,"rule":"只收中文，合計 2–4 字。預設「沈衡」，不想改也可以直接確定。"}
+PASS  截圖 viewport 1280×720  — [1280,720]
+PASS  console 0 error  — []
+
+結果：41/41 PASS
+exit=0
