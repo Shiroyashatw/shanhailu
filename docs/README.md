@@ -32,6 +32,7 @@ docs/
 ├─ loc/                 本地化產出（命名、用詞、對照表、名稱表）
 ├─ plan/                排期、拍板清單、製作人裁決、交辦單
 ├─ ui/batch1/           UIUX 第一批定稿規格與彩稿
+├─ art/                 美術成品暫存（世界地圖 v1 資料、聚落平面圖規格）
 ├─ archive/             舊版與作廢內容
 └─ evidence/            開發驗收證據（既有，不動）
 ```
@@ -64,6 +65,8 @@ docs/
 | `specs/SPEC-ATB.md` | 戰鬥行動條（ATB）規格 v0.1.3 | 待定（草案；ATB 目前暫停，驗算未回） |
 | `specs/SPEC-GRAVE.md` | 盜墓規格（第一批：窯外墳場亂墳＋無名古塚與盜洞入口）v0.1 | 待定（待驗算，數值為手算初值，不得當定稿實作） |
 | `specs/SPEC-NPC.md` | 人事與生成規格（資料層）v0.1 | 待定（第一輪已驗；N2／N3 待驗算） |
+| `specs/SPEC-ROUTE.md` | 身分與階級框架 v0.1：身分總表（35 種＋6 條派內的路）、三階、兩種身分槽、差事格式 | 待定（草案；8 題等 mumi，數字未驗算） |
+| `specs/SPEC-FAC.md` | 勢力路線內容 v0.1：第一批三條生計行會（懸壺社、窯幫＋洪爐會、山獵盟＋皮匠行）與新系統「打造」 | 待定（草案；5 題等 mumi，數字未驗算） |
 | `specs/CHANGELOG.md` | 第一批規格變更紀錄（SPEC-TIME／01／02／03，v0.2 → v0.4） | 定案（紀錄；v0.5 起的變動看各 SPEC 檔內修訂紀錄） |
 | `specs/handoff/ATB-loc-handoff.md` | ATB 先交件：給本地化的回合語意對照表與名詞定義 | 待定（隨 SPEC-ATB 暫停） |
 | `specs/handoff/ATB-uiux-handoff.md` | ATB 先交件：給 UIUX 的跑道、意圖小標、狀態記號 | 待定（隨 SPEC-ATB 暫停） |
