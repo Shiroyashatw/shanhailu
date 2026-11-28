@@ -1,0 +1,8 @@
+source,seed,jiao,trips,hours,events,bandits,day_trips,day_events,day_bandits,night_trips,night_events,night_bandits,h_per_bandit,trips_with_jiao25
+node-vm,20261127,natural,4000,4000,929,169,2502,418,69,1498,511,100,23.6686,3906
+node-vm,20261128,natural,4000,4000,989,193,2502,465,91,1498,524,102,20.7254,3906
+node-vm,20261127,reset,4000,4000,1193,225,2502,544,104,1498,649,121,17.7778,0
+node-vm,20261128,reset,4000,4000,1211,219,2502,594,114,1498,617,105,18.2648,0
+browser tests/measure-dev04-bandit.js,20261127,natural,4000,4003,932,169,2499,417,NA,1501,515,NA,23.6864,NA
+browser sim/dev04/measure-browser.js,20261127,natural,4000,4000,929,169,2502,418,69,1498,511,100,23.6686,NA
+browser sim/dev04/measure-browser.js,20261128,natural,4000,4000,989,193,2502,465,91,1498,524,102,20.7254,NA

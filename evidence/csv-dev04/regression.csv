@@ -1,0 +1,3 @@
+js_version,starter_x2,starter_x4,cleaner_x2,cleaner_x4,ex_rate_starter,ex_rate_cleaner,expected,reproduced
+b1-civ@0ad0b46f (main@dd3843b js),0.8652,0.7898,1.1528,1.2423,5.1779,6.5974,0.865／0.790／1.153／1.242,yes
+PR16 js,0.8991,0.834,1.1476,1.236,5.1743,6.6116,0.865／0.790／1.153／1.242,no

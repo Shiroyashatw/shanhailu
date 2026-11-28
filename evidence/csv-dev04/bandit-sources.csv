@@ -1,0 +1,21 @@
+type,file_line,what
+來源,js/data.js:515,EVENTS「劫匪攔路」（5 個野徑事件之一，game.js startEvent 以 pick() 等機率抽）
+機制,js/game.js:1990-1994,startEvent：獸潮期間 60% 直接給「異獸蹤跡」，否則 pick(D.EVENTS) 等機率五選一；只有 travel() 在 rnd() < 遇險率 時呼叫
+機制,js/game.js:713,travel()：抵達後擲一次遇險；城鎮內、地城、採集、追蹤、探查都不會叫 startEvent
+來源,js/game.js:2010,劫匪攔路事件入戰（1 名）：交買路錢但銀兩不足
+來源,js/game.js:2017,劫匪攔路事件入戰（1 名）：開口周旋失敗
+來源,js/game.js:2019,劫匪攔路事件入戰（1 名）：迎戰
+來源,js/game.js:1167,傳聞查探入戰（2 名）：「根本是餌」沒察覺→中伏（ambush）
+來源,js/game.js:1181,傳聞查探入戰（2 名）：「有人盤踞」動手搶
+來源,js/game.js:1183,傳聞查探入戰（2 名）：「根本是餌」察覺→先下手（stun 1）
+來源,js/game.js:1188,傳聞查探入戰（2 名）：「有人盤踞」開口談分帳失敗
+權重,js/game.js:1056,"truthW：盤踞權重 ×min(crew,4)/4（crew 起手 4 → 25/100）"
+權重,js/game.js:1061,liveTruth：盤踞且 crew<1 → 當作「已被取走」
+計數,js/game.js:1027-1035,"questProgress(kill, id)：所有 status=active、kind=kill、enemy=id 的委託 +1；不看擊殺地點、來源或戰鬥類型"
+計數,js/game.js:1724,killEnemy：任何戰鬥裡打倒任何敵人都呼叫 questProgress → 野徑事件、傳聞、餌，殺的劫匪全部都算
+副作用,js/game.js:1725,killEnemy → banditKilled（同樣不看來源）
+副作用,js/game.js:1399-1408,banditKilled：匪勢 B −2.5、crew −0.5（下限 0）；crew 由 >0 降到 0 時「據點被端」破曉聲望 +2。不推進委託、不產生劫匪
+地點,js/game.js:1038-1044,questWhere：kill 類只回傳 QUEST_GEN.where 的字串，不對應任何節點、不影響生成
+地點,js/data.js:421,where.bandit = '野徑一帶'：NODES 沒有叫「野徑一帶」的節點（最接近的是 chakou「野徑岔口」）
+委託,js/game.js:948-952,"banditDraw：只決定委託板上要不要出劫匪題（p=clamp((B−20)/80,0,0.5)），不產生劫匪"
+資料表掃描,js/data.js（執行時）,window.SHL_DATA 各表含字串 'bandit' 的只有：ENEMIES、QUEST_GEN、EVENTS（WILDS、DUNGEONS、EXPLORE、BOUNTIES、TIDE 都沒有）
