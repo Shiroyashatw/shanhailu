@@ -759,3 +759,24 @@ h4 { margin-top: 0; }
 .walker { position: absolute; left: 0; top: 0; width: 32px; height: 32px; pointer-events: none; will-change: transform; }
 .walker .px { filter: drop-shadow(0 2px 1px rgba(0, 0, 0, .7)); }
 .walker.anon .px { opacity: .92; }
+
+/* ===== DEV-TIME（SPEC-TIME 10.2）：右欄時間、寒意條、打烊 ===== */
+.silver { left: auto; right: 8px; top: 8px; }
+.pill.clock { justify-content: flex-start; padding: 0 5px; color: var(--ink-2); }
+.pill.clock .ckd, .pill.clock .ckm { font-size: 11px; white-space: pre; }
+.pill.clock .ckd { font-size: 10px; letter-spacing: -0.2px; }
+.pill.clock .ckm { margin-left: 3px; }
+.pill.clock .ckw { padding-left: 3px; }
+.pill.clock .ckp { font-size: 12px; font-weight: 700; color: var(--gold); }
+.pill.clock .ckw { margin-left: auto; font-size: 11px; color: var(--ink-3); }
+.pill.clock .ckw.wx-snow, .pill.clock .ckw.wx-fog { color: #a9c4dc; }
+.pill.clock .ckw.wx-rain { color: #8fa9c8; }
+.v-cold .bar > i { background: #8fb8d8; }
+.stc.wc-yellow { color: #d8b84a; }
+.stc.wc-orange { color: #d98a3a; }
+.stc.wc-red { color: var(--red); }
+.stc.blink { animation: stblink 1s steps(2, start) infinite; }
+@keyframes stblink { to { visibility: hidden; } }
+.bld em.shut { color: var(--red); }
+.btitle .bshut { display: inline-flex; align-items: center; height: 20px; padding: 0 8px; margin-top: 6px; border: 1px solid var(--red); color: var(--red); font-weight: 700; }
+.tpanel.shut .ibox, .tpanel.shut .shelf, .tpanel.shut .trade, .tpanel.shut .qgrid, .tpanel.shut .dcard, .tpanel.shut .rcard { opacity: .45; pointer-events: none; }

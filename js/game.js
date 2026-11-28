@@ -56,31 +56,46 @@ window.SHL = (function () {
     return String(Math.floor(m / 60)).padStart(2, '0') + ':' + String(m % 60).padStart(2, '0');
   }
   function fmtTime(t) { return '第 ' + (Math.floor(t / 1440) + 1) + ' 日 ' + fmtClock(t); }
-  function dayOf(t) { return Math.floor(t / 1440) + 1; }
-  function hourOf(t) { return Math.floor((t % 1440) / 60); }
-  function isNight(t) { const h = hourOf(t); return h >= 20 || h < 5; }
-  // SPEC-TIME 2.2：四時段（半開區間）；夜暗度 w 見 D.TIME.DARK（7.1）
-  function phaseOf(t) { const m = ((t % 1440) + 1440) % 1440; return m >= 300 && m < 480 ? 'dawn' : m >= 480 && m < 1020 ? 'day' : m >= 1020 && m < 1200 ? 'dusk' : 'night'; }
-  // 天候：DEV-TIME 尚未落地（weatherAt 不在程式裡），目前一律晴。
-  // TODO(DEV-TIME)：weatherNow() 必須改為呼叫 weatherAt(t)；不要在別處另寫一套天氣邏輯（數值裁定：本輪維持晴）。
-  function weatherNow(/* t */) { return 'clear'; }
+  // SPEC-TIME 2.2／2.3：曆法與時段一律呼叫 js/time.js（SHL_TIME），不在這裡另算鐘點
+  const TM = window.SHL_TIME;
+  const dayOf = TM.dayOf, phaseOf = TM.phaseOf, minOfDay = TM.minOfDay, dayOfSeason = TM.dayOfSeason, dayOfYear = TM.dayOfYear;
+  // 相容：isNight ≡ phaseOf(t) === 'night'（即 h ≥ 20 || h < 5，行為與舊判定相同）
+  function isNight(t) { return phaseOf(t) === 'night'; }
+  // SPEC-TIME 3.2：天候是純函式，只看 S.seed 與時刻，不吃 S.rng、不存檔。
+  // FORCE_WX 只給測試固定天候（_debug.forceWeather），不存檔；正常遊戲永遠是 null。
+  let FORCE_WX = null;
+  function weatherAt(t) { if (t === undefined) t = S.t; return FORCE_WX || TM.weatherAt(S.seed, t); }
+  function fmtPhase(t) { return D.TIME_STR.phase[phaseOf(t)]; }
+  // 右欄時間：元年春・第 12 日・白天 14:30（時段名為主、鐘點為次級）
+  function fmtStamp(t) { return D.TIME_STR.stamp.replace('{date}', fmtDate(t)).replace('{day}', dayOf(t)).replace('{phase}', fmtPhase(t)).replace('{clock}', fmtClock(t)); }
   // SPEC-TIME 7.1b briefDanger 用的當下倍率 (1 + w_now) × wxRisk(當下)
-  function dangerMult(t, wx) { return (1 + D.TIME.DARK[phaseOf(t)]) * D.TIME.WX_RISK[wx || weatherNow(t)]; }
+  function dangerMult(t, wx) { return (1 + D.TIME.DARK[phaseOf(t)]) * D.TIME.WX_RISK[wx || weatherAt(t)]; }
   // SPEC-TIME 7.1 行走倍率 (1 + mean(w)) × wxRisk：取行走期間 [t0, t0+mins)，mean(w) 按每段分鐘數加權，
   // wxRisk 取期間最大值。時段邊界都在整點，逐整點切片即可（每片落在單一時段內）。
-  function walkMult(t0, mins) {
+  function darkStats(t0, mins) {
     let t = t0, sumW = 0, wx = 0;
     while (t < t0 + mins) {
       const next = Math.min(t0 + mins, Math.floor(t / 60) * 60 + 60);
       sumW += D.TIME.DARK[phaseOf(t)] * (next - t);
-      wx = Math.max(wx, D.TIME.WX_RISK[weatherNow(t)]);
+      wx = Math.max(wx, D.TIME.WX_RISK[weatherAt(t)]);
       t = next;
     }
-    return (1 + sumW / mins) * wx;
+    return { mean: mins > 0 ? sumW / mins : 0, wx: wx || 1 };
+  }
+  function walkMult(t0, mins) { const d = darkStats(t0, mins); return (1 + d.mean) * d.wx; }
+  // SPEC-TIME 7.1／AC 24 露宿遇險：0.12 + (0.25 − 0.12) × mean(w)（睡眠 8 小時按切片時長加權）；
+  // 再乘 低險地 ×0.6、野營詞綴 ×0.6、獸潮 ×1.5、wxRisk（睡眠期間最大值）、Time.mod('riskMul')，0.85 封頂只做一次。
+  // opts.bare：只回公式本體（AC 24 測點不加任何乘項）。取代舊式「起點或終點是黑夜就算 0.25」。
+  function campRisk(t, opts) {
+    const o = opts || {}, C = D.TIME.CAMP_RISK, d = darkStats(t, 8 * 60);
+    const base = C.lo + (C.hi - C.lo) * d.mean;
+    if (o.bare) return base;
+    const W = D.WILDS[S.loc] || {};
+    const r = base * (W.risk === '低' ? 0.6 : 1) * (perk('ying', 25) ? 0.6 : 1) * (tideOn() ? 1.5 : 1) * d.wx * TM.modMul('riskMul', { t, loc: S.loc, exposure: 'camp', kind: 'camp' });
+    return Math.min(D.WORLD.RISK_CAP, r);
   }
   // 曆法：一季 30 天、一年 120 天；開局元年春第 1 日、20 歲
-  function seasonOf(t) { return Math.floor((dayOf(t) - 1) / 30) % 4; }
-  function yearOf(t) { return Math.floor((dayOf(t) - 1) / 120); }
+  const seasonOf = TM.seasonOf, yearOf = TM.yearOf;
   function ageOf(t) { return START_AGE + yearOf(t); }
   function fmtDate(t) { return (D.YEAR_NAMES[yearOf(t)] || (yearOf(t) + 1)) + '年' + D.SEASONS[seasonOf(t)]; }
 
@@ -213,13 +228,28 @@ window.SHL = (function () {
     if (r <= 1) return { id: 'heavy', name: '超載', mult: perk('fuz', 50) ? 0.7 : 0.6, fat: 1.5 };
     return { id: 'over', name: '超載（過量）', mult: 0.4, fat: 2 };
   }
+  // SPEC-TIME 6.1：生存條所在的警示階（D.SURVIVAL_STAGES；UI 與日誌共用）
+  function stageOf(stat, v) {
+    const L = D.SURVIVAL_STAGES[stat];
+    if (stat === 'food') return L.find((x) => (x.open ? v > x.from : v >= x.from)) || L[L.length - 1];
+    return L.find((x) => v < x.to) || L[L.length - 1];
+  }
+  function coldFx(v) { return stageOf('cold', v === undefined ? S.cold || 0 : v).fx || {}; }
   function speedMult() {
     let m = loadBand().mult * (1 + affixSum('spd') / 100);
     if (S.fat >= 80) m *= 0.85;
+    const cf = coldFx(); if (cf.speed) m *= cf.speed; // 寒顫 ×0.9、凍僵 ×0.8（6.1）
     return m;
   }
   // SPEC-TIME 7.2 腳程：M 以整數百分點 half-up 取兩位，判檔與算時間都用這個值（倍率公式本身不變）
   function paceMult() { return Math.floor(speedMult() * 100 + 0.5 + 1e-9) / 100; }
+  // 單一邊的有效腳程 M_i：雪天野徑 ×0.85、官道 ×0.925 與左欄 M 相乘後再 half-up 取兩位（3.1、7.2）
+  // 假設：雪的倍率取「出發當下」的天候（行走途中跨 05:00 換天候日不重算）。
+  function edgeMult(e, t) {
+    const sp = D.TIME.WX_SPEED[weatherAt(t === undefined ? S.t : t)];
+    const f = sp ? (e.road ? sp.road : sp.wild) : 1;
+    return Math.floor(speedMult() * f * 100 + 0.5 + 1e-9) / 100;
+  }
   function paceName(m) {
     const k = Math.round((m === undefined ? paceMult() : m) * 100), cuts = D.TIME.PACE_CUTS; let i = 0;
     while (i < cuts.length && k < Math.round(cuts[i] * 100)) i++;
@@ -250,6 +280,7 @@ window.SHL = (function () {
     let h = 0.86 + affixSum('acc') / 100 + profLv(weaponType()) * 0.0015 + (attrVal('shen') - 10) * 0.005;
     if (S.fat >= 80) h -= 0.15;
     if (S.food < 20) h -= 0.05;
+    const cf = coldFx(); if (cf.hit) h += cf.hit; // 寒顫 −10%、凍僵 −15%（6.1；命中相加後夾 0.3–0.98）
     return clamp(h, 0.3, 0.98);
   }
   function dodgeChance() { return clamp(0.1 + profLv('shan') * 0.002 + (attrVal('shen') - 10) * 0.01, 0.02, 0.45); }
@@ -278,7 +309,7 @@ window.SHL = (function () {
       skills: [],
       equip: { main: null, off: null, head: null, chest: null, gloves: null, boots: null, amulet: null, ring1: null, ring2: null, belt: null, bag: null, cart: null, cartLocked: true },
       pack: [], ground: { node: 'huiyao', items: [] },
-      nodes: {}, fire: false,
+      nodes: {}, fire: false, fireUntil: 0, cold: 0, // SPEC-TIME 10.1：營火熄滅時刻、寒意（缺欄位的舊存檔以 0 補，見 timeFields）
       quests: [], rumors: [], freeRumor: {},
       world: { tide: null, next: 0, hurt: {} },
       // SPEC-01 §1／§3.3 預留欄位（只存、不做介面；內容由 SPEC-02 定）
@@ -493,30 +524,194 @@ window.SHL = (function () {
     commit();
   }
 
-  // ================= 時間流逝與生存 =================
+  // ================= 時間流逝與生存（SPEC-TIME 第 5、6 節：按整點切片結算） =================
+  // 10.1：缺欄位（舊存檔）讀到時以預設補（寒意 0、營火熄滅時刻 0）；不寫舊檔遷移、不升 SCHEMA
+  function timeFields(st) {
+    if (typeof st.cold !== 'number') st.cold = 0;
+    if (typeof st.fireUntil !== 'number') st.fireUntil = 0;
+  }
+  // 5.3 exposure：opts.exposure 可覆寫；否則依場景推導。
+  // 假設：在地圖畫面（S.scene='map'）時依所在節點種類推導（城鎮→town、地城→dungeon、荒野→有火 camp／無火 outdoor）。
+  function exposureOf() {
+    if (S.scene === 'town') { const B = bld(); return B && B.place === S.loc ? 'indoor' : 'town'; }
+    if (S.scene === 'dungeon') return 'dungeon';
+    const N = D.NODES[S.loc];
+    if (N && N.kind === 'town') return 'town';
+    if (N && N.kind === 'dungeon') return 'dungeon';
+    return S.fire ? 'camp' : 'outdoor';
+  }
+  // 地點寒冷差異（10.1 coldOffset，預設 0；數值歸 SPEC-SEASON，本包不填）
+  function coldOffsetOf(id) { const N = D.NODES[id] || {}, X = D.WILDS[id] || D.DUNGEONS[id] || {}; return N.coldOffset || X.coldOffset || 0; }
+  // 禦寒點數 S.warm = min(4, Σ裝備.warm)（裝備數值歸 SPEC-SEASON，目前全為 0）
+  function warmPts() { let w = 0; allEquipped().forEach((eq) => (w += eqBase(eq).warm || 0)); return Math.min(D.TIME.COLD.WARM_MAX, w); }
+  // 6.4 寒意每小時變化。outdoor：g = max(0, S_eff + P + W + coldOffset − warm)；其餘為緩解或地城的 coldOffset
+  function coldRate(exposure, t, wx, loc) {
+    const C = D.TIME.COLD;
+    if (exposure === 'outdoor') {
+      const add = TM.modAdd('coldGainAdd', { t, loc, exposure, weather: wx });
+      return Math.max(0, TM.sEff(t) + C.PHASE[phaseOf(t)] + C.WX[wx] + coldOffsetOf(loc) - warmPts() + add);
+    }
+    if (exposure === 'dungeon') return Math.max(0, coldOffsetOf(loc));
+    if (exposure === 'camp') return C.RELIEF.camp[wx];
+    return C.RELIEF[exposure] || 0;
+  }
+  // ---- 切片邊界：每個整點 ∪ S.fireUntil（5.1）；另把營業邊界與關前 30 分（8.1）、曆法事件起訖（9.3）也當邊界，
+  // 讓 shop.*／cal.event 的處理器看到的 S.t 就是該時刻（假設：規格 5.1 只列整點與 fireUntil，多切的點只讓切片更細，速率結果不變）。
+  let SHOP_CUTS = null;
+  function shopCuts() {
+    if (SHOP_CUTS) return SHOP_CUTS;
+    const set = new Set();
+    Object.keys(D.BUILDINGS).forEach((bid) => { const h = TM.hoursOf(D.BUILDINGS[bid]); if (h) { set.add(h[0]); set.add(h[1]); set.add(((h[1] - D.TIME.SHOP_WARN) % 1440 + 1440) % 1440); } });
+    return (SHOP_CUTS = Array.from(set).filter((m) => m % 60 !== 0));
+  }
+  // 曆法事件（9.3）在某日的開始與結束時刻；dayOfSeason／startMin／durationH 任一為 null 即不觸發（十二神祭空殼）
+  function calSpans(dayLo, dayHi) {
+    const out = [];
+    D.CAL_EVENTS.forEach((E) => {
+      if (E.dayOfSeason == null || E.startMin == null || E.durationH == null) return;
+      for (let d = dayLo; d <= dayHi; d++) {
+        const t = (d - 1) * 1440;
+        if ((E.season == null || seasonOf(t) === E.season) && dayOfSeason(t) === E.dayOfSeason) out.push({ E, start: t + E.startMin, end: t + E.startMin + Math.round(E.durationH * 60) });
+      }
+    });
+    return out;
+  }
+  function calLookback() { let h = 0; D.CAL_EVENTS.forEach((E) => { if (E.durationH) h = Math.max(h, E.durationH); }); return Math.ceil(h / 24) + 1; }
+  function nextCut(st, t, tEnd) {
+    let n = Math.floor(t / 60) * 60 + 60;
+    if (st.fire && st.fireUntil > t && st.fireUntil < n) n = st.fireUntil;
+    const base = t - minOfDay(t);
+    shopCuts().forEach((m) => [base + m, base + m + 1440].forEach((x) => { if (x > t && x < n) n = x; }));
+    calSpans(dayOf(t) - calLookback(), dayOf(t) + 1).forEach((s) => [s.start, s.end].forEach((x) => { if (x > t && x < n) n = x; }));
+    return Math.min(n, tEnd);
+  }
+  // 切片內線性變化 v(s) = a + (b − a)·s（s ∈ [0, 1]）時，條件成立的區段：ge＝v ≥ X，否則 v < X
+  function span(a, b, X, ge) {
+    const ok0 = ge ? a >= X : a < X, ok1 = ge ? b >= X : b < X;
+    if (ok0 && ok1) return [0, 1];
+    if (!ok0 && !ok1) return [0, 0];
+    const s = clamp((X - a) / (b - a), 0, 1);
+    return ok0 ? [0, s] : [s, 1];
+  }
+  // ---- 5.2 切片結算核心：live＝真的推進（寫 S、發事件、日誌、死亡）；否則只在副本上算（previewSurvival 用，純函式）
+  function settle(st, mins, opts, live) {
+    const tEnd = st.t + mins, base = opts.exposure || exposureOf(), DR = D.TIME.DRAIN, mh = maxHp();
+    const fatBase = (opts.fatMult || 1) * (1 - affixSum('fatred') / 100) * clamp(1 - (attrVal('xin') - 10) * 0.02, 0.6, 1.3);
+    while (st.t < tEnd) {
+      const t0 = st.t, t1 = nextCut(st, t0, tEnd), dm = t1 - t0, f = dm / 60;
+      // 1. 時段、季節、天候、exposure 一律取切片起點
+      const phase = phaseOf(t0), season = seasonOf(t0), wx = weatherAt(t0);
+      const exposure = base === 'camp' && !st.fire ? 'outdoor' : base;
+      const ctx = { t: t0, loc: S.loc, exposure, phase, season, weather: wx };
+      // 2. 營火：到時熄滅（B4：熄火時刻是切片邊界，之後的切片視為 outdoor）
+      if (st.fire && t1 >= st.fireUntil) { st.fire = false; if (live) log(D.TIME_STR.fireOut); }
+      const pre = { food: st.food, fat: st.fat, cold: st.cold };
+      // 3. 飽食：opts.food 為整個行動的總量，按切片分鐘比例攤派；沒給就 4／小時。
+      //    季節倍率取切片起點；睡眠（opts.foodSeasonAt）依 6.2 裁定以起床時刻判定、整段同一倍率
+      const fs = D.TIME.FOOD_MULT[opts.foodSeasonAt !== undefined ? seasonOf(opts.foodSeasonAt) : season] * TM.modMul('foodMult', ctx);
+      const rawFood = st.food - (opts.food !== undefined ? (opts.food * dm) / mins : 4 * f) * fs;
+      st.food = clamp(rawFood, 0, 100);
+      // 4. 疲累：沒給就 2／小時；只乘正值（恢復量不乘）；寒意 ≥30（切片起點）再 ×1.2
+      const df = opts.fat !== undefined ? (opts.fat * dm) / mins : 2 * f;
+      const fm = fatBase * (coldFx(pre.cold).fatMult || 1) * TM.modMul('fatMult', ctx);
+      const rawFat = st.fat + (df > 0 ? df * fm : df);
+      st.fat = clamp(rawFat, 0, 100);
+      // 5. 寒意
+      const rawCold = st.cold + coldRate(exposure, t0, wx, S.loc) * f;
+      st.cold = clamp(rawCold, 0, 100);
+      // 6. 生命：切片內食、疲、寒都是線性變化，扣血與回復只算「條件成立的那一段」的時間
+      //    （AC 23：飽食 5、每小時 1.25，第 4.0 小時歸零，其後 9 小時才扣 3×9＝27；不論就寢是否在整點都一樣）
+      const len = (a, b) => Math.max(0, Math.min(a[1], b[1]) - Math.max(a[0], b[0]));
+      const zFood = span(-pre.food, -rawFood, 0, true), fat100 = span(pre.fat, rawFat, 100, true);
+      const c90 = span(pre.cold, rawCold, 90, true), c100 = span(pre.cold, rawCold, 100, true), cLt100 = span(pre.cold, rawCold, 100, false);
+      const dr = { cold: (DR.cold90 * len(c90, cLt100) + DR.cold100 * len(c100, [0, 1])) * f, food: DR.food * len(zFood, [0, 1]) * f, fat: DR.fat * len(fat100, [0, 1]) * f };
+      const drain = Math.min(dr.cold + dr.food + dr.fat, (DR.cap + TM.modAdd('hpDrainCap', ctx)) * f);
+      const hp0 = st.hp;
+      // 自然回復：飽食 ≥30 且 寒意 <60（6.5）
+      const rg = len(span(pre.food, rawFood, 30, true), span(pre.cold, rawCold, 60, false));
+      if (!opts.noRegen && rg > 0) st.hp = Math.min(mh, st.hp + D.TIME.REGEN * f * rg);
+      st.hp -= drain;
+      // 睡眠保護（6.5、Q7）：hpFloor 只由客棧 rest／營帳 bunk 傳入，生存扣血最低留到此值；露宿與一般行動不傳
+      if (opts.hpFloor !== undefined && st.hp < opts.hpFloor) st.hp = opts.hpFloor;
+      if (drain > 0) {
+        // 死因：本切片扣血最大的一項，同值時 凍 > 餓 > 力竭
+        const k = ['cold', 'food', 'fat'].reduce((a, b) => (dr[b] > dr[a] ? b : a), 'cold');
+        st.cause = D.TIME_STR.cause[k];
+      }
+      st.t = t1;
+      // 7. 致死：中止後續切片，S.t 停在該切片終點
+      if (st.hp <= 0) { st.deadAt = t1; break; }
+      if (!live) continue;
+      // 8. 跨階與結算事件
+      ['food', 'fat', 'cold'].forEach((k) => { const a = stageOf(k, pre[k]), b = stageOf(k, st[k]); if (a !== b) TM.emit('survival.stage', { stat: k, from: a.id, to: b.id }); });
+      TM.emit('survival.settle', { drain: { food: dr.food, fat: dr.fat, cold: dr.cold }, hpDelta: st.hp - hp0 });
+      TM.emit('time.slice', { t0, t1, phase, season, weather: wx, exposure });
+      // 9. 邊界事件（固定順序）
+      boundaryEvents(t0, t1);
+    }
+  }
+  function boundaryEvents(t0, t1) {
+    const E = TM.emit;
+    if (t1 % 60 === 0) E('time.hour', { t: t1, hour: minOfDay(t1) / 60 });
+    const p0 = phaseOf(t0), p1 = phaseOf(t1); if (p0 !== p1) E('time.phase', { from: p0, to: p1, t: t1 });
+    const w0 = weatherAt(t0), w1 = weatherAt(t1); if (w0 !== w1) E('time.weather', { from: w0, to: w1, t: t1 });
+    if (minOfDay(t1) === 0) {
+      E('time.newDay', { day: dayOf(t1) });
+      const s0 = seasonOf(t1 - 1), s1 = seasonOf(t1);
+      if (s0 !== s1) E('time.season', { from: s0, to: s1 });
+      if (dayOfSeason(t1) === D.TIME.EVE_DAY) E('time.seasonEve', { season: s1, next: (s1 + 1) % 4, daysLeft: D.TIME.SEASON_DAYS - D.TIME.EVE_DAY + 1 });
+      if (yearOf(t1) !== yearOf(t1 - 1)) E('time.year', { year: yearOf(t1) });
+    }
+    calSpans(dayOf(t1) - calLookback(), dayOf(t1)).forEach((s) => {
+      if (s.start === t1) E('cal.event', { id: s.E.id, kind: s.E.kind, stage: 'start' });
+      if (s.end === t1) E('cal.event', { id: s.E.id, kind: s.E.kind, stage: 'end' });
+    });
+    shopEvents(t1);
+  }
+  // 8.1：營業邊界與關前 30 分發 shop.open／shop.close；「X 快打烊了」日誌只寫人所在城鎮的店，合成一行
+  function shopEvents(t) {
+    const m = minOfDay(t), soon = [];
+    Object.keys(D.BUILDINGS).forEach((bid) => {
+      const B = D.BUILDINGS[bid], h = TM.hoursOf(B); if (!h) return;
+      if (m === h[0]) TM.emit('shop.open', { bid, t, soon: false });
+      if (m === h[1]) TM.emit('shop.close', { bid, t, soon: false });
+      if (m === ((h[1] - D.TIME.SHOP_WARN) % 1440 + 1440) % 1440) { TM.emit('shop.close', { bid, t, soon: true }); if (S.scene === 'town' && B.place === S.loc && isOpen(bid, t)) soon.push(B.name); }
+    });
+    if (soon.length) log(D.TIME_STR.soon.replace('{names}', soon.join('、')));
+  }
+  // B10：0 小時直接返回、不發事件；負數視為錯誤，不回溯時間
   function passTime(hours, opts) {
     opts = opts || {};
-    const mins = Math.round(hours * 60);
-    const startDay = dayOf(S.t);
-    S.t += mins;
-    S.stats.hours += hours;
-    const fatMult = (opts.fatMult || 1) * (1 - affixSum('fatred') / 100) * clamp(1 - (attrVal('xin') - 10) * 0.02, 0.6, 1.3);
-    const foodMult = seasonOf(S.t) === 3 ? 1.25 : 1; // 冬季飽食消耗 +25%
-    S.food = clamp(S.food - (opts.food !== undefined ? opts.food : 4 * hours) * foodMult, 0, 100);
-    const df = opts.fat !== undefined ? opts.fat : 2 * hours;
-    S.fat = clamp(S.fat + (df > 0 ? df * fatMult : df), 0, 100);
-    // 生命：飽食過低回復停滯、斷糧扣血；過度疲累扣血
-    if (S.food <= 0) { S.hp -= 3 * hours; S.stats.cause = '餓死荒野'; }
-    else if (S.food >= 30 && !opts.noRegen) S.hp = Math.min(maxHp(), S.hp + 1 * hours);
-    if (S.fat >= 100) { S.hp -= 2 * hours; S.stats.cause = '力竭倒地'; }
-    // SPEC-TIME Q7：hpFloor 只由客棧 rest／營帳 bunk 傳入，生存扣血最低留到此值（店家叫醒、灌湯）；露宿與一般等待不傳
-    if (opts.hpFloor !== undefined && S.hp < opts.hpFloor) S.hp = opts.hpFloor;
-    S.food = Math.round(S.food); S.fat = Math.round(S.fat); S.hp = Math.round(S.hp);
-    // SPEC-01 §2：一次 passTime 跨 ≥2 個日界時逐日補算；每次日結看到的 S.t 是該日 00:00（SPEC-TIME B2）
-    const endT = S.t, endDay = dayOf(endT);
-    for (let d = startDay + 1; d <= endDay; d++) { S.t = (d - 1) * 1440; newDay(d); }
-    S.t = endT;
+    if (!(hours > 0)) { if (hours < 0) console.assert(false, 'passTime：時數不可為負', hours); return; }
+    const mins = Math.round(hours * 60); if (mins <= 0) return;
+    timeFields(S);
+    const t0 = S.t;
+    settle(S, mins, opts, true);
+    S.stats.hours += (S.t - t0) / 60;
+    // 內部數值切片中保留小數，passTime 結束才四捨五入存回（6.2 裁定：飽食整數儲存，P-01 低優先不處理）
+    S.food = Math.round(S.food); S.fat = Math.round(S.fat); S.cold = Math.round(S.cold); S.hp = Math.round(S.hp);
+    if (S.cause) { S.stats.cause = S.cause; delete S.cause; }
+    delete S.deadAt;
     checkDeath();
+  }
+  // 6.5 預覽：純函式，不改 S、不用 S.rng；回傳預測的食、疲、寒、hp 與是否致死（deathIn＝距今幾小時）
+  function previewSurvival(hours, opts) {
+    opts = opts || {};
+    const st = { t: S.t, food: S.food, fat: S.fat, cold: S.cold || 0, hp: S.hp, fire: S.fire, fireUntil: S.fireUntil || 0 };
+    const mins = Math.round((hours || 0) * 60);
+    if (mins > 0) settle(st, mins, opts, false);
+    const dead = st.hp <= 0;
+    return { food: Math.round(st.food), fat: Math.round(st.fat), cold: Math.round(st.cold), hp: Math.max(0, Math.round(st.hp)), dead, deathIn: dead ? (st.deadAt - S.t) / 60 : null, cause: dead ? st.cause : null };
+  }
+  // 預測會死時的二次確認（6.5、B15）：同一個行動在同一時刻按第二次才執行；不存檔
+  let deathAck = null;
+  function deathConfirm(key, pv) {
+    if (!pv.dead) { deathAck = null; return true; }
+    if (deathAck === key) { deathAck = null; return true; }
+    deathAck = key;
+    log(D.TIME_STR.deathWarn.replace('{h}', Math.max(1, Math.ceil(pv.deathIn))), 'bad');
+    emit();
+    return false;
   }
   function newDay(day) {
     if (day === undefined) day = dayOf(S.t);
@@ -531,6 +726,50 @@ window.SHL = (function () {
     restockShops();
     questTick(day);
     rumorTick(day);
+  }
+  // ---- 本包自己掛的預設處理器（9.1）：newDay 改由 time.newDay 事件呼叫（內容不變）；其餘只寫日誌 ----
+  TM.on('time.newDay', (e) => newDay(e.day));
+  TM.on('time.seasonEve', (e) => log(e.next === 3 ? D.TIME_STR.winterEve : D.TIME_STR.seasonEve.replace('{next}', D.SEASONS[e.next]), e.next === 3 ? 'bad' : ''));
+  TM.on('survival.stage', (e) => {
+    const L = D.SURVIVAL_STAGES[e.stat], a = L.findIndex((x) => x.id === e.from), b = L.findIndex((x) => x.id === e.to), st = L[b];
+    const worse = b > a, txt = (worse ? D.TIME_STR.stageUp : D.TIME_STR.stageDown).replace('{stat}', D.TIME_STR.stat[e.stat]).replace('{stage}', st.name);
+    // 升到「橘」以上要有明顯提示（6.1）：日誌標紅；畫面上的狀態牌另由右欄顯示
+    log(txt, worse && (st.color === 'orange' || st.color === 'red') ? 'bad' : '');
+  });
+  // ================= 店鋪營業（SPEC-TIME 第 8 節） =================
+  // isOpen(bid, t)：minOfDay 落在 [開, 關)；再過 Time.mod('shopHours') 覆寫（後註冊者優先）。純函式
+  function isOpen(bid, t) {
+    const B = D.BUILDINGS[bid]; if (!B) return false;
+    if (t === undefined) t = S.t;
+    const open = TM.inHours(TM.hoursOf(B), t);
+    const o = TM.modOverride('shopHours', { bid, t, loc: B.place, open });
+    return o === undefined ? open : !!o;
+  }
+  // 下一次開門的時刻（≥ t）；24 小時營業回傳 t
+  function nextOpen(bid, t) {
+    if (t === undefined) t = S.t;
+    for (let x = t, n = 0; n <= 4 * 48; n++, x = Math.floor(x / 30) * 30 + 30) if (isOpen(bid, x)) return x;
+    return null;
+  }
+  function closedTag(bid) { const x = nextOpen(bid); return D.TIME_STR.closedTag.replace('{time}', x === null ? '—' : fmtClock(x)); }
+  // 服務只在行動開始時檢查（做到一半跨過關門時間不中斷）；打烊只停用服務，不踢人（B7）
+  function shopShut() {
+    if (S.scene !== 'town' || !S.townTab || isOpen(S.townTab)) return false;
+    const B = D.BUILDINGS[S.townTab], x = nextOpen(S.townTab);
+    log(D.TIME_STR.closedLine.replace('{name}', B.name).replace('{time}', x === null ? '—' : fmtClock(x)), 'bad'); emit();
+    return true;
+  }
+  // 7.2 等待：waitUntil('phase'＝下一個時段，或 'open:<bid>'＝該店開門)；最短 30 分、最長 12 小時；exposure 依場景推導
+  function waitUntil(target) {
+    if (!S || S.dead || S.combat || S.scene === 'event' || S.scene === 'loot') return;
+    let to = null;
+    if (target === 'phase') { const P = [300, 480, 1020, 1200], m = minOfDay(S.t); const nx = P.find((x) => x > m); to = S.t - m + (nx === undefined ? 1440 + P[0] : nx); }
+    else if (typeof target === 'string' && target.indexOf('open:') === 0) { to = nextOpen(target.slice(5)); if (to === S.t) return; }
+    if (to === null) return;
+    const W = D.TIME.WAIT, mins = clamp(to - S.t, W.min, W.max);
+    if (!deathConfirm('wait:' + target + ':' + S.t, previewSurvival(mins / 60))) return;
+    passTime(mins / 60);
+    commit();
   }
   function nodeState(id) {
     if (!S.nodes[id]) {
@@ -553,10 +792,13 @@ window.SHL = (function () {
     die(cause || S.stats.cause || '不明');
     return true;
   }
+  // B6：行走途中死亡時，死亡地點顯示為「甲往乙的途中」（travel() 設定，passTime 結束即清掉）
+  let enRoute = null;
   function die(cause) {
     const N = D.NODES[S.loc];
+    const where = enRoute ? D.TIME_STR.enRoute.replace('{from}', D.NODES[enRoute.from].name).replace('{to}', D.NODES[enRoute.to].name) : N.name;
     S.dead = {
-      cause, where: N.name, when: fmtTime(S.t),
+      cause, where, when: fmtTime(S.t),
       days: dayOf(S.t), hours: Math.round(S.stats.hours),
       name: fullName(), origin: identity(), age: ageOf(S.t), date: fmtDate(S.t),
       // SPEC-02 §12.2 墓誌銘接口：本包只寫 name（玩家自取名字）；善惡、所屬、終局等欄位屬之後的包
@@ -570,7 +812,7 @@ window.SHL = (function () {
     };
     S.combat = null; S.event = null; S.loot = null; S.overlay = null;
     S.scene = 'dead';
-    log(fullName() + '死於' + N.name + '：' + cause, 'bad');
+    log(fullName() + '死於' + where + '：' + cause, 'bad');
     // 純永久死亡：刪檔（檢查點模式則保留 checkpoint 快照，本版介面不開放）
     if (S.meta.saveMode === 'permadeath') wipeSave();
   }
@@ -605,6 +847,8 @@ window.SHL = (function () {
     if (u.hp) { const heal = u.hp + Math.round(profLv('yao') * 0.3); S.hp = Math.min(maxHp(), S.hp + heal); log('飲下' + I.name + '，生命 +' + heal); if (inCombat) fx({ t: 'p_heal', d: heal, php: S.hp }); }
     if (u.fat) { S.fat = clamp(S.fat + u.fat, 0, 100); log('服下' + I.name + '，疲累 ' + u.fat); if (inCombat && !u.hp) fx({ t: 'p_text', text: '疲累 ' + u.fat }); }
     if (u.food) { const f = u.food + (it.k === 'ration' ? Math.round(profLv('peng') * 0.2) : 0); S.food = clamp(S.food + f, 0, 100); log('吃下' + I.name + '，飽食 +' + f); if (inCombat && !u.fat) fx({ t: 'p_text', text: '飽食 +' + f }); }
+    // SPEC-TIME 10.1：物品 use.cold（暖身，負值＝降寒意）；數值歸 SPEC-SEASON，目前沒有物品填這個欄位
+    if (u.cold) { S.cold = clamp((S.cold || 0) + u.cold, 0, 100); log(I.name + '下肚，' + D.TIME_STR.stat.cold + ' ' + u.cold); }
     it.n -= 1; if (it.n <= 0) S.pack[i] = null;
     return true;
   }
@@ -617,6 +861,7 @@ window.SHL = (function () {
     const eq = it.eq; const need = ID_NEED[eq.rarity] || 0;
     if (pay) {
       const B = bld(); if (!B || !B.identify || S.scene !== 'town') return false;
+      if (shopShut()) return false;
       const fee = identifyFee(eq);
       if (S.silver < fee) { log('銀兩不足，鑑定要 ' + fee + ' 兩。', 'bad'); emit(); return false; }
       S.silver -= fee; addRep('star', fee / 50);
@@ -761,15 +1006,22 @@ window.SHL = (function () {
   }
   // risk_base：全程官道 0.04、含野徑單段 0.22、含野徑多段 0.30（遇襲、顯示、簡報、委託單共用）
   function riskBase(edges) { return edges.some((e) => !e.road) ? (edges.length > 1 ? 0.3 : 0.22) : 0.04; }
-  // 趕路時數：ceil(Σh ÷ M)，至少 1（判檔與算時間用同一個 M）
-  function walkHours(edges) { return Math.max(1, Math.ceil(edges.reduce((a, e) => a + e.h, 0) / paceMult())); }
+  // 趕路時數（SPEC-TIME 7.2「野外步行」與腳程檔第 2 條）：T = ceil(2·Σ(h_i ÷ M_i)) ÷ 2，至少 0.5 小時。
+  // M_i 為該邊的有效腳程（含雪天，見 edgeMult），以整數百分點相除避免 6÷0.6 這類浮點誤差多進 0.5 小時。
+  // （DEV-TIME 前的實作是 ceil(Σh ÷ M) 整小時、至少 1；規格 v0.3 起已改 0.5 小時進位）
+  function walkHours(edges, t) { return walkHoursOf(edges.map((e) => [e.h, edgeMult(e, t)])); }
+  // 純公式：[[h_i, M_i], …] → 小時（M_i 已取兩位）
+  function walkHoursOf(list) {
+    const x = list.reduce((a, [h, m]) => a + (h * 100) / Math.round(m * 100), 0);
+    return Math.max(0.5, Math.ceil(2 * x - 1e-9) / 2);
+  }
   // 路線險值（唯一公式；遇襲判定、travelPreview、route() 第三層都只呼叫這一個）：
   // SPEC-TIME 7.1：risk_base × (1 + mean(w)) × wxRisk（整段路程），再乘超載、輕功、獸潮、R（SPEC-01 §4.8），
   // 0.85 封頂在所有乘項之後只做一次。t0＝出發時刻；不再看出發當下 isNight（SPEC-01 第 2 節）。
   function routeRisk(edges, t0) {
     const band = loadBand();
     const wild = edges.some((e) => !e.road);
-    let risk = riskBase(edges) * walkMult(t0, walkHours(edges) * 60);
+    let risk = riskBase(edges) * walkMult(t0, walkHours(edges, t0) * 60) * TM.modMul('riskMul', { t: t0, loc: S.loc, exposure: 'outdoor', kind: 'walk' });
     if (band.id === 'heavy' || band.id === 'over') risk *= 1.4;
     if (wild && perk('jiao', 25)) risk *= 0.8;
     if (wild && tideOn()) risk *= 1.5;
@@ -785,7 +1037,8 @@ window.SHL = (function () {
   }
   function travelPreview(to) {
     const edges = route(S.loc, to);
-    const sm = paceMult();
+    // 地圖趕路列用該路線的有效 M（含雪天；7.2 第 5 條）。假設：官道與野徑混走時取較低（較慢）的那個 M 顯示
+    const sm = edges.length ? Math.min.apply(null, edges.map((e) => edgeMult(e))) : paceMult();
     const hours = walkHours(edges);
     const band = loadBand();
     const xingRed = clamp(1 - profLv('jiao') * 0.003 - (S.skills.includes('jixing') ? 0.1 : 0), 0.4, 1);
@@ -796,7 +1049,10 @@ window.SHL = (function () {
     const risk = routeRisk(edges, S.t); // 畫面險級與 travel() 遇襲判定用同一個值
     const riskName = riskTier(risk);
     const via = edges.length > 1 ? D.NODES[edges.stops[0]].name : (edges[0] && edges[0].road ? '官道' : '野徑');
-    return { edges, hours, fat, food, risk, riskName, mult: sm, pace: paceName(sm), via, wild, R };
+    // 6.5：行走前預覽生存（travel() 用同一組參數真的走）；passOpts.fat 先扣回 fatred，因為 passTime 會再乘一次
+    const passOpts = { fat: fat / ((1 - affixSum('fatred') / 100) || 1), food, exposure: 'outdoor' };
+    const surv = previewSurvival(hours, passOpts);
+    return { edges, hours, fat, food, risk, riskName, mult: sm, pace: paceName(sm), via, wild, R, weather: weatherAt(), passOpts, surv };
   }
   // SPEC-TIME 7.1b briefDanger「出城路險」：本鎮到每個已知目的地照 route() 的路線各算一次，取最高。
   // risk_base × R × (1 + w_now) × wxRisk × 獸潮 1.5（只乘含野徑的路線）；不含超載、詞綴；封頂後取三位分檔。
@@ -819,7 +1075,7 @@ window.SHL = (function () {
   // 委託單基準路程級（7.1b）：白天（w=0）、不超載、無獸潮、天候取當日、R 取現值
   function baseRouteTier(edges) {
     const wild = edges.some((e) => !e.road);
-    return riskTier(riskBase(edges) * riskR(wild) * D.TIME.WX_RISK[weatherNow(S.t)]);
+    return riskTier(riskBase(edges) * riskR(wild) * D.TIME.WX_RISK[weatherAt(S.t)]);
   }
   // 收集單「已知來源」只算採集點與獸跡產地（SPEC-01 4.9、Q-v5-3）；獵殺單看 QUEST_GEN.where 與該獸的獸跡
   function questSources(q) {
@@ -860,18 +1116,22 @@ window.SHL = (function () {
     if (totalWt() > carryCap() * 1.25) { log('背得太重寸步難行，先丟掉些東西。', 'bad'); return emit(); }
     const p = travelPreview(to);
     if (!p.edges.length) return;
-    const fromName = D.NODES[S.loc].name;
+    if (!deathConfirm('travel:' + to + ':' + S.t, p.surv)) return; // 預測會死：二次確認（6.5）
+    const from = S.loc, fromName = D.NODES[from].name;
     if (S.ground.items.length && S.ground.node === S.loc) log('留在' + fromName + '地面的東西沒帶走。');
     S.fire = false;
     S.dest = null;
-    S.loc = to; S.ground = { node: to, items: [] };
     const bandId = loadBand().id;
-    passTime(p.hours, { fat: p.fat / ((1 - affixSum('fatred') / 100) || 1), food: p.food });
+    // B6：先 passTime（exposure 明確為 outdoor），走完才改 S.loc；途中死亡時死亡地點記為「途中」
+    enRoute = { from, to };
+    passTime(p.hours, p.passOpts);
+    enRoute = null;
+    if (S.dead) return commit();
+    S.loc = to; S.ground = { node: to, items: [] };
     gainProf('jiao', 3 * p.hours);
     // 負重訓練：常態重負以上趕路才會漲
     if (bandId !== 'light') gainProf('fuz', (bandId === 'normal' ? 4 : 6) * p.hours);
     log('自' + fromName + '出發，經' + p.via + '，' + p.hours + ' 小時後抵達' + D.NODES[to].name + '。');
-    if (S.dead) return commit();
     HOOKS.lastEncRisk = p.risk; // 只給測試讀：本趟遇襲判定實際用的 risk
     if (rnd() < p.risk) { startEvent(to); return commit(); }
     enterNode(to);
@@ -948,6 +1208,7 @@ window.SHL = (function () {
   function buy() {
     const tr = S.trade; if (!tr || tr.mode !== 'buy') return;
     const rows = shopRows(); const row = rows[tr.idx]; if (!row || row.stock <= 0) return;
+    if (shopShut()) return;
     if (rowLocked(row)) { log('這件貨不賣生客：' + Object.keys(row.rep).map((f) => D.FACTIONS[f].name + '聲望 ' + row.rep[f]).join('、') + '。', 'bad'); return emit(); }
     const qty = row.it.k === 'eq' ? 1 : Math.min(tr.qty, row.stock);
     const cost = buyPrice(row) * qty;
@@ -981,6 +1242,7 @@ window.SHL = (function () {
     const it = S.pack[slot]; if (!it) return;
     const B = bld();
     if (!B || !B.buys || S.scene !== 'town') { log('要進店裡才能賣。', 'bad'); return emit(); }
+    if (shopShut()) return;
     const p = sellPrice(it); let got = p;
     if (!p) { log(B.name + '不收' + itemName(it) + '。', 'bad'); return emit(); }
     // 交易稅 5%（SPEC-01 §5.7）：在 sell() 內扣，日誌附「（交易稅 X 兩）」；熟練與聲望仍以行情所得計（沿用現況）
@@ -1019,7 +1281,8 @@ window.SHL = (function () {
   function sleepFoodCost(hours) { return 1.25 * hours; }
   function sleepToMorning(opts) {
     const now = S.t; const hours = (wakeTime(now) - now) / 60; // 起床公式不變（wakeTime）
-    passTime(hours, Object.assign({ food: sleepFoodCost(hours), fat: 0, noRegen: true }, opts || {}));
+    // 6.2 裁定：跨季睡眠以起床時刻判定冬季 ×1.25，整段同一倍率（foodSeasonAt）；exposure 為 indoor（客棧、傷兵帳）
+    passTime(hours, Object.assign({ food: sleepFoodCost(hours), fat: 0, noRegen: true, foodSeasonAt: now + hours * 60, exposure: 'indoor' }, opts || {}));
   }
   function innCost() {
     const m = townHurt(S.loc) ? 2 : 1;
@@ -1028,13 +1291,15 @@ window.SHL = (function () {
   // 建築服務：一律先檢查人在不在那種建築裡
   function service(k, arg) {
     if (S.scene !== 'town' || S.dead) return;
+    if (shopShut()) return; // 8.1：打烊時服務停用（客棧、傷兵帳、神廟、關樓 24 小時）
     const c = innCost();
     switch (k) {
       case 'rest': if (!inBld('inn') || !pay(c.rest)) return;
-        sleepToMorning({ hpFloor: 1 }); S.hp = maxHp(); S.fat = 0; if (S.corrupt) { S.corrupt = Math.max(0, S.corrupt - 10); S.hp = maxHp(); }
+        sleepToMorning({ hpFloor: 1 }); S.hp = maxHp(); S.fat = 0; S.cold = 0; // 6.4：客棧睡一夜寒意歸 0（與疲累同步） if (S.corrupt) { S.corrupt = Math.max(0, S.corrupt - 10); S.hp = maxHp(); }
         log('歇了一夜，疲累清零、生命回滿。', 'good'); break;
       case 'soup': if (!inBld('inn') || !pay(c.soup)) return;
-        S.food = clamp(S.food + 30, 0, 100); passTime(0.5, { food: 0, fat: 0 }); log('喝了碗熱湯，飽食 +30'); break;
+        // Q3：熱湯 +30 → +35（價格不變）；10.2：寒意 −15
+        S.food = clamp(S.food + D.TIME.SOUP.food, 0, 100); S.cold = clamp((S.cold || 0) + D.TIME.SOUP.cold, 0, 100); passTime(0.5, { food: 0, fat: 0 }); log('喝了碗熱湯，飽食 +' + D.TIME.SOUP.food + '、寒意 ' + D.TIME.SOUP.cold); break;
       case 'tea': if (!inBld('tea') || !pay(c.tea)) return;
         S.fat = clamp(S.fat - 10, 0, 100); S.food = clamp(S.food + 10, 0, 100); passTime(0.5, { food: 0, fat: 0 }); log('喝了碗粗茶，疲累 −10、飽食 +10'); break;
       case 'nap': if (!inBld('tea') || !pay(c.nap)) return;
@@ -1044,7 +1309,7 @@ window.SHL = (function () {
       case 'cleanse': if (!inBld('medic')) return; if (!S.corrupt) { log('你身上沒有侵蝕。'); return emit(); } if (!pay(c.cleanse)) return;
         passTime(2, { fat: 5 }); S.corrupt = 0; log('放血、敷藥、灌湯。侵蝕退了。', 'good'); break;
       case 'bunk': if (!inBld('medic') || !pay(c.bunk)) return;
-        sleepToMorning({ hpFloor: 1 }); S.fat = 0; S.hp = Math.min(maxHp(), S.hp + 30); log('在營帳的通鋪睡了一夜，疲累清零、生命 +30。', 'good'); break;
+        sleepToMorning({ hpFloor: 1 }); S.fat = 0; S.cold = 0; S.hp = Math.min(maxHp(), S.hp + 30); log('在營帳的通鋪睡了一夜，疲累清零、生命 +30。', 'good'); break;
       case 'drill': {
         const P = PROF[arg]; if (!inBld('drill') || !P || P.grp !== 'wu') return; if (!pay(c.drill)) return;
         passTime(4, { fat: 20 }); if (S.dead) return commit();
@@ -1183,6 +1448,7 @@ window.SHL = (function () {
   function questAct(id) {
     const q = S.quests.find((x) => x.id === id); if (!q || S.scene !== 'town') return;
     if (q.giver ? S.street !== q.giver : !inBld('board')) return;
+    if (!q.giver && shopShut()) return; // 委託板（board）08:00–17:00
     if (q.status === 'open' || q.status === 'hidden') {
       if (q.kind === 'deliver') {
         if (S.silver < q.deposit) { log('押金不足（' + q.deposit + ' 兩）。', 'bad'); return emit(); }
@@ -1249,6 +1515,7 @@ window.SHL = (function () {
   }
   function hearRumor() {
     if (!inBld('inn') && !inBld('tea')) return;
+    if (shopShut()) return;
     const day = dayOf(S.t); const free = S.freeRumor[S.loc] !== day; const cost = free ? 0 : innCost().rumor;
     if (S.rumors.length >= D.RUMOR.max) { log('傳聞記得太多了，先去查證幾則再說。', 'bad'); return emit(); }
     if (S.silver < cost) { log('銀兩不足，請不起酒。', 'bad'); return emit(); }
@@ -1729,6 +1996,7 @@ window.SHL = (function () {
     const R = D.RECIPES.find((r) => r.id === rid);
     if (!R || !canCraftHere(R)) { log(R && R.fireOnly ? '需要先生起營火。' : '需要營火或城鎮藥爐。', 'bad'); return emit(); }
     if (countItem(R.mat) < R.n) { log('材料不足：' + D.ITEMS[R.mat].name + ' ' + countItem(R.mat) + '/' + R.n, 'bad'); return emit(); }
+    if (!(S.scene === 'wild' && S.fire) && shopShut()) return; // 城鎮藥爐跟著藥鋪打烊
     const food = R.out === 'ration'; const sk = food ? 'peng' : 'yao';
     const saved = !food && perk('yao', 25) && R.n > 1 && rnd() < 0.3;
     const dbl = food ? perk('peng', 25) && rnd() < 0.3 : perk('yao', 50) && rnd() < 0.25;
@@ -1788,16 +2056,19 @@ window.SHL = (function () {
   }
   function camp() {
     if (S.scene !== 'wild' || S.dead) return;
+    timeFields(S);
     if (!S.fire) {
-      passTime(1, { fat: 1 });
+      passTime(1, { fat: 1 }); // 點火的這 1 小時仍是 outdoor
       if (S.dead) return commit();
-      S.fire = true; gainProf('ying', 4); log('生起營火。可調和藥水、烤製乾糧，或露宿到天亮。');
+      // 6.4：點火後 fireUntil = t + FIRE_DUR（晴／霧 8 小時、雨／雪 4 小時，以點火時天候為準）
+      S.fire = true; S.fireUntil = S.t + D.TIME.FIRE_DUR[weatherAt(S.t)] * 60;
+      gainProf('ying', 4); log('生起營火。可調和藥水、烤製乾糧，或露宿到天亮。');
       return commit();
     }
-    // 露宿：睡 8 小時，夜警風險
-    const night = isNight(S.t) || isNight(S.t + 8 * 60);
-    const risk = (night ? 0.25 : 0.12) * (D.WILDS[S.loc].risk === '低' ? 0.6 : 1) * (perk('ying', 25) ? 0.6 : 1) * (tideOn() ? 1.5 : 1);
+    // 露宿：睡 8 小時，夜警風險（7.1／AC 24 漸進倍率）；露宿沒有睡眠保護，預測會死要二次確認（B15）
+    const risk = campRisk(S.t);
     const rec = 50 * (S.skills.includes('xi') ? 1.25 : 1) * (perk('ying', 50) ? 1.25 : 1);
+    if (!deathConfirm('camp:' + S.t, previewSurvival(8, { food: 16, fat: -rec }))) return;
     passTime(8, { food: 16, fat: -rec });
     if (S.dead) return commit();
     gainProf('ying', 8);
@@ -2241,9 +2512,9 @@ window.SHL = (function () {
         if (bi >= 0) { const nm = itemName(S.pack[bi]); S.pack[bi] = null; res('丟下' + nm + '，趁亂逃脫。'); } else res('身無長物，劫匪啐了一口放你走。');
         break;
       }
-      case 'detour': passTime(1); res('繞路多走了 1 小時。'); break;
+      case 'detour': passTime(1, { exposure: 'outdoor' }); res('繞路多走了 1 小時。'); break;
       case 'study':
-        passTime(1); gainProf('jiao', 12);
+        passTime(1, { exposure: 'outdoor' }); gainProf('jiao', 12);
         if (!S.skills.includes('jixing')) { S.skills.push('jixing'); res('參悟口訣，習得「疾行」，腳力有所長進。', 'good'); }
         else res('參悟口訣，腳力有所長進。');
         break;
@@ -2277,6 +2548,8 @@ window.SHL = (function () {
     get state() { return S; },
     init, on, restart, save, wipeSave, readRaw, SAVE_KEY,
     fmtTime, fmtClock, fmtDate, dayOf, isNight, seasonOf, ageOf, wakeTime, garrisonName, sPub, riskR, crowd, cityView, questRisk, questTier, briefDanger, dangerMult, phaseOf, paceMult, paceName, wakeLabel, longLeft, onEvent,
+    // DEV-TIME（SPEC-TIME 第 1 節共用介面）
+    Time: TM, weatherAt, isOpen, nextOpen, closedTag, fmtPhase, fmtStamp, minOfDay, dayOfSeason, dayOfYear, yearOf, previewSurvival, stageOf, waitUntil, campRisk, edgeMult, walkHours, walkHoursOf,
     maxHp, carryCap, totalWt, loadBand, speedMult, armor, weaponDmg, weaponType, hitChance, dodgeChance, critChance, bagCap,
     attrVal, attrProgress, profLv, profProgress, perk,
     eqBase, eqValue, itemWt, itemName, itemGlyph, itemIcon, countItem, affixSum, reqUnmet, slotFits,
@@ -2295,6 +2568,9 @@ window.SHL = (function () {
     eventChoose, eventDone, setOverlay, setProfTab, setJournalTab, sysCamp,
     _debug: { passTime, sleepFoodCost, addItem, die, startCombat, newEq, gainProf, addRumor, worldTick, lootEq, addRep, addCodex, addCorrupt,
       townTick, newDay, wrnd, tradeTax, HOOKS, setNoise: (on) => { NOISE = !!on; }, rnd,
-      regionTick, banditKilled, tideDelta, tideTarget, truthW, liveTruth, genQuests, killEnemy, victory },
+      regionTick, banditKilled, tideDelta, tideTarget, truthW, liveTruth, genQuests, killEnemy, victory,
+      forceWeather: (wx) => { FORCE_WX = wx || null; }, coldRate, exposureOf,
+      // 測試用：在副本上連續結算多段（不取整、不改 S），驗「一次結算＝分段結算」（AC 6）
+      simulate: (pieces, opts) => { const st = { t: S.t, food: S.food, fat: S.fat, cold: S.cold || 0, hp: S.hp, fire: S.fire, fireUntil: S.fireUntil || 0 }; pieces.forEach((h) => settle(st, Math.round(h * 60), opts || {}, false)); return st; } },
   };
 })();

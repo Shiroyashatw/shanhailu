@@ -35,6 +35,7 @@
 - `js/lore.js`：世界觀文本（見聞錄、NPC 台詞、探查與初訪文字）
 - `js/icons.js`、`js/icons_npc.js`、`js/icons_more.js`：像素圖示、頭像、敵人（載入時轉成 CSS class `.ic-<id>`）
 - `js/scenes.js`、`js/scenes_town.js`、`js/scenes_map.js`：像素場景、城鎮平面圖、地圖（`.sc-<id>`；並提供建築的點擊範圍）
+- `js/time.js`：時間骨幹的純函式（時段、曆法、天候 `weatherAt`、營業時段）與事件 `Time.on`／修正器 `Time.mod`（SPEC-TIME；切片結算 `passTime` 在 game.js）
 - `js/game.js`：規則（狀態、存檔、時間、成長、城鎮服務、探查、委託、傳聞、世界事件、戰鬥）
 - `js/ui.js`：三欄渲染、戰鬥演出、拖拉、縮放
 - `tests/e2e.js`：Playwright 自動化互動驗證
