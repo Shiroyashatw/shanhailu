@@ -697,18 +697,33 @@ window.SHL = (function () {
   }
   function route(from, to) {
     // Dijkstra：以基礎時數為權重，只走已知的地點
-    const dist = {}, prev = {}, Q = Object.keys(D.NODES).filter(known);
-    Q.forEach((k) => (dist[k] = Infinity)); dist[from] = 0;
+    // SPEC-TIME 7.1b／AC 20 tie-break：權重是（總時數, 野徑段數）的字典序——總時數相同時野徑段數少的優先，全官道最優先；
+    // 不依賴 NODES／EDGES 的排列順序（兩鍵都相同的路線才可能因順序不同而換條，兩者時數與險級基礎相同）
+    const dist = {}, wild = {}, prev = {}, Q = Object.keys(D.NODES).filter(known);
+    Q.forEach((k) => { dist[k] = Infinity; wild[k] = Infinity; }); dist[from] = 0; wild[from] = 0;
+    const better = (h1, w1, h2, w2) => h1 < h2 || (h1 === h2 && w1 < w2);
     const left = new Set(Q);
     while (left.size) {
-      let u = null; left.forEach((k) => { if (u === null || dist[k] < dist[u]) u = k; });
+      let u = null; left.forEach((k) => { if (u === null || better(dist[k], wild[k], dist[u], wild[u])) u = k; });
       left.delete(u);
-      neighbors(u).forEach(([v, e]) => { if (dist[u] + e.h < dist[v]) { dist[v] = dist[u] + e.h; prev[v] = [u, e]; } });
+      neighbors(u).forEach(([v, e]) => {
+        const h = dist[u] + e.h, w = wild[u] + (e.road ? 0 : 1);
+        if (better(h, w, dist[v], wild[v])) { dist[v] = h; wild[v] = w; prev[v] = [u, e]; }
+      });
     }
     const edges = []; const stops = []; let c = to;
     while (c !== from && prev[c]) { edges.unshift(prev[c][1]); stops.unshift(c); c = prev[c][0]; }
     edges.stops = stops;
     return edges;
+  }
+  // SPEC-TIME 7.1b 路程險級：先封頂 RISK_CAP，再 half-up 取三位（以千分位整數比較，防浮點：0.1495 → 150 →「中」），
+  // 依 D.TIME.RISK_CUTS 半開區間分四檔。所有用到路程險級的地方都走這一個函式。
+  function riskTier(risk) {
+    const r = Math.min(D.WORLD.RISK_CAP, risk);
+    const k = Math.floor(r * 1000 + 0.5 + 1e-9);
+    const cuts = D.TIME.RISK_CUTS; let i = 0;
+    while (i < cuts.length && k >= Math.round(cuts[i] * 1000)) i++;
+    return D.TIME.RISK_TIERS[i];
   }
   function travelPreview(to) {
     const edges = route(S.loc, to);
@@ -728,7 +743,7 @@ window.SHL = (function () {
     // SPEC-01 §4.8「套用」：多乘治安／匪勢修正 R，封頂 0.85 在所有乘項之後做一次（夜間仍用現況 isNight；SPEC-TIME 7.1 屬 DEV-TIME）
     const R = riskR(wild);
     risk = Math.min(D.WORLD.RISK_CAP, risk * R);
-    const riskName = risk < 0.15 ? '低' : risk < 0.35 ? '中' : '高';
+    const riskName = riskTier(risk);
     const via = edges.length > 1 ? D.NODES[edges.stops[0]].name : (edges[0] && edges[0].road ? '官道' : '野徑');
     return { edges, hours, fat, food, risk, riskName, mult: sm, via, wild, R };
   }
@@ -2008,7 +2023,7 @@ window.SHL = (function () {
     clickPack, unequip, useItem, pickupGround, drag, identify, identifyFee, chooseOrigin,
     backToTitle, confirmName, nameErrors, fullName, identity, randomName, fallbackName, wantedPoster,
     place, bld, inBld, known, repOk, repOf, knownFactions, LORE,
-    selectDest, travel, travelPreview, toMap, enterHere, route, setMapView,
+    selectDest, travel, travelPreview, riskTier, toMap, enterHere, route, setMapView,
     explore, exploreInfo, exploreChance, wildPoints,
     setTab, selectShop, setQty, buy, sell, sellPrice, buyPrice, buysHere, rowLocked, shopRows, townPrice, avgPrice, innRest, innSoup, innCost, townHurt, service,
     talk, streetTalk, streetClose, cheapRumor,

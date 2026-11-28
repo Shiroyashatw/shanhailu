@@ -453,6 +453,8 @@ window.SHL_DATA = (function () {
   // ---------- 世界事件：獸潮 ----------
   const TIDE = { towns: ['huiyao', 'duyin'], first: [3, 4], gap: [5, 7], days: 2, need: 4, reward: 50, potMult: 1.5, hurtDays: 2 };
   // 歇息起床（SPEC-TIME v0.4 §11 B1）：起床＝min(max(現在+minH, 下一個 wakeMin), 現在+maxH)；maxH 13 為建議值、未經模擬（Q-T7 乙）
+  // SPEC-TIME 7.1b 險級分檔：路程險級門檻（半開區間；比較前 risk 先封頂 0.85、再 half-up 取三位）→ 低／中／高／極高
+  const TIME = { RISK_CUTS: [0.15, 0.35, 0.60], RISK_TIERS: ['低', '中', '高', '極高'] };
   const SLEEP = { wakeMin: 8 * 60, minH: 6, maxH: 13 };
   // ===== 兩鎮循環（SPEC-01 v0.4 §3、§4；單一來源，DEV-02） =====
   // 標記沿用規格：〔LW〕living-world、〔新〕規格補值、〔既有〕現況。數字全部照 SPEC-01 v0.4，未經本包調整。
@@ -576,5 +578,5 @@ window.SHL_DATA = (function () {
   const SLOT_NAMES = { main: '主手', off: '副手', head: '頭盔', chest: '胸甲', gloves: '手套', boots: '靴子', amulet: '護身符', ring1: '左戒', ring2: '右戒', belt: '腰帶', bag: '背包', cart: '馬車' };
   const SLOT_GLYPH = { main: '刃', off: '盾', head: '冠', chest: '甲', gloves: '手', boots: '靴', amulet: '符', ring1: '戒', ring2: '戒', belt: '帶', bag: '囊', cart: '車' };
 
-  return { ITEMS, SKILLS, TECHS, BASES, AFFIXES, UNIQUES, LEGENDS, RARITY, ENEMIES, NODES, EDGES, REGION_LABELS, WILDS, DUNGEONS, PRICES, PLACES, BUILDINGS, ITEM_CLASS, NPCS, FACTIONS, EXPLORE, CODEX_CATS, BOUNTIES, QUEST_GEN, RUMOR, TIDE, SLEEP, WORLD, RECIPES, EVENTS, ATTRS, PROFS, PROF_GROUPS, WTYPE_NAMES, ORIGINS, NAME_DEFAULT, NAME_POOL, SEASONS, YEAR_NAMES, EQ_SLOTS, SLOT_NAMES, SLOT_GLYPH };
+  return { ITEMS, SKILLS, TECHS, BASES, AFFIXES, UNIQUES, LEGENDS, RARITY, ENEMIES, NODES, EDGES, REGION_LABELS, WILDS, DUNGEONS, PRICES, PLACES, BUILDINGS, ITEM_CLASS, NPCS, FACTIONS, EXPLORE, CODEX_CATS, BOUNTIES, QUEST_GEN, RUMOR, TIDE, SLEEP, TIME, WORLD, RECIPES, EVENTS, ATTRS, PROFS, PROF_GROUPS, WTYPE_NAMES, ORIGINS, NAME_DEFAULT, NAME_POOL, SEASONS, YEAR_NAMES, EQ_SLOTS, SLOT_NAMES, SLOT_GLYPH };
 })();

@@ -388,6 +388,77 @@ async function fresh(page, base, q) {
     console.log('CFLASH ' + JSON.stringify(cflashLog.map((c) => ({ mode: c.mode, total: c.total, maxPerSec: c.maxPerSec, minGapMs: c.minGapMs }))));
   }
 
+  // ===== T. 險級四檔與等長官道優先（SPEC-TIME 7.1b、第 14 節 AC 20；fix3） =====
+  if (want('tier')) {
+    await fresh(page, base);
+    const tv = await page.evaluate(() => {
+      const G = window.SHL; const D = window.SHL_DATA;
+      const pts = [0.149, 0.150, 0.349, 0.350, 0.599, 0.600, 0.85, 0.1495, 0.3495, 0.5995, 0.9, 1.5];
+      return { cuts: D.TIME.RISK_CUTS, tiers: pts.map((r) => [r, G.riskTier(r)]) };
+    });
+    const T = Object.fromEntries(tv.tiers.map(([r, t]) => [String(r), t]));
+    check('D.TIME.RISK_CUTS = [0.15, 0.35, 0.60]', JSON.stringify(tv.cuts) === '[0.15,0.35,0.6]', tv.cuts);
+    check('AC 20 測點 0.149／0.150／0.349／0.350／0.599／0.600／0.85 → 低／中／中／高／高／極高／極高',
+      ['0.149', '0.15', '0.349', '0.35', '0.599', '0.6', '0.85'].map((k) => T[k]).join('／') === '低／中／中／高／高／極高／極高', tv.tiers.slice(0, 7));
+    check('取三位 half-up：0.1495 → 中、0.3495 → 高、0.5995 → 極高', T['0.1495'] === '中' && T['0.3495'] === '高' && T['0.5995'] === '極高', tv.tiers.slice(7, 10));
+    check('超過 0.85 先封頂：0.9、1.5 → 極高', T['0.9'] === '極高' && T['1.5'] === '極高', tv.tiers.slice(10));
+    // 等長路線：灰窯→渡陰 官道 2+2＝4 vs 經岔口 1+1+2＝4（含野徑）；灰窯→破曉營 官道 6 vs 經岔口、青梧、古窯 1+1+2+2＝6（全野徑）
+    const rt = await page.evaluate(() => {
+      const G = window.SHL; const D = window.SHL_DATA; const S = G.state;
+      S.loc = 'huiyao'; S.scene = 'map'; S.t = 12 * 60;
+      const pairs = [['huiyao', 'duyin'], ['duyin', 'huiyao'], ['huiyao', 'poxiao'], ['poxiao', 'huiyao']];
+      const run = () => pairs.map(([a, b]) => { const e = G.route(a, b); return { a, b, h: e.reduce((x, y) => x + y.h, 0), allRoad: e.length > 0 && e.every((y) => y.road), n: e.length }; });
+      // 等長確認：拿掉 灰窯–驛站 這段官道後，同一對地點仍有等長、但含野徑的路線（經岔口）
+      const keep = D.EDGES.slice(); const cut = keep.findIndex((e) => e.road && [e.a, e.b].sort().join() === 'huiyao,yizhan');
+      D.EDGES.splice(cut, 1);
+      const wildOnly = pairs.map(([a, b]) => { const e = G.route(a, b); return { h: e.reduce((x, y) => x + y.h, 0), wild: e.some((y) => !y.road) }; });
+      D.EDGES.length = 0; keep.forEach((e) => D.EDGES.push(e));
+      const normal = run();
+      const prevN = G.travelPreview('duyin');
+      D.EDGES.reverse(); const reversed = run(); const prevR = G.travelPreview('duyin');
+      // 再把 NODES 鍵的順序也反轉（同一物件，刪掉再依反序加回）
+      const ks = Object.keys(D.NODES), vs = ks.map((k) => D.NODES[k]); ks.forEach((k) => delete D.NODES[k]); ks.slice().reverse().forEach((k, i) => (D.NODES[k] = vs[ks.length - 1 - i]));
+      const bothRev = run();
+      ks.forEach((k) => delete D.NODES[k]); ks.forEach((k, i) => (D.NODES[k] = vs[i])); D.EDGES.reverse();
+      const restored = D.EDGES.every((e, i) => e === keep[i]) && Object.keys(D.NODES).join() === ks.join();
+      return { wildOnly, normal, reversed, bothRev, restored, prevN: { wild: prevN.wild, risk: prevN.risk, tier: prevN.riskName }, prevR: { wild: prevR.wild, risk: prevR.risk, tier: prevR.riskName } };
+    });
+    const allRoad = (arr) => arr.every((x) => x.allRoad) && arr.map((x) => x.h).join() === '4,4,6,6';
+    check('等長情境成立：拿掉灰窯–驛站官道後，灰窯↔渡陰仍 4 小時、灰窯↔破曉營仍 6 小時，且改走含野徑路線', rt.wildOnly.map((x) => x.h).join() === '4,4,6,6' && rt.wildOnly.every((x) => x.wild), rt.wildOnly);
+    check('AC 20 等長官道優先（正常 EDGES）：灰窯↔渡陰、灰窯↔破曉營四個方向全走官道', allRoad(rt.normal), rt.normal);
+    check('AC 20 等長官道優先（EDGES 反轉）：四個方向仍全走官道', allRoad(rt.reversed), rt.reversed);
+    check('AC 20 等長官道優先（EDGES 與 NODES 皆反轉）：四個方向仍全走官道', allRoad(rt.bothRev), rt.bothRev);
+    check('送貨路程 travelPreview(渡陰) 白天官道 0.040「低」，EDGES 反轉後不變', !rt.prevN.wild && near(rt.prevN.risk, 0.04, 1e-12) && rt.prevN.tier === '低' && JSON.stringify(rt.prevN) === JSON.stringify(rt.prevR), { normal: rt.prevN, reversed: rt.prevR });
+    check('測後 EDGES／NODES 順序已還原', rt.restored);
+    // 自造等長情境（舊 route() 的嚴格小於在這裡會隨順序改走野徑，用來確認 tie-break 是明寫的，不是碰巧）：
+    //  甲：平行兩條 灰窯–渡陰 各 2 小時（官道一條、野徑一條）→ 舊版取 EDGES 中先出現者
+    //  乙：灰窯–驛站–渡陰 官道 1+1 vs 灰窯–岔口–渡陰 野徑 1+1 → 舊版取 NODES 中先彈出的中繼點
+    const syn = await page.evaluate(() => {
+      const G = window.SHL; const D = window.SHL_DATA;
+      const cases = {
+        甲: [{ a: 'huiyao', b: 'duyin', h: 2, road: true }, { a: 'huiyao', b: 'duyin', h: 2 }],
+        乙: [{ a: 'huiyao', b: 'yizhan', h: 1, road: true }, { a: 'yizhan', b: 'duyin', h: 1, road: true }, { a: 'huiyao', b: 'chakou', h: 1 }, { a: 'chakou', b: 'duyin', h: 1 }],
+      };
+      const keep = D.EDGES.slice(); const ks = Object.keys(D.NODES), vs = ks.map((k) => D.NODES[k]);
+      const setN = (rev) => { ks.forEach((k) => delete D.NODES[k]); (rev ? ks.slice().reverse() : ks).forEach((k) => (D.NODES[k] = vs[ks.indexOf(k)])); };
+      const out = {};
+      Object.keys(cases).forEach((c) => [0, 1].forEach((er) => [0, 1].forEach((nr) => [0, 1].forEach((sw) => {
+        D.EDGES.length = 0;
+        let list = er ? cases[c].slice().reverse() : cases[c].slice();
+        if (sw) list = list.map((e) => Object.assign({}, e, { a: e.b, b: e.a })); // 端點對調
+        list.forEach((e) => D.EDGES.push(e)); setN(nr);
+        const go = G.route('huiyao', 'duyin'), back = G.route('duyin', 'huiyao');
+        out[c + (er ? '・EDGES 反轉' : '・EDGES 正常') + (nr ? '・NODES 反轉' : '') + (sw ? '・端點對調' : '')] = go.length > 0 && back.length > 0 && go.concat(back).every((e) => e.road) && go.reduce((x, y) => x + y.h, 0) === 2;
+      }))));
+      D.EDGES.length = 0; keep.forEach((e) => D.EDGES.push(e)); setN(0);
+      out.restored = D.EDGES.every((e, i) => e === keep[i]) && Object.keys(D.NODES).join() === ks.join();
+      return out;
+    });
+    const synKeys = Object.keys(syn).filter((k) => k !== 'restored');
+    check('AC 20 自造等長情境（平行官道／野徑、雙段官道／野徑）× EDGES 正常與反轉 × NODES 正常與反轉 × 端點對調：一律走官道', synKeys.length === 16 && synKeys.every((k) => syn[k]), syn);
+    check('自造情境測後 EDGES／NODES 已還原', syn.restored);
+  }
+
   // ===== 截圖（1280×720；本包無對應 UI 草稿） =====
   if (want('shots')) {
     await fresh(page, base);
