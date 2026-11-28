@@ -47,12 +47,12 @@ tests/e2e.js:354:  check('#4 原本的路口（官道驛站）現在可以當目
 tests/e2e-dev02.js:462:  // ===== U. fix4：「中高」改「高」（數值 18:14 裁定、SPEC-TIME AC 21）；route() 第三、四層 tie-break =====
 tests/e2e-dev02.js:466:    check('[AC 21] 資料 WILDS／DUNGEONS／NODES／TIME 不含「中高」', !ids.data.includes('中高'));
 tests/e2e-dev02.js:473:    const bad = Object.keys(seen).filter((k) => seen[k].body.includes('中高'));
-tests/e2e-dev02.js:474:    check('[AC 21] 逐一進入全部荒野 ' + ids.wilds.length + ' 處、地城 ' + ids.dgs.length + ' 處，畫面不出現「中高�
-tests/e2e-dev02.js:475:    check('[AC 21] 原「中高」的腐骨沼（荒野）、沉淵祭窟（地城）現顯示「險 高」', seen.fuzhao.pill === '險 �
+tests/e2e-dev02.js:474:    check('[AC 21] 逐一進入全部荒野 ' + ids.wilds.length + ' 處、地城 ' + ids.dgs.length + ' 處，畫面不出現「中高
+tests/e2e-dev02.js:475:    check('[AC 21] 原「中高」的腐骨沼（荒野）、沉淵祭窟（地城）現顯示「險 高」', seen.fuzhao.pill === '險 
 tests/e2e-dev02.js:496:    check('[AC 21] 日誌（含趕路、露宿、進地城共 ' + lg.n + ' 行）與日誌畫面不出現「中高」', lg.n > 0 && !lg.t
 js/icons_npc.js:461:  // 溫姑 — camp medic, white headscarf, calm
 js/icons_npc.js:601:  // 赤鴉 — crow-guard huntress, feather cloak, beak half-mask, corroded arm
-tests/e2e-dev05.js:282:    // 造齊四種單：長期獵殺（起手固定單）、有期限獵殺（腐骨沼＝中高）、收集（無險級）、送貨（�
+tests/e2e-dev05.js:282:    // 造齊四種單：長期獵殺（起手固定單）、有期限獵殺（腐骨沼＝中高）、收集（無險級）、送貨（
 tests/e2e-dev05.js:298:  check('有期限獵殺（腐骨沼，地點級高）：「危險 高」紅框＋「逾期則撕榜」（畫面不出現「中高」）'
 tests/e2e-dev05.js:451:    // 地點舊稱「中高」：顯示層對應為「高」
 tests/e2e-dev05.js:452:    const old = D.WILDS.fuzhao.risk; D.WILDS.fuzhao.risk = '中高';
