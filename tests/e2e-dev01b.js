@@ -75,14 +75,27 @@ async function shot(page, name) {
   check('1 字（只有姓或只有名）→ length', (await errsOf('沈', '')).includes('length') && (await errsOf('', '衡')).includes('length'));
   check('5 字 → length', (await errsOf('歐陽', '明月衡')).join() === 'length' && (await errsOf('司馬', '明月衡')).join() === 'length');
   check('英數、空白 → chars', (await errsOf('沈', 'a')).join() === 'chars' && (await errsOf('沈', '9')).join() === 'chars' && (await errsOf('沈', ' 衡')).join() === 'chars');
-  const listed = await page.evaluate(() => window.SHL_DATA.NAME_TAKEN.every((w) => { const a = Array.from(w); return window.SHL.nameErrors(a[0], a.slice(1).join('')).join() === 'taken'; }));
+  const listed = await page.evaluate(() => window.SHL_DATA.NAME_TAKEN.every((w) => { const a = Array.from(w), k = a.length === 4 ? 2 : 1; return window.SHL.nameErrors(a.slice(0, k).join(''), a.slice(k).join('')).join() === 'taken'; }));
   check('NAME_TAKEN 每一項整名輸入都回 taken', listed, (await page.evaluate(() => window.SHL_DATA.NAME_TAKEN.length)) + ' 項');
   const final = fs.readFileSync(path.join(ROOT, 'js/data.js'), 'utf8');
-  check('NAME_TAKEN 含固定角色全名與定稿第 5 節起始表（12 稱謂詞＋20 遊戲名詞）', await page.evaluate(() => {
+  check('NAME_TAKEN 含固定角色全名、定稿第 5 節起始表（12 稱謂詞＋20 遊戲名詞）與 8 項勢力全名', await page.evaluate(() => {
     const T = window.SHL_DATA.NAME_TAKEN;
     const need = ['虞九淵', '明夷', '撿骨師', '傀母', '蠱母', '里正', '鴉首', '路人', '兇煞', '良民', '平民', '掌櫃', '先生', '客官', '守備', '紅霧', '腳程', '輕快', '平常', '沉重', '蹣跚', '鎮衙', '祭祀', '侵蝕', '破曉', '天星', '鴉衛', '拜裂', '九幽', '飲霧', '四象', '黑水', '天工', '萬神'];
-    return need.every((w) => T.includes(w)) && T.length === need.length;
+    const factions = ['四象軍', '破曉軍團', '天星商會', '拜裂教', '黑水盟', '天工盟', '萬神教', '九幽殿'];
+    return need.concat(factions).every((w) => T.includes(w)) && T.length === need.length + factions.length;
   }) && /const NAME_TAKEN = \[/.test(final));
+  // 本地化 18:09 裁定：九大勢力全名收入（鴉衛已在），共 42 項、無重複
+  const takenLen = await page.evaluate(() => [window.SHL_DATA.NAME_TAKEN.length, new Set(window.SHL_DATA.NAME_TAKEN).size]);
+  check('NAME_TAKEN 共 42 項、無重複', takenLen[0] === 42 && takenLen[1] === 42, takenLen);
+  for (const [su, gi] of [['四', '象軍'], ['破曉', '軍團'], ['天星', '商會'], ['拜', '裂教'], ['黑', '水盟'], ['天', '工盟'], ['萬', '神教'], ['九', '幽殿'], ['鴉', '衛']]) {
+    const got = await errsOf(su, gi);
+    check('勢力全名「' + su + '｜' + gi + '」→ taken', got.join() === 'taken', got);
+  }
+  // 非完全相同不因勢力全名被攔（「四象」「九幽」本身是遊戲名詞，照原規則仍 taken）
+  for (const [su, gi, want] of [['四', '象', ['taken']], ['九', '幽', ['taken']], ['四', '象兵', []], ['四象', '軍團', []], ['九幽', '殿主', []], ['李', '九幽', []], ['破', '曉軍', []], ['天', '星會', []], ['黑', '水幫', []], ['萬', '神殿', []], ['拜', '裂', ['taken']], ['拜裂', '教主', []], ['趙', '天工', []]]) {
+    const got = await errsOf(su, gi);
+    check('非全名「' + su + '｜' + gi + '」→ ' + (want.length ? want.join('＋') + '（原規則）' : '不攔'), got.join() === want.join(), got);
+  }
 
   // ---------- 2. 開局池 ----------
   const pool = await page.evaluate(() => window.SHL_DATA.NAME_POOL);
