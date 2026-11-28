@@ -730,7 +730,7 @@ h4 { margin-top: 0; }
 .hintbox { position: absolute; right: 6px; top: 38px; width: 300px; border: 1px solid var(--gold); background: #100f0c; padding: 8px 10px; z-index: 6; pointer-events: none; box-shadow: 0 4px 12px rgba(0, 0, 0, .7); }
 .hintbox b { display: block; font-size: 15px; color: var(--gold); margin-bottom: 4px; }
 .hintbox span { font-size: 13px; line-height: 19px; color: var(--ink); }
-.loadbar .spd { cursor: help; }
+.loadbar .spd { cursor: help; white-space: nowrap; font-size: 12px; }
 
 /* ---------- DEV-05 委託單（UI-02-06） ---------- */
 .qgrid { position: absolute; left: 0; top: 18px; width: 784px; height: 452px; overflow-y: auto; display: grid; grid-template-columns: repeat(3, 254px); grid-auto-rows: 218px; gap: 8px 10px; align-content: start; }

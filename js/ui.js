@@ -44,7 +44,7 @@
   // 腳程「檔名 ×M」（SPEC-TIME 7.2：M 取兩位後判檔，與算時間同一個值）
   function paceTxt(m) { m = m === undefined ? G.paceMult() : m; return tx(TX.map.speedVal, { pace: G.paceName(m), mult: m.toFixed(2) }); }
   // 客棧／通鋪「睡到 {wake}」：時間由 G.wakeLabel()（＝實際起床的 wakeTime）給，hover 定稿句
-  function sleepTxt() { return '<span title="' + TX.inn.sleepHint + '" data-testid="sleep-to">' + tx(TX.inn.sleep, { wake: G.wakeLabel() }) + '</span>'; }
+  function sleepTxt() { return '<span title="' + TX.inn.sleepHint + '" data-testid="sleep-to">' + G.wakeLabel() + '</span>'; }
   function sgn(n) { return n > 0 ? '+' + n : n < 0 ? '\u2212' + -n : '0'; }
 
   // ======================= 左欄 =======================
@@ -108,7 +108,7 @@
     // 負重底條
     const w = G.totalWt(), cc = G.carryCap();
     const pct = Math.min(1, w / cc);
-    h += '<div class="loadbar" data-testid="loadbar">' + ico('ui_load', '負', 16) + '<div class="thinbar' + (pct > 0.75 ? ' warn' : pct > 0.4 ? ' mid' : '') + '" style="width:72px"><i style="width:' + (pct * 100).toFixed(1) + '%"></i><b style="left:40%"></b><b style="left:75%"></b></div><span>' + Math.round(w) + '/' + cc + '</span><span class="spd" data-tip="spd" data-testid="speed">' + TX.map.speed + ' ' + paceTxt() + '</span></div>';
+    h += '<div class="loadbar" data-testid="loadbar">' + ico('ui_load', '負', 16) + '<div class="thinbar' + (pct > 0.75 ? ' warn' : pct > 0.4 ? ' mid' : '') + '" style="width:56px"><i style="width:' + (pct * 100).toFixed(1) + '%"></i><b style="left:40%"></b><b style="left:75%"></b></div><span>' + Math.round(w) + '/' + cc + '</span><span class="spd" data-tip="spd" data-testid="speed">' + TX.map.speed + ' ' + paceTxt() + '</span></div>';
     h += '<div id="tip" style="display:none"></div>';
     $L.innerHTML = h;
   }
@@ -489,7 +489,7 @@
     h += '<button class="btn ctog" data-a="cityToggle" data-testid="city-toggle" title="' + C.toggleHint + '">' + C.title + '</button>';
     h += tile('prosperity', C.label.prosperity, v.pName, pBad, v.P + (delta ? '　' + delta : ''), arrow);
     h += tile('order', C.label.order, v.oName, oBad, String(v.O), '');
-    h += tile('treasury', C.label.treasury, tName, tBad, v.has ? tx(C.treasuryAmount, { T: Math.round(b.T) }) : C.pending, '');
+    h += tile('treasury', C.label.treasury, tName, tBad, v.has ? tx(C.treasuryAmount, { T: Math.round(b.T) }) : '', '');
     h += cityOpen ? '<button class="btn cclose" data-a="cityToggle" data-testid="city-collapse">' + C.collapse + '</button>' : exploreBtn(S, 'cexp');
     h += '</div>';
     if (cityOpen) {

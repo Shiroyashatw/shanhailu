@@ -563,7 +563,7 @@ window.SHL_DATA = (function () {
     },
     // 客棧／通鋪（dev05-strings 2a／2b）：{wake} 由 G.wakeLabel() 代入（與實際起床同一個 wakeTime）
     inn: {
-      sleep: '睡到 {wake}', tomorrow: '明日 ', sleepHint: '睡到早上 08:00，至少 6 小時、最多 13 小時',
+      sleep: '睡到 {wake}', sleepNext: '睡到明日 {wake}', sleepHint: '睡到早上 08:00，至少 6 小時、最多 13 小時',
     },
   };
 

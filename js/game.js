@@ -995,11 +995,11 @@ window.SHL = (function () {
     return Math.min(Math.max(now + D.SLEEP.minH * 60, n8), now + D.SLEEP.maxH * 60);
   }
   // SPEC-TIME §6.2：睡眠（客棧、傷兵帳）飽食 1.25／小時（取代整夜固定 10）；冬季 ×1.25 仍由 passTime 照現況套用
-  // 客棧按鈕字「睡到 {wake}」：與 sleepToMorning 同一個 wakeTime；起床在隔天加「明日」
+  // 客棧按鈕字「睡到 {wake}」：與 sleepToMorning 同一個 wakeTime；起床在隔天用「睡到明日 {wake}」
   function wakeLabel(now) {
     if (now === undefined) now = S.t;
-    const w = wakeTime(now);
-    return (dayOf(w) > dayOf(now) ? D.TEXT.inn.tomorrow : '') + fmtClock(w);
+    const w = wakeTime(now), I = D.TEXT.inn;
+    return (dayOf(w) > dayOf(now) ? I.sleepNext : I.sleep).replace('{wake}', fmtClock(w));
   }
   function sleepFoodCost(hours) { return 1.25 * hours; }
   function sleepToMorning(opts) {
