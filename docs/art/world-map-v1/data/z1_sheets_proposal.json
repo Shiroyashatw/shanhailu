@@ -1,0 +1,176 @@
+{
+ "sheets": [
+  {
+   "sheet": "Z1-1 崑崙丘",
+   "center": [
+    90,
+    70
+   ],
+   "scale": 3.5,
+   "bounds_native": [
+    33.1,
+    30.0,
+    146.9,
+    110.0
+   ],
+   "points": 21,
+   "shown_at_Z1": 6,
+   "Z2_only": 15,
+   "outside_bounds": []
+  },
+  {
+   "sheet": "Z1-2 瘴澤・鎮西城・灰窯原",
+   "center": [
+    140,
+    132
+   ],
+   "scale": 3.0,
+   "bounds_native": [
+    73.7,
+    85.3,
+    206.3,
+    178.7
+   ],
+   "points": 126,
+   "shown_at_Z1": 25,
+   "Z2_only": 101,
+   "outside_bounds": []
+  },
+  {
+   "sheet": "Z1-3 北山",
+   "center": [
+    196,
+    62
+   ],
+   "scale": 2.5,
+   "bounds_native": [
+    116.4,
+    6.0,
+    275.6,
+    118.0
+   ],
+   "points": 40,
+   "shown_at_Z1": 17,
+   "Z2_only": 23,
+   "outside_bounds": []
+  },
+  {
+   "sheet": "Z1-4 中山・黑水渡",
+   "center": [
+    202,
+    124
+   ],
+   "scale": 3.5,
+   "bounds_native": [
+    145.1,
+    84.0,
+    258.9,
+    164.0
+   ],
+   "points": 20,
+   "shown_at_Z1": 11,
+   "Z2_only": 9,
+   "outside_bounds": []
+  },
+  {
+   "sheet": "Z1-5 東山",
+   "center": [
+    292,
+    140
+   ],
+   "scale": 2.25,
+   "bounds_native": [
+    203.6,
+    77.8,
+    380.4,
+    202.2
+   ],
+   "points": 45,
+   "shown_at_Z1": 13,
+   "Z2_only": 32,
+   "outside_bounds": []
+  },
+  {
+   "sheet": "Z1-6 南山東・海內南",
+   "center": [
+    188,
+    200
+   ],
+   "scale": 3.0,
+   "bounds_native": [
+    121.7,
+    153.3,
+    254.3,
+    246.7
+   ],
+   "points": 39,
+   "shown_at_Z1": 14,
+   "Z2_only": 25,
+   "outside_bounds": []
+  },
+  {
+   "sheet": "Z1-7 南山西",
+   "center": [
+    100,
+    192
+   ],
+   "scale": 3.0,
+   "bounds_native": [
+    33.7,
+    145.3,
+    166.3,
+    238.7
+   ],
+   "points": 12,
+   "shown_at_Z1": 6,
+   "Z2_only": 6,
+   "outside_bounds": []
+  },
+  {
+   "sheet": "Z1-8a 海外・奇肱國（插框）",
+   "center": [
+    16,
+    113
+   ],
+   "scale": 6.0,
+   "bounds_native": [
+    -17.2,
+    89.7,
+    49.2,
+    136.3
+   ],
+   "points": 9,
+   "shown_at_Z1": 4,
+   "Z2_only": 5,
+   "outside_bounds": []
+  },
+  {
+   "sheet": "Z1-8b 海外・三身國（插框）",
+   "center": [
+    150,
+    254
+   ],
+   "scale": 6.0,
+   "bounds_native": [
+    116.8,
+    230.7,
+    183.2,
+    277.3
+   ],
+   "points": 6,
+   "shown_at_Z1": 5,
+   "Z2_only": 1,
+   "outside_bounds": []
+  }
+ ],
+ "not_on_Z1(大荒等)": [
+  "DH-01",
+  "DH-02",
+  "DH-03",
+  "DH-04",
+  "DH-05",
+  "DH-06",
+  "DH-07",
+  "DH-08"
+ ]
+}

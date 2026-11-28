@@ -1,0 +1,262 @@
+{
+ "note": "由 src/overlay.py 依 points_v1.json＋territory_398x280.png 產生；座標＝原生 398×280 左上角",
+ "dash": "((x+y)>>1)&1==0 畫",
+ "territory": {
+  "白虎軍": "#d8cfbd",
+  "朱雀軍": "#b5382c",
+  "玄武軍": "#587888",
+  "青龍軍": "#5f9a7a",
+  "炎祝部": "#e07a2a",
+  "北海冰部": "#8fb0bc"
+ },
+ "markers": [
+  {
+   "id": "SJ-11",
+   "kind": "rift",
+   "x": 137,
+   "y": 157
+  },
+  {
+   "id": "KL-06",
+   "kind": "rift",
+   "x": 80,
+   "y": 50
+  },
+  {
+   "id": "KL-07",
+   "kind": "rift",
+   "x": 90,
+   "y": 90
+  },
+  {
+   "id": "NS-38",
+   "kind": "rift",
+   "x": 214,
+   "y": 182
+  },
+  {
+   "id": "NS-39",
+   "kind": "rift",
+   "x": 172,
+   "y": 192
+  },
+  {
+   "id": "NS-40",
+   "kind": "rift",
+   "x": 92,
+   "y": 214
+  },
+  {
+   "id": "BS-28",
+   "kind": "rift",
+   "x": 126,
+   "y": 58
+  },
+  {
+   "id": "BS-29",
+   "kind": "rift",
+   "x": 186,
+   "y": 46
+  },
+  {
+   "id": "BS-30",
+   "kind": "rift",
+   "x": 254,
+   "y": 62
+  },
+  {
+   "id": "DS-31",
+   "kind": "rift",
+   "x": 272,
+   "y": 86
+  },
+  {
+   "id": "DS-32",
+   "kind": "rift",
+   "x": 292,
+   "y": 192
+  },
+  {
+   "id": "DS-33",
+   "kind": "rift",
+   "x": 318,
+   "y": 82
+  },
+  {
+   "id": "GD-01",
+   "kind": "city9",
+   "x": 177,
+   "y": 131,
+   "w": 9
+  },
+  {
+   "id": "ZZ-01",
+   "kind": "city15",
+   "x": 117,
+   "y": 122,
+   "w": 15
+  },
+  {
+   "id": "NS-01",
+   "kind": "city15",
+   "x": 187,
+   "y": 157,
+   "w": 15
+  },
+  {
+   "id": "BS-01",
+   "kind": "city15",
+   "x": 173,
+   "y": 75,
+   "w": 15
+  },
+  {
+   "id": "DS-01",
+   "kind": "city15",
+   "x": 243,
+   "y": 114,
+   "w": 15
+  },
+  {
+   "id": "HN-01",
+   "kind": "city9",
+   "x": 207,
+   "y": 147,
+   "w": 9
+  },
+  {
+   "id": "HW-01",
+   "kind": "city9",
+   "x": 10,
+   "y": 108,
+   "w": 9
+  },
+  {
+   "id": "HW-09",
+   "kind": "city9",
+   "x": 146,
+   "y": 251,
+   "w": 9
+  },
+  {
+   "id": "ZZ-23",
+   "kind": "seal",
+   "faction": "屍傀門",
+   "color": "#9c958a",
+   "x": 106,
+   "y": 137
+  },
+  {
+   "id": "ZZ-25",
+   "kind": "seal",
+   "faction": "蠱母堂",
+   "color": "#64873a",
+   "x": 101,
+   "y": 119
+  },
+  {
+   "id": "ZZ-26",
+   "kind": "seal",
+   "faction": "窮奇寨",
+   "color": "#a57a4a",
+   "x": 106,
+   "y": 99
+  },
+  {
+   "id": "KL-14",
+   "kind": "seal",
+   "faction": "合獸門",
+   "color": "#c9a24a",
+   "x": 72,
+   "y": 92
+  },
+  {
+   "id": "KL-16",
+   "kind": "seal",
+   "faction": "飲霧宗",
+   "color": "#a3a894",
+   "x": 62,
+   "y": 70
+  },
+  {
+   "id": "NS-17",
+   "kind": "seal",
+   "faction": "炎祝部",
+   "color": "#e07a2a",
+   "x": 156,
+   "y": 180
+  },
+  {
+   "id": "NS-24",
+   "kind": "seal",
+   "faction": "九幽殿",
+   "color": "#dc6350",
+   "x": 160,
+   "y": 168
+  },
+  {
+   "id": "NS-29",
+   "kind": "seal",
+   "faction": "射日宗",
+   "color": "#f4c552",
+   "x": 201,
+   "y": 217
+  },
+  {
+   "id": "BS-22",
+   "kind": "seal",
+   "faction": "北海冰部",
+   "color": "#8fb0bc",
+   "x": 194,
+   "y": 48
+  },
+  {
+   "id": "DS-09",
+   "kind": "seal",
+   "faction": "十二祀社",
+   "color": "#5f9a7a",
+   "x": 272,
+   "y": 146
+  },
+  {
+   "id": "DS-25",
+   "kind": "seal",
+   "faction": "萬神教",
+   "color": "#d8cfbd",
+   "x": 325,
+   "y": 129
+  },
+  {
+   "id": "HN-02",
+   "kind": "seal",
+   "faction": "黑水盟",
+   "color": "#587888",
+   "x": 214,
+   "y": 139
+  },
+  {
+   "id": "HW-02",
+   "kind": "seal",
+   "faction": "千機閣",
+   "color": "#cfa878",
+   "x": 16,
+   "y": 101
+  },
+  {
+   "id": "HW-10",
+   "kind": "seal",
+   "faction": "換骨樓",
+   "color": "#6f7566",
+   "x": 153,
+   "y": 246
+  },
+  {
+   "id": "DH-01",
+   "kind": "outer_ring_event",
+   "color": "#d8cfbd",
+   "x": 57,
+   "y": 263,
+   "w": 7
+  }
+ ]
+}

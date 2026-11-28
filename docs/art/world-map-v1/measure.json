@@ -1,0 +1,5338 @@
+{
+ "continent_v1_terrain_398x280.png": {
+  "size": [
+   398,
+   280
+  ],
+  "colors": 38,
+  "off_palette_px": 0,
+  "semi_transparent_px": 0,
+  "mean_luma_0_1": 0.0835,
+  "mean_rel_luminance": 0.0114,
+  "not_in_MAP_PAL": []
+ },
+ "continent_v1_terrain_796x560@2x.png": {
+  "size": [
+   796,
+   560
+  ],
+  "colors": 38,
+  "off_palette_px": 0,
+  "semi_transparent_px": 0,
+  "mean_luma_0_1": 0.0835,
+  "mean_rel_luminance": 0.0109,
+  "not_in_MAP_PAL": []
+ },
+ "continent_v1_terrain_1592x1120@4x.png": {
+  "size": [
+   1592,
+   1120
+  ],
+  "colors": 38,
+  "off_palette_px": 0,
+  "semi_transparent_px": 0,
+  "mean_luma_0_1": 0.0835,
+  "mean_rel_luminance": 0.0111,
+  "not_in_MAP_PAL": []
+ },
+ "continent_v1_Z0_ingame_mock_796x560.png": {
+  "size": [
+   796,
+   560
+  ],
+  "colors": 61,
+  "off_palette_px": 0,
+  "semi_transparent_px": 0,
+  "mean_luma_0_1": 0.0877,
+  "mean_rel_luminance": 0.0146,
+  "not_in_MAP_PAL": [
+   "#0d0c0a",
+   "#40291a",
+   "#4b4640",
+   "#587888",
+   "#64873a",
+   "#6e2018",
+   "#736d64",
+   "#8fb0bc",
+   "#9c958a",
+   "#a3a894",
+   "#a57a4a",
+   "#c6bfb1",
+   "#cfa878",
+   "#dc6350",
+   "#e07a2a",
+   "#ecd684",
+   "#f3ecdb",
+   "#f4c552"
+  ]
+ },
+ "continent_v1_overlay_398x280.png": {
+  "size": [
+   398,
+   280
+  ],
+  "colors": 27,
+  "off_palette_px": 0,
+  "semi_transparent_px": 0,
+  "mean_luma_0_1": null,
+  "mean_rel_luminance": null,
+  "not_in_MAP_PAL": [
+   "#0d0c0a",
+   "#40291a",
+   "#4b4640",
+   "#587888",
+   "#64873a",
+   "#6e2018",
+   "#736d64",
+   "#8fb0bc",
+   "#9c958a",
+   "#a3a894",
+   "#a57a4a",
+   "#c6bfb1",
+   "#cfa878",
+   "#dc6350",
+   "#e07a2a",
+   "#ecd684",
+   "#f3ecdb",
+   "#f4c552"
+  ]
+ },
+ "terrain_ext_colors_used": {},
+ "icon_contrast": [
+  {
+   "id": "GD-01",
+   "kind": "city9",
+   "icon_main": "#c6bfb1",
+   "contrast_vs_ground": 9.95,
+   "outline_vs_ground": 1.07
+  },
+  {
+   "id": "ZZ-01",
+   "kind": "city15",
+   "icon_main": "#c6bfb1",
+   "contrast_vs_ground": 9.43,
+   "outline_vs_ground": 1.13
+  },
+  {
+   "id": "NS-01",
+   "kind": "city15",
+   "icon_main": "#c6bfb1",
+   "contrast_vs_ground": 9.79,
+   "outline_vs_ground": 1.09
+  },
+  {
+   "id": "BS-01",
+   "kind": "city15",
+   "icon_main": "#c6bfb1",
+   "contrast_vs_ground": 7.32,
+   "outline_vs_ground": 1.46
+  },
+  {
+   "id": "DS-01",
+   "kind": "city15",
+   "icon_main": "#c6bfb1",
+   "contrast_vs_ground": 9.34,
+   "outline_vs_ground": 1.15
+  },
+  {
+   "id": "HN-01",
+   "kind": "city9",
+   "icon_main": "#c6bfb1",
+   "contrast_vs_ground": 10.28,
+   "outline_vs_ground": 1.04
+  },
+  {
+   "id": "HW-01",
+   "kind": "city9",
+   "icon_main": "#c6bfb1",
+   "contrast_vs_ground": 9.09,
+   "outline_vs_ground": 1.18
+  },
+  {
+   "id": "HW-09",
+   "kind": "city9",
+   "icon_main": "#c6bfb1",
+   "contrast_vs_ground": 8.69,
+   "outline_vs_ground": 1.23
+  },
+  {
+   "id": "ZZ-23",
+   "kind": "seal",
+   "icon_main": "#9c958a",
+   "contrast_vs_ground": 5.84,
+   "outline_vs_ground": 1.13
+  },
+  {
+   "id": "ZZ-25",
+   "kind": "seal",
+   "icon_main": "#64873a",
+   "contrast_vs_ground": 3.79,
+   "outline_vs_ground": 1.25
+  },
+  {
+   "id": "ZZ-26",
+   "kind": "seal",
+   "icon_main": "#a57a4a",
+   "contrast_vs_ground": 4.51,
+   "outline_vs_ground": 1.13
+  },
+  {
+   "id": "KL-14",
+   "kind": "seal",
+   "icon_main": "#c9a24a",
+   "contrast_vs_ground": 6.99,
+   "outline_vs_ground": 1.17
+  },
+  {
+   "id": "KL-16",
+   "kind": "seal",
+   "icon_main": "#a3a894",
+   "contrast_vs_ground": 5.16,
+   "outline_vs_ground": 1.55
+  },
+  {
+   "id": "NS-17",
+   "kind": "seal",
+   "icon_main": "#e07a2a",
+   "contrast_vs_ground": 5.37,
+   "outline_vs_ground": 1.21
+  },
+  {
+   "id": "NS-24",
+   "kind": "seal",
+   "icon_main": "#dc6350",
+   "contrast_vs_ground": 4.21,
+   "outline_vs_ground": 1.31
+  },
+  {
+   "id": "NS-29",
+   "kind": "seal",
+   "icon_main": "#f4c552",
+   "contrast_vs_ground": 11.46,
+   "outline_vs_ground": 1.05
+  },
+  {
+   "id": "BS-22",
+   "kind": "seal",
+   "icon_main": "#8fb0bc",
+   "contrast_vs_ground": 3.68,
+   "outline_vs_ground": 2.3
+  },
+  {
+   "id": "DS-09",
+   "kind": "seal",
+   "icon_main": "#5f9a7a",
+   "contrast_vs_ground": 4.92,
+   "outline_vs_ground": 1.21
+  },
+  {
+   "id": "DS-25",
+   "kind": "seal",
+   "icon_main": "#d8cfbd",
+   "contrast_vs_ground": 10.0,
+   "outline_vs_ground": 1.26
+  },
+  {
+   "id": "HN-02",
+   "kind": "seal",
+   "icon_main": "#587888",
+   "contrast_vs_ground": 3.98,
+   "outline_vs_ground": 1.04
+  },
+  {
+   "id": "HW-02",
+   "kind": "seal",
+   "icon_main": "#cfa878",
+   "contrast_vs_ground": 8.14,
+   "outline_vs_ground": 1.09
+  },
+  {
+   "id": "HW-10",
+   "kind": "seal",
+   "icon_main": "#6f7566",
+   "contrast_vs_ground": 3.77,
+   "outline_vs_ground": 1.09
+  },
+  {
+   "id": "DH-01",
+   "kind": "outer_ring_event",
+   "icon_main": "#d8cfbd",
+   "contrast_vs_ground": 12.9,
+   "outline_vs_ground": 1.02
+  }
+ ],
+ "icon_contrast_min": 3.68,
+ "icon_contrast_median": 7.32,
+ "territory_dash_contrast": {
+  "白虎軍": {
+   "color": "#d8cfbd",
+   "border_px": 224,
+   "area_px": 1037,
+   "contrast_vs_ground": 11.17
+  },
+  "朱雀軍": {
+   "color": "#b5382c",
+   "border_px": 289,
+   "area_px": 1287,
+   "contrast_vs_ground": 2.93
+  },
+  "玄武軍": {
+   "color": "#587888",
+   "border_px": 173,
+   "area_px": 739,
+   "contrast_vs_ground": 2.02
+  },
+  "青龍軍": {
+   "color": "#5f9a7a",
+   "border_px": 253,
+   "area_px": 1952,
+   "contrast_vs_ground": 5.22
+  },
+  "炎祝部": {
+   "color": "#e07a2a",
+   "border_px": 130,
+   "area_px": 545,
+   "contrast_vs_ground": 5.58
+  },
+  "北海冰部": {
+   "color": "#8fb0bc",
+   "border_px": 126,
+   "area_px": 596,
+   "contrast_vs_ground": 4.04
+  }
+ },
+ "points": {
+  "total": 358,
+  "zoom": {
+   "Z2": 213,
+   "Z1": 79,
+   "Z0": 22,
+   "城鎮平面": 32,
+   "Z2（暗，預設不顯示）": 11,
+   "Z0（外圈記號）": 1
+  },
+  "placement": {
+   "人工": 89,
+   "鎮內（同城座標，見城鎮平面）": 32,
+   "自動：參照點＋方向詞": 210,
+   "自動：區塊範圍＋方向詞": 22,
+   "人工（15:37 製作人點位修正，美術定座標）": 5
+  },
+  "z1_sheet": {
+   "Z1-4 中山・黑水渡": 20,
+   "Z1-2 瘴澤・鎮西城・灰窯原": 126,
+   "Z1-1 崑崙丘": 21,
+   "Z1-6 南山東・海內南": 39,
+   "Z1-7 南山西": 12,
+   "Z1-3 北山": 40,
+   "Z1-5 東山": 45,
+   "Z1-8a 海外・奇肱國（插框）": 9,
+   "Z1-8b 海外・三身國（插框）": 6,
+   "（不上 Z1：Z0 外圈記號＋事件入口，E3）": 1,
+   "（不上 Z1：大荒於 Z0 外圈）": 7
+  },
+  "z2_sheets": 28
+ },
+ "z1": {
+  "sheets": {
+   "Z1-2 瘴澤・鎮西城・灰窯原": {
+    "scale": 3.0,
+    "center": [
+     140,
+     132
+    ],
+    "terrain_colors": 42,
+    "overlay_colors": 22,
+    "combined_colors": 63,
+    "off_palette_px": 0,
+    "semi_transparent_px": 0,
+    "mean_rel_luminance": 0.0115,
+    "own_points_Z1": 25,
+    "icons_drawn": 36,
+    "own_icons_missing_or_clipped": [],
+    "icons_moved": [
+     [
+      "ZZ-12",
+      6.0
+     ],
+     [
+      "ZZ-18",
+      2.0
+     ],
+     [
+      "ZZ-20",
+      2.0
+     ]
+    ],
+    "label_failures": [],
+    "neighbour_labels_omitted": [],
+    "icon_contrast_min": 3.6,
+    "icons_below_3": [],
+    "border_contrast": {
+     "白虎軍": {
+      "color": "#d8cfbd",
+      "dash_px": 330,
+      "contrast_vs_ground_mean": 11.59,
+      "halo_px": 0,
+      "local_contrast_mean": 11.38,
+      "local_contrast_p10": 10.1
+     },
+     "朱雀軍": {
+      "color": "#b5382c",
+      "dash_px": 124,
+      "contrast_vs_ground_mean": 3.12,
+      "halo_px": 350,
+      "local_contrast_mean": 3.32,
+      "local_contrast_p10": 3.32
+     },
+     "炎祝部": {
+      "color": "#e07a2a",
+      "dash_px": 19,
+      "contrast_vs_ground_mean": 6.47,
+      "halo_px": 0,
+      "local_contrast_mean": 6.43,
+      "local_contrast_p10": 6.12
+     }
+    }
+   },
+   "Z1-1 崑崙丘": {
+    "scale": 3.5,
+    "center": [
+     90,
+     70
+    ],
+    "terrain_colors": 52,
+    "overlay_colors": 12,
+    "combined_colors": 63,
+    "off_palette_px": 0,
+    "semi_transparent_px": 0,
+    "mean_rel_luminance": 0.0162,
+    "own_points_Z1": 6,
+    "icons_drawn": 9,
+    "own_icons_missing_or_clipped": [],
+    "icons_moved": [],
+    "label_failures": [],
+    "neighbour_labels_omitted": [],
+    "icon_contrast_min": 4.08,
+    "icons_below_3": [],
+    "border_contrast": {}
+   },
+   "Z1-3 北山": {
+    "scale": 2.5,
+    "center": [
+     196,
+     62
+    ],
+    "terrain_colors": 44,
+    "overlay_colors": 20,
+    "combined_colors": 64,
+    "off_palette_px": 0,
+    "semi_transparent_px": 0,
+    "mean_rel_luminance": 0.0245,
+    "own_points_Z1": 17,
+    "icons_drawn": 20,
+    "own_icons_missing_or_clipped": [],
+    "icons_moved": [
+     [
+      "BS-19",
+      5.0
+     ],
+     [
+      "BS-17",
+      2.0
+     ],
+     [
+      "BS-32",
+      2.0
+     ],
+     [
+      "BS-33",
+      1.0
+     ]
+    ],
+    "label_failures": [],
+    "neighbour_labels_omitted": [],
+    "icon_contrast_min": 3.34,
+    "icons_below_3": [],
+    "border_contrast": {
+     "玄武軍": {
+      "color": "#587888",
+      "dash_px": 228,
+      "contrast_vs_ground_mean": 2.07,
+      "halo_px": 562,
+      "local_contrast_mean": 4.09,
+      "local_contrast_p10": 4.02
+     },
+     "青龍軍": {
+      "color": "#5f9a7a",
+      "dash_px": 58,
+      "contrast_vs_ground_mean": 5.03,
+      "halo_px": 3,
+      "local_contrast_mean": 5.26,
+      "local_contrast_p10": 4.73
+     },
+     "北海冰部": {
+      "color": "#8fb0bc",
+      "dash_px": 142,
+      "contrast_vs_ground_mean": 3.85,
+      "halo_px": 196,
+      "local_contrast_mean": 7.23,
+      "local_contrast_p10": 4.62
+     }
+    }
+   },
+   "Z1-4 中山・黑水渡": {
+    "scale": 3.5,
+    "center": [
+     202,
+     124
+    ],
+    "terrain_colors": 44,
+    "overlay_colors": 19,
+    "combined_colors": 63,
+    "off_palette_px": 0,
+    "semi_transparent_px": 0,
+    "mean_rel_luminance": 0.0184,
+    "own_points_Z1": 11,
+    "icons_drawn": 22,
+    "own_icons_missing_or_clipped": [],
+    "icons_moved": [
+     [
+      "HN-02",
+      1.0
+     ],
+     [
+      "HN-03",
+      6.0
+     ],
+     [
+      "HN-06",
+      3.0
+     ],
+     [
+      "HN-07",
+      5.0
+     ],
+     [
+      "HN-08",
+      8.0
+     ],
+     [
+      "HN-09",
+      8.0
+     ]
+    ],
+    "label_failures": [],
+    "neighbour_labels_omitted": [],
+    "icon_contrast_min": 3.0,
+    "icons_below_3": [],
+    "border_contrast": {
+     "白虎軍": {
+      "color": "#d8cfbd",
+      "dash_px": 204,
+      "contrast_vs_ground_mean": 10.55,
+      "halo_px": 0,
+      "local_contrast_mean": 10.69,
+      "local_contrast_p10": 9.28
+     },
+     "朱雀軍": {
+      "color": "#b5382c",
+      "dash_px": 59,
+      "contrast_vs_ground_mean": 2.79,
+      "halo_px": 170,
+      "local_contrast_mean": 3.32,
+      "local_contrast_p10": 3.32
+     },
+     "玄武軍": {
+      "color": "#587888",
+      "dash_px": 15,
+      "contrast_vs_ground_mean": 3.22,
+      "halo_px": 42,
+      "local_contrast_mean": 4.11,
+      "local_contrast_p10": 4.15
+     },
+     "青龍軍": {
+      "color": "#5f9a7a",
+      "dash_px": 190,
+      "contrast_vs_ground_mean": 4.73,
+      "halo_px": 49,
+      "local_contrast_mean": 5.08,
+      "local_contrast_p10": 4.33
+     }
+    }
+   },
+   "Z1-5 東山": {
+    "scale": 2.25,
+    "center": [
+     292,
+     140
+    ],
+    "terrain_colors": 43,
+    "overlay_colors": 21,
+    "combined_colors": 63,
+    "off_palette_px": 0,
+    "semi_transparent_px": 0,
+    "mean_rel_luminance": 0.0109,
+    "own_points_Z1": 13,
+    "icons_drawn": 18,
+    "own_icons_missing_or_clipped": [],
+    "icons_moved": [
+     [
+      "DS-08",
+      8.0
+     ],
+     [
+      "DS-34",
+      2.0
+     ],
+     [
+      "DS-35",
+      2.0
+     ],
+     [
+      "DS-37",
+      6.0
+     ],
+     [
+      "HN-05",
+      3.0
+     ]
+    ],
+    "label_failures": [],
+    "neighbour_labels_omitted": [],
+    "icon_contrast_min": 3.68,
+    "icons_below_3": [],
+    "border_contrast": {
+     "朱雀軍": {
+      "color": "#b5382c",
+      "dash_px": 53,
+      "contrast_vs_ground_mean": 3.02,
+      "halo_px": 168,
+      "local_contrast_mean": 3.32,
+      "local_contrast_p10": 3.32
+     },
+     "玄武軍": {
+      "color": "#587888",
+      "dash_px": 33,
+      "contrast_vs_ground_mean": 3.37,
+      "halo_px": 64,
+      "local_contrast_mean": 3.95,
+      "local_contrast_p10": 3.45
+     },
+     "青龍軍": {
+      "color": "#5f9a7a",
+      "dash_px": 266,
+      "contrast_vs_ground_mean": 5.27,
+      "halo_px": 16,
+      "local_contrast_mean": 5.34,
+      "local_contrast_p10": 4.86
+     }
+    }
+   },
+   "Z1-6 南山東・海內南": {
+    "scale": 3.0,
+    "center": [
+     188,
+     200
+    ],
+    "terrain_colors": 46,
+    "overlay_colors": 18,
+    "combined_colors": 63,
+    "off_palette_px": 0,
+    "semi_transparent_px": 0,
+    "mean_rel_luminance": 0.0097,
+    "own_points_Z1": 14,
+    "icons_drawn": 18,
+    "own_icons_missing_or_clipped": [],
+    "icons_moved": [
+     [
+      "NS-08",
+      3.0
+     ],
+     [
+      "NS-42",
+      4.0
+     ]
+    ],
+    "label_failures": [],
+    "neighbour_labels_omitted": [],
+    "icon_contrast_min": 3.89,
+    "icons_below_3": [],
+    "border_contrast": {
+     "朱雀軍": {
+      "color": "#b5382c",
+      "dash_px": 358,
+      "contrast_vs_ground_mean": 2.98,
+      "halo_px": 1062,
+      "local_contrast_mean": 3.32,
+      "local_contrast_p10": 3.32
+     },
+     "炎祝部": {
+      "color": "#e07a2a",
+      "dash_px": 161,
+      "contrast_vs_ground_mean": 5.89,
+      "halo_px": 0,
+      "local_contrast_mean": 5.93,
+      "local_contrast_p10": 5.11
+     }
+    }
+   },
+   "Z1-7 南山西": {
+    "scale": 3.0,
+    "center": [
+     100,
+     192
+    ],
+    "terrain_colors": 48,
+    "overlay_colors": 16,
+    "combined_colors": 63,
+    "off_palette_px": 0,
+    "semi_transparent_px": 0,
+    "mean_rel_luminance": 0.0252,
+    "own_points_Z1": 6,
+    "icons_drawn": 12,
+    "own_icons_missing_or_clipped": [],
+    "icons_moved": [],
+    "label_failures": [],
+    "neighbour_labels_omitted": [],
+    "icon_contrast_min": 4.09,
+    "icons_below_3": [],
+    "border_contrast": {
+     "朱雀軍": {
+      "color": "#b5382c",
+      "dash_px": 56,
+      "contrast_vs_ground_mean": 2.95,
+      "halo_px": 164,
+      "local_contrast_mean": 3.32,
+      "local_contrast_p10": 3.32
+     },
+     "炎祝部": {
+      "color": "#e07a2a",
+      "dash_px": 137,
+      "contrast_vs_ground_mean": 5.76,
+      "halo_px": 4,
+      "local_contrast_mean": 5.9,
+      "local_contrast_p10": 5.06
+     }
+    }
+   },
+   "Z1-8a 海外・奇肱國（插框）": {
+    "scale": 6.0,
+    "center": [
+     16,
+     113
+    ],
+    "terrain_colors": 48,
+    "overlay_colors": 9,
+    "combined_colors": 56,
+    "off_palette_px": 0,
+    "semi_transparent_px": 0,
+    "mean_rel_luminance": 0.0069,
+    "own_points_Z1": 4,
+    "icons_drawn": 4,
+    "own_icons_missing_or_clipped": [],
+    "icons_moved": [
+     [
+      "HW-02",
+      4.0
+     ]
+    ],
+    "label_failures": [],
+    "neighbour_labels_omitted": [],
+    "icon_contrast_min": 6.12,
+    "icons_below_3": [],
+    "border_contrast": {}
+   },
+   "Z1-8b 海外・三身國（插框）": {
+    "scale": 6.0,
+    "center": [
+     150,
+     254
+    ],
+    "terrain_colors": 35,
+    "overlay_colors": 11,
+    "combined_colors": 46,
+    "off_palette_px": 0,
+    "semi_transparent_px": 0,
+    "mean_rel_luminance": 0.0057,
+    "own_points_Z1": 5,
+    "icons_drawn": 5,
+    "own_icons_missing_or_clipped": [],
+    "icons_moved": [
+     [
+      "HW-10",
+      4.0
+     ],
+     [
+      "HW-11",
+      3.0
+     ],
+     [
+      "HW-13",
+      1.0
+     ]
+    ],
+    "label_failures": [],
+    "neighbour_labels_omitted": [],
+    "icon_contrast_min": 3.35,
+    "icons_below_3": [],
+    "border_contrast": {}
+   }
+  },
+  "self_check": {
+   "Z1-2 瘴澤・鎮西城・灰窯原": {
+    "combined_le_64": true,
+    "off_palette_0": true,
+    "semi_transparent_0": true,
+    "no_label_overlap_or_fail": true,
+    "nothing_clipped": true,
+    "icon_contrast_ge_3": true,
+    "border_contrast_ge_3": true
+   },
+   "Z1-1 崑崙丘": {
+    "combined_le_64": true,
+    "off_palette_0": true,
+    "semi_transparent_0": true,
+    "no_label_overlap_or_fail": true,
+    "nothing_clipped": true,
+    "icon_contrast_ge_3": true,
+    "border_contrast_ge_3": true
+   },
+   "Z1-3 北山": {
+    "combined_le_64": true,
+    "off_palette_0": true,
+    "semi_transparent_0": true,
+    "no_label_overlap_or_fail": true,
+    "nothing_clipped": true,
+    "icon_contrast_ge_3": true,
+    "border_contrast_ge_3": true
+   },
+   "Z1-4 中山・黑水渡": {
+    "combined_le_64": true,
+    "off_palette_0": true,
+    "semi_transparent_0": true,
+    "no_label_overlap_or_fail": true,
+    "nothing_clipped": true,
+    "icon_contrast_ge_3": true,
+    "border_contrast_ge_3": true
+   },
+   "Z1-5 東山": {
+    "combined_le_64": true,
+    "off_palette_0": true,
+    "semi_transparent_0": true,
+    "no_label_overlap_or_fail": true,
+    "nothing_clipped": true,
+    "icon_contrast_ge_3": true,
+    "border_contrast_ge_3": true
+   },
+   "Z1-6 南山東・海內南": {
+    "combined_le_64": true,
+    "off_palette_0": true,
+    "semi_transparent_0": true,
+    "no_label_overlap_or_fail": true,
+    "nothing_clipped": true,
+    "icon_contrast_ge_3": true,
+    "border_contrast_ge_3": true
+   },
+   "Z1-7 南山西": {
+    "combined_le_64": true,
+    "off_palette_0": true,
+    "semi_transparent_0": true,
+    "no_label_overlap_or_fail": true,
+    "nothing_clipped": true,
+    "icon_contrast_ge_3": true,
+    "border_contrast_ge_3": true
+   },
+   "Z1-8a 海外・奇肱國（插框）": {
+    "combined_le_64": true,
+    "off_palette_0": true,
+    "semi_transparent_0": true,
+    "no_label_overlap_or_fail": true,
+    "nothing_clipped": true,
+    "icon_contrast_ge_3": true,
+    "border_contrast_ge_3": true
+   },
+   "Z1-8b 海外・三身國（插框）": {
+    "combined_le_64": true,
+    "off_palette_0": true,
+    "semi_transparent_0": true,
+    "no_label_overlap_or_fail": true,
+    "nothing_clipped": true,
+    "icon_contrast_ge_3": true,
+    "border_contrast_ge_3": true
+   }
+  },
+  "border_metric": "local_contrast_p10：虛線像素 vs 合成圖中相鄰非虛線像素平均（含墨暈），第 10 百分位",
+  "icon_metric": "剪影對比＝max(主體平均 vs 2px 地環, 外框 vs 地環)"
+ },
+ "season_remap_validation": {
+  "Z0": {
+   "class_px": {
+    "water": 43461,
+    "void": 29518,
+    "plain": 17549,
+    "forest": 954,
+    "swamp": 2146,
+    "desert": 1361,
+    "rock": 12310,
+    "snow_ice": 530,
+    "lava": 772,
+    "ash_waste": 2839
+   },
+   "base_colors": 38,
+   "spring": {
+    "colors": 42,
+    "changed_px": 11677,
+    "off_palette": 0
+   },
+   "summer": {
+    "colors": 39,
+    "changed_px": 2674,
+    "off_palette": 0
+   },
+   "autumn": {
+    "colors": 40,
+    "changed_px": 6227,
+    "off_palette": 0
+   },
+   "winter": {
+    "colors": 26,
+    "changed_px": 39169,
+    "off_palette": 0
+   }
+  },
+  "Z1-1": {
+   "class_px": {
+    "water": 57181,
+    "void": 4197,
+    "plain": 13962,
+    "forest": 140,
+    "swamp": 6608,
+    "desert": 0,
+    "rock": 27478,
+    "snow_ice": 1190,
+    "lava": 684,
+    "ash_waste": 0
+   },
+   "base_terrain_colors": 52,
+   "spring": {
+    "terrain_colors": 45,
+    "combined_with_overlay": 56
+   },
+   "summer": {
+    "terrain_colors": 50,
+    "combined_with_overlay": 61
+   },
+   "autumn": {
+    "terrain_colors": 47,
+    "combined_with_overlay": 58
+   },
+   "winter": {
+    "terrain_colors": 25,
+    "combined_with_overlay": 36
+   }
+  },
+  "Z1-2": {
+   "class_px": {
+    "water": 4387,
+    "void": 8,
+    "plain": 32054,
+    "forest": 855,
+    "swamp": 11570,
+    "desert": 1027,
+    "rock": 33711,
+    "snow_ice": 0,
+    "lava": 1735,
+    "ash_waste": 26093
+   },
+   "base_terrain_colors": 42,
+   "spring": {
+    "terrain_colors": 44,
+    "combined_with_overlay": 65
+   },
+   "summer": {
+    "terrain_colors": 42,
+    "combined_with_overlay": 63
+   },
+   "autumn": {
+    "terrain_colors": 42,
+    "combined_with_overlay": 63
+   },
+   "winter": {
+    "terrain_colors": 25,
+    "combined_with_overlay": 46
+   }
+  },
+  "Z1-3": {
+   "class_px": {
+    "water": 42294,
+    "void": 17890,
+    "plain": 21730,
+    "forest": 2216,
+    "swamp": 752,
+    "desert": 0,
+    "rock": 19039,
+    "snow_ice": 7207,
+    "lava": 241,
+    "ash_waste": 71
+   },
+   "base_terrain_colors": 44,
+   "spring": {
+    "terrain_colors": 42,
+    "combined_with_overlay": 62
+   },
+   "summer": {
+    "terrain_colors": 43,
+    "combined_with_overlay": 63
+   },
+   "autumn": {
+    "terrain_colors": 44,
+    "combined_with_overlay": 64
+   },
+   "winter": {
+    "terrain_colors": 23,
+    "combined_with_overlay": 43
+   }
+  },
+  "Z1-4": {
+   "class_px": {
+    "water": 15325,
+    "void": 158,
+    "plain": 50554,
+    "forest": 2786,
+    "swamp": 0,
+    "desert": 0,
+    "rock": 21101,
+    "snow_ice": 1,
+    "lava": 1171,
+    "ash_waste": 20344
+   },
+   "base_terrain_colors": 44,
+   "spring": {
+    "terrain_colors": 44,
+    "combined_with_overlay": 63
+   },
+   "summer": {
+    "terrain_colors": 44,
+    "combined_with_overlay": 63
+   },
+   "autumn": {
+    "terrain_colors": 40,
+    "combined_with_overlay": 59
+   },
+   "winter": {
+    "terrain_colors": 22,
+    "combined_with_overlay": 41
+   }
+  },
+  "Z1-5": {
+   "class_px": {
+    "water": 37932,
+    "void": 399,
+    "plain": 21463,
+    "forest": 8851,
+    "swamp": 0,
+    "desert": 0,
+    "rock": 42602,
+    "snow_ice": 0,
+    "lava": 193,
+    "ash_waste": 0
+   },
+   "base_terrain_colors": 43,
+   "spring": {
+    "terrain_colors": 33,
+    "combined_with_overlay": 53
+   },
+   "summer": {
+    "terrain_colors": 41,
+    "combined_with_overlay": 61
+   },
+   "autumn": {
+    "terrain_colors": 34,
+    "combined_with_overlay": 54
+   },
+   "winter": {
+    "terrain_colors": 20,
+    "combined_with_overlay": 40
+   }
+  },
+  "Z1-6": {
+   "class_px": {
+    "water": 52272,
+    "void": 542,
+    "plain": 29398,
+    "forest": 85,
+    "swamp": 0,
+    "desert": 419,
+    "rock": 16741,
+    "snow_ice": 0,
+    "lava": 2844,
+    "ash_waste": 9139
+   },
+   "base_terrain_colors": 46,
+   "spring": {
+    "terrain_colors": 46,
+    "combined_with_overlay": 63
+   },
+   "summer": {
+    "terrain_colors": 46,
+    "combined_with_overlay": 63
+   },
+   "autumn": {
+    "terrain_colors": 44,
+    "combined_with_overlay": 61
+   },
+   "winter": {
+    "terrain_colors": 26,
+    "combined_with_overlay": 43
+   }
+  },
+  "Z1-7": {
+   "class_px": {
+    "water": 34534,
+    "void": 2434,
+    "plain": 33882,
+    "forest": 959,
+    "swamp": 898,
+    "desert": 14820,
+    "rock": 11630,
+    "snow_ice": 0,
+    "lava": 1584,
+    "ash_waste": 10699
+   },
+   "base_terrain_colors": 48,
+   "spring": {
+    "terrain_colors": 47,
+    "combined_with_overlay": 62
+   },
+   "summer": {
+    "terrain_colors": 48,
+    "combined_with_overlay": 63
+   },
+   "autumn": {
+    "terrain_colors": 45,
+    "combined_with_overlay": 60
+   },
+   "winter": {
+    "terrain_colors": 29,
+    "combined_with_overlay": 44
+   }
+  },
+  "Z1-8a": {
+   "class_px": {
+    "water": 42786,
+    "void": 43561,
+    "plain": 15788,
+    "forest": 192,
+    "swamp": 717,
+    "desert": 0,
+    "rock": 8396,
+    "snow_ice": 0,
+    "lava": 0,
+    "ash_waste": 0
+   },
+   "base_terrain_colors": 48,
+   "spring": {
+    "terrain_colors": 41,
+    "combined_with_overlay": 49
+   },
+   "summer": {
+    "terrain_colors": 46,
+    "combined_with_overlay": 54
+   },
+   "autumn": {
+    "terrain_colors": 41,
+    "combined_with_overlay": 49
+   },
+   "winter": {
+    "terrain_colors": 21,
+    "combined_with_overlay": 30
+   }
+  },
+  "Z1-8b": {
+   "class_px": {
+    "water": 67434,
+    "void": 33312,
+    "plain": 4620,
+    "forest": 0,
+    "swamp": 0,
+    "desert": 0,
+    "rock": 6074,
+    "snow_ice": 0,
+    "lava": 0,
+    "ash_waste": 0
+   },
+   "base_terrain_colors": 35,
+   "spring": {
+    "terrain_colors": 28,
+    "combined_with_overlay": 39
+   },
+   "summer": {
+    "terrain_colors": 33,
+    "combined_with_overlay": 44
+   },
+   "autumn": {
+    "terrain_colors": 31,
+    "combined_with_overlay": 42
+   },
+   "winter": {
+    "terrain_colors": 16,
+    "combined_with_overlay": 27
+   }
+  }
+ },
+ "z2": {
+  "Z2-A1": {
+   "name": "灰窯原・官道西（破曉營・渡陰關）",
+   "scale": 16,
+   "center": [
+    149,
+    140
+   ],
+   "terrain_colors": 38,
+   "overlay_colors": 19,
+   "combined_colors": 57,
+   "off_palette_px": 0,
+   "semi_transparent_px": 0,
+   "mean_rel_luminance": 0.026,
+   "own_points_visible": 17,
+   "hidden_points_data_only": [
+    "YJ-17"
+   ],
+   "icons_drawn": 20,
+   "own_icons_missing_or_clipped": [],
+   "icons_moved": [
+    [
+     "GD-47",
+     2.0
+    ]
+   ],
+   "icon_move_max_px": 2.0,
+   "label_failures": [],
+   "neighbour_labels_omitted": [],
+   "icon_contrast_min": 4.72,
+   "icons_below_3": [],
+   "icons_lightened": [],
+   "border_contrast": {
+    "白虎軍": {
+     "color": "#d8cfbd",
+     "dash_px": 205,
+     "contrast_vs_ground_mean": 9.31,
+     "halo_px": 0,
+     "local_contrast_mean": 9.83,
+     "local_contrast_p10": 8.75
+    }
+   },
+   "river_px": {
+    "黑水": 0,
+    "北支": 0,
+    "灰窯原北支": 962,
+    "東支": 0,
+    "東支支流（暫名）": 0
+   },
+   "waterfix_px": 1320,
+   "compose_from_neighbour_px": 0,
+   "seafix_px": 0,
+   "landfix": null,
+   "painted_river_px": 0,
+   "dynamic_slots": {
+    "count": 10,
+    "target": 11,
+    "min_required": 4,
+    "free_land_px": 73551,
+    "by_type": {
+     "event": 10,
+     "gather": 10,
+     "camp": 5,
+     "dungeon": 4,
+     "altar": 1
+    },
+    "altar_anchor_shrines": [],
+    "lava_soft_fallback": false,
+    "locked": true,
+    "lock_types_lost": {},
+    "lock_dropped": []
+   },
+   "density": {
+    "free_ratio": 0.661,
+    "icons_per_10k_land_px": 1.85,
+    "crowded_cells": [
+     {
+      "cell_px": [
+       228,
+       56,
+       285,
+       112
+      ],
+      "free_ratio": 0.02,
+      "points": [
+       "渡陰關",
+       "守關營房",
+       "破曉護民哨",
+       "渡陰關鬼市"
+      ]
+     }
+    ]
+   },
+   "self_check": {
+    "combined_le_64": true,
+    "off_palette_0": true,
+    "semi_transparent_0": true,
+    "no_label_overlap_or_fail": true,
+    "nothing_clipped": true,
+    "icon_contrast_ge_3": true,
+    "border_contrast_ge_3": true,
+    "luminance_le_0.03": true,
+    "dynamic_slots_ge_min": true,
+    "dungeon_slot_ge_1": true
+   }
+  },
+  "Z2-A2": {
+   "name": "灰窯原・官道東（官道驛站・灰窯鎮）",
+   "scale": 16,
+   "center": [
+    173,
+    139
+   ],
+   "terrain_colors": 40,
+   "overlay_colors": 23,
+   "combined_colors": 63,
+   "off_palette_px": 0,
+   "semi_transparent_px": 0,
+   "mean_rel_luminance": 0.0248,
+   "own_points_visible": 24,
+   "hidden_points_data_only": [],
+   "icons_drawn": 27,
+   "own_icons_missing_or_clipped": [],
+   "icons_moved": [
+    [
+     "YJ-09",
+     1.0
+    ]
+   ],
+   "icon_move_max_px": 1.0,
+   "label_failures": [],
+   "neighbour_labels_omitted": [],
+   "icon_contrast_min": 4.03,
+   "icons_below_3": [],
+   "icons_lightened": [],
+   "border_contrast": {
+    "白虎軍": {
+     "color": "#d8cfbd",
+     "dash_px": 264,
+     "contrast_vs_ground_mean": 9.23,
+     "halo_px": 0,
+     "local_contrast_mean": 9.77,
+     "local_contrast_p10": 7.59
+    }
+   },
+   "river_px": {
+    "黑水": 0,
+    "北支": 0,
+    "灰窯原北支": 4,
+    "東支": 0,
+    "東支支流（暫名）": 0
+   },
+   "waterfix_px": 0,
+   "compose_from_neighbour_px": 0,
+   "seafix_px": 0,
+   "landfix": null,
+   "painted_river_px": 0,
+   "dynamic_slots": {
+    "count": 10,
+    "target": 10,
+    "min_required": 4,
+    "free_land_px": 69011,
+    "by_type": {
+     "event": 10,
+     "gather": 10,
+     "dungeon": 9,
+     "camp": 6
+    },
+    "altar_anchor_shrines": [
+     "GD-07",
+     "GD-08",
+     "YJ-02"
+    ],
+    "lava_soft_fallback": false,
+    "locked": true,
+    "lock_types_lost": {},
+    "lock_dropped": []
+   },
+   "density": {
+    "free_ratio": 0.584,
+    "icons_per_10k_land_px": 2.42,
+    "crowded_cells": [
+     {
+      "cell_px": [
+       171,
+       168,
+       228,
+       224
+      ],
+      "free_ratio": 0.02,
+      "points": [
+       "岔口路障",
+       "岔口小祠",
+       "野徑岔口黑攤",
+       "野徑岔口",
+       "逃兵營火"
+      ]
+     },
+     {
+      "cell_px": [
+       0,
+       224,
+       57,
+       280
+      ],
+      "free_ratio": 0.15,
+      "points": [
+       "止血草叢",
+       "懸壺藥寮",
+       "獵戶舊棚"
+      ]
+     }
+    ]
+   },
+   "self_check": {
+    "combined_le_64": true,
+    "off_palette_0": true,
+    "semi_transparent_0": true,
+    "no_label_overlap_or_fail": true,
+    "nothing_clipped": true,
+    "icon_contrast_ge_3": true,
+    "border_contrast_ge_3": true,
+    "luminance_le_0.03": true,
+    "dynamic_slots_ge_min": true,
+    "dungeon_slot_ge_1": true
+   }
+  },
+  "Z2-A3": {
+   "name": "灰窯原・獸徑裂口與窯礦坡（撿骨師營地・酉神裂口）",
+   "scale": 15,
+   "center": [
+    147,
+    153
+   ],
+   "terrain_colors": 43,
+   "overlay_colors": 20,
+   "combined_colors": 60,
+   "off_palette_px": 0,
+   "semi_transparent_px": 0,
+   "mean_rel_luminance": 0.0268,
+   "own_points_visible": 27,
+   "hidden_points_data_only": [
+    "YK-14",
+    "SJ-18"
+   ],
+   "icons_drawn": 29,
+   "own_icons_missing_or_clipped": [],
+   "icons_moved": [
+    [
+     "SJ-07",
+     3.0
+    ],
+    [
+     "SJ-12",
+     2.0
+    ],
+    [
+     "YK-08",
+     1.0
+    ]
+   ],
+   "icon_move_max_px": 3.0,
+   "label_failures": [],
+   "neighbour_labels_omitted": [],
+   "icon_contrast_min": 3.62,
+   "icons_below_3": [],
+   "icons_lightened": [],
+   "border_contrast": {
+    "白虎軍": {
+     "color": "#d8cfbd",
+     "dash_px": 42,
+     "contrast_vs_ground_mean": 8.75,
+     "halo_px": 0,
+     "local_contrast_mean": 9.16,
+     "local_contrast_p10": 6.86
+    }
+   },
+   "river_px": {
+    "黑水": 2546,
+    "北支": 0,
+    "灰窯原北支": 123,
+    "東支": 0,
+    "東支支流（暫名）": 0
+   },
+   "waterfix_px": 1033,
+   "compose_from_neighbour_px": 0,
+   "seafix_px": 0,
+   "landfix": null,
+   "painted_river_px": 0,
+   "dynamic_slots": {
+    "count": 8,
+    "target": 8,
+    "min_required": 4,
+    "free_land_px": 58319,
+    "by_type": {
+     "event": 8,
+     "gather": 8,
+     "altar": 1,
+     "camp": 3,
+     "dungeon": 2
+    },
+    "altar_anchor_shrines": [],
+    "lava_soft_fallback": false,
+    "locked": true,
+    "lock_types_lost": {},
+    "lock_dropped": []
+   },
+   "density": {
+    "free_ratio": 0.626,
+    "icons_per_10k_land_px": 2.73,
+    "crowded_cells": [
+     {
+      "cell_px": [
+       342,
+       112,
+       399,
+       168
+      ],
+      "free_ratio": 0.05,
+      "points": [
+       "千機閣分閣",
+       "黑水收礦棚",
+       "赤石礦戶",
+       "赤石廢礦",
+       "礦道・南坑"
+      ]
+     },
+     {
+      "cell_px": [
+       57,
+       168,
+       114,
+       224
+      ],
+      "free_ratio": 0.14,
+      "points": [
+       "破曉清窟前哨",
+       "酉神裂口",
+       "神骨堆",
+       "霧客出沒處"
+      ]
+     }
+    ]
+   },
+   "self_check": {
+    "combined_le_64": true,
+    "off_palette_0": true,
+    "semi_transparent_0": true,
+    "no_label_overlap_or_fail": true,
+    "nothing_clipped": true,
+    "icon_contrast_ge_3": true,
+    "border_contrast_ge_3": true,
+    "luminance_le_0.03": true,
+    "dynamic_slots_ge_min": true,
+    "dungeon_slot_ge_1": true
+   }
+  },
+  "Z2-A4": {
+   "name": "灰窯原・腐沼塚地（腐骨沼・沉淵祭窟）",
+   "scale": 16,
+   "center": [
+    172,
+    151
+   ],
+   "terrain_colors": 45,
+   "overlay_colors": 18,
+   "combined_colors": 63,
+   "off_palette_px": 0,
+   "semi_transparent_px": 0,
+   "mean_rel_luminance": 0.0248,
+   "own_points_visible": 20,
+   "hidden_points_data_only": [
+    "YJ-18",
+    "FZ-20"
+   ],
+   "icons_drawn": 28,
+   "own_icons_missing_or_clipped": [],
+   "icons_moved": [
+    [
+     "FZ-19",
+     2.0
+    ]
+   ],
+   "icon_move_max_px": 2.0,
+   "label_failures": [],
+   "neighbour_labels_omitted": [],
+   "icon_contrast_min": 4.27,
+   "icons_below_3": [],
+   "icons_lightened": [],
+   "border_contrast": {
+    "白虎軍": {
+     "color": "#d8cfbd",
+     "dash_px": 82,
+     "contrast_vs_ground_mean": 9.22,
+     "halo_px": 0,
+     "local_contrast_mean": 9.93,
+     "local_contrast_p10": 7.71
+    }
+   },
+   "river_px": {
+    "黑水": 0,
+    "北支": 0,
+    "灰窯原北支": 841,
+    "東支": 0,
+    "東支支流（暫名）": 0
+   },
+   "waterfix_px": 1081,
+   "compose_from_neighbour_px": 0,
+   "seafix_px": 0,
+   "landfix": null,
+   "painted_river_px": 0,
+   "dynamic_slots": {
+    "count": 10,
+    "target": 10,
+    "min_required": 4,
+    "free_land_px": 71224,
+    "by_type": {
+     "event": 10,
+     "gather": 10,
+     "altar": 1,
+     "camp": 4,
+     "dungeon": 4
+    },
+    "altar_anchor_shrines": [],
+    "lava_soft_fallback": false,
+    "locked": true,
+    "lock_types_lost": {},
+    "lock_dropped": []
+   },
+   "density": {
+    "free_ratio": 0.57,
+    "icons_per_10k_land_px": 2.56,
+    "crowded_cells": [
+     {
+      "cell_px": [
+       342,
+       0,
+       399,
+       56
+      ],
+      "free_ratio": 0.04,
+      "points": [
+       "祭窟火盆台",
+       "沉淵祭窟",
+       "祭窟外小徑"
+      ]
+     },
+     {
+      "cell_px": [
+       285,
+       112,
+       342,
+       168
+      ],
+      "free_ratio": 0.04,
+      "points": [
+       "拾屍棚",
+       "沼蠱草棚",
+       "沼邊義莊",
+       "沼地渡口"
+      ]
+     },
+     {
+      "cell_px": [
+       342,
+       112,
+       399,
+       168
+      ],
+      "free_ratio": 0.05,
+      "points": [
+       "沼底蠱窩",
+       "沼民水寨",
+       "腐骨沼",
+       "沼蛭淺灘",
+       "浮屍灘"
+      ]
+     }
+    ]
+   },
+   "self_check": {
+    "combined_le_64": true,
+    "off_palette_0": true,
+    "semi_transparent_0": true,
+    "no_label_overlap_or_fail": true,
+    "nothing_clipped": true,
+    "icon_contrast_ge_3": true,
+    "border_contrast_ge_3": true,
+    "luminance_le_0.03": true,
+    "dynamic_slots_ge_min": true,
+    "dungeon_slot_ge_1": true
+   }
+  },
+  "Z2-A5": {
+   "name": "瘴澤北（窮奇洞・蠱巢・瘴澤古墓）",
+   "scale": 12,
+   "center": [
+    115,
+    112
+   ],
+   "terrain_colors": 47,
+   "overlay_colors": 13,
+   "combined_colors": 60,
+   "off_palette_px": 0,
+   "semi_transparent_px": 0,
+   "mean_rel_luminance": 0.0187,
+   "own_points_visible": 9,
+   "hidden_points_data_only": [],
+   "icons_drawn": 9,
+   "own_icons_missing_or_clipped": [],
+   "icons_moved": [
+    [
+     "ZZ-25",
+     8.0
+    ],
+    [
+     "ZZ-27",
+     6.0
+    ]
+   ],
+   "icon_move_max_px": 8.0,
+   "label_failures": [],
+   "neighbour_labels_omitted": [],
+   "icon_contrast_min": 4.33,
+   "icons_below_3": [],
+   "icons_lightened": [],
+   "border_contrast": {
+    "白虎軍": {
+     "color": "#d8cfbd",
+     "dash_px": 114,
+     "contrast_vs_ground_mean": 10.08,
+     "halo_px": 0,
+     "local_contrast_mean": 10.47,
+     "local_contrast_p10": 9.13
+    }
+   },
+   "river_px": {
+    "黑水": 0,
+    "北支": 0,
+    "灰窯原北支": 0,
+    "東支": 0,
+    "東支支流（暫名）": 0
+   },
+   "waterfix_px": 0,
+   "compose_from_neighbour_px": 0,
+   "seafix_px": 0,
+   "landfix": null,
+   "painted_river_px": 0,
+   "dynamic_slots": {
+    "count": 12,
+    "target": 12,
+    "min_required": 4,
+    "free_land_px": 86653,
+    "by_type": {
+     "event": 12,
+     "gather": 12,
+     "dungeon": 10,
+     "altar": 1,
+     "camp": 2
+    },
+    "altar_anchor_shrines": [],
+    "lava_soft_fallback": false,
+    "locked": true,
+    "lock_types_lost": {},
+    "lock_dropped": []
+   },
+   "density": {
+    "free_ratio": 0.85,
+    "icons_per_10k_land_px": 0.81,
+    "crowded_cells": []
+   },
+   "self_check": {
+    "combined_le_64": true,
+    "off_palette_0": true,
+    "semi_transparent_0": true,
+    "no_label_overlap_or_fail": true,
+    "nothing_clipped": true,
+    "icon_contrast_ge_3": true,
+    "border_contrast_ge_3": true,
+    "luminance_le_0.03": true,
+    "dynamic_slots_ge_min": true,
+    "dungeon_slot_ge_1": true
+   }
+  },
+  "Z2-A6": {
+   "name": "鎮西城",
+   "scale": 16,
+   "center": [
+    125,
+    132
+   ],
+   "terrain_colors": 41,
+   "overlay_colors": 22,
+   "combined_colors": 62,
+   "off_palette_px": 0,
+   "semi_transparent_px": 0,
+   "mean_rel_luminance": 0.0184,
+   "own_points_visible": 15,
+   "hidden_points_data_only": [
+    "ZZ-32",
+    "ZZ-33",
+    "ZZ-34"
+   ],
+   "icons_drawn": 18,
+   "own_icons_missing_or_clipped": [],
+   "icons_moved": [
+    [
+     "ZZ-02",
+     5.0
+    ],
+    [
+     "ZZ-06",
+     5.0
+    ],
+    [
+     "ZZ-09",
+     2.0
+    ],
+    [
+     "ZZ-12",
+     1.0
+    ],
+    [
+     "ZZ-10",
+     2.0
+    ]
+   ],
+   "icon_move_max_px": 5.0,
+   "label_failures": [],
+   "neighbour_labels_omitted": [],
+   "icon_contrast_min": 4.97,
+   "icons_below_3": [],
+   "icons_lightened": [],
+   "border_contrast": {
+    "白虎軍": {
+     "color": "#d8cfbd",
+     "dash_px": 395,
+     "contrast_vs_ground_mean": 10.09,
+     "halo_px": 0,
+     "local_contrast_mean": 10.35,
+     "local_contrast_p10": 9.21
+    }
+   },
+   "river_px": {
+    "黑水": 0,
+    "北支": 0,
+    "灰窯原北支": 0,
+    "東支": 0,
+    "東支支流（暫名）": 0
+   },
+   "waterfix_px": 0,
+   "compose_from_neighbour_px": 40116,
+   "seafix_px": 0,
+   "landfix": null,
+   "painted_river_px": 0,
+   "dynamic_slots": {
+    "count": 11,
+    "target": 11,
+    "min_required": 4,
+    "free_land_px": 77126,
+    "by_type": {
+     "event": 11,
+     "camp": 5,
+     "altar": 1,
+     "gather": 9,
+     "dungeon": 8
+    },
+    "altar_anchor_shrines": [
+     "ZZ-10"
+    ],
+    "lava_soft_fallback": false,
+    "locked": true,
+    "lock_types_lost": {},
+    "lock_dropped": []
+   },
+   "density": {
+    "free_ratio": 0.724,
+    "icons_per_10k_land_px": 1.62,
+    "crowded_cells": [
+     {
+      "cell_px": [
+       171,
+       112,
+       228,
+       168
+      ],
+      "free_ratio": 0.02,
+      "points": [
+       "鎮西城",
+       "鎮西糧倉",
+       "鎮西破曉分營",
+       "鎮西驛",
+       "鎮西神龕"
+      ]
+     }
+    ]
+   },
+   "self_check": {
+    "combined_le_64": true,
+    "off_palette_0": true,
+    "semi_transparent_0": true,
+    "no_label_overlap_or_fail": true,
+    "nothing_clipped": true,
+    "icon_contrast_ge_3": true,
+    "border_contrast_ge_3": true,
+    "luminance_le_0.03": true,
+    "dynamic_slots_ge_min": true,
+    "dungeon_slot_ge_1": true
+   }
+  },
+  "Z2-A7": {
+   "name": "瘴澤南（殃宅・瘴澤渡）",
+   "scale": 12,
+   "center": [
+    113,
+    136
+   ],
+   "terrain_colors": 34,
+   "overlay_colors": 22,
+   "combined_colors": 56,
+   "off_palette_px": 0,
+   "semi_transparent_px": 0,
+   "mean_rel_luminance": 0.0175,
+   "own_points_visible": 6,
+   "hidden_points_data_only": [],
+   "icons_drawn": 13,
+   "own_icons_missing_or_clipped": [],
+   "icons_moved": [
+    [
+     "ZZ-24",
+     2.0
+    ],
+    [
+     "ZZ-11",
+     3.0
+    ]
+   ],
+   "icon_move_max_px": 3.0,
+   "label_failures": [],
+   "neighbour_labels_omitted": [],
+   "icon_contrast_min": 4.78,
+   "icons_below_3": [],
+   "icons_lightened": [],
+   "border_contrast": {
+    "白虎軍": {
+     "color": "#d8cfbd",
+     "dash_px": 177,
+     "contrast_vs_ground_mean": 10.27,
+     "halo_px": 0,
+     "local_contrast_mean": 10.57,
+     "local_contrast_p10": 9.61
+    }
+   },
+   "river_px": {
+    "黑水": 1259,
+    "北支": 0,
+    "灰窯原北支": 0,
+    "東支": 0,
+    "東支支流（暫名）": 0
+   },
+   "waterfix_px": 0,
+   "compose_from_neighbour_px": 0,
+   "seafix_px": 0,
+   "landfix": null,
+   "painted_river_px": 0,
+   "dynamic_slots": {
+    "count": 11,
+    "target": 12,
+    "min_required": 4,
+    "free_land_px": 80609,
+    "by_type": {
+     "event": 11,
+     "gather": 11,
+     "dungeon": 10,
+     "altar": 1,
+     "camp": 3
+    },
+    "altar_anchor_shrines": [],
+    "lava_soft_fallback": false,
+    "locked": true,
+    "lock_types_lost": {},
+    "lock_dropped": []
+   },
+   "density": {
+    "free_ratio": 0.762,
+    "icons_per_10k_land_px": 1.18,
+    "crowded_cells": []
+   },
+   "self_check": {
+    "combined_le_64": true,
+    "off_palette_0": true,
+    "semi_transparent_0": true,
+    "no_label_overlap_or_fail": true,
+    "nothing_clipped": true,
+    "icon_contrast_ge_3": true,
+    "border_contrast_ge_3": true,
+    "luminance_le_0.03": true,
+    "dynamic_slots_ge_min": true,
+    "dungeon_slot_ge_1": true
+   }
+  },
+  "Z2-B1": {
+   "name": "崑崙丘南（霧宮・戌神裂口・百獸窟）",
+   "scale": 8,
+   "center": [
+    90,
+    84
+   ],
+   "terrain_colors": 49,
+   "overlay_colors": 14,
+   "combined_colors": 62,
+   "off_palette_px": 0,
+   "semi_transparent_px": 0,
+   "mean_rel_luminance": 0.0204,
+   "own_points_visible": 14,
+   "hidden_points_data_only": [],
+   "icons_drawn": 14,
+   "own_icons_missing_or_clipped": [],
+   "icons_moved": [
+    [
+     "KL-05",
+     13.0
+    ],
+    [
+     "KL-17",
+     10.0
+    ],
+    [
+     "KL-19",
+     6.0
+    ],
+    [
+     "KL-12",
+     2.0
+    ],
+    [
+     "KL-13",
+     6.0
+    ]
+   ],
+   "icon_move_max_px": 13.0,
+   "label_failures": [],
+   "neighbour_labels_omitted": [],
+   "icon_contrast_min": 4.2,
+   "icons_below_3": [],
+   "icons_lightened": [],
+   "border_contrast": {},
+   "river_px": {
+    "黑水": 0,
+    "北支": 0,
+    "灰窯原北支": 0,
+    "東支": 0,
+    "東支支流（暫名）": 0
+   },
+   "waterfix_px": 0,
+   "compose_from_neighbour_px": 0,
+   "seafix_px": 0,
+   "landfix": null,
+   "painted_river_px": 0,
+   "dynamic_slots": {
+    "count": 8,
+    "target": 8,
+    "min_required": 4,
+    "free_land_px": 56297,
+    "by_type": {
+     "event": 8,
+     "gather": 5,
+     "dungeon": 5,
+     "camp": 2,
+     "altar": 1
+    },
+    "altar_anchor_shrines": [
+     "KL-19"
+    ],
+    "lava_soft_fallback": false,
+    "locked": true,
+    "lock_types_lost": {},
+    "lock_dropped": []
+   },
+   "density": {
+    "free_ratio": 0.844,
+    "icons_per_10k_land_px": 1.77,
+    "crowded_cells": []
+   },
+   "self_check": {
+    "combined_le_64": true,
+    "off_palette_0": true,
+    "semi_transparent_0": true,
+    "no_label_overlap_or_fail": true,
+    "nothing_clipped": true,
+    "icon_contrast_ge_3": true,
+    "border_contrast_ge_3": true,
+    "luminance_le_0.03": true,
+    "dynamic_slots_ge_min": true,
+    "dungeon_slot_ge_1": true
+   }
+  },
+  "Z2-B2": {
+   "name": "崑崙丘北（申神裂口・三危）",
+   "scale": 8,
+   "center": [
+    90,
+    57
+   ],
+   "terrain_colors": 50,
+   "overlay_colors": 11,
+   "combined_colors": 59,
+   "off_palette_px": 0,
+   "semi_transparent_px": 0,
+   "mean_rel_luminance": 0.0143,
+   "own_points_visible": 7,
+   "hidden_points_data_only": [],
+   "icons_drawn": 10,
+   "own_icons_missing_or_clipped": [],
+   "icons_moved": [
+    [
+     "KL-18",
+     6.0
+    ],
+    [
+     "KL-09",
+     6.0
+    ],
+    [
+     "KL-10",
+     5.0
+    ],
+    [
+     "KL-12",
+     2.0
+    ]
+   ],
+   "icon_move_max_px": 6.0,
+   "label_failures": [],
+   "neighbour_labels_omitted": [],
+   "icon_contrast_min": 4.15,
+   "icons_below_3": [],
+   "icons_lightened": [],
+   "border_contrast": {},
+   "river_px": {
+    "黑水": 0,
+    "北支": 0,
+    "灰窯原北支": 0,
+    "東支": 0,
+    "東支支流（暫名）": 0
+   },
+   "waterfix_px": 0,
+   "compose_from_neighbour_px": 0,
+   "seafix_px": 0,
+   "landfix": null,
+   "painted_river_px": 0,
+   "dynamic_slots": {
+    "count": 5,
+    "target": 5,
+    "min_required": 4,
+    "free_land_px": 32132,
+    "by_type": {
+     "event": 5,
+     "gather": 2,
+     "dungeon": 2,
+     "altar": 1
+    },
+    "altar_anchor_shrines": [
+     "KL-18"
+    ],
+    "lava_soft_fallback": true,
+    "locked": true,
+    "lock_types_lost": {},
+    "lock_dropped": []
+   },
+   "density": {
+    "free_ratio": 0.861,
+    "icons_per_10k_land_px": 2.66,
+    "crowded_cells": []
+   },
+   "self_check": {
+    "combined_le_64": true,
+    "off_palette_0": true,
+    "semi_transparent_0": true,
+    "no_label_overlap_or_fail": true,
+    "nothing_clipped": true,
+    "icon_contrast_ge_3": true,
+    "border_contrast_ge_3": true,
+    "luminance_le_0.03": true,
+    "dynamic_slots_ge_min": true,
+    "dungeon_slot_ge_1": true
+   }
+  },
+  "Z2-B3": {
+   "name": "北山西（冰牆西關・亥神裂口・寒淵）",
+   "scale": 9,
+   "center": [
+    146,
+    64
+   ],
+   "terrain_colors": 42,
+   "overlay_colors": 15,
+   "combined_colors": 57,
+   "off_palette_px": 0,
+   "semi_transparent_px": 0,
+   "mean_rel_luminance": 0.0271,
+   "own_points_visible": 9,
+   "hidden_points_data_only": [],
+   "icons_drawn": 12,
+   "own_icons_missing_or_clipped": [],
+   "icons_moved": [
+    [
+     "BS-16",
+     1.0
+    ]
+   ],
+   "icon_move_max_px": 1.0,
+   "label_failures": [],
+   "neighbour_labels_omitted": [],
+   "icon_contrast_min": 3.04,
+   "icons_below_3": [],
+   "icons_lightened": [],
+   "border_contrast": {
+    "玄武軍": {
+     "color": "#587888",
+     "dash_px": 34,
+     "contrast_vs_ground_mean": 2.06,
+     "halo_px": 63,
+     "local_contrast_mean": 4.03,
+     "local_contrast_p10": 3.81
+    },
+    "北海冰部": {
+     "color": "#8fb0bc",
+     "dash_px": 58,
+     "contrast_vs_ground_mean": 2.53,
+     "halo_px": 145,
+     "local_contrast_mean": 8.26,
+     "local_contrast_p10": 8.2
+    }
+   },
+   "river_px": {
+    "黑水": 0,
+    "北支": 0,
+    "灰窯原北支": 0,
+    "東支": 0,
+    "東支支流（暫名）": 0
+   },
+   "waterfix_px": 0,
+   "compose_from_neighbour_px": 0,
+   "seafix_px": 0,
+   "landfix": null,
+   "painted_river_px": 0,
+   "dynamic_slots": {
+    "count": 6,
+    "target": 6,
+    "min_required": 4,
+    "free_land_px": 42305,
+    "by_type": {
+     "event": 6,
+     "altar": 1,
+     "gather": 1,
+     "dungeon": 2,
+     "camp": 1
+    },
+    "altar_anchor_shrines": [
+     "BS-15"
+    ],
+    "lava_soft_fallback": false,
+    "locked": true,
+    "lock_types_lost": {},
+    "lock_dropped": []
+   },
+   "density": {
+    "free_ratio": 0.827,
+    "icons_per_10k_land_px": 2.14,
+    "crowded_cells": []
+   },
+   "self_check": {
+    "combined_le_64": true,
+    "off_palette_0": true,
+    "semi_transparent_0": true,
+    "no_label_overlap_or_fail": true,
+    "nothing_clipped": true,
+    "icon_contrast_ge_3": true,
+    "border_contrast_ge_3": true,
+    "luminance_le_0.03": true,
+    "dynamic_slots_ge_min": true,
+    "dungeon_slot_ge_1": true
+   }
+  },
+  "Z2-B4": {
+   "name": "北山・單狐與鎮北城",
+   "scale": 12,
+   "center": [
+    176,
+    74
+   ],
+   "terrain_colors": 41,
+   "overlay_colors": 22,
+   "combined_colors": 62,
+   "off_palette_px": 0,
+   "semi_transparent_px": 0,
+   "mean_rel_luminance": 0.0257,
+   "own_points_visible": 18,
+   "hidden_points_data_only": [
+    "BS-13"
+   ],
+   "icons_drawn": 18,
+   "own_icons_missing_or_clipped": [],
+   "icons_moved": [
+    [
+     "BS-11",
+     4.0
+    ],
+    [
+     "BS-19",
+     2.0
+    ],
+    [
+     "BS-12",
+     3.0
+    ]
+   ],
+   "icon_move_max_px": 4.0,
+   "label_failures": [],
+   "neighbour_labels_omitted": [],
+   "icon_contrast_min": 5.48,
+   "icons_below_3": [],
+   "icons_lightened": [],
+   "border_contrast": {
+    "玄武軍": {
+     "color": "#587888",
+     "dash_px": 121,
+     "contrast_vs_ground_mean": 2.71,
+     "halo_px": 178,
+     "local_contrast_mean": 3.98,
+     "local_contrast_p10": 3.72
+    }
+   },
+   "river_px": {
+    "黑水": 0,
+    "北支": 0,
+    "灰窯原北支": 0,
+    "東支": 0,
+    "東支支流（暫名）": 0
+   },
+   "waterfix_px": 0,
+   "compose_from_neighbour_px": 0,
+   "seafix_px": 0,
+   "landfix": null,
+   "painted_river_px": 0,
+   "dynamic_slots": {
+    "count": 8,
+    "target": 7,
+    "min_required": 4,
+    "free_land_px": 52228,
+    "by_type": {
+     "event": 8,
+     "gather": 3,
+     "camp": 2,
+     "dungeon": 2,
+     "altar": 1
+    },
+    "altar_anchor_shrines": [
+     "BS-06"
+    ],
+    "lava_soft_fallback": false,
+    "locked": true,
+    "lock_types_lost": {},
+    "lock_dropped": []
+   },
+   "density": {
+    "free_ratio": 0.719,
+    "icons_per_10k_land_px": 2.41,
+    "crowded_cells": [
+     {
+      "cell_px": [
+       228,
+       224,
+       285,
+       280
+      ],
+      "free_ratio": 0.11,
+      "points": [
+       "鎮北城",
+       "玄武營",
+       "鎮北神龕"
+      ]
+     }
+    ]
+   },
+   "self_check": {
+    "combined_le_64": true,
+    "off_palette_0": true,
+    "semi_transparent_0": true,
+    "no_label_overlap_or_fail": true,
+    "nothing_clipped": true,
+    "icon_contrast_ge_3": true,
+    "border_contrast_ge_3": true,
+    "luminance_le_0.03": true,
+    "dynamic_slots_ge_min": true,
+    "dungeon_slot_ge_1": true
+   }
+  },
+  "Z2-B5": {
+   "name": "北山・冰窟與子神裂口",
+   "scale": 8,
+   "center": [
+    198,
+    61
+   ],
+   "terrain_colors": 40,
+   "overlay_colors": 15,
+   "combined_colors": 55,
+   "off_palette_px": 0,
+   "semi_transparent_px": 0,
+   "mean_rel_luminance": 0.0282,
+   "own_points_visible": 8,
+   "hidden_points_data_only": [],
+   "icons_drawn": 10,
+   "own_icons_missing_or_clipped": [],
+   "icons_moved": [
+    [
+     "BS-23",
+     8.0
+    ],
+    [
+     "BS-24",
+     8.0
+    ],
+    [
+     "BS-38",
+     5.0
+    ]
+   ],
+   "icon_move_max_px": 8.0,
+   "label_failures": [],
+   "neighbour_labels_omitted": [],
+   "icon_contrast_min": 4.3,
+   "icons_below_3": [],
+   "icons_lightened": [
+    "BS-23"
+   ],
+   "border_contrast": {
+    "玄武軍": {
+     "color": "#587888",
+     "dash_px": 250,
+     "contrast_vs_ground_mean": 3.06,
+     "halo_px": 367,
+     "local_contrast_mean": 4.06,
+     "local_contrast_p10": 3.92
+    },
+    "北海冰部": {
+     "color": "#8fb0bc",
+     "dash_px": 271,
+     "contrast_vs_ground_mean": 6.76,
+     "halo_px": 52,
+     "local_contrast_mean": 7.2,
+     "local_contrast_p10": 5.37
+    }
+   },
+   "river_px": {
+    "黑水": 0,
+    "北支": 0,
+    "灰窯原北支": 0,
+    "東支": 0,
+    "東支支流（暫名）": 0
+   },
+   "waterfix_px": 0,
+   "compose_from_neighbour_px": 0,
+   "seafix_px": 0,
+   "landfix": null,
+   "painted_river_px": 0,
+   "dynamic_slots": {
+    "count": 4,
+    "target": 5,
+    "min_required": 4,
+    "free_land_px": 32263,
+    "by_type": {
+     "event": 4,
+     "dungeon": 2,
+     "altar": 1
+    },
+    "altar_anchor_shrines": [],
+    "lava_soft_fallback": false,
+    "locked": true,
+    "lock_types_lost": {},
+    "lock_dropped": []
+   },
+   "density": {
+    "free_ratio": 0.85,
+    "icons_per_10k_land_px": 2.44,
+    "crowded_cells": []
+   },
+   "self_check": {
+    "combined_le_64": true,
+    "off_palette_0": true,
+    "semi_transparent_0": true,
+    "no_label_overlap_or_fail": true,
+    "nothing_clipped": true,
+    "icon_contrast_ge_3": true,
+    "border_contrast_ge_3": true,
+    "luminance_le_0.03": true,
+    "dynamic_slots_ge_min": true,
+    "dungeon_slot_ge_1": true
+   }
+  },
+  "Z2-B6": {
+   "name": "北山東（冰牆東關・丑神裂口・少咸山）",
+   "scale": 9,
+   "center": [
+    248,
+    56
+   ],
+   "terrain_colors": 48,
+   "overlay_colors": 11,
+   "combined_colors": 58,
+   "off_palette_px": 0,
+   "semi_transparent_px": 0,
+   "mean_rel_luminance": 0.0286,
+   "own_points_visible": 4,
+   "hidden_points_data_only": [],
+   "icons_drawn": 4,
+   "own_icons_missing_or_clipped": [],
+   "icons_moved": [],
+   "icon_move_max_px": 0,
+   "label_failures": [],
+   "neighbour_labels_omitted": [],
+   "icon_contrast_min": 7.03,
+   "icons_below_3": [],
+   "icons_lightened": [],
+   "border_contrast": {
+    "玄武軍": {
+     "color": "#587888",
+     "dash_px": 97,
+     "contrast_vs_ground_mean": 2.66,
+     "halo_px": 223,
+     "local_contrast_mean": 4.06,
+     "local_contrast_p10": 3.78
+    }
+   },
+   "river_px": {
+    "黑水": 0,
+    "北支": 212,
+    "灰窯原北支": 0,
+    "東支": 0,
+    "東支支流（暫名）": 0
+   },
+   "waterfix_px": 0,
+   "compose_from_neighbour_px": 0,
+   "seafix_px": 7235,
+   "landfix": null,
+   "painted_river_px": 0,
+   "dynamic_slots": {
+    "count": 4,
+    "target": 4,
+    "min_required": 4,
+    "free_land_px": 28234,
+    "by_type": {
+     "event": 4,
+     "altar": 1,
+     "gather": 1,
+     "dungeon": 2
+    },
+    "altar_anchor_shrines": [],
+    "lava_soft_fallback": false,
+    "locked": true,
+    "lock_types_lost": {},
+    "lock_dropped": []
+   },
+   "density": {
+    "free_ratio": 0.923,
+    "icons_per_10k_land_px": 1.06,
+    "crowded_cells": []
+   },
+   "self_check": {
+    "combined_le_64": true,
+    "off_palette_0": true,
+    "semi_transparent_0": true,
+    "no_label_overlap_or_fail": true,
+    "nothing_clipped": true,
+    "icon_contrast_ge_3": true,
+    "border_contrast_ge_3": true,
+    "luminance_le_0.03": true,
+    "dynamic_slots_ge_min": true,
+    "dungeon_slot_ge_1": true
+   }
+  },
+  "Z2-C1": {
+   "name": "中山・冥門（血霧環帶・十二神座）",
+   "scale": 5,
+   "center": [
+    196,
+    116
+   ],
+   "terrain_colors": 43,
+   "overlay_colors": 20,
+   "combined_colors": 63,
+   "off_palette_px": 0,
+   "semi_transparent_px": 0,
+   "mean_rel_luminance": 0.0155,
+   "own_points_visible": 8,
+   "hidden_points_data_only": [],
+   "icons_drawn": 18,
+   "own_icons_missing_or_clipped": [],
+   "icons_moved": [
+    [
+     "GD-11",
+     1.0
+    ],
+    [
+     "YJ-09",
+     3.0
+    ]
+   ],
+   "icon_move_max_px": 3.0,
+   "label_failures": [],
+   "neighbour_labels_omitted": [],
+   "icon_contrast_min": 5.25,
+   "icons_below_3": [],
+   "icons_lightened": [],
+   "border_contrast": {
+    "白虎軍": {
+     "color": "#d8cfbd",
+     "dash_px": 199,
+     "contrast_vs_ground_mean": 10.97,
+     "halo_px": 0,
+     "local_contrast_mean": 10.98,
+     "local_contrast_p10": 9.84
+    },
+    "青龍軍": {
+     "color": "#5f9a7a",
+     "dash_px": 55,
+     "contrast_vs_ground_mean": 4.91,
+     "halo_px": 0,
+     "local_contrast_mean": 5.05,
+     "local_contrast_p10": 4.66
+    }
+   },
+   "river_px": {
+    "黑水": 0,
+    "北支": 317,
+    "灰窯原北支": 192,
+    "東支": 0,
+    "東支支流（暫名）": 0
+   },
+   "waterfix_px": 0,
+   "compose_from_neighbour_px": 0,
+   "seafix_px": 0,
+   "landfix": null,
+   "painted_river_px": 0,
+   "dynamic_slots": {
+    "count": 11,
+    "target": 11,
+    "min_required": 4,
+    "free_land_px": 73877,
+    "by_type": {
+     "event": 11,
+     "gather": 11,
+     "dungeon": 5,
+     "altar": 1,
+     "camp": 1
+    },
+    "altar_anchor_shrines": [],
+    "lava_soft_fallback": false,
+    "locked": true,
+    "lock_types_lost": {},
+    "lock_dropped": []
+   },
+   "density": {
+    "free_ratio": 0.811,
+    "icons_per_10k_land_px": 1.77,
+    "crowded_cells": [
+     {
+      "cell_px": [
+       0,
+       224,
+       57,
+       280
+      ],
+      "free_ratio": 0.07,
+      "points": [
+       "官道驛站",
+       "官道河橋",
+       "藥林鐵脈"
+      ]
+     },
+     {
+      "cell_px": [
+       57,
+       224,
+       114,
+       280
+      ],
+      "free_ratio": 0.02,
+      "points": [
+       "斷路幫窩",
+       "鴉巢外枯樹",
+       "官道里碑",
+       "官道十里亭",
+       "野徑岔口"
+      ]
+     }
+    ]
+   },
+   "self_check": {
+    "combined_le_64": true,
+    "off_palette_0": true,
+    "semi_transparent_0": true,
+    "no_label_overlap_or_fail": true,
+    "nothing_clipped": true,
+    "icon_contrast_ge_3": true,
+    "border_contrast_ge_3": true,
+    "luminance_le_0.03": true,
+    "dynamic_slots_ge_min": true,
+    "dungeon_slot_ge_1": true
+   }
+  },
+  "Z2-C2": {
+   "name": "黑水渡",
+   "scale": 16,
+   "center": [
+    211,
+    149
+   ],
+   "terrain_colors": 38,
+   "overlay_colors": 18,
+   "combined_colors": 56,
+   "off_palette_px": 0,
+   "semi_transparent_px": 0,
+   "mean_rel_luminance": 0.0095,
+   "own_points_visible": 12,
+   "hidden_points_data_only": [],
+   "icons_drawn": 12,
+   "own_icons_missing_or_clipped": [],
+   "icons_moved": [
+    [
+     "HN-03",
+     2.0
+    ],
+    [
+     "HN-10",
+     4.0
+    ]
+   ],
+   "icon_move_max_px": 4.0,
+   "label_failures": [],
+   "neighbour_labels_omitted": [],
+   "icon_contrast_min": 4.06,
+   "icons_below_3": [],
+   "icons_lightened": [],
+   "border_contrast": {
+    "朱雀軍": {
+     "color": "#b5382c",
+     "dash_px": 86,
+     "contrast_vs_ground_mean": 2.9,
+     "halo_px": 235,
+     "local_contrast_mean": 3.3,
+     "local_contrast_p10": 3.32
+    }
+   },
+   "river_px": {
+    "黑水": 1240,
+    "北支": 728,
+    "灰窯原北支": 0,
+    "東支": 0,
+    "東支支流（暫名）": 0
+   },
+   "waterfix_px": 0,
+   "compose_from_neighbour_px": 0,
+   "seafix_px": 0,
+   "landfix": {
+    "anchors": [
+     "HN-01",
+     "HN-02",
+     "HN-04",
+     "HN-10",
+     "HN-11",
+     "HN-14"
+    ],
+    "px": 3162
+   },
+   "painted_river_px": 0,
+   "dynamic_slots": {
+    "count": 6,
+    "target": 6,
+    "min_required": 4,
+    "free_land_px": 43141,
+    "by_type": {
+     "event": 6,
+     "altar": 1,
+     "gather": 5,
+     "dungeon": 2
+    },
+    "altar_anchor_shrines": [],
+    "lava_soft_fallback": false,
+    "locked": true,
+    "lock_types_lost": {},
+    "lock_dropped": []
+   },
+   "density": {
+    "free_ratio": 0.853,
+    "icons_per_10k_land_px": 2.03,
+    "crowded_cells": [
+     {
+      "cell_px": [
+       171,
+       168,
+       228,
+       224
+      ],
+      "free_ratio": 0.0,
+      "points": [
+       "黑水渡",
+       "黑水渡碼頭",
+       "黑水西渡",
+       "黑水中繼島",
+       "黑水渡鬼市"
+      ]
+     }
+    ]
+   },
+   "self_check": {
+    "combined_le_64": true,
+    "off_palette_0": true,
+    "semi_transparent_0": true,
+    "no_label_overlap_or_fail": true,
+    "nothing_clipped": true,
+    "icon_contrast_ge_3": true,
+    "border_contrast_ge_3": true,
+    "luminance_le_0.03": true,
+    "dynamic_slots_ge_min": true,
+    "dungeon_slot_ge_1": true
+   }
+  },
+  "Z2-C3": {
+   "name": "鎮東城（東山驛・竹山村）",
+   "scale": 12,
+   "center": [
+    257,
+    130
+   ],
+   "terrain_colors": 42,
+   "overlay_colors": 21,
+   "combined_colors": 62,
+   "off_palette_px": 0,
+   "semi_transparent_px": 0,
+   "mean_rel_luminance": 0.0198,
+   "own_points_visible": 10,
+   "hidden_points_data_only": [],
+   "icons_drawn": 10,
+   "own_icons_missing_or_clipped": [],
+   "icons_moved": [
+    [
+     "DS-04",
+     9.0
+    ],
+    [
+     "DS-05",
+     3.0
+    ],
+    [
+     "DS-21",
+     5.0
+    ],
+    [
+     "DS-35",
+     2.0
+    ],
+    [
+     "DS-39",
+     3.0
+    ],
+    [
+     "DS-06",
+     6.0
+    ]
+   ],
+   "icon_move_max_px": 9.0,
+   "label_failures": [],
+   "neighbour_labels_omitted": [],
+   "icon_contrast_min": 4.77,
+   "icons_below_3": [],
+   "icons_lightened": [],
+   "border_contrast": {
+    "青龍軍": {
+     "color": "#5f9a7a",
+     "dash_px": 281,
+     "contrast_vs_ground_mean": 5.07,
+     "halo_px": 100,
+     "local_contrast_mean": 5.43,
+     "local_contrast_p10": 4.48
+    }
+   },
+   "river_px": {
+    "黑水": 0,
+    "北支": 0,
+    "灰窯原北支": 0,
+    "東支": 0,
+    "東支支流（暫名）": 4117
+   },
+   "waterfix_px": 0,
+   "compose_from_neighbour_px": 0,
+   "seafix_px": 0,
+   "landfix": null,
+   "painted_river_px": 4117,
+   "dynamic_slots": {
+    "count": 12,
+    "target": 12,
+    "min_required": 4,
+    "free_land_px": 82643,
+    "by_type": {
+     "event": 12,
+     "gather": 8,
+     "dungeon": 7,
+     "camp": 1,
+     "altar": 1
+    },
+    "altar_anchor_shrines": [
+     "DS-06"
+    ],
+    "lava_soft_fallback": false,
+    "locked": true,
+    "lock_types_lost": {},
+    "lock_dropped": []
+   },
+   "density": {
+    "free_ratio": 0.845,
+    "icons_per_10k_land_px": 0.94,
+    "crowded_cells": [
+     {
+      "cell_px": [
+       114,
+       56,
+       171,
+       112
+      ],
+      "free_ratio": 0.11,
+      "points": [
+       "鎮東城",
+       "青龍營",
+       "鎮東義莊"
+      ]
+     }
+    ]
+   },
+   "self_check": {
+    "combined_le_64": true,
+    "off_palette_0": true,
+    "semi_transparent_0": true,
+    "no_label_overlap_or_fail": true,
+    "nothing_clipped": true,
+    "icon_contrast_ge_3": true,
+    "border_contrast_ge_3": true,
+    "luminance_le_0.03": true,
+    "dynamic_slots_ge_min": true,
+    "dungeon_slot_ge_1": true
+   }
+  },
+  "Z2-C4": {
+   "name": "東山北嶺（寅神・辰神裂口）",
+   "scale": 5,
+   "center": [
+    298,
+    100
+   ],
+   "terrain_colors": 51,
+   "overlay_colors": 12,
+   "combined_colors": 63,
+   "off_palette_px": 0,
+   "semi_transparent_px": 0,
+   "mean_rel_luminance": 0.017,
+   "own_points_visible": 5,
+   "hidden_points_data_only": [],
+   "icons_drawn": 6,
+   "own_icons_missing_or_clipped": [],
+   "icons_moved": [],
+   "icon_move_max_px": 0,
+   "label_failures": [],
+   "neighbour_labels_omitted": [],
+   "icon_contrast_min": 6.21,
+   "icons_below_3": [],
+   "icons_lightened": [],
+   "border_contrast": {
+    "青龍軍": {
+     "color": "#5f9a7a",
+     "dash_px": 106,
+     "contrast_vs_ground_mean": 5.08,
+     "halo_px": 25,
+     "local_contrast_mean": 5.34,
+     "local_contrast_p10": 4.39
+    }
+   },
+   "river_px": {
+    "黑水": 0,
+    "北支": 0,
+    "灰窯原北支": 0,
+    "東支": 240,
+    "東支支流（暫名）": 1695
+   },
+   "waterfix_px": 0,
+   "compose_from_neighbour_px": 0,
+   "seafix_px": 0,
+   "landfix": null,
+   "painted_river_px": 1695,
+   "dynamic_slots": {
+    "count": 11,
+    "target": 11,
+    "min_required": 4,
+    "free_land_px": 76722,
+    "by_type": {
+     "event": 11,
+     "gather": 5,
+     "altar": 1,
+     "dungeon": 2
+    },
+    "altar_anchor_shrines": [],
+    "lava_soft_fallback": false,
+    "locked": true,
+    "lock_types_lost": {},
+    "lock_dropped": []
+   },
+   "density": {
+    "free_ratio": 0.931,
+    "icons_per_10k_land_px": 0.63,
+    "crowded_cells": []
+   },
+   "self_check": {
+    "combined_le_64": true,
+    "off_palette_0": true,
+    "semi_transparent_0": true,
+    "no_label_overlap_or_fail": true,
+    "nothing_clipped": true,
+    "icon_contrast_ge_3": true,
+    "border_contrast_ge_3": true,
+    "luminance_le_0.03": true,
+    "dynamic_slots_ge_min": true,
+    "dungeon_slot_ge_1": true
+   }
+  },
+  "Z2-C5": {
+   "name": "廢廟群（祀社總壇・祭品田）",
+   "scale": 12,
+   "center": [
+    285,
+    145
+   ],
+   "terrain_colors": 47,
+   "overlay_colors": 16,
+   "combined_colors": 62,
+   "off_palette_px": 0,
+   "semi_transparent_px": 0,
+   "mean_rel_luminance": 0.0207,
+   "own_points_visible": 17,
+   "hidden_points_data_only": [],
+   "icons_drawn": 17,
+   "own_icons_missing_or_clipped": [],
+   "icons_moved": [
+    [
+     "DS-36",
+     4.0
+    ],
+    [
+     "DS-11",
+     4.0
+    ],
+    [
+     "DS-13",
+     3.0
+    ],
+    [
+     "DS-15",
+     5.0
+    ],
+    [
+     "DS-16",
+     4.0
+    ],
+    [
+     "DS-08",
+     14.0
+    ]
+   ],
+   "icon_move_max_px": 14.0,
+   "label_failures": [],
+   "neighbour_labels_omitted": [],
+   "icon_contrast_min": 5.12,
+   "icons_below_3": [],
+   "icons_lightened": [],
+   "border_contrast": {
+    "青龍軍": {
+     "color": "#5f9a7a",
+     "dash_px": 201,
+     "contrast_vs_ground_mean": 4.75,
+     "halo_px": 73,
+     "local_contrast_mean": 5.29,
+     "local_contrast_p10": 4.26
+    }
+   },
+   "river_px": {
+    "黑水": 0,
+    "北支": 0,
+    "灰窯原北支": 0,
+    "東支": 755,
+    "東支支流（暫名）": 4710
+   },
+   "waterfix_px": 0,
+   "compose_from_neighbour_px": 0,
+   "seafix_px": 0,
+   "landfix": null,
+   "painted_river_px": 4657,
+   "dynamic_slots": {
+    "count": 10,
+    "target": 10,
+    "min_required": 4,
+    "free_land_px": 73153,
+    "by_type": {
+     "event": 10,
+     "gather": 5,
+     "dungeon": 4,
+     "camp": 3
+    },
+    "altar_anchor_shrines": [
+     "DS-10",
+     "DS-11",
+     "DS-12",
+     "DS-13",
+     "DS-14",
+     "DS-15",
+     "DS-16"
+    ],
+    "lava_soft_fallback": false,
+    "locked": true,
+    "lock_types_lost": {},
+    "lock_dropped": []
+   },
+   "density": {
+    "free_ratio": 0.803,
+    "icons_per_10k_land_px": 1.75,
+    "crowded_cells": [
+     {
+      "cell_px": [
+       57,
+       168,
+       114,
+       224
+      ],
+      "free_ratio": 0.0,
+      "points": [
+       "祀社總壇",
+       "空桑古廟",
+       "曹夕廟",
+       "廢廟群"
+      ]
+     },
+     {
+      "cell_px": [
+       114,
+       168,
+       171,
+       224
+      ],
+      "free_ratio": 0.08,
+      "points": [
+       "護廟東哨",
+       "廢廟難民棚",
+       "高氏廟",
+       "葛山廟"
+      ]
+     }
+    ]
+   },
+   "self_check": {
+    "combined_le_64": true,
+    "off_palette_0": true,
+    "semi_transparent_0": true,
+    "no_label_overlap_or_fail": true,
+    "nothing_clipped": true,
+    "icon_contrast_ge_3": true,
+    "border_contrast_ge_3": true,
+    "luminance_le_0.03": true,
+    "dynamic_slots_ge_min": true,
+    "dungeon_slot_ge_1": true
+   }
+  },
+  "Z2-C6": {
+   "name": "扶桑坡（萬神堂・姑射山）",
+   "scale": 10,
+   "center": [
+    340,
+    129
+   ],
+   "terrain_colors": 45,
+   "overlay_colors": 15,
+   "combined_colors": 59,
+   "off_palette_px": 0,
+   "semi_transparent_px": 0,
+   "mean_rel_luminance": 0.0181,
+   "own_points_visible": 11,
+   "hidden_points_data_only": [],
+   "icons_drawn": 11,
+   "own_icons_missing_or_clipped": [],
+   "icons_moved": [
+    [
+     "DS-26",
+     8.0
+    ],
+    [
+     "DS-29",
+     3.0
+    ],
+    [
+     "DS-23",
+     2.0
+    ],
+    [
+     "DS-45",
+     1.0
+    ]
+   ],
+   "icon_move_max_px": 8.0,
+   "label_failures": [],
+   "neighbour_labels_omitted": [],
+   "icon_contrast_min": 4.67,
+   "icons_below_3": [],
+   "icons_lightened": [],
+   "border_contrast": {},
+   "river_px": {
+    "黑水": 0,
+    "北支": 0,
+    "灰窯原北支": 0,
+    "東支": 0,
+    "東支支流（暫名）": 0
+   },
+   "waterfix_px": 0,
+   "compose_from_neighbour_px": 0,
+   "seafix_px": 0,
+   "landfix": null,
+   "painted_river_px": 0,
+   "dynamic_slots": {
+    "count": 10,
+    "target": 10,
+    "min_required": 4,
+    "free_land_px": 67251,
+    "by_type": {
+     "event": 10,
+     "dungeon": 7,
+     "gather": 6
+    },
+    "altar_anchor_shrines": [
+     "DS-28",
+     "DS-29"
+    ],
+    "lava_soft_fallback": false,
+    "locked": true,
+    "lock_types_lost": {},
+    "lock_dropped": []
+   },
+   "density": {
+    "free_ratio": 0.883,
+    "icons_per_10k_land_px": 1.29,
+    "crowded_cells": [
+     {
+      "cell_px": [
+       57,
+       112,
+       114,
+       168
+      ],
+      "free_ratio": 0.06,
+      "points": [
+       "勃垂村",
+       "山腰神龕",
+       "坡下神龕",
+       "扶桑坡"
+      ]
+     }
+    ]
+   },
+   "self_check": {
+    "combined_le_64": true,
+    "off_palette_0": true,
+    "semi_transparent_0": true,
+    "no_label_overlap_or_fail": true,
+    "nothing_clipped": true,
+    "icon_contrast_ge_3": true,
+    "border_contrast_ge_3": true,
+    "luminance_le_0.03": true,
+    "dynamic_slots_ge_min": true,
+    "dungeon_slot_ge_1": true
+   }
+  },
+  "Z2-C7": {
+   "name": "東山南（卯神裂口・子桐山）",
+   "scale": 6,
+   "center": [
+    313,
+    186
+   ],
+   "terrain_colors": 55,
+   "overlay_colors": 7,
+   "combined_colors": 62,
+   "off_palette_px": 0,
+   "semi_transparent_px": 0,
+   "mean_rel_luminance": 0.0131,
+   "own_points_visible": 2,
+   "hidden_points_data_only": [],
+   "icons_drawn": 2,
+   "own_icons_missing_or_clipped": [],
+   "icons_moved": [],
+   "icon_move_max_px": 0,
+   "label_failures": [],
+   "neighbour_labels_omitted": [],
+   "icon_contrast_min": 8.09,
+   "icons_below_3": [],
+   "icons_lightened": [],
+   "border_contrast": {},
+   "river_px": {
+    "黑水": 0,
+    "北支": 0,
+    "灰窯原北支": 0,
+    "東支": 0,
+    "東支支流（暫名）": 0
+   },
+   "waterfix_px": 0,
+   "compose_from_neighbour_px": 0,
+   "seafix_px": 0,
+   "landfix": null,
+   "painted_river_px": 0,
+   "dynamic_slots": {
+    "count": 10,
+    "target": 10,
+    "min_required": 4,
+    "free_land_px": 72394,
+    "by_type": {
+     "event": 10,
+     "gather": 5,
+     "dungeon": 6,
+     "altar": 1
+    },
+    "altar_anchor_shrines": [],
+    "lava_soft_fallback": false,
+    "locked": true,
+    "lock_types_lost": {},
+    "lock_dropped": []
+   },
+   "density": {
+    "free_ratio": 0.977,
+    "icons_per_10k_land_px": 0.24,
+    "crowded_cells": []
+   },
+   "self_check": {
+    "combined_le_64": true,
+    "off_palette_0": true,
+    "semi_transparent_0": true,
+    "no_label_overlap_or_fail": true,
+    "nothing_clipped": true,
+    "icon_contrast_ge_3": true,
+    "border_contrast_ge_3": true,
+    "luminance_le_0.03": true,
+    "dynamic_slots_ge_min": true,
+    "dungeon_slot_ge_1": true
+   }
+  },
+  "Z2-D1": {
+   "name": "南山・焚獄與祝融山（赤銅礦場・火山祝壇）",
+   "scale": 10,
+   "center": [
+    170,
+    174
+   ],
+   "terrain_colors": 45,
+   "overlay_colors": 16,
+   "combined_colors": 60,
+   "off_palette_px": 0,
+   "semi_transparent_px": 0,
+   "mean_rel_luminance": 0.0147,
+   "own_points_visible": 14,
+   "hidden_points_data_only": [],
+   "icons_drawn": 14,
+   "own_icons_missing_or_clipped": [],
+   "icons_moved": [
+    [
+     "NS-20",
+     8.0
+    ],
+    [
+     "NS-21",
+     6.0
+    ],
+    [
+     "NS-23",
+     6.0
+    ],
+    [
+     "NS-18",
+     6.0
+    ],
+    [
+     "NS-22",
+     5.0
+    ],
+    [
+     "NS-25",
+     5.0
+    ]
+   ],
+   "icon_move_max_px": 8.0,
+   "label_failures": [],
+   "neighbour_labels_omitted": [],
+   "icon_contrast_min": 5.27,
+   "icons_below_3": [],
+   "icons_lightened": [],
+   "border_contrast": {
+    "朱雀軍": {
+     "color": "#b5382c",
+     "dash_px": 516,
+     "contrast_vs_ground_mean": 2.96,
+     "halo_px": 1299,
+     "local_contrast_mean": 3.3,
+     "local_contrast_p10": 3.32
+    },
+    "炎祝部": {
+     "color": "#e07a2a",
+     "dash_px": 118,
+     "contrast_vs_ground_mean": 5.72,
+     "halo_px": 0,
+     "local_contrast_mean": 5.94,
+     "local_contrast_p10": 5.04
+    }
+   },
+   "river_px": {
+    "黑水": 1566,
+    "北支": 0,
+    "灰窯原北支": 0,
+    "東支": 0,
+    "東支支流（暫名）": 0
+   },
+   "waterfix_px": 0,
+   "compose_from_neighbour_px": 0,
+   "seafix_px": 0,
+   "landfix": null,
+   "painted_river_px": 0,
+   "dynamic_slots": {
+    "count": 10,
+    "target": 10,
+    "min_required": 4,
+    "free_land_px": 72453,
+    "by_type": {
+     "event": 10,
+     "gather": 8,
+     "camp": 2,
+     "dungeon": 2,
+     "altar": 1
+    },
+    "altar_anchor_shrines": [
+     "NS-18"
+    ],
+    "lava_soft_fallback": false,
+    "locked": true,
+    "lock_types_lost": {},
+    "lock_dropped": []
+   },
+   "density": {
+    "free_ratio": 0.797,
+    "icons_per_10k_land_px": 1.28,
+    "crowded_cells": [
+     {
+      "cell_px": [
+       114,
+       112,
+       171,
+       168
+      ],
+      "free_ratio": 0.06,
+      "points": [
+       "焚獄",
+       "赤銅礦場",
+       "赤銅坊",
+       "岩漿河",
+       "焚獄外圍"
+      ]
+     }
+    ]
+   },
+   "self_check": {
+    "combined_le_64": true,
+    "off_palette_0": true,
+    "semi_transparent_0": true,
+    "no_label_overlap_or_fail": true,
+    "nothing_clipped": true,
+    "icon_contrast_ge_3": true,
+    "border_contrast_ge_3": true,
+    "luminance_le_0.03": true,
+    "dynamic_slots_ge_min": true,
+    "dungeon_slot_ge_1": true
+   }
+  },
+  "Z2-D2": {
+   "name": "南山・鎮南城（巳神・午神裂口）",
+   "scale": 8,
+   "center": [
+    193,
+    178
+   ],
+   "terrain_colors": 41,
+   "overlay_colors": 20,
+   "combined_colors": 61,
+   "off_palette_px": 0,
+   "semi_transparent_px": 0,
+   "mean_rel_luminance": 0.0126,
+   "own_points_visible": 11,
+   "hidden_points_data_only": [],
+   "icons_drawn": 12,
+   "own_icons_missing_or_clipped": [],
+   "icons_moved": [
+    [
+     "NS-04",
+     13.0
+    ],
+    [
+     "NS-06",
+     10.0
+    ],
+    [
+     "NS-48",
+     10.0
+    ]
+   ],
+   "icon_move_max_px": 13.0,
+   "label_failures": [],
+   "neighbour_labels_omitted": [],
+   "icon_contrast_min": 5.39,
+   "icons_below_3": [],
+   "icons_lightened": [],
+   "border_contrast": {
+    "朱雀軍": {
+     "color": "#b5382c",
+     "dash_px": 532,
+     "contrast_vs_ground_mean": 2.87,
+     "halo_px": 1352,
+     "local_contrast_mean": 3.3,
+     "local_contrast_p10": 3.32
+    }
+   },
+   "river_px": {
+    "黑水": 383,
+    "北支": 0,
+    "灰窯原北支": 0,
+    "東支": 0,
+    "東支支流（暫名）": 0
+   },
+   "waterfix_px": 0,
+   "compose_from_neighbour_px": 0,
+   "seafix_px": 0,
+   "landfix": {
+    "anchors": [
+     "NS-38"
+    ],
+    "px": 499
+   },
+   "painted_river_px": 0,
+   "dynamic_slots": {
+    "count": 10,
+    "target": 10,
+    "min_required": 4,
+    "free_land_px": 71548,
+    "by_type": {
+     "event": 10,
+     "gather": 8,
+     "camp": 3,
+     "dungeon": 4,
+     "altar": 1
+    },
+    "altar_anchor_shrines": [
+     "NS-06"
+    ],
+    "lava_soft_fallback": false,
+    "locked": true,
+    "lock_types_lost": {},
+    "lock_dropped": []
+   },
+   "density": {
+    "free_ratio": 0.745,
+    "icons_per_10k_land_px": 1.29,
+    "crowded_cells": []
+   },
+   "self_check": {
+    "combined_le_64": true,
+    "off_palette_0": true,
+    "semi_transparent_0": true,
+    "no_label_overlap_or_fail": true,
+    "nothing_clipped": true,
+    "icon_contrast_ge_3": true,
+    "border_contrast_ge_3": true,
+    "luminance_le_0.03": true,
+    "dynamic_slots_ge_min": true,
+    "dungeon_slot_ge_1": true
+   }
+  },
+  "Z2-D3": {
+   "name": "南山南（招搖鎮・射日崖・羽民國）",
+   "scale": 7.5,
+   "center": [
+    219,
+    211
+   ],
+   "terrain_colors": 42,
+   "overlay_colors": 21,
+   "combined_colors": 63,
+   "off_palette_px": 0,
+   "semi_transparent_px": 0,
+   "mean_rel_luminance": 0.0087,
+   "own_points_visible": 12,
+   "hidden_points_data_only": [
+    "NS-10",
+    "NS-13"
+   ],
+   "icons_drawn": 13,
+   "own_icons_missing_or_clipped": [],
+   "icons_moved": [
+    [
+     "NS-08",
+     2.0
+    ],
+    [
+     "NS-30",
+     10.0
+    ],
+    [
+     "NS-31",
+     10.0
+    ],
+    [
+     "NS-33",
+     8.0
+    ],
+    [
+     "NS-09",
+     7.0
+    ],
+    [
+     "NS-28",
+     2.0
+    ],
+    [
+     "NS-42",
+     2.0
+    ]
+   ],
+   "icon_move_max_px": 10.0,
+   "label_failures": [],
+   "neighbour_labels_omitted": [],
+   "icon_contrast_min": 5.44,
+   "icons_below_3": [],
+   "icons_lightened": [],
+   "border_contrast": {
+    "朱雀軍": {
+     "color": "#b5382c",
+     "dash_px": 166,
+     "contrast_vs_ground_mean": 2.92,
+     "halo_px": 440,
+     "local_contrast_mean": 3.32,
+     "local_contrast_p10": 3.32
+    }
+   },
+   "river_px": {
+    "黑水": 0,
+    "北支": 0,
+    "灰窯原北支": 0,
+    "東支": 191,
+    "東支支流（暫名）": 0
+   },
+   "waterfix_px": 0,
+   "compose_from_neighbour_px": 0,
+   "seafix_px": 0,
+   "landfix": {
+    "anchors": [
+     "HN-12"
+    ],
+    "px": 540
+   },
+   "painted_river_px": 0,
+   "dynamic_slots": {
+    "count": 4,
+    "target": 4,
+    "min_required": 4,
+    "free_land_px": 27646,
+    "by_type": {
+     "event": 4,
+     "dungeon": 1,
+     "altar": 1
+    },
+    "altar_anchor_shrines": [],
+    "lava_soft_fallback": false,
+    "locked": true,
+    "lock_types_lost": {},
+    "lock_dropped": []
+   },
+   "density": {
+    "free_ratio": 0.773,
+    "icons_per_10k_land_px": 2.92,
+    "crowded_cells": [
+     {
+      "cell_px": [
+       57,
+       168,
+       114,
+       224
+      ],
+      "free_ratio": 0.14,
+      "points": [
+       "射日崖",
+       "射日宗山門",
+       "射日宗箭場"
+      ]
+     }
+    ]
+   },
+   "self_check": {
+    "combined_le_64": true,
+    "off_palette_0": true,
+    "semi_transparent_0": true,
+    "no_label_overlap_or_fail": true,
+    "nothing_clipped": true,
+    "icon_contrast_ge_3": true,
+    "border_contrast_ge_3": true,
+    "luminance_le_0.03": true,
+    "dynamic_slots_ge_min": true,
+    "dungeon_slot_ge_1": true
+   }
+  },
+  "Z2-D4": {
+   "name": "南山西・青丘（堯光山・黑水海外渡口）",
+   "scale": 9,
+   "center": [
+    58,
+    184
+   ],
+   "terrain_colors": 44,
+   "overlay_colors": 19,
+   "combined_colors": 62,
+   "off_palette_px": 0,
+   "semi_transparent_px": 0,
+   "mean_rel_luminance": 0.0295,
+   "own_points_visible": 6,
+   "hidden_points_data_only": [],
+   "icons_drawn": 6,
+   "own_icons_missing_or_clipped": [],
+   "icons_moved": [
+    [
+     "NS-36",
+     4.0
+    ],
+    [
+     "NS-37",
+     6.0
+    ]
+   ],
+   "icon_move_max_px": 6.0,
+   "label_failures": [],
+   "neighbour_labels_omitted": [],
+   "icon_contrast_min": 4.43,
+   "icons_below_3": [],
+   "icons_lightened": [],
+   "border_contrast": {},
+   "river_px": {
+    "黑水": 0,
+    "北支": 0,
+    "灰窯原北支": 0,
+    "東支": 0,
+    "東支支流（暫名）": 0
+   },
+   "waterfix_px": 0,
+   "compose_from_neighbour_px": 0,
+   "seafix_px": 0,
+   "landfix": {
+    "anchors": [
+     "NS-46"
+    ],
+    "px": 260
+   },
+   "painted_river_px": 0,
+   "dynamic_slots": {
+    "count": 9,
+    "target": 9,
+    "min_required": 4,
+    "free_land_px": 66279,
+    "by_type": {
+     "event": 9,
+     "gather": 8,
+     "dungeon": 6,
+     "altar": 1,
+     "camp": 3
+    },
+    "altar_anchor_shrines": [],
+    "lava_soft_fallback": false,
+    "locked": true,
+    "lock_types_lost": {},
+    "lock_dropped": []
+   },
+   "density": {
+    "free_ratio": 0.842,
+    "icons_per_10k_land_px": 0.72,
+    "crowded_cells": []
+   },
+   "self_check": {
+    "combined_le_64": true,
+    "off_palette_0": true,
+    "semi_transparent_0": true,
+    "no_label_overlap_or_fail": true,
+    "nothing_clipped": true,
+    "icon_contrast_ge_3": true,
+    "border_contrast_ge_3": true,
+    "luminance_le_0.03": true,
+    "dynamic_slots_ge_min": true,
+    "dungeon_slot_ge_1": true
+   }
+  },
+  "Z2-D5": {
+   "name": "南山西・炎州（未神裂口・箕尾山）",
+   "scale": 7,
+   "center": [
+    119,
+    198
+   ],
+   "terrain_colors": 34,
+   "overlay_colors": 20,
+   "combined_colors": 54,
+   "off_palette_px": 0,
+   "semi_transparent_px": 0,
+   "mean_rel_luminance": 0.029,
+   "own_points_visible": 6,
+   "hidden_points_data_only": [],
+   "icons_drawn": 6,
+   "own_icons_missing_or_clipped": [],
+   "icons_moved": [
+    [
+     "NS-44",
+     1.0
+    ],
+    [
+     "NS-12",
+     6.0
+    ]
+   ],
+   "icon_move_max_px": 6.0,
+   "label_failures": [],
+   "neighbour_labels_omitted": [],
+   "icon_contrast_min": 6.11,
+   "icons_below_3": [],
+   "icons_lightened": [],
+   "border_contrast": {
+    "炎祝部": {
+     "color": "#e07a2a",
+     "dash_px": 45,
+     "contrast_vs_ground_mean": 6.08,
+     "halo_px": 0,
+     "local_contrast_mean": 6.16,
+     "local_contrast_p10": 5.65
+    }
+   },
+   "river_px": {
+    "黑水": 0,
+    "北支": 0,
+    "灰窯原北支": 0,
+    "東支": 0,
+    "東支支流（暫名）": 0
+   },
+   "waterfix_px": 0,
+   "compose_from_neighbour_px": 0,
+   "seafix_px": 0,
+   "landfix": {
+    "anchors": [
+     "NS-49"
+    ],
+    "px": 253
+   },
+   "painted_river_px": 0,
+   "dynamic_slots": {
+    "count": 12,
+    "target": 12,
+    "min_required": 4,
+    "free_land_px": 83466,
+    "by_type": {
+     "event": 12,
+     "gather": 10,
+     "dungeon": 11,
+     "altar": 1
+    },
+    "altar_anchor_shrines": [
+     "NS-12"
+    ],
+    "lava_soft_fallback": false,
+    "locked": true,
+    "lock_types_lost": {},
+    "lock_dropped": []
+   },
+   "density": {
+    "free_ratio": 0.943,
+    "icons_per_10k_land_px": 0.61,
+    "crowded_cells": []
+   },
+   "self_check": {
+    "combined_le_64": true,
+    "off_palette_0": true,
+    "semi_transparent_0": true,
+    "no_label_overlap_or_fail": true,
+    "nothing_clipped": true,
+    "icon_contrast_ge_3": true,
+    "border_contrast_ge_3": true,
+    "luminance_le_0.03": true,
+    "dynamic_slots_ge_min": true,
+    "dungeon_slot_ge_1": true
+   }
+  },
+  "Z2-D6": {
+   "name": "海外・奇肱國",
+   "scale": 16,
+   "center": [
+    14.5,
+    113
+   ],
+   "terrain_colors": 46,
+   "overlay_colors": 16,
+   "combined_colors": 61,
+   "off_palette_px": 0,
+   "semi_transparent_px": 0,
+   "mean_rel_luminance": 0.0108,
+   "own_points_visible": 9,
+   "hidden_points_data_only": [],
+   "icons_drawn": 9,
+   "own_icons_missing_or_clipped": [],
+   "icons_moved": [
+    [
+     "HW-04",
+     2.0
+    ],
+    [
+     "HW-06",
+     4.0
+    ],
+    [
+     "HW-05",
+     1.0
+    ]
+   ],
+   "icon_move_max_px": 4.0,
+   "label_failures": [],
+   "neighbour_labels_omitted": [],
+   "icon_contrast_min": 6.46,
+   "icons_below_3": [],
+   "icons_lightened": [],
+   "border_contrast": {},
+   "river_px": {
+    "黑水": 0,
+    "北支": 0,
+    "灰窯原北支": 0,
+    "東支": 0,
+    "東支支流（暫名）": 0
+   },
+   "waterfix_px": 0,
+   "compose_from_neighbour_px": 0,
+   "seafix_px": 0,
+   "landfix": null,
+   "painted_river_px": 0,
+   "dynamic_slots": {
+    "count": 7,
+    "target": 7,
+    "min_required": 4,
+    "free_land_px": 51502,
+    "by_type": {
+     "event": 7,
+     "gather": 7,
+     "dungeon": 7,
+     "altar": 1
+    },
+    "altar_anchor_shrines": [],
+    "lava_soft_fallback": false,
+    "locked": true,
+    "lock_types_lost": {},
+    "lock_dropped": []
+   },
+   "density": {
+    "free_ratio": 0.836,
+    "icons_per_10k_land_px": 1.35,
+    "crowded_cells": [
+     {
+      "cell_px": [
+       171,
+       112,
+       228,
+       168
+      ],
+      "free_ratio": 0.03,
+      "points": [
+       "奇肱國",
+       "千機總閣",
+       "天工盟議事廳",
+       "機關林"
+      ]
+     }
+    ]
+   },
+   "self_check": {
+    "combined_le_64": true,
+    "off_palette_0": true,
+    "semi_transparent_0": true,
+    "no_label_overlap_or_fail": true,
+    "nothing_clipped": true,
+    "icon_contrast_ge_3": true,
+    "border_contrast_ge_3": true,
+    "luminance_le_0.03": true,
+    "dynamic_slots_ge_min": true,
+    "dungeon_slot_ge_1": true
+   }
+  },
+  "Z2-D7": {
+   "name": "海外・三身國",
+   "scale": 16,
+   "center": [
+    151,
+    256
+   ],
+   "terrain_colors": 44,
+   "overlay_colors": 16,
+   "combined_colors": 59,
+   "off_palette_px": 0,
+   "semi_transparent_px": 0,
+   "mean_rel_luminance": 0.0155,
+   "own_points_visible": 6,
+   "hidden_points_data_only": [],
+   "icons_drawn": 6,
+   "own_icons_missing_or_clipped": [],
+   "icons_moved": [
+    [
+     "HW-10",
+     8.0
+    ]
+   ],
+   "icon_move_max_px": 8.0,
+   "label_failures": [],
+   "neighbour_labels_omitted": [],
+   "icon_contrast_min": 4.12,
+   "icons_below_3": [],
+   "icons_lightened": [],
+   "border_contrast": {},
+   "river_px": {
+    "黑水": 0,
+    "北支": 0,
+    "灰窯原北支": 0,
+    "東支": 0,
+    "東支支流（暫名）": 0
+   },
+   "waterfix_px": 0,
+   "compose_from_neighbour_px": 0,
+   "seafix_px": 0,
+   "landfix": null,
+   "painted_river_px": 0,
+   "dynamic_slots": {
+    "count": 9,
+    "target": 9,
+    "min_required": 4,
+    "free_land_px": 62692,
+    "by_type": {
+     "event": 9,
+     "gather": 6,
+     "dungeon": 7,
+     "altar": 1,
+     "camp": 2
+    },
+    "altar_anchor_shrines": [],
+    "lava_soft_fallback": false,
+    "locked": true,
+    "lock_types_lost": {},
+    "lock_dropped": []
+   },
+   "density": {
+    "free_ratio": 0.914,
+    "icons_per_10k_land_px": 0.84,
+    "crowded_cells": [
+     {
+      "cell_px": [
+       171,
+       112,
+       228,
+       168
+      ],
+      "free_ratio": 0.07,
+      "points": [
+       "三身國",
+       "換骨工坊",
+       "三身國碼頭",
+       "三身國巨像"
+      ]
+     }
+    ]
+   },
+   "self_check": {
+    "combined_le_64": true,
+    "off_palette_0": true,
+    "semi_transparent_0": true,
+    "no_label_overlap_or_fail": true,
+    "nothing_clipped": true,
+    "icon_contrast_ge_3": true,
+    "border_contrast_ge_3": true,
+    "luminance_le_0.03": true,
+    "dynamic_slots_ge_min": true,
+    "dungeon_slot_ge_1": true
+   }
+  }
+ },
+ "crowding_audit": {
+  "metric": "free_ratio＝陸地中距圖示／字框／道路(膨脹2px) ≥10px 的比例；crowded cell＝57×56 格內 free<0.15 且 ≥3 點；判定：free<0.45 或 ≥3 擁擠格＝過密，free<0.6 或有擁擠格＝偏密",
+  "z1": {
+   "Z1-1 崑崙丘": {
+    "scale": 3.5,
+    "icons_drawn": 9,
+    "free_ratio": 0.771,
+    "icons_per_10k_land_px": 1.8,
+    "crowded_cells": [],
+    "slot_capacity_at_z2_rules": 5,
+    "slot_target": 5,
+    "verdict": "可"
+   },
+   "Z1-2 瘴澤・鎮西城・灰窯原": {
+    "scale": 3.0,
+    "icons_drawn": 36,
+    "free_ratio": 0.587,
+    "icons_per_10k_land_px": 3.36,
+    "crowded_cells": [
+     {
+      "cell_px": [
+       114,
+       112,
+       171,
+       168
+      ],
+      "free_ratio": 0.02,
+      "points": [
+       "鎮西城",
+       "鎮西驛",
+       "瘴澤渡",
+       "瘴口村",
+       "枯柳村",
+       "鹽井村"
+      ]
+     }
+    ],
+    "slot_capacity_at_z2_rules": 9,
+    "slot_target": 9,
+    "verdict": "偏密"
+   },
+   "Z1-3 北山": {
+    "scale": 2.5,
+    "icons_drawn": 20,
+    "free_ratio": 0.619,
+    "icons_per_10k_land_px": 3.9,
+    "crowded_cells": [],
+    "slot_capacity_at_z2_rules": 5,
+    "slot_target": 5,
+    "verdict": "可"
+   },
+   "Z1-4 中山・黑水渡": {
+    "scale": 3.5,
+    "icons_drawn": 22,
+    "free_ratio": 0.745,
+    "icons_per_10k_land_px": 2.29,
+    "crowded_cells": [
+     {
+      "cell_px": [
+       57,
+       168,
+       114,
+       224
+      ],
+      "free_ratio": 0.13,
+      "points": [
+       "官道驛站",
+       "岔口路障",
+       "鴉巢"
+      ]
+     },
+     {
+      "cell_px": [
+       228,
+       224,
+       285,
+       280
+      ],
+      "free_ratio": 0.1,
+      "points": [
+       "黑水渡",
+       "黑水盟總壇",
+       "黑水渡碼頭",
+       "天星水路碼頭",
+       "黑水南渡",
+       "黑水東渡"
+      ]
+     }
+    ],
+    "slot_capacity_at_z2_rules": 10,
+    "slot_target": 10,
+    "verdict": "偏密"
+   },
+   "Z1-5 東山": {
+    "scale": 2.25,
+    "icons_drawn": 18,
+    "free_ratio": 0.773,
+    "icons_per_10k_land_px": 2.46,
+    "crowded_cells": [],
+    "slot_capacity_at_z2_rules": 8,
+    "slot_target": 8,
+    "verdict": "可"
+   },
+   "Z1-6 南山東・海內南": {
+    "scale": 3.0,
+    "icons_drawn": 18,
+    "free_ratio": 0.673,
+    "icons_per_10k_land_px": 3.07,
+    "crowded_cells": [],
+    "slot_capacity_at_z2_rules": 5,
+    "slot_target": 5,
+    "verdict": "可"
+   },
+   "Z1-7 南山西": {
+    "scale": 3.0,
+    "icons_drawn": 12,
+    "free_ratio": 0.759,
+    "icons_per_10k_land_px": 1.61,
+    "crowded_cells": [],
+    "slot_capacity_at_z2_rules": 8,
+    "slot_target": 8,
+    "verdict": "可"
+   },
+   "Z1-8a 海外・奇肱國（插框）": {
+    "scale": 6.0,
+    "icons_drawn": 4,
+    "free_ratio": 0.845,
+    "icons_per_10k_land_px": 1.59,
+    "crowded_cells": [],
+    "slot_capacity_at_z2_rules": 4,
+    "slot_target": 4,
+    "verdict": "可"
+   },
+   "Z1-8b 海外・三身國（插框）": {
+    "scale": 6.0,
+    "icons_drawn": 5,
+    "free_ratio": 0.702,
+    "icons_per_10k_land_px": 4.68,
+    "crowded_cells": [],
+    "slot_capacity_at_z2_rules": 4,
+    "slot_target": 4,
+    "verdict": "可"
+   }
+  },
+  "z2": {
+   "Z2-A1": {
+    "free_ratio": 0.661,
+    "icons_per_10k_land_px": 1.85,
+    "crowded_cells": [
+     {
+      "cell_px": [
+       228,
+       56,
+       285,
+       112
+      ],
+      "free_ratio": 0.02,
+      "points": [
+       "渡陰關",
+       "守關營房",
+       "破曉護民哨",
+       "渡陰關鬼市"
+      ]
+     }
+    ],
+    "slots": 10,
+    "verdict": "偏密"
+   },
+   "Z2-A2": {
+    "free_ratio": 0.584,
+    "icons_per_10k_land_px": 2.42,
+    "crowded_cells": [
+     {
+      "cell_px": [
+       171,
+       168,
+       228,
+       224
+      ],
+      "free_ratio": 0.02,
+      "points": [
+       "岔口路障",
+       "岔口小祠",
+       "野徑岔口黑攤",
+       "野徑岔口",
+       "逃兵營火"
+      ]
+     },
+     {
+      "cell_px": [
+       0,
+       224,
+       57,
+       280
+      ],
+      "free_ratio": 0.15,
+      "points": [
+       "止血草叢",
+       "懸壺藥寮",
+       "獵戶舊棚"
+      ]
+     }
+    ],
+    "slots": 10,
+    "verdict": "偏密"
+   },
+   "Z2-A3": {
+    "free_ratio": 0.626,
+    "icons_per_10k_land_px": 2.73,
+    "crowded_cells": [
+     {
+      "cell_px": [
+       342,
+       112,
+       399,
+       168
+      ],
+      "free_ratio": 0.05,
+      "points": [
+       "千機閣分閣",
+       "黑水收礦棚",
+       "赤石礦戶",
+       "赤石廢礦",
+       "礦道・南坑"
+      ]
+     },
+     {
+      "cell_px": [
+       57,
+       168,
+       114,
+       224
+      ],
+      "free_ratio": 0.14,
+      "points": [
+       "破曉清窟前哨",
+       "酉神裂口",
+       "神骨堆",
+       "霧客出沒處"
+      ]
+     }
+    ],
+    "slots": 8,
+    "verdict": "偏密"
+   },
+   "Z2-A4": {
+    "free_ratio": 0.57,
+    "icons_per_10k_land_px": 2.56,
+    "crowded_cells": [
+     {
+      "cell_px": [
+       342,
+       0,
+       399,
+       56
+      ],
+      "free_ratio": 0.04,
+      "points": [
+       "祭窟火盆台",
+       "沉淵祭窟",
+       "祭窟外小徑"
+      ]
+     },
+     {
+      "cell_px": [
+       285,
+       112,
+       342,
+       168
+      ],
+      "free_ratio": 0.04,
+      "points": [
+       "拾屍棚",
+       "沼蠱草棚",
+       "沼邊義莊",
+       "沼地渡口"
+      ]
+     },
+     {
+      "cell_px": [
+       342,
+       112,
+       399,
+       168
+      ],
+      "free_ratio": 0.05,
+      "points": [
+       "沼底蠱窩",
+       "沼民水寨",
+       "腐骨沼",
+       "沼蛭淺灘",
+       "浮屍灘"
+      ]
+     }
+    ],
+    "slots": 10,
+    "verdict": "過密"
+   },
+   "Z2-A5": {
+    "free_ratio": 0.85,
+    "icons_per_10k_land_px": 0.81,
+    "crowded_cells": [],
+    "slots": 12,
+    "verdict": "可"
+   },
+   "Z2-A6": {
+    "free_ratio": 0.724,
+    "icons_per_10k_land_px": 1.62,
+    "crowded_cells": [
+     {
+      "cell_px": [
+       171,
+       112,
+       228,
+       168
+      ],
+      "free_ratio": 0.02,
+      "points": [
+       "鎮西城",
+       "鎮西糧倉",
+       "鎮西破曉分營",
+       "鎮西驛",
+       "鎮西神龕"
+      ]
+     }
+    ],
+    "slots": 11,
+    "verdict": "偏密"
+   },
+   "Z2-A7": {
+    "free_ratio": 0.762,
+    "icons_per_10k_land_px": 1.18,
+    "crowded_cells": [],
+    "slots": 11,
+    "verdict": "可"
+   },
+   "Z2-B1": {
+    "free_ratio": 0.844,
+    "icons_per_10k_land_px": 1.77,
+    "crowded_cells": [],
+    "slots": 8,
+    "verdict": "可"
+   },
+   "Z2-B2": {
+    "free_ratio": 0.861,
+    "icons_per_10k_land_px": 2.66,
+    "crowded_cells": [],
+    "slots": 5,
+    "verdict": "可"
+   },
+   "Z2-B3": {
+    "free_ratio": 0.827,
+    "icons_per_10k_land_px": 2.14,
+    "crowded_cells": [],
+    "slots": 6,
+    "verdict": "可"
+   },
+   "Z2-B4": {
+    "free_ratio": 0.719,
+    "icons_per_10k_land_px": 2.41,
+    "crowded_cells": [
+     {
+      "cell_px": [
+       228,
+       224,
+       285,
+       280
+      ],
+      "free_ratio": 0.11,
+      "points": [
+       "鎮北城",
+       "玄武營",
+       "鎮北神龕"
+      ]
+     }
+    ],
+    "slots": 8,
+    "verdict": "偏密"
+   },
+   "Z2-B5": {
+    "free_ratio": 0.85,
+    "icons_per_10k_land_px": 2.44,
+    "crowded_cells": [],
+    "slots": 4,
+    "verdict": "可"
+   },
+   "Z2-B6": {
+    "free_ratio": 0.923,
+    "icons_per_10k_land_px": 1.06,
+    "crowded_cells": [],
+    "slots": 4,
+    "verdict": "可"
+   },
+   "Z2-C1": {
+    "free_ratio": 0.811,
+    "icons_per_10k_land_px": 1.77,
+    "crowded_cells": [
+     {
+      "cell_px": [
+       0,
+       224,
+       57,
+       280
+      ],
+      "free_ratio": 0.07,
+      "points": [
+       "官道驛站",
+       "官道河橋",
+       "藥林鐵脈"
+      ]
+     },
+     {
+      "cell_px": [
+       57,
+       224,
+       114,
+       280
+      ],
+      "free_ratio": 0.02,
+      "points": [
+       "斷路幫窩",
+       "鴉巢外枯樹",
+       "官道里碑",
+       "官道十里亭",
+       "野徑岔口"
+      ]
+     }
+    ],
+    "slots": 11,
+    "verdict": "偏密"
+   },
+   "Z2-C2": {
+    "free_ratio": 0.853,
+    "icons_per_10k_land_px": 2.03,
+    "crowded_cells": [
+     {
+      "cell_px": [
+       171,
+       168,
+       228,
+       224
+      ],
+      "free_ratio": 0.0,
+      "points": [
+       "黑水渡",
+       "黑水渡碼頭",
+       "黑水西渡",
+       "黑水中繼島",
+       "黑水渡鬼市"
+      ]
+     }
+    ],
+    "slots": 6,
+    "verdict": "偏密"
+   },
+   "Z2-C3": {
+    "free_ratio": 0.845,
+    "icons_per_10k_land_px": 0.94,
+    "crowded_cells": [
+     {
+      "cell_px": [
+       114,
+       56,
+       171,
+       112
+      ],
+      "free_ratio": 0.11,
+      "points": [
+       "鎮東城",
+       "青龍營",
+       "鎮東義莊"
+      ]
+     }
+    ],
+    "slots": 12,
+    "verdict": "偏密"
+   },
+   "Z2-C4": {
+    "free_ratio": 0.931,
+    "icons_per_10k_land_px": 0.63,
+    "crowded_cells": [],
+    "slots": 11,
+    "verdict": "可"
+   },
+   "Z2-C5": {
+    "free_ratio": 0.803,
+    "icons_per_10k_land_px": 1.75,
+    "crowded_cells": [
+     {
+      "cell_px": [
+       57,
+       168,
+       114,
+       224
+      ],
+      "free_ratio": 0.0,
+      "points": [
+       "祀社總壇",
+       "空桑古廟",
+       "曹夕廟",
+       "廢廟群"
+      ]
+     },
+     {
+      "cell_px": [
+       114,
+       168,
+       171,
+       224
+      ],
+      "free_ratio": 0.08,
+      "points": [
+       "護廟東哨",
+       "廢廟難民棚",
+       "高氏廟",
+       "葛山廟"
+      ]
+     }
+    ],
+    "slots": 10,
+    "verdict": "偏密"
+   },
+   "Z2-C6": {
+    "free_ratio": 0.883,
+    "icons_per_10k_land_px": 1.29,
+    "crowded_cells": [
+     {
+      "cell_px": [
+       57,
+       112,
+       114,
+       168
+      ],
+      "free_ratio": 0.06,
+      "points": [
+       "勃垂村",
+       "山腰神龕",
+       "坡下神龕",
+       "扶桑坡"
+      ]
+     }
+    ],
+    "slots": 10,
+    "verdict": "偏密"
+   },
+   "Z2-C7": {
+    "free_ratio": 0.977,
+    "icons_per_10k_land_px": 0.24,
+    "crowded_cells": [],
+    "slots": 10,
+    "verdict": "可"
+   },
+   "Z2-D1": {
+    "free_ratio": 0.797,
+    "icons_per_10k_land_px": 1.28,
+    "crowded_cells": [
+     {
+      "cell_px": [
+       114,
+       112,
+       171,
+       168
+      ],
+      "free_ratio": 0.06,
+      "points": [
+       "焚獄",
+       "赤銅礦場",
+       "赤銅坊",
+       "岩漿河",
+       "焚獄外圍"
+      ]
+     }
+    ],
+    "slots": 10,
+    "verdict": "偏密"
+   },
+   "Z2-D2": {
+    "free_ratio": 0.745,
+    "icons_per_10k_land_px": 1.29,
+    "crowded_cells": [],
+    "slots": 10,
+    "verdict": "可"
+   },
+   "Z2-D3": {
+    "free_ratio": 0.773,
+    "icons_per_10k_land_px": 2.92,
+    "crowded_cells": [
+     {
+      "cell_px": [
+       57,
+       168,
+       114,
+       224
+      ],
+      "free_ratio": 0.14,
+      "points": [
+       "射日崖",
+       "射日宗山門",
+       "射日宗箭場"
+      ]
+     }
+    ],
+    "slots": 4,
+    "verdict": "偏密"
+   },
+   "Z2-D4": {
+    "free_ratio": 0.842,
+    "icons_per_10k_land_px": 0.72,
+    "crowded_cells": [],
+    "slots": 9,
+    "verdict": "可"
+   },
+   "Z2-D5": {
+    "free_ratio": 0.943,
+    "icons_per_10k_land_px": 0.61,
+    "crowded_cells": [],
+    "slots": 12,
+    "verdict": "可"
+   },
+   "Z2-D6": {
+    "free_ratio": 0.836,
+    "icons_per_10k_land_px": 1.35,
+    "crowded_cells": [
+     {
+      "cell_px": [
+       171,
+       112,
+       228,
+       168
+      ],
+      "free_ratio": 0.03,
+      "points": [
+       "奇肱國",
+       "千機總閣",
+       "天工盟議事廳",
+       "機關林"
+      ]
+     }
+    ],
+    "slots": 7,
+    "verdict": "偏密"
+   },
+   "Z2-D7": {
+    "free_ratio": 0.914,
+    "icons_per_10k_land_px": 0.84,
+    "crowded_cells": [
+     {
+      "cell_px": [
+       171,
+       112,
+       228,
+       168
+      ],
+      "free_ratio": 0.07,
+      "points": [
+       "三身國",
+       "換骨工坊",
+       "三身國碼頭",
+       "三身國巨像"
+      ]
+     }
+    ],
+    "slots": 9,
+    "verdict": "偏密"
+   }
+  }
+ },
+ "game_consistency_z2": {
+  "method": "遊戲 data.js 區域圖節點（鏡像後座標）以相似變換擬合到 points_v1 Z0 座標；殘差＝擬合後距離；pair_flips＝兩點相對方位差 >90°",
+  "rotation_deg": -13.6,
+  "scale": 0.0657,
+  "rms_residual_z0px": 5.73,
+  "spread_z0px": 17.53,
+  "nodes": [
+   {
+    "game": "huiyao",
+    "name": "灰窯鎮",
+    "point": "GD-01",
+    "z0": [
+     181.0,
+     136.0
+    ],
+    "game_fit_z0": [
+     179.9,
+     140.2
+    ],
+    "residual_z0px": 4.31,
+    "residual_vs_spread": 0.25
+   },
+   {
+    "game": "yizhan",
+    "name": "官道驛站",
+    "point": "GD-13",
+    "z0": [
+     166.0,
+     137.0
+    ],
+    "game_fit_z0": [
+     166.4,
+     135.0
+    ],
+    "residual_z0px": 2.03,
+    "residual_vs_spread": 0.12
+   },
+   {
+    "game": "duyin",
+    "name": "渡陰關",
+    "point": "GD-24",
+    "z0": [
+     152.0,
+     136.0
+    ],
+    "game_fit_z0": [
+     153.2,
+     130.6
+    ],
+    "residual_z0px": 5.55,
+    "residual_vs_spread": 0.32
+   },
+   {
+    "game": "poxiao",
+    "name": "破曉營",
+    "point": "GD-42",
+    "z0": [
+     142.0,
+     137.0
+    ],
+    "game_fit_z0": [
+     139.9,
+     134.3
+    ],
+    "residual_z0px": 3.41,
+    "residual_vs_spread": 0.19
+   },
+   {
+    "game": "chakou",
+    "name": "野徑岔口",
+    "point": "YJ-01",
+    "z0": [
+     173.0,
+     142.0
+    ],
+    "game_fit_z0": [
+     167.5,
+     144.5
+    ],
+    "residual_z0px": 6.07,
+    "residual_vs_spread": 0.35
+   },
+   {
+    "game": "qingwu",
+    "name": "青霧藥林",
+    "point": "YJ-10",
+    "z0": [
+     160.0,
+     144.0
+    ],
+    "game_fit_z0": [
+     154.8,
+     144.2
+    ],
+    "residual_z0px": 5.23,
+    "residual_vs_spread": 0.3
+   },
+   {
+    "game": "guyao",
+    "name": "亂葬古窯",
+    "point": "YK-01",
+    "z0": [
+     144.0,
+     146.0
+    ],
+    "game_fit_z0": [
+     141.9,
+     142.5
+    ],
+    "residual_z0px": 4.11,
+    "residual_vs_spread": 0.23
+   },
+   {
+    "game": "kugu",
+    "name": "枯骨獸徑",
+    "point": "SJ-01",
+    "z0": [
+     146.0,
+     153.0
+    ],
+    "game_fit_z0": [
+     149.6,
+     152.2
+    ],
+    "residual_z0px": 3.69,
+    "residual_vs_spread": 0.21
+   },
+   {
+    "game": "chishi",
+    "name": "赤石廢礦",
+    "point": "YK-04",
+    "z0": [
+     157.0,
+     151.0
+    ],
+    "game_fit_z0": [
+     164.3,
+     154.1
+    ],
+    "residual_z0px": 7.89,
+    "residual_vs_spread": 0.45
+   },
+   {
+    "game": "fuzhao",
+    "name": "腐骨沼",
+    "point": "FZ-01",
+    "z0": [
+     181.0,
+     149.0
+    ],
+    "game_fit_z0": [
+     175.9,
+     150.6
+    ],
+    "residual_z0px": 5.34,
+    "residual_vs_spread": 0.3
+   },
+   {
+    "game": "jiku",
+    "name": "沉淵祭窟",
+    "point": "FZ-13",
+    "z0": [
+     182.0,
+     144.0
+    ],
+    "game_fit_z0": [
+     184.9,
+     147.4
+    ],
+    "residual_z0px": 4.5,
+    "residual_vs_spread": 0.26
+   },
+   {
+    "game": "shigu",
+    "name": "撿骨師營地",
+    "point": "SJ-08",
+    "z0": [
+     141.0,
+     156.0
+    ],
+    "game_fit_z0": [
+     150.5,
+     158.8
+    ],
+    "residual_z0px": 9.92,
+    "residual_vs_spread": 0.57
+   },
+   {
+    "game": "liekou",
+    "name": "酉神裂口",
+    "point": "SJ-11",
+    "z0": [
+     137.0,
+     157.0
+    ],
+    "game_fit_z0": [
+     142.7,
+     158.6
+    ],
+    "residual_z0px": 5.95,
+    "residual_vs_spread": 0.34
+   },
+   {
+    "game": "yachao",
+    "name": "鴉巢",
+    "point": "YJ-08",
+    "z0": [
+     175.0,
+     142.0
+    ],
+    "game_fit_z0": [
+     172.4,
+     136.2
+    ],
+    "residual_z0px": 6.3,
+    "residual_vs_spread": 0.36
+   },
+   {
+    "game": "guzhong",
+    "name": "無名古塚",
+    "point": "FZ-09",
+    "z0": [
+     178.0,
+     154.0
+    ],
+    "game_fit_z0": [
+     171.1,
+     154.6
+    ],
+    "residual_z0px": 6.89,
+    "residual_vs_spread": 0.39
+   }
+  ],
+  "pair_flips": [],
+  "theme_checks_other_batches": {
+   "note": "B 批起：遊戲只有灰窯原區域圖，其餘地區只比大陸圖主題與色調。崑崙丘屬西山區塊，但 Z0／Z1 已定案為紅黑火山＋血霧（崑崙丘＝裂口源頭），與遊戲「西山＝毒沼古墓」的綠調不同，屬既定設定，非錯誤。C 批：黑水渡屬「海內」，遊戲無此大陸主題，借中山比對；中山在 GDD v0.3 為「大陸圖上可見，未開放」。東山遊戲色盤偏墨綠（廢棄廟宇），Z2 東山頁為暗綠林地＋灰岩。D 批：南山 5 頁（焚獄火山、鎮南城、招搖・射日崖、青丘、炎州）紅褐火山灰＋沙漠，對上遊戲「南山＝火與岩漿」紅色系；海外兩島（奇肱國、三身國）暗褐中性，對上「海外＝異國異人」；奇肱國偏橄欖（機關林），可接受。",
+   "sheets": [
+    {
+     "sheet": "Z2-B1",
+     "continent": "西山",
+     "game_theme": "毒沼古墓",
+     "z2_land_mean": [
+      28,
+      25,
+      23
+     ],
+     "game_palette_mean": [
+      17,
+      25,
+      16
+     ],
+     "z2_hue": "neutral",
+     "game_hue": "green"
+    },
+    {
+     "sheet": "Z2-B2",
+     "continent": "西山",
+     "game_theme": "毒沼古墓",
+     "z2_land_mean": [
+      41,
+      23,
+      22
+     ],
+     "game_palette_mean": [
+      17,
+      25,
+      16
+     ],
+     "z2_hue": "red",
+     "game_hue": "green"
+    },
+    {
+     "sheet": "Z2-B3",
+     "continent": "北山",
+     "game_theme": "冰雪洞窟",
+     "z2_land_mean": [
+      25,
+      29,
+      32
+     ],
+     "game_palette_mean": [
+      57,
+      67,
+      76
+     ],
+     "z2_hue": "blue-grey",
+     "game_hue": "blue-grey"
+    },
+    {
+     "sheet": "Z2-B4",
+     "continent": "北山",
+     "game_theme": "冰雪洞窟",
+     "z2_land_mean": [
+      26,
+      28,
+      27
+     ],
+     "game_palette_mean": [
+      57,
+      67,
+      76
+     ],
+     "z2_hue": "neutral",
+     "game_hue": "blue-grey"
+    },
+    {
+     "sheet": "Z2-B5",
+     "continent": "北山",
+     "game_theme": "冰雪洞窟",
+     "z2_land_mean": [
+      13,
+      16,
+      21
+     ],
+     "game_palette_mean": [
+      57,
+      67,
+      76
+     ],
+     "z2_hue": "blue-grey",
+     "game_hue": "blue-grey"
+    },
+    {
+     "sheet": "Z2-B6",
+     "continent": "北山",
+     "game_theme": "冰雪洞窟",
+     "z2_land_mean": [
+      31,
+      35,
+      38
+     ],
+     "game_palette_mean": [
+      57,
+      67,
+      76
+     ],
+     "z2_hue": "blue-grey",
+     "game_hue": "blue-grey"
+    },
+    {
+     "sheet": "Z2-C1",
+     "continent": "中山",
+     "game_theme": "地層與冥門所在",
+     "z2_land_mean": [
+      39,
+      28,
+      21
+     ],
+     "game_palette_mean": [
+      21,
+      19,
+      25
+     ],
+     "z2_hue": "red",
+     "game_hue": "neutral"
+    },
+    {
+     "sheet": "Z2-C2",
+     "continent": "中山",
+     "game_theme": "地層與冥門所在",
+     "z2_land_mean": [
+      33,
+      27,
+      22
+     ],
+     "game_palette_mean": [
+      21,
+      19,
+      25
+     ],
+     "z2_hue": "red",
+     "game_hue": "neutral"
+    },
+    {
+     "sheet": "Z2-C3",
+     "continent": "東山",
+     "game_theme": "廢棄廟宇",
+     "z2_land_mean": [
+      35,
+      34,
+      21
+     ],
+     "game_palette_mean": [
+      17,
+      33,
+      25
+     ],
+     "z2_hue": "olive",
+     "game_hue": "green"
+    },
+    {
+     "sheet": "Z2-C4",
+     "continent": "東山",
+     "game_theme": "廢棄廟宇",
+     "z2_land_mean": [
+      29,
+      28,
+      26
+     ],
+     "game_palette_mean": [
+      17,
+      33,
+      25
+     ],
+     "z2_hue": "neutral",
+     "game_hue": "green"
+    },
+    {
+     "sheet": "Z2-C5",
+     "continent": "東山",
+     "game_theme": "廢棄廟宇",
+     "z2_land_mean": [
+      33,
+      32,
+      24
+     ],
+     "game_palette_mean": [
+      17,
+      33,
+      25
+     ],
+     "z2_hue": "olive",
+     "game_hue": "green"
+    },
+    {
+     "sheet": "Z2-C6",
+     "continent": "東山",
+     "game_theme": "廢棄廟宇",
+     "z2_land_mean": [
+      34,
+      34,
+      32
+     ],
+     "game_palette_mean": [
+      17,
+      33,
+      25
+     ],
+     "z2_hue": "neutral",
+     "game_hue": "green"
+    },
+    {
+     "sheet": "Z2-C7",
+     "continent": "東山",
+     "game_theme": "廢棄廟宇",
+     "z2_land_mean": [
+      24,
+      25,
+      22
+     ],
+     "game_palette_mean": [
+      17,
+      33,
+      25
+     ],
+     "z2_hue": "neutral",
+     "game_hue": "green"
+    },
+    {
+     "sheet": "Z2-D1",
+     "continent": "南山",
+     "game_theme": "火與岩漿",
+     "z2_land_mean": [
+      42,
+      23,
+      18
+     ],
+     "game_palette_mean": [
+      32,
+      16,
+      13
+     ],
+     "z2_hue": "red",
+     "game_hue": "red"
+    },
+    {
+     "sheet": "Z2-D2",
+     "continent": "南山",
+     "game_theme": "火與岩漿",
+     "z2_land_mean": [
+      40,
+      25,
+      19
+     ],
+     "game_palette_mean": [
+      32,
+      16,
+      13
+     ],
+     "z2_hue": "red",
+     "game_hue": "red"
+    },
+    {
+     "sheet": "Z2-D3",
+     "continent": "南山",
+     "game_theme": "火與岩漿",
+     "z2_land_mean": [
+      35,
+      22,
+      19
+     ],
+     "game_palette_mean": [
+      32,
+      16,
+      13
+     ],
+     "z2_hue": "red",
+     "game_hue": "red"
+    },
+    {
+     "sheet": "Z2-D4",
+     "continent": "南山",
+     "game_theme": "火與岩漿",
+     "z2_land_mean": [
+      57,
+      45,
+      30
+     ],
+     "game_palette_mean": [
+      32,
+      16,
+      13
+     ],
+     "z2_hue": "red",
+     "game_hue": "red"
+    },
+    {
+     "sheet": "Z2-D5",
+     "continent": "南山",
+     "game_theme": "火與岩漿",
+     "z2_land_mean": [
+      56,
+      40,
+      27
+     ],
+     "game_palette_mean": [
+      32,
+      16,
+      13
+     ],
+     "z2_hue": "red",
+     "game_hue": "red"
+    },
+    {
+     "sheet": "Z2-D6",
+     "continent": "海外",
+     "game_theme": "異國異人",
+     "z2_land_mean": [
+      32,
+      29,
+      22
+     ],
+     "game_palette_mean": [
+      34,
+      31,
+      25
+     ],
+     "z2_hue": "olive",
+     "game_hue": "neutral"
+    },
+    {
+     "sheet": "Z2-D7",
+     "continent": "海外",
+     "game_theme": "異國異人",
+     "z2_land_mean": [
+      37,
+      34,
+      29
+     ],
+     "game_palette_mean": [
+      34,
+      31,
+      25
+     ],
+     "z2_hue": "neutral",
+     "game_hue": "neutral"
+    }
+   ]
+  }
+ }
+}

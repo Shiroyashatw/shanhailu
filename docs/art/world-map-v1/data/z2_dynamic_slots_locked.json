@@ -1,0 +1,2366 @@
+{
+ "note": "mumi 已核可的動態格座標（鎖定）：A 批 14:25、B 批 14:45、C 批 15:06、D 批 15:20（地方層 27 頁定案，共 238 格）。重跑時沿用位置與編號，只重算可用類型；失效的格記在 lock_dropped。15:37 起另鎖野外祭壇格（altar:true）：點位變動後只要該格仍合規，祭壇格不換位。15:47 起可用類型也鎖（allowed）：標籤變動只能讓類型變少（記 lock_types_lost，改標籤位置處理），不會變多。",
+ "sheets": {
+  "Z2-A1": [
+   {
+    "id": "Z2-A1-S01",
+    "x": 98,
+    "y": 56,
+    "altar": true,
+    "allowed": [
+     "event",
+     "gather",
+     "camp",
+     "dungeon",
+     "altar"
+    ]
+   },
+   {
+    "id": "Z2-A1-S02",
+    "x": 197,
+    "y": 58,
+    "allowed": [
+     "event",
+     "gather",
+     "camp",
+     "dungeon"
+    ]
+   },
+   {
+    "id": "Z2-A1-S03",
+    "x": 283,
+    "y": 64,
+    "allowed": [
+     "event",
+     "gather"
+    ]
+   },
+   {
+    "id": "Z2-A1-S04",
+    "x": 27,
+    "y": 124,
+    "allowed": [
+     "event",
+     "gather"
+    ]
+   },
+   {
+    "id": "Z2-A1-S05",
+    "x": 219,
+    "y": 163,
+    "allowed": [
+     "event",
+     "gather",
+     "dungeon"
+    ]
+   },
+   {
+    "id": "Z2-A1-S06",
+    "x": 271,
+    "y": 119,
+    "allowed": [
+     "event",
+     "gather"
+    ]
+   },
+   {
+    "id": "Z2-A1-S07",
+    "x": 325,
+    "y": 185,
+    "allowed": [
+     "event",
+     "gather",
+     "camp",
+     "dungeon"
+    ]
+   },
+   {
+    "id": "Z2-A1-S08",
+    "x": 154,
+    "y": 267,
+    "allowed": [
+     "event",
+     "gather",
+     "camp"
+    ]
+   },
+   {
+    "id": "Z2-A1-S09",
+    "x": 180,
+    "y": 230,
+    "allowed": [
+     "event",
+     "gather",
+     "camp"
+    ]
+   },
+   {
+    "id": "Z2-A1-S10",
+    "x": 290,
+    "y": 224,
+    "allowed": [
+     "event",
+     "gather"
+    ]
+   }
+  ],
+  "Z2-A2": [
+   {
+    "id": "Z2-A2-S01",
+    "x": 370,
+    "y": 49,
+    "allowed": [
+     "event",
+     "gather",
+     "dungeon"
+    ]
+   },
+   {
+    "id": "Z2-A2-S02",
+    "x": 198,
+    "y": 66,
+    "allowed": [
+     "event",
+     "gather",
+     "dungeon"
+    ]
+   },
+   {
+    "id": "Z2-A2-S03",
+    "x": 255,
+    "y": 102,
+    "allowed": [
+     "event",
+     "gather",
+     "camp",
+     "dungeon"
+    ]
+   },
+   {
+    "id": "Z2-A2-S04",
+    "x": 17,
+    "y": 155,
+    "allowed": [
+     "event",
+     "gather",
+     "dungeon"
+    ]
+   },
+   {
+    "id": "Z2-A2-S05",
+    "x": 370,
+    "y": 163,
+    "allowed": [
+     "event",
+     "gather",
+     "camp",
+     "dungeon"
+    ]
+   },
+   {
+    "id": "Z2-A2-S06",
+    "x": 20,
+    "y": 195,
+    "allowed": [
+     "event",
+     "gather",
+     "camp",
+     "dungeon"
+    ]
+   },
+   {
+    "id": "Z2-A2-S07",
+    "x": 74,
+    "y": 246,
+    "allowed": [
+     "event",
+     "gather",
+     "camp"
+    ]
+   },
+   {
+    "id": "Z2-A2-S08",
+    "x": 119,
+    "y": 263,
+    "allowed": [
+     "event",
+     "gather",
+     "camp",
+     "dungeon"
+    ]
+   },
+   {
+    "id": "Z2-A2-S09",
+    "x": 267,
+    "y": 254,
+    "allowed": [
+     "event",
+     "gather",
+     "dungeon"
+    ]
+   },
+   {
+    "id": "Z2-A2-S10",
+    "x": 312,
+    "y": 238,
+    "allowed": [
+     "event",
+     "gather",
+     "camp",
+     "dungeon"
+    ]
+   }
+  ],
+  "Z2-A3": [
+   {
+    "id": "Z2-A3-S01",
+    "x": 184,
+    "y": 15,
+    "altar": true,
+    "allowed": [
+     "event",
+     "gather",
+     "altar"
+    ]
+   },
+   {
+    "id": "Z2-A3-S02",
+    "x": 129,
+    "y": 69,
+    "allowed": [
+     "event",
+     "gather"
+    ]
+   },
+   {
+    "id": "Z2-A3-S03",
+    "x": 148,
+    "y": 97,
+    "allowed": [
+     "event",
+     "gather",
+     "camp"
+    ]
+   },
+   {
+    "id": "Z2-A3-S04",
+    "x": 55,
+    "y": 128,
+    "allowed": [
+     "event",
+     "gather",
+     "dungeon"
+    ]
+   },
+   {
+    "id": "Z2-A3-S05",
+    "x": 105,
+    "y": 137,
+    "allowed": [
+     "event",
+     "gather",
+     "camp",
+     "dungeon"
+    ]
+   },
+   {
+    "id": "Z2-A3-S06",
+    "x": 189,
+    "y": 122,
+    "allowed": [
+     "event",
+     "gather"
+    ]
+   },
+   {
+    "id": "Z2-A3-S07",
+    "x": 196,
+    "y": 181,
+    "allowed": [
+     "event",
+     "gather",
+     "camp"
+    ]
+   },
+   {
+    "id": "Z2-A3-S08",
+    "x": 220,
+    "y": 192,
+    "allowed": [
+     "event",
+     "gather"
+    ]
+   }
+  ],
+  "Z2-A4": [
+   {
+    "id": "Z2-A4-S01",
+    "x": 25,
+    "y": 12,
+    "altar": true,
+    "allowed": [
+     "event",
+     "gather",
+     "altar"
+    ]
+   },
+   {
+    "id": "Z2-A4-S02",
+    "x": 108,
+    "y": 81,
+    "allowed": [
+     "event",
+     "gather",
+     "camp"
+    ]
+   },
+   {
+    "id": "Z2-A4-S03",
+    "x": 284,
+    "y": 57,
+    "allowed": [
+     "event",
+     "gather",
+     "dungeon"
+    ]
+   },
+   {
+    "id": "Z2-A4-S04",
+    "x": 295,
+    "y": 100,
+    "allowed": [
+     "event",
+     "gather"
+    ]
+   },
+   {
+    "id": "Z2-A4-S05",
+    "x": 54,
+    "y": 162,
+    "allowed": [
+     "event",
+     "gather",
+     "camp"
+    ]
+   },
+   {
+    "id": "Z2-A4-S06",
+    "x": 92,
+    "y": 163,
+    "allowed": [
+     "event",
+     "gather",
+     "camp",
+     "dungeon"
+    ]
+   },
+   {
+    "id": "Z2-A4-S07",
+    "x": 18,
+    "y": 196,
+    "allowed": [
+     "event",
+     "gather",
+     "dungeon"
+    ]
+   },
+   {
+    "id": "Z2-A4-S08",
+    "x": 201,
+    "y": 209,
+    "allowed": [
+     "event",
+     "gather",
+     "dungeon"
+    ]
+   },
+   {
+    "id": "Z2-A4-S09",
+    "x": 385,
+    "y": 208,
+    "allowed": [
+     "event",
+     "gather"
+    ]
+   },
+   {
+    "id": "Z2-A4-S10",
+    "x": 159,
+    "y": 232,
+    "allowed": [
+     "event",
+     "gather",
+     "camp"
+    ]
+   }
+  ],
+  "Z2-A5": [
+   {
+    "id": "Z2-A5-S01",
+    "x": 119,
+    "y": 17,
+    "altar": true,
+    "allowed": [
+     "event",
+     "gather",
+     "dungeon",
+     "altar"
+    ]
+   },
+   {
+    "id": "Z2-A5-S02",
+    "x": 225,
+    "y": 44,
+    "allowed": [
+     "event",
+     "gather"
+    ]
+   },
+   {
+    "id": "Z2-A5-S03",
+    "x": 301,
+    "y": 23,
+    "allowed": [
+     "event",
+     "gather",
+     "dungeon"
+    ]
+   },
+   {
+    "id": "Z2-A5-S04",
+    "x": 231,
+    "y": 81,
+    "allowed": [
+     "event",
+     "gather",
+     "camp"
+    ]
+   },
+   {
+    "id": "Z2-A5-S05",
+    "x": 338,
+    "y": 57,
+    "allowed": [
+     "event",
+     "gather",
+     "dungeon"
+    ]
+   },
+   {
+    "id": "Z2-A5-S06",
+    "x": 23,
+    "y": 127,
+    "allowed": [
+     "event",
+     "gather",
+     "dungeon"
+    ]
+   },
+   {
+    "id": "Z2-A5-S07",
+    "x": 122,
+    "y": 129,
+    "allowed": [
+     "event",
+     "gather",
+     "dungeon"
+    ]
+   },
+   {
+    "id": "Z2-A5-S08",
+    "x": 169,
+    "y": 125,
+    "allowed": [
+     "event",
+     "gather",
+     "dungeon"
+    ]
+   },
+   {
+    "id": "Z2-A5-S09",
+    "x": 195,
+    "y": 201,
+    "allowed": [
+     "event",
+     "gather",
+     "dungeon"
+    ]
+   },
+   {
+    "id": "Z2-A5-S10",
+    "x": 214,
+    "y": 176,
+    "allowed": [
+     "event",
+     "gather",
+     "camp",
+     "dungeon"
+    ]
+   },
+   {
+    "id": "Z2-A5-S11",
+    "x": 156,
+    "y": 227,
+    "allowed": [
+     "event",
+     "gather",
+     "dungeon"
+    ]
+   },
+   {
+    "id": "Z2-A5-S12",
+    "x": 249,
+    "y": 237,
+    "allowed": [
+     "event",
+     "gather",
+     "dungeon"
+    ]
+   }
+  ],
+  "Z2-A6": [
+   {
+    "id": "Z2-A6-S01",
+    "x": 12,
+    "y": 43,
+    "altar": true,
+    "allowed": [
+     "event",
+     "camp",
+     "altar"
+    ]
+   },
+   {
+    "id": "Z2-A6-S02",
+    "x": 55,
+    "y": 103,
+    "allowed": [
+     "event"
+    ]
+   },
+   {
+    "id": "Z2-A6-S03",
+    "x": 145,
+    "y": 92,
+    "allowed": [
+     "event",
+     "gather",
+     "dungeon"
+    ]
+   },
+   {
+    "id": "Z2-A6-S04",
+    "x": 89,
+    "y": 134,
+    "allowed": [
+     "event",
+     "gather",
+     "camp",
+     "dungeon"
+    ]
+   },
+   {
+    "id": "Z2-A6-S05",
+    "x": 284,
+    "y": 151,
+    "allowed": [
+     "event",
+     "gather"
+    ]
+   },
+   {
+    "id": "Z2-A6-S06",
+    "x": 368,
+    "y": 130,
+    "allowed": [
+     "event",
+     "gather",
+     "camp",
+     "dungeon"
+    ]
+   },
+   {
+    "id": "Z2-A6-S07",
+    "x": 122,
+    "y": 186,
+    "allowed": [
+     "event",
+     "gather",
+     "camp",
+     "dungeon"
+    ]
+   },
+   {
+    "id": "Z2-A6-S08",
+    "x": 366,
+    "y": 197,
+    "allowed": [
+     "event",
+     "gather",
+     "camp",
+     "dungeon"
+    ]
+   },
+   {
+    "id": "Z2-A6-S09",
+    "x": 83,
+    "y": 244,
+    "allowed": [
+     "event",
+     "gather",
+     "dungeon"
+    ]
+   },
+   {
+    "id": "Z2-A6-S10",
+    "x": 194,
+    "y": 247,
+    "allowed": [
+     "event",
+     "gather",
+     "dungeon"
+    ]
+   },
+   {
+    "id": "Z2-A6-S11",
+    "x": 290,
+    "y": 227,
+    "allowed": [
+     "event",
+     "gather",
+     "dungeon"
+    ]
+   }
+  ],
+  "Z2-A7": [
+   {
+    "id": "Z2-A7-S01",
+    "x": 109,
+    "y": 20,
+    "allowed": [
+     "event",
+     "gather",
+     "dungeon"
+    ]
+   },
+   {
+    "id": "Z2-A7-S02",
+    "x": 148,
+    "y": 26,
+    "allowed": [
+     "event",
+     "gather",
+     "dungeon"
+    ]
+   },
+   {
+    "id": "Z2-A7-S03",
+    "x": 32,
+    "y": 104,
+    "allowed": [
+     "event",
+     "gather",
+     "dungeon"
+    ]
+   },
+   {
+    "id": "Z2-A7-S04",
+    "x": 171,
+    "y": 99,
+    "altar": true,
+    "allowed": [
+     "event",
+     "gather",
+     "dungeon",
+     "altar"
+    ]
+   },
+   {
+    "id": "Z2-A7-S05",
+    "x": 201,
+    "y": 82,
+    "allowed": [
+     "event",
+     "gather",
+     "camp",
+     "dungeon"
+    ]
+   },
+   {
+    "id": "Z2-A7-S06",
+    "x": 293,
+    "y": 109,
+    "allowed": [
+     "event",
+     "gather"
+    ]
+   },
+   {
+    "id": "Z2-A7-S07",
+    "x": 62,
+    "y": 131,
+    "allowed": [
+     "event",
+     "gather",
+     "dungeon"
+    ]
+   },
+   {
+    "id": "Z2-A7-S08",
+    "x": 117,
+    "y": 165,
+    "allowed": [
+     "event",
+     "gather",
+     "dungeon"
+    ]
+   },
+   {
+    "id": "Z2-A7-S09",
+    "x": 172,
+    "y": 131,
+    "allowed": [
+     "event",
+     "gather",
+     "dungeon"
+    ]
+   },
+   {
+    "id": "Z2-A7-S10",
+    "x": 200,
+    "y": 119,
+    "allowed": [
+     "event",
+     "gather",
+     "camp",
+     "dungeon"
+    ]
+   },
+   {
+    "id": "Z2-A7-S11",
+    "x": 346,
+    "y": 218,
+    "allowed": [
+     "event",
+     "gather",
+     "camp",
+     "dungeon"
+    ]
+   }
+  ],
+  "Z2-B1": [
+   {
+    "id": "Z2-B1-S01",
+    "x": 361,
+    "y": 132,
+    "allowed": [
+     "event",
+     "gather"
+    ]
+   },
+   {
+    "id": "Z2-B1-S02",
+    "x": 40,
+    "y": 208,
+    "allowed": [
+     "event",
+     "gather",
+     "dungeon"
+    ]
+   },
+   {
+    "id": "Z2-B1-S03",
+    "x": 274,
+    "y": 188,
+    "allowed": [
+     "event",
+     "gather"
+    ]
+   },
+   {
+    "id": "Z2-B1-S04",
+    "x": 320,
+    "y": 198,
+    "allowed": [
+     "event",
+     "camp",
+     "dungeon"
+    ]
+   },
+   {
+    "id": "Z2-B1-S05",
+    "x": 202,
+    "y": 253,
+    "allowed": [
+     "event",
+     "dungeon"
+    ]
+   },
+   {
+    "id": "Z2-B1-S06",
+    "x": 251,
+    "y": 261,
+    "allowed": [
+     "event",
+     "gather",
+     "dungeon"
+    ]
+   },
+   {
+    "id": "Z2-B1-S07",
+    "x": 334,
+    "y": 224,
+    "allowed": [
+     "event",
+     "gather"
+    ]
+   },
+   {
+    "id": "Z2-B1-S08",
+    "x": 337,
+    "y": 252,
+    "altar": true,
+    "allowed": [
+     "event",
+     "camp",
+     "dungeon",
+     "altar"
+    ]
+   }
+  ],
+  "Z2-B2": [
+   {
+    "id": "Z2-B2-S01",
+    "x": 181,
+    "y": 210,
+    "allowed": [
+     "event",
+     "gather"
+    ]
+   },
+   {
+    "id": "Z2-B2-S02",
+    "x": 218,
+    "y": 213,
+    "allowed": [
+     "event",
+     "dungeon"
+    ]
+   },
+   {
+    "id": "Z2-B2-S03",
+    "x": 227,
+    "y": 171,
+    "allowed": [
+     "event"
+    ]
+   },
+   {
+    "id": "Z2-B2-S04",
+    "x": 384,
+    "y": 184,
+    "altar": true,
+    "allowed": [
+     "event",
+     "gather",
+     "altar"
+    ]
+   },
+   {
+    "id": "Z2-B2-S05",
+    "x": 288,
+    "y": 224,
+    "allowed": [
+     "event",
+     "dungeon"
+    ]
+   }
+  ],
+  "Z2-B3": [
+   {
+    "id": "Z2-B3-S01",
+    "x": 24,
+    "y": 266,
+    "altar": true,
+    "allowed": [
+     "event",
+     "altar"
+    ]
+   },
+   {
+    "id": "Z2-B3-S02",
+    "x": 221,
+    "y": 265,
+    "allowed": [
+     "event"
+    ]
+   },
+   {
+    "id": "Z2-B3-S03",
+    "x": 252,
+    "y": 253,
+    "allowed": [
+     "event",
+     "gather",
+     "dungeon"
+    ]
+   },
+   {
+    "id": "Z2-B3-S04",
+    "x": 301,
+    "y": 267,
+    "allowed": [
+     "event"
+    ]
+   },
+   {
+    "id": "Z2-B3-S05",
+    "x": 342,
+    "y": 247,
+    "allowed": [
+     "event",
+     "camp",
+     "dungeon"
+    ]
+   },
+   {
+    "id": "Z2-B3-S06",
+    "x": 383,
+    "y": 264,
+    "allowed": [
+     "event"
+    ]
+   }
+  ],
+  "Z2-B4": [
+   {
+    "id": "Z2-B4-S01",
+    "x": 135,
+    "y": 154,
+    "allowed": [
+     "event",
+     "gather"
+    ]
+   },
+   {
+    "id": "Z2-B4-S02",
+    "x": 43,
+    "y": 179,
+    "allowed": [
+     "event"
+    ]
+   },
+   {
+    "id": "Z2-B4-S03",
+    "x": 108,
+    "y": 170,
+    "allowed": [
+     "event",
+     "gather",
+     "camp"
+    ]
+   },
+   {
+    "id": "Z2-B4-S04",
+    "x": 222,
+    "y": 202,
+    "allowed": [
+     "event"
+    ]
+   },
+   {
+    "id": "Z2-B4-S05",
+    "x": 297,
+    "y": 204,
+    "allowed": [
+     "event",
+     "gather"
+    ]
+   },
+   {
+    "id": "Z2-B4-S06",
+    "x": 375,
+    "y": 223,
+    "allowed": [
+     "event"
+    ]
+   },
+   {
+    "id": "Z2-B4-S07",
+    "x": 45,
+    "y": 258,
+    "altar": true,
+    "allowed": [
+     "event",
+     "camp",
+     "dungeon",
+     "altar"
+    ]
+   },
+   {
+    "id": "Z2-B4-S08",
+    "x": 81,
+    "y": 258,
+    "allowed": [
+     "event",
+     "dungeon"
+    ]
+   }
+  ],
+  "Z2-B5": [
+   {
+    "id": "Z2-B5-S01",
+    "x": 72,
+    "y": 129,
+    "altar": true,
+    "allowed": [
+     "event",
+     "dungeon",
+     "altar"
+    ]
+   },
+   {
+    "id": "Z2-B5-S02",
+    "x": 111,
+    "y": 113,
+    "allowed": [
+     "event",
+     "dungeon"
+    ]
+   },
+   {
+    "id": "Z2-B5-S03",
+    "x": 175,
+    "y": 149,
+    "allowed": [
+     "event"
+    ]
+   },
+   {
+    "id": "Z2-B5-S04",
+    "x": 202,
+    "y": 120,
+    "allowed": [
+     "event"
+    ]
+   }
+  ],
+  "Z2-B6": [
+   {
+    "id": "Z2-B6-S01",
+    "x": 374,
+    "y": 164,
+    "altar": true,
+    "allowed": [
+     "event",
+     "altar"
+    ]
+   },
+   {
+    "id": "Z2-B6-S02",
+    "x": 313,
+    "y": 261,
+    "allowed": [
+     "event"
+    ]
+   },
+   {
+    "id": "Z2-B6-S03",
+    "x": 341,
+    "y": 256,
+    "allowed": [
+     "event",
+     "gather",
+     "dungeon"
+    ]
+   },
+   {
+    "id": "Z2-B6-S04",
+    "x": 368,
+    "y": 243,
+    "allowed": [
+     "event",
+     "dungeon"
+    ]
+   }
+  ],
+  "Z2-C1": [
+   {
+    "id": "Z2-C1-S01",
+    "x": 46,
+    "y": 27,
+    "altar": true,
+    "allowed": [
+     "event",
+     "gather",
+     "dungeon",
+     "altar"
+    ]
+   },
+   {
+    "id": "Z2-C1-S02",
+    "x": 127,
+    "y": 23,
+    "allowed": [
+     "event",
+     "gather",
+     "camp",
+     "dungeon"
+    ]
+   },
+   {
+    "id": "Z2-C1-S03",
+    "x": 301,
+    "y": 54,
+    "allowed": [
+     "event",
+     "gather",
+     "dungeon"
+    ]
+   },
+   {
+    "id": "Z2-C1-S04",
+    "x": 306,
+    "y": 27,
+    "allowed": [
+     "event",
+     "gather",
+     "dungeon"
+    ]
+   },
+   {
+    "id": "Z2-C1-S05",
+    "x": 101,
+    "y": 72,
+    "allowed": [
+     "event",
+     "gather"
+    ]
+   },
+   {
+    "id": "Z2-C1-S06",
+    "x": 133,
+    "y": 90,
+    "allowed": [
+     "event",
+     "gather"
+    ]
+   },
+   {
+    "id": "Z2-C1-S07",
+    "x": 343,
+    "y": 94,
+    "allowed": [
+     "event",
+     "gather",
+     "dungeon"
+    ]
+   },
+   {
+    "id": "Z2-C1-S08",
+    "x": 377,
+    "y": 60,
+    "allowed": [
+     "event",
+     "gather"
+    ]
+   },
+   {
+    "id": "Z2-C1-S09",
+    "x": 24,
+    "y": 149,
+    "allowed": [
+     "event",
+     "gather"
+    ]
+   },
+   {
+    "id": "Z2-C1-S10",
+    "x": 67,
+    "y": 188,
+    "allowed": [
+     "event",
+     "gather"
+    ]
+   },
+   {
+    "id": "Z2-C1-S11",
+    "x": 227,
+    "y": 244,
+    "allowed": [
+     "event",
+     "gather"
+    ]
+   }
+  ],
+  "Z2-C2": [
+   {
+    "id": "Z2-C2-S01",
+    "x": 79,
+    "y": 58,
+    "altar": true,
+    "allowed": [
+     "event",
+     "altar"
+    ]
+   },
+   {
+    "id": "Z2-C2-S02",
+    "x": 95,
+    "y": 107,
+    "allowed": [
+     "event",
+     "gather",
+     "dungeon"
+    ]
+   },
+   {
+    "id": "Z2-C2-S03",
+    "x": 122,
+    "y": 109,
+    "allowed": [
+     "event",
+     "gather",
+     "dungeon"
+    ]
+   },
+   {
+    "id": "Z2-C2-S04",
+    "x": 164,
+    "y": 117,
+    "allowed": [
+     "event",
+     "gather"
+    ]
+   },
+   {
+    "id": "Z2-C2-S05",
+    "x": 271,
+    "y": 247,
+    "allowed": [
+     "event",
+     "gather"
+    ]
+   },
+   {
+    "id": "Z2-C2-S06",
+    "x": 289,
+    "y": 226,
+    "allowed": [
+     "event",
+     "gather"
+    ]
+   }
+  ],
+  "Z2-C3": [
+   {
+    "id": "Z2-C3-S01",
+    "x": 57,
+    "y": 38,
+    "allowed": [
+     "event",
+     "gather",
+     "dungeon"
+    ]
+   },
+   {
+    "id": "Z2-C3-S02",
+    "x": 201,
+    "y": 19,
+    "allowed": [
+     "event",
+     "gather",
+     "dungeon"
+    ]
+   },
+   {
+    "id": "Z2-C3-S03",
+    "x": 249,
+    "y": 54,
+    "allowed": [
+     "event",
+     "gather",
+     "dungeon"
+    ]
+   },
+   {
+    "id": "Z2-C3-S04",
+    "x": 42,
+    "y": 61,
+    "allowed": [
+     "event",
+     "gather",
+     "dungeon"
+    ]
+   },
+   {
+    "id": "Z2-C3-S05",
+    "x": 273,
+    "y": 112,
+    "allowed": [
+     "event",
+     "gather"
+    ]
+   },
+   {
+    "id": "Z2-C3-S06",
+    "x": 34,
+    "y": 175,
+    "allowed": [
+     "event",
+     "dungeon"
+    ]
+   },
+   {
+    "id": "Z2-C3-S07",
+    "x": 231,
+    "y": 202,
+    "allowed": [
+     "event",
+     "camp",
+     "dungeon"
+    ]
+   },
+   {
+    "id": "Z2-C3-S08",
+    "x": 331,
+    "y": 211,
+    "allowed": [
+     "event",
+     "gather"
+    ]
+   },
+   {
+    "id": "Z2-C3-S09",
+    "x": 337,
+    "y": 168,
+    "allowed": [
+     "event",
+     "gather"
+    ]
+   },
+   {
+    "id": "Z2-C3-S10",
+    "x": 40,
+    "y": 237,
+    "allowed": [
+     "event",
+     "gather",
+     "dungeon"
+    ]
+   },
+   {
+    "id": "Z2-C3-S11",
+    "x": 218,
+    "y": 238,
+    "allowed": [
+     "event"
+    ]
+   },
+   {
+    "id": "Z2-C3-S12",
+    "x": 286,
+    "y": 258,
+    "altar": true,
+    "allowed": [
+     "event",
+     "altar"
+    ]
+   }
+  ],
+  "Z2-C4": [
+   {
+    "id": "Z2-C4-S01",
+    "x": 80,
+    "y": 51,
+    "altar": true,
+    "allowed": [
+     "event",
+     "gather",
+     "altar"
+    ]
+   },
+   {
+    "id": "Z2-C4-S02",
+    "x": 82,
+    "y": 105,
+    "allowed": [
+     "event",
+     "dungeon"
+    ]
+   },
+   {
+    "id": "Z2-C4-S03",
+    "x": 12,
+    "y": 133,
+    "allowed": [
+     "event",
+     "gather"
+    ]
+   },
+   {
+    "id": "Z2-C4-S04",
+    "x": 57,
+    "y": 120,
+    "allowed": [
+     "event",
+     "dungeon"
+    ]
+   },
+   {
+    "id": "Z2-C4-S05",
+    "x": 91,
+    "y": 153,
+    "allowed": [
+     "event"
+    ]
+   },
+   {
+    "id": "Z2-C4-S06",
+    "x": 156,
+    "y": 160,
+    "allowed": [
+     "event"
+    ]
+   },
+   {
+    "id": "Z2-C4-S07",
+    "x": 90,
+    "y": 192,
+    "allowed": [
+     "event",
+     "gather"
+    ]
+   },
+   {
+    "id": "Z2-C4-S08",
+    "x": 97,
+    "y": 218,
+    "allowed": [
+     "event",
+     "gather"
+    ]
+   },
+   {
+    "id": "Z2-C4-S09",
+    "x": 122,
+    "y": 201,
+    "allowed": [
+     "event",
+     "gather"
+    ]
+   },
+   {
+    "id": "Z2-C4-S10",
+    "x": 144,
+    "y": 220,
+    "allowed": [
+     "event"
+    ]
+   },
+   {
+    "id": "Z2-C4-S11",
+    "x": 19,
+    "y": 225,
+    "allowed": [
+     "event"
+    ]
+   }
+  ],
+  "Z2-C5": [
+   {
+    "id": "Z2-C5-S01",
+    "x": 60,
+    "y": 48,
+    "allowed": [
+     "event",
+     "gather"
+    ]
+   },
+   {
+    "id": "Z2-C5-S02",
+    "x": 154,
+    "y": 37,
+    "allowed": [
+     "event"
+    ]
+   },
+   {
+    "id": "Z2-C5-S03",
+    "x": 150,
+    "y": 95,
+    "allowed": [
+     "event"
+    ]
+   },
+   {
+    "id": "Z2-C5-S04",
+    "x": 173,
+    "y": 110,
+    "allowed": [
+     "event",
+     "gather",
+     "dungeon"
+    ]
+   },
+   {
+    "id": "Z2-C5-S05",
+    "x": 190,
+    "y": 83,
+    "allowed": [
+     "event"
+    ]
+   },
+   {
+    "id": "Z2-C5-S06",
+    "x": 37,
+    "y": 201,
+    "allowed": [
+     "event",
+     "gather",
+     "camp"
+    ]
+   },
+   {
+    "id": "Z2-C5-S07",
+    "x": 182,
+    "y": 171,
+    "allowed": [
+     "event",
+     "camp",
+     "dungeon"
+    ]
+   },
+   {
+    "id": "Z2-C5-S08",
+    "x": 16,
+    "y": 238,
+    "allowed": [
+     "event",
+     "gather",
+     "dungeon"
+    ]
+   },
+   {
+    "id": "Z2-C5-S09",
+    "x": 195,
+    "y": 266,
+    "allowed": [
+     "event",
+     "gather"
+    ]
+   },
+   {
+    "id": "Z2-C5-S10",
+    "x": 237,
+    "y": 242,
+    "allowed": [
+     "event",
+     "camp",
+     "dungeon"
+    ]
+   }
+  ],
+  "Z2-C6": [
+   {
+    "id": "Z2-C6-S01",
+    "x": 300,
+    "y": 78,
+    "allowed": [
+     "event",
+     "dungeon"
+    ]
+   },
+   {
+    "id": "Z2-C6-S02",
+    "x": 315,
+    "y": 108,
+    "allowed": [
+     "event",
+     "gather"
+    ]
+   },
+   {
+    "id": "Z2-C6-S03",
+    "x": 243,
+    "y": 147,
+    "allowed": [
+     "event",
+     "gather"
+    ]
+   },
+   {
+    "id": "Z2-C6-S04",
+    "x": 269,
+    "y": 156,
+    "allowed": [
+     "event",
+     "gather",
+     "dungeon"
+    ]
+   },
+   {
+    "id": "Z2-C6-S05",
+    "x": 304,
+    "y": 140,
+    "allowed": [
+     "event",
+     "dungeon"
+    ]
+   },
+   {
+    "id": "Z2-C6-S06",
+    "x": 356,
+    "y": 132,
+    "allowed": [
+     "event",
+     "gather"
+    ]
+   },
+   {
+    "id": "Z2-C6-S07",
+    "x": 249,
+    "y": 183,
+    "allowed": [
+     "event",
+     "dungeon"
+    ]
+   },
+   {
+    "id": "Z2-C6-S08",
+    "x": 302,
+    "y": 216,
+    "allowed": [
+     "event",
+     "gather",
+     "dungeon"
+    ]
+   },
+   {
+    "id": "Z2-C6-S09",
+    "x": 317,
+    "y": 168,
+    "allowed": [
+     "event",
+     "gather",
+     "dungeon"
+    ]
+   },
+   {
+    "id": "Z2-C6-S10",
+    "x": 271,
+    "y": 228,
+    "allowed": [
+     "event",
+     "dungeon"
+    ]
+   }
+  ],
+  "Z2-C7": [
+   {
+    "id": "Z2-C7-S01",
+    "x": 18,
+    "y": 72,
+    "altar": true,
+    "allowed": [
+     "event",
+     "gather",
+     "dungeon",
+     "altar"
+    ]
+   },
+   {
+    "id": "Z2-C7-S02",
+    "x": 101,
+    "y": 80,
+    "allowed": [
+     "event",
+     "gather"
+    ]
+   },
+   {
+    "id": "Z2-C7-S03",
+    "x": 12,
+    "y": 138,
+    "allowed": [
+     "event"
+    ]
+   },
+   {
+    "id": "Z2-C7-S04",
+    "x": 30,
+    "y": 194,
+    "allowed": [
+     "event",
+     "gather",
+     "dungeon"
+    ]
+   },
+   {
+    "id": "Z2-C7-S05",
+    "x": 52,
+    "y": 169,
+    "allowed": [
+     "event",
+     "gather"
+    ]
+   },
+   {
+    "id": "Z2-C7-S06",
+    "x": 126,
+    "y": 208,
+    "allowed": [
+     "event",
+     "dungeon"
+    ]
+   },
+   {
+    "id": "Z2-C7-S07",
+    "x": 157,
+    "y": 206,
+    "allowed": [
+     "event",
+     "gather",
+     "dungeon"
+    ]
+   },
+   {
+    "id": "Z2-C7-S08",
+    "x": 66,
+    "y": 235,
+    "allowed": [
+     "event",
+     "dungeon"
+    ]
+   },
+   {
+    "id": "Z2-C7-S09",
+    "x": 103,
+    "y": 255,
+    "allowed": [
+     "event",
+     "dungeon"
+    ]
+   },
+   {
+    "id": "Z2-C7-S10",
+    "x": 276,
+    "y": 235,
+    "allowed": [
+     "event"
+    ]
+   }
+  ],
+  "Z2-D1": [
+   {
+    "id": "Z2-D1-S01",
+    "x": 21,
+    "y": 49,
+    "allowed": [
+     "event",
+     "gather"
+    ]
+   },
+   {
+    "id": "Z2-D1-S02",
+    "x": 35,
+    "y": 24,
+    "allowed": [
+     "event",
+     "gather"
+    ]
+   },
+   {
+    "id": "Z2-D1-S03",
+    "x": 244,
+    "y": 54,
+    "allowed": [
+     "event",
+     "gather",
+     "camp"
+    ]
+   },
+   {
+    "id": "Z2-D1-S04",
+    "x": 50,
+    "y": 59,
+    "allowed": [
+     "event",
+     "gather"
+    ]
+   },
+   {
+    "id": "Z2-D1-S05",
+    "x": 100,
+    "y": 68,
+    "allowed": [
+     "event",
+     "gather"
+    ]
+   },
+   {
+    "id": "Z2-D1-S06",
+    "x": 271,
+    "y": 64,
+    "allowed": [
+     "event",
+     "gather"
+    ]
+   },
+   {
+    "id": "Z2-D1-S07",
+    "x": 294,
+    "y": 77,
+    "allowed": [
+     "event",
+     "gather"
+    ]
+   },
+   {
+    "id": "Z2-D1-S08",
+    "x": 345,
+    "y": 71,
+    "altar": true,
+    "allowed": [
+     "event",
+     "camp",
+     "dungeon",
+     "altar"
+    ]
+   },
+   {
+    "id": "Z2-D1-S09",
+    "x": 223,
+    "y": 156,
+    "allowed": [
+     "event",
+     "dungeon"
+    ]
+   },
+   {
+    "id": "Z2-D1-S10",
+    "x": 349,
+    "y": 137,
+    "allowed": [
+     "event",
+     "gather"
+    ]
+   }
+  ],
+  "Z2-D2": [
+   {
+    "id": "Z2-D2-S01",
+    "x": 310,
+    "y": 51,
+    "allowed": [
+     "event",
+     "gather"
+    ]
+   },
+   {
+    "id": "Z2-D2-S02",
+    "x": 326,
+    "y": 93,
+    "allowed": [
+     "event"
+    ]
+   },
+   {
+    "id": "Z2-D2-S03",
+    "x": 112,
+    "y": 117,
+    "allowed": [
+     "event",
+     "camp",
+     "dungeon"
+    ]
+   },
+   {
+    "id": "Z2-D2-S04",
+    "x": 130,
+    "y": 148,
+    "allowed": [
+     "event",
+     "gather",
+     "dungeon"
+    ]
+   },
+   {
+    "id": "Z2-D2-S05",
+    "x": 149,
+    "y": 117,
+    "allowed": [
+     "event",
+     "gather"
+    ]
+   },
+   {
+    "id": "Z2-D2-S06",
+    "x": 34,
+    "y": 209,
+    "altar": true,
+    "allowed": [
+     "event",
+     "gather",
+     "dungeon",
+     "altar"
+    ]
+   },
+   {
+    "id": "Z2-D2-S07",
+    "x": 94,
+    "y": 201,
+    "allowed": [
+     "event",
+     "gather"
+    ]
+   },
+   {
+    "id": "Z2-D2-S08",
+    "x": 193,
+    "y": 206,
+    "allowed": [
+     "event",
+     "gather",
+     "camp"
+    ]
+   },
+   {
+    "id": "Z2-D2-S09",
+    "x": 276,
+    "y": 171,
+    "allowed": [
+     "event",
+     "gather",
+     "camp"
+    ]
+   },
+   {
+    "id": "Z2-D2-S10",
+    "x": 186,
+    "y": 251,
+    "allowed": [
+     "event",
+     "gather",
+     "dungeon"
+    ]
+   }
+  ],
+  "Z2-D3": [
+   {
+    "id": "Z2-D3-S01",
+    "x": 48,
+    "y": 75,
+    "altar": true,
+    "allowed": [
+     "event",
+     "dungeon",
+     "altar"
+    ]
+   },
+   {
+    "id": "Z2-D3-S02",
+    "x": 14,
+    "y": 166,
+    "allowed": [
+     "event"
+    ]
+   },
+   {
+    "id": "Z2-D3-S03",
+    "x": 37,
+    "y": 133,
+    "allowed": [
+     "event"
+    ]
+   },
+   {
+    "id": "Z2-D3-S04",
+    "x": 83,
+    "y": 266,
+    "allowed": [
+     "event"
+    ]
+   }
+  ],
+  "Z2-D4": [
+   {
+    "id": "Z2-D4-S01",
+    "x": 177,
+    "y": 32,
+    "altar": true,
+    "allowed": [
+     "event",
+     "gather",
+     "dungeon",
+     "altar"
+    ]
+   },
+   {
+    "id": "Z2-D4-S02",
+    "x": 179,
+    "y": 66,
+    "allowed": [
+     "event",
+     "gather",
+     "dungeon"
+    ]
+   },
+   {
+    "id": "Z2-D4-S03",
+    "x": 332,
+    "y": 109,
+    "allowed": [
+     "event",
+     "gather"
+    ]
+   },
+   {
+    "id": "Z2-D4-S04",
+    "x": 159,
+    "y": 140,
+    "allowed": [
+     "event",
+     "gather"
+    ]
+   },
+   {
+    "id": "Z2-D4-S05",
+    "x": 377,
+    "y": 131,
+    "allowed": [
+     "event",
+     "gather",
+     "dungeon"
+    ]
+   },
+   {
+    "id": "Z2-D4-S06",
+    "x": 256,
+    "y": 179,
+    "allowed": [
+     "event",
+     "gather",
+     "camp",
+     "dungeon"
+    ]
+   },
+   {
+    "id": "Z2-D4-S07",
+    "x": 355,
+    "y": 220,
+    "allowed": [
+     "event",
+     "gather"
+    ]
+   },
+   {
+    "id": "Z2-D4-S08",
+    "x": 185,
+    "y": 235,
+    "allowed": [
+     "event",
+     "camp",
+     "dungeon"
+    ]
+   },
+   {
+    "id": "Z2-D4-S09",
+    "x": 218,
+    "y": 231,
+    "allowed": [
+     "event",
+     "gather",
+     "camp",
+     "dungeon"
+    ]
+   }
+  ],
+  "Z2-D5": [
+   {
+    "id": "Z2-D5-S01",
+    "x": 49,
+    "y": 30,
+    "allowed": [
+     "event",
+     "gather",
+     "dungeon"
+    ]
+   },
+   {
+    "id": "Z2-D5-S02",
+    "x": 202,
+    "y": 34,
+    "allowed": [
+     "event",
+     "dungeon"
+    ]
+   },
+   {
+    "id": "Z2-D5-S03",
+    "x": 296,
+    "y": 32,
+    "allowed": [
+     "event",
+     "dungeon"
+    ]
+   },
+   {
+    "id": "Z2-D5-S04",
+    "x": 302,
+    "y": 88,
+    "allowed": [
+     "event",
+     "gather",
+     "dungeon"
+    ]
+   },
+   {
+    "id": "Z2-D5-S05",
+    "x": 185,
+    "y": 144,
+    "allowed": [
+     "event",
+     "gather",
+     "dungeon"
+    ]
+   },
+   {
+    "id": "Z2-D5-S06",
+    "x": 215,
+    "y": 131,
+    "allowed": [
+     "event",
+     "gather",
+     "dungeon"
+    ]
+   },
+   {
+    "id": "Z2-D5-S07",
+    "x": 243,
+    "y": 162,
+    "allowed": [
+     "event",
+     "gather",
+     "dungeon"
+    ]
+   },
+   {
+    "id": "Z2-D5-S08",
+    "x": 355,
+    "y": 116,
+    "allowed": [
+     "event",
+     "gather",
+     "dungeon"
+    ]
+   },
+   {
+    "id": "Z2-D5-S09",
+    "x": 116,
+    "y": 204,
+    "allowed": [
+     "event",
+     "gather",
+     "dungeon"
+    ]
+   },
+   {
+    "id": "Z2-D5-S10",
+    "x": 150,
+    "y": 194,
+    "allowed": [
+     "event",
+     "gather"
+    ]
+   },
+   {
+    "id": "Z2-D5-S11",
+    "x": 273,
+    "y": 182,
+    "allowed": [
+     "event",
+     "gather",
+     "dungeon"
+    ]
+   },
+   {
+    "id": "Z2-D5-S12",
+    "x": 71,
+    "y": 243,
+    "altar": true,
+    "allowed": [
+     "event",
+     "gather",
+     "dungeon",
+     "altar"
+    ]
+   }
+  ],
+  "Z2-D6": [
+   {
+    "id": "Z2-D6-S01",
+    "x": 113,
+    "y": 52,
+    "altar": true,
+    "allowed": [
+     "event",
+     "gather",
+     "dungeon",
+     "altar"
+    ]
+   },
+   {
+    "id": "Z2-D6-S02",
+    "x": 151,
+    "y": 40,
+    "allowed": [
+     "event",
+     "gather",
+     "dungeon"
+    ]
+   },
+   {
+    "id": "Z2-D6-S03",
+    "x": 125,
+    "y": 78,
+    "allowed": [
+     "event",
+     "gather",
+     "dungeon"
+    ]
+   },
+   {
+    "id": "Z2-D6-S04",
+    "x": 103,
+    "y": 124,
+    "allowed": [
+     "event",
+     "gather",
+     "dungeon"
+    ]
+   },
+   {
+    "id": "Z2-D6-S05",
+    "x": 109,
+    "y": 213,
+    "allowed": [
+     "event",
+     "gather",
+     "dungeon"
+    ]
+   },
+   {
+    "id": "Z2-D6-S06",
+    "x": 184,
+    "y": 241,
+    "allowed": [
+     "event",
+     "gather",
+     "dungeon"
+    ]
+   },
+   {
+    "id": "Z2-D6-S07",
+    "x": 261,
+    "y": 263,
+    "allowed": [
+     "event",
+     "gather",
+     "dungeon"
+    ]
+   }
+  ],
+  "Z2-D7": [
+   {
+    "id": "Z2-D7-S01",
+    "x": 72,
+    "y": 87,
+    "altar": true,
+    "allowed": [
+     "event",
+     "gather",
+     "dungeon",
+     "altar"
+    ]
+   },
+   {
+    "id": "Z2-D7-S02",
+    "x": 85,
+    "y": 62,
+    "allowed": [
+     "event",
+     "gather",
+     "dungeon"
+    ]
+   },
+   {
+    "id": "Z2-D7-S03",
+    "x": 125,
+    "y": 62,
+    "allowed": [
+     "event",
+     "gather",
+     "dungeon"
+    ]
+   },
+   {
+    "id": "Z2-D7-S04",
+    "x": 160,
+    "y": 90,
+    "allowed": [
+     "event",
+     "gather",
+     "camp",
+     "dungeon"
+    ]
+   },
+   {
+    "id": "Z2-D7-S05",
+    "x": 189,
+    "y": 65,
+    "allowed": [
+     "event",
+     "dungeon"
+    ]
+   },
+   {
+    "id": "Z2-D7-S06",
+    "x": 41,
+    "y": 117,
+    "allowed": [
+     "event",
+     "gather",
+     "dungeon"
+    ]
+   },
+   {
+    "id": "Z2-D7-S07",
+    "x": 150,
+    "y": 129,
+    "allowed": [
+     "event",
+     "camp",
+     "dungeon"
+    ]
+   },
+   {
+    "id": "Z2-D7-S08",
+    "x": 349,
+    "y": 156,
+    "allowed": [
+     "event",
+     "gather"
+    ]
+   },
+   {
+    "id": "Z2-D7-S09",
+    "x": 258,
+    "y": 243,
+    "allowed": [
+     "event"
+    ]
+   }
+  ]
+ }
+}

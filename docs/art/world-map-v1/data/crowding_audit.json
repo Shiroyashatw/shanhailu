@@ -1,0 +1,667 @@
+{
+ "metric": "free_ratio＝陸地中距圖示／字框／道路(膨脹2px) ≥10px 的比例；crowded cell＝57×56 格內 free<0.15 且 ≥3 點；判定：free<0.45 或 ≥3 擁擠格＝過密，free<0.6 或有擁擠格＝偏密",
+ "z1": {
+  "Z1-1 崑崙丘": {
+   "scale": 3.5,
+   "icons_drawn": 9,
+   "free_ratio": 0.771,
+   "icons_per_10k_land_px": 1.8,
+   "crowded_cells": [],
+   "slot_capacity_at_z2_rules": 5,
+   "slot_target": 5,
+   "verdict": "可"
+  },
+  "Z1-2 瘴澤・鎮西城・灰窯原": {
+   "scale": 3.0,
+   "icons_drawn": 36,
+   "free_ratio": 0.587,
+   "icons_per_10k_land_px": 3.36,
+   "crowded_cells": [
+    {
+     "cell_px": [
+      114,
+      112,
+      171,
+      168
+     ],
+     "free_ratio": 0.02,
+     "points": [
+      "鎮西城",
+      "鎮西驛",
+      "瘴澤渡",
+      "瘴口村",
+      "枯柳村",
+      "鹽井村"
+     ]
+    }
+   ],
+   "slot_capacity_at_z2_rules": 9,
+   "slot_target": 9,
+   "verdict": "偏密"
+  },
+  "Z1-3 北山": {
+   "scale": 2.5,
+   "icons_drawn": 20,
+   "free_ratio": 0.619,
+   "icons_per_10k_land_px": 3.9,
+   "crowded_cells": [],
+   "slot_capacity_at_z2_rules": 5,
+   "slot_target": 5,
+   "verdict": "可"
+  },
+  "Z1-4 中山・黑水渡": {
+   "scale": 3.5,
+   "icons_drawn": 22,
+   "free_ratio": 0.745,
+   "icons_per_10k_land_px": 2.29,
+   "crowded_cells": [
+    {
+     "cell_px": [
+      57,
+      168,
+      114,
+      224
+     ],
+     "free_ratio": 0.13,
+     "points": [
+      "官道驛站",
+      "岔口路障",
+      "鴉巢"
+     ]
+    },
+    {
+     "cell_px": [
+      228,
+      224,
+      285,
+      280
+     ],
+     "free_ratio": 0.1,
+     "points": [
+      "黑水渡",
+      "黑水盟總壇",
+      "黑水渡碼頭",
+      "天星水路碼頭",
+      "黑水南渡",
+      "黑水東渡"
+     ]
+    }
+   ],
+   "slot_capacity_at_z2_rules": 10,
+   "slot_target": 10,
+   "verdict": "偏密"
+  },
+  "Z1-5 東山": {
+   "scale": 2.25,
+   "icons_drawn": 18,
+   "free_ratio": 0.773,
+   "icons_per_10k_land_px": 2.46,
+   "crowded_cells": [],
+   "slot_capacity_at_z2_rules": 8,
+   "slot_target": 8,
+   "verdict": "可"
+  },
+  "Z1-6 南山東・海內南": {
+   "scale": 3.0,
+   "icons_drawn": 18,
+   "free_ratio": 0.673,
+   "icons_per_10k_land_px": 3.07,
+   "crowded_cells": [],
+   "slot_capacity_at_z2_rules": 5,
+   "slot_target": 5,
+   "verdict": "可"
+  },
+  "Z1-7 南山西": {
+   "scale": 3.0,
+   "icons_drawn": 12,
+   "free_ratio": 0.759,
+   "icons_per_10k_land_px": 1.61,
+   "crowded_cells": [],
+   "slot_capacity_at_z2_rules": 8,
+   "slot_target": 8,
+   "verdict": "可"
+  },
+  "Z1-8a 海外・奇肱國（插框）": {
+   "scale": 6.0,
+   "icons_drawn": 4,
+   "free_ratio": 0.845,
+   "icons_per_10k_land_px": 1.59,
+   "crowded_cells": [],
+   "slot_capacity_at_z2_rules": 4,
+   "slot_target": 4,
+   "verdict": "可"
+  },
+  "Z1-8b 海外・三身國（插框）": {
+   "scale": 6.0,
+   "icons_drawn": 5,
+   "free_ratio": 0.702,
+   "icons_per_10k_land_px": 4.68,
+   "crowded_cells": [],
+   "slot_capacity_at_z2_rules": 4,
+   "slot_target": 4,
+   "verdict": "可"
+  }
+ },
+ "z2": {
+  "Z2-A1": {
+   "free_ratio": 0.661,
+   "icons_per_10k_land_px": 1.85,
+   "crowded_cells": [
+    {
+     "cell_px": [
+      228,
+      56,
+      285,
+      112
+     ],
+     "free_ratio": 0.02,
+     "points": [
+      "渡陰關",
+      "守關營房",
+      "破曉護民哨",
+      "渡陰關鬼市"
+     ]
+    }
+   ],
+   "slots": 10,
+   "verdict": "偏密"
+  },
+  "Z2-A2": {
+   "free_ratio": 0.584,
+   "icons_per_10k_land_px": 2.42,
+   "crowded_cells": [
+    {
+     "cell_px": [
+      171,
+      168,
+      228,
+      224
+     ],
+     "free_ratio": 0.02,
+     "points": [
+      "岔口路障",
+      "岔口小祠",
+      "野徑岔口黑攤",
+      "野徑岔口",
+      "逃兵營火"
+     ]
+    },
+    {
+     "cell_px": [
+      0,
+      224,
+      57,
+      280
+     ],
+     "free_ratio": 0.15,
+     "points": [
+      "止血草叢",
+      "懸壺藥寮",
+      "獵戶舊棚"
+     ]
+    }
+   ],
+   "slots": 10,
+   "verdict": "偏密"
+  },
+  "Z2-A3": {
+   "free_ratio": 0.626,
+   "icons_per_10k_land_px": 2.73,
+   "crowded_cells": [
+    {
+     "cell_px": [
+      342,
+      112,
+      399,
+      168
+     ],
+     "free_ratio": 0.05,
+     "points": [
+      "千機閣分閣",
+      "黑水收礦棚",
+      "赤石礦戶",
+      "赤石廢礦",
+      "礦道・南坑"
+     ]
+    },
+    {
+     "cell_px": [
+      57,
+      168,
+      114,
+      224
+     ],
+     "free_ratio": 0.14,
+     "points": [
+      "破曉清窟前哨",
+      "酉神裂口",
+      "神骨堆",
+      "霧客出沒處"
+     ]
+    }
+   ],
+   "slots": 8,
+   "verdict": "偏密"
+  },
+  "Z2-A4": {
+   "free_ratio": 0.57,
+   "icons_per_10k_land_px": 2.56,
+   "crowded_cells": [
+    {
+     "cell_px": [
+      342,
+      0,
+      399,
+      56
+     ],
+     "free_ratio": 0.04,
+     "points": [
+      "祭窟火盆台",
+      "沉淵祭窟",
+      "祭窟外小徑"
+     ]
+    },
+    {
+     "cell_px": [
+      285,
+      112,
+      342,
+      168
+     ],
+     "free_ratio": 0.04,
+     "points": [
+      "拾屍棚",
+      "沼蠱草棚",
+      "沼邊義莊",
+      "沼地渡口"
+     ]
+    },
+    {
+     "cell_px": [
+      342,
+      112,
+      399,
+      168
+     ],
+     "free_ratio": 0.05,
+     "points": [
+      "沼底蠱窩",
+      "沼民水寨",
+      "腐骨沼",
+      "沼蛭淺灘",
+      "浮屍灘"
+     ]
+    }
+   ],
+   "slots": 10,
+   "verdict": "過密"
+  },
+  "Z2-A5": {
+   "free_ratio": 0.85,
+   "icons_per_10k_land_px": 0.81,
+   "crowded_cells": [],
+   "slots": 12,
+   "verdict": "可"
+  },
+  "Z2-A6": {
+   "free_ratio": 0.724,
+   "icons_per_10k_land_px": 1.62,
+   "crowded_cells": [
+    {
+     "cell_px": [
+      171,
+      112,
+      228,
+      168
+     ],
+     "free_ratio": 0.02,
+     "points": [
+      "鎮西城",
+      "鎮西糧倉",
+      "鎮西破曉分營",
+      "鎮西驛",
+      "鎮西神龕"
+     ]
+    }
+   ],
+   "slots": 11,
+   "verdict": "偏密"
+  },
+  "Z2-A7": {
+   "free_ratio": 0.762,
+   "icons_per_10k_land_px": 1.18,
+   "crowded_cells": [],
+   "slots": 11,
+   "verdict": "可"
+  },
+  "Z2-B1": {
+   "free_ratio": 0.844,
+   "icons_per_10k_land_px": 1.77,
+   "crowded_cells": [],
+   "slots": 8,
+   "verdict": "可"
+  },
+  "Z2-B2": {
+   "free_ratio": 0.861,
+   "icons_per_10k_land_px": 2.66,
+   "crowded_cells": [],
+   "slots": 5,
+   "verdict": "可"
+  },
+  "Z2-B3": {
+   "free_ratio": 0.827,
+   "icons_per_10k_land_px": 2.14,
+   "crowded_cells": [],
+   "slots": 6,
+   "verdict": "可"
+  },
+  "Z2-B4": {
+   "free_ratio": 0.719,
+   "icons_per_10k_land_px": 2.41,
+   "crowded_cells": [
+    {
+     "cell_px": [
+      228,
+      224,
+      285,
+      280
+     ],
+     "free_ratio": 0.11,
+     "points": [
+      "鎮北城",
+      "玄武營",
+      "鎮北神龕"
+     ]
+    }
+   ],
+   "slots": 8,
+   "verdict": "偏密"
+  },
+  "Z2-B5": {
+   "free_ratio": 0.85,
+   "icons_per_10k_land_px": 2.44,
+   "crowded_cells": [],
+   "slots": 4,
+   "verdict": "可"
+  },
+  "Z2-B6": {
+   "free_ratio": 0.923,
+   "icons_per_10k_land_px": 1.06,
+   "crowded_cells": [],
+   "slots": 4,
+   "verdict": "可"
+  },
+  "Z2-C1": {
+   "free_ratio": 0.811,
+   "icons_per_10k_land_px": 1.77,
+   "crowded_cells": [
+    {
+     "cell_px": [
+      0,
+      224,
+      57,
+      280
+     ],
+     "free_ratio": 0.07,
+     "points": [
+      "官道驛站",
+      "官道河橋",
+      "藥林鐵脈"
+     ]
+    },
+    {
+     "cell_px": [
+      57,
+      224,
+      114,
+      280
+     ],
+     "free_ratio": 0.02,
+     "points": [
+      "斷路幫窩",
+      "鴉巢外枯樹",
+      "官道里碑",
+      "官道十里亭",
+      "野徑岔口"
+     ]
+    }
+   ],
+   "slots": 11,
+   "verdict": "偏密"
+  },
+  "Z2-C2": {
+   "free_ratio": 0.853,
+   "icons_per_10k_land_px": 2.03,
+   "crowded_cells": [
+    {
+     "cell_px": [
+      171,
+      168,
+      228,
+      224
+     ],
+     "free_ratio": 0.0,
+     "points": [
+      "黑水渡",
+      "黑水渡碼頭",
+      "黑水西渡",
+      "黑水中繼島",
+      "黑水渡鬼市"
+     ]
+    }
+   ],
+   "slots": 6,
+   "verdict": "偏密"
+  },
+  "Z2-C3": {
+   "free_ratio": 0.845,
+   "icons_per_10k_land_px": 0.94,
+   "crowded_cells": [
+    {
+     "cell_px": [
+      114,
+      56,
+      171,
+      112
+     ],
+     "free_ratio": 0.11,
+     "points": [
+      "鎮東城",
+      "青龍營",
+      "鎮東義莊"
+     ]
+    }
+   ],
+   "slots": 12,
+   "verdict": "偏密"
+  },
+  "Z2-C4": {
+   "free_ratio": 0.931,
+   "icons_per_10k_land_px": 0.63,
+   "crowded_cells": [],
+   "slots": 11,
+   "verdict": "可"
+  },
+  "Z2-C5": {
+   "free_ratio": 0.803,
+   "icons_per_10k_land_px": 1.75,
+   "crowded_cells": [
+    {
+     "cell_px": [
+      57,
+      168,
+      114,
+      224
+     ],
+     "free_ratio": 0.0,
+     "points": [
+      "祀社總壇",
+      "空桑古廟",
+      "曹夕廟",
+      "廢廟群"
+     ]
+    },
+    {
+     "cell_px": [
+      114,
+      168,
+      171,
+      224
+     ],
+     "free_ratio": 0.08,
+     "points": [
+      "護廟東哨",
+      "廢廟難民棚",
+      "高氏廟",
+      "葛山廟"
+     ]
+    }
+   ],
+   "slots": 10,
+   "verdict": "偏密"
+  },
+  "Z2-C6": {
+   "free_ratio": 0.883,
+   "icons_per_10k_land_px": 1.29,
+   "crowded_cells": [
+    {
+     "cell_px": [
+      57,
+      112,
+      114,
+      168
+     ],
+     "free_ratio": 0.06,
+     "points": [
+      "勃垂村",
+      "山腰神龕",
+      "坡下神龕",
+      "扶桑坡"
+     ]
+    }
+   ],
+   "slots": 10,
+   "verdict": "偏密"
+  },
+  "Z2-C7": {
+   "free_ratio": 0.977,
+   "icons_per_10k_land_px": 0.24,
+   "crowded_cells": [],
+   "slots": 10,
+   "verdict": "可"
+  },
+  "Z2-D1": {
+   "free_ratio": 0.797,
+   "icons_per_10k_land_px": 1.28,
+   "crowded_cells": [
+    {
+     "cell_px": [
+      114,
+      112,
+      171,
+      168
+     ],
+     "free_ratio": 0.06,
+     "points": [
+      "焚獄",
+      "赤銅礦場",
+      "赤銅坊",
+      "岩漿河",
+      "焚獄外圍"
+     ]
+    }
+   ],
+   "slots": 10,
+   "verdict": "偏密"
+  },
+  "Z2-D2": {
+   "free_ratio": 0.745,
+   "icons_per_10k_land_px": 1.29,
+   "crowded_cells": [],
+   "slots": 10,
+   "verdict": "可"
+  },
+  "Z2-D3": {
+   "free_ratio": 0.773,
+   "icons_per_10k_land_px": 2.92,
+   "crowded_cells": [
+    {
+     "cell_px": [
+      57,
+      168,
+      114,
+      224
+     ],
+     "free_ratio": 0.14,
+     "points": [
+      "射日崖",
+      "射日宗山門",
+      "射日宗箭場"
+     ]
+    }
+   ],
+   "slots": 4,
+   "verdict": "偏密"
+  },
+  "Z2-D4": {
+   "free_ratio": 0.842,
+   "icons_per_10k_land_px": 0.72,
+   "crowded_cells": [],
+   "slots": 9,
+   "verdict": "可"
+  },
+  "Z2-D5": {
+   "free_ratio": 0.943,
+   "icons_per_10k_land_px": 0.61,
+   "crowded_cells": [],
+   "slots": 12,
+   "verdict": "可"
+  },
+  "Z2-D6": {
+   "free_ratio": 0.836,
+   "icons_per_10k_land_px": 1.35,
+   "crowded_cells": [
+    {
+     "cell_px": [
+      171,
+      112,
+      228,
+      168
+     ],
+     "free_ratio": 0.03,
+     "points": [
+      "奇肱國",
+      "千機總閣",
+      "天工盟議事廳",
+      "機關林"
+     ]
+    }
+   ],
+   "slots": 7,
+   "verdict": "偏密"
+  },
+  "Z2-D7": {
+   "free_ratio": 0.914,
+   "icons_per_10k_land_px": 0.84,
+   "crowded_cells": [
+    {
+     "cell_px": [
+      171,
+      112,
+      228,
+      168
+     ],
+     "free_ratio": 0.07,
+     "points": [
+      "三身國",
+      "換骨工坊",
+      "三身國碼頭",
+      "三身國巨像"
+     ]
+    }
+   ],
+   "slots": 9,
+   "verdict": "偏密"
+  }
+ }
+}

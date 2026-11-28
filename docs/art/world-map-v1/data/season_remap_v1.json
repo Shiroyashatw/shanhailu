@@ -1,0 +1,730 @@
+{
+ "palette_class_table": {
+  "#0f0e0c": "rock",
+  "#0a0908": "rock",
+  "#2e2c29": "rock",
+  "#3d3a36": "rock",
+  "#4f4b45": "rock",
+  "#66615a": "rock",
+  "#857f75": "rock",
+  "#2a3643": "water",
+  "#3a4a5a": "water",
+  "#1f1610": "plain",
+  "#2b1f16": "plain",
+  "#3b2a1c": "plain",
+  "#4d3724": "plain",
+  "#634a30": "plain",
+  "#7d6040": "plain",
+  "#b5382c": "lava",
+  "#8c2c22": "lava",
+  "#5e1f19": "lava",
+  "#3d1512": "lava",
+  "#c9a24a": "desert",
+  "#8a6c2e": "desert",
+  "#5c4a22": "desert",
+  "#5f9a7a": "forest",
+  "#3f6d57": "forest",
+  "#2a4a3c": "forest",
+  "#1a2e26": "forest",
+  "#d8cfbd": "plain",
+  "#a59c88": "plain",
+  "#7b735f": "plain",
+  "#5a5448": "rock",
+  "#4a3d22": "plain",
+  "#6b5a30": "desert",
+  "#93803f": "desert",
+  "#e0863a": "lava",
+  "#f2c46a": "desert",
+  "#7a5a24": "desert",
+  "#4e493d": "plain",
+  "#6f6858": "rock",
+  "#8f8672": "rock",
+  "#aea48f": "plain",
+  "#14181c": "water",
+  "#222930": "water",
+  "#323b44": "water",
+  "#46515a": "water",
+  "#66747e": "snow_ice",
+  "#32302d": "rock",
+  "#39332a": "plain",
+  "#070a0f": "rock",
+  "#0b1118": "rock",
+  "#060507": "rock",
+  "#15120f": "rock",
+  "#201b15": "plain",
+  "#100f13": "rock",
+  "#1b1820": "water",
+  "#170d0b": "rock",
+  "#2a1410": "plain",
+  "#2a333b": "water",
+  "#38434c": "water",
+  "#48545e": "water",
+  "#0c120d": "rock",
+  "#162013": "forest",
+  "#0d1813": "forest",
+  "#162a20": "forest",
+  "#1a1814": "plain",
+  "#2b271f": "plain",
+  "#141910": "forest",
+  "#1c2415": "forest",
+  "#0e160e": "forest",
+  "#121c12": "forest",
+  "#232015": "plain",
+  "#2a2720": "plain",
+  "#312d25": "plain",
+  "#27231b": "plain",
+  "#311913": "plain",
+  "#34481f": "forest",
+  "#3f443a": "forest",
+  "#6f7566": "forest",
+  "#2a3944": "water",
+  "#3f5866": "water"
+ },
+ "classes": [
+  "water",
+  "void",
+  "plain",
+  "forest",
+  "swamp",
+  "desert",
+  "rock",
+  "snow_ice",
+  "lava",
+  "ash_waste"
+ ],
+ "class_view_colours": {
+  "water": "#2a3944",
+  "void": "#060507",
+  "plain": "#7d6040",
+  "forest": "#3f6d57",
+  "swamp": "#5f9a7a",
+  "desert": "#c9a24a",
+  "rock": "#66615a",
+  "snow_ice": "#d8cfbd",
+  "lava": "#e0863a",
+  "ash_waste": "#8f8672"
+ },
+ "remap_tables": {
+  "spring": {
+   "plain": {
+    "#1f1610": "#201b15",
+    "#2b1f16": "#27231b",
+    "#4d3724": "#4a3d22",
+    "#a59c88": "#aea48f",
+    "#201b15": "#27231b",
+    "#2a1410": "#2b1f16",
+    "#2b271f": "#312d25",
+    "#2a2720": "#312d25",
+    "#312d25": "#39332a",
+    "#27231b": "#2b271f",
+    "#311913": "#2b1f16"
+   },
+   "forest": {
+    "#162013": "#1c2415",
+    "#162a20": "#1a2e26",
+    "#141910": "#121c12",
+    "#0e160e": "#141910",
+    "#121c12": "#162013"
+   },
+   "swamp": {
+    "#0f0e0c": "#15120f",
+    "#0a0908": "#0f0e0c",
+    "#2e2c29": "#32302d",
+    "#3d3a36": "#3f443a",
+    "#2a3643": "#323b44",
+    "#3a4a5a": "#46515a",
+    "#1f1610": "#201b15",
+    "#2b1f16": "#27231b",
+    "#4d3724": "#4a3d22",
+    "#a59c88": "#aea48f",
+    "#323b44": "#38434c",
+    "#070a0f": "#100f13",
+    "#0b1118": "#14181c",
+    "#060507": "#0a0908",
+    "#15120f": "#1a1814",
+    "#201b15": "#27231b",
+    "#170d0b": "#15120f",
+    "#162a20": "#1a2e26",
+    "#2b271f": "#312d25",
+    "#0e160e": "#141910",
+    "#2a2720": "#312d25",
+    "#27231b": "#2a2720",
+    "#311913": "#2b1f16",
+    "#2a3944": "#323b44"
+   }
+  },
+  "summer": {
+   "plain": {
+    "#1f1610": "#201b15",
+    "#27231b": "#2b271f"
+   },
+   "forest": {},
+   "desert": {}
+  },
+  "autumn": {
+   "plain": {
+    "#a59c88": "#aea48f",
+    "#4e493d": "#634a30",
+    "#39332a": "#3b2a1c",
+    "#1a1814": "#201b15",
+    "#2a2720": "#2b271f",
+    "#312d25": "#3b2a1c",
+    "#27231b": "#2b1f16"
+   },
+   "forest": {
+    "#5f9a7a": "#a59c88",
+    "#3f6d57": "#7b735f",
+    "#2a4a3c": "#4e493d",
+    "#1a2e26": "#312d25",
+    "#162013": "#232015",
+    "#0d1813": "#1a1814",
+    "#162a20": "#2b271f",
+    "#141910": "#201b15",
+    "#1c2415": "#232015",
+    "#0e160e": "#1a1814",
+    "#121c12": "#232015",
+    "#34481f": "#5c4a22",
+    "#3f443a": "#4a3d22",
+    "#6f7566": "#7b735f"
+   },
+   "swamp": {
+    "#2e2c29": "#312d25",
+    "#3d3a36": "#39332a",
+    "#4f4b45": "#4e493d",
+    "#66615a": "#6f6858",
+    "#2a3643": "#2a333b",
+    "#3a4a5a": "#46515a",
+    "#2a4a3c": "#3f443a",
+    "#222930": "#2e2c29",
+    "#323b44": "#3d3a36",
+    "#46515a": "#4f4b45",
+    "#32302d": "#312d25",
+    "#0b1118": "#100f13",
+    "#2a333b": "#32302d",
+    "#38434c": "#3d3a36",
+    "#48545e": "#4f4b45",
+    "#0d1813": "#0e160e",
+    "#162a20": "#1c2415",
+    "#121c12": "#141910",
+    "#2a2720": "#2b271f",
+    "#3f443a": "#4e493d",
+    "#6f7566": "#7b735f",
+    "#2a3944": "#323b44",
+    "#3f5866": "#46515a"
+   }
+  },
+  "winter": {
+   "water": {
+    "#2a3643": "#323b44",
+    "#3a4a5a": "#48545e",
+    "#222930": "#2a333b",
+    "#323b44": "#38434c",
+    "#46515a": "#48545e",
+    "#2a333b": "#323b44",
+    "#38434c": "#46515a",
+    "#2a3944": "#38434c"
+   },
+   "plain": {
+    "#1f1610": "#2e2c29",
+    "#2b1f16": "#32302d",
+    "#3b2a1c": "#3d3a36",
+    "#4d3724": "#4f4b45",
+    "#634a30": "#66615a",
+    "#7d6040": "#857f75",
+    "#a59c88": "#aea48f",
+    "#7b735f": "#857f75",
+    "#4a3d22": "#4f4b45",
+    "#4e493d": "#66615a",
+    "#aea48f": "#d8cfbd",
+    "#39332a": "#4f4b45",
+    "#201b15": "#32302d",
+    "#2a1410": "#2e2c29",
+    "#1a1814": "#2e2c29",
+    "#2b271f": "#3d3a36",
+    "#232015": "#32302d",
+    "#2a2720": "#3d3a36",
+    "#312d25": "#3d3a36",
+    "#27231b": "#3d3a36",
+    "#311913": "#32302d"
+   },
+   "forest": {
+    "#5f9a7a": "#a59c88",
+    "#3f6d57": "#6f7566",
+    "#2a4a3c": "#3f443a",
+    "#1a2e26": "#32302d",
+    "#162013": "#2a2720",
+    "#0d1813": "#1a1814",
+    "#162a20": "#2e2c29",
+    "#141910": "#1a1814",
+    "#1c2415": "#2a2720",
+    "#0e160e": "#1a1814",
+    "#121c12": "#141910",
+    "#34481f": "#3f443a"
+   },
+   "swamp": {
+    "#0f0e0c": "#1a1814",
+    "#0a0908": "#15120f",
+    "#2e2c29": "#3d3a36",
+    "#3d3a36": "#4f4b45",
+    "#4f4b45": "#66615a",
+    "#2a3643": "#38434c",
+    "#3a4a5a": "#48545e",
+    "#1f1610": "#2a2720",
+    "#2b1f16": "#2e2c29",
+    "#3b2a1c": "#3d3a36",
+    "#4d3724": "#4f4b45",
+    "#634a30": "#66615a",
+    "#7d6040": "#857f75",
+    "#5f9a7a": "#a59c88",
+    "#3f6d57": "#6f7566",
+    "#2a4a3c": "#46515a",
+    "#1a2e26": "#32302d",
+    "#a59c88": "#aea48f",
+    "#7b735f": "#857f75",
+    "#5a5448": "#66615a",
+    "#4a3d22": "#4f4b45",
+    "#4e493d": "#4f4b45",
+    "#6f6858": "#857f75",
+    "#8f8672": "#857f75",
+    "#14181c": "#222930",
+    "#222930": "#2a333b",
+    "#323b44": "#38434c",
+    "#46515a": "#48545e",
+    "#32302d": "#3d3a36",
+    "#39332a": "#3d3a36",
+    "#070a0f": "#14181c",
+    "#0b1118": "#14181c",
+    "#060507": "#15120f",
+    "#15120f": "#1a1814",
+    "#201b15": "#2e2c29",
+    "#100f13": "#14181c",
+    "#1b1820": "#222930",
+    "#170d0b": "#1a1814",
+    "#2a1410": "#2a2720",
+    "#2a333b": "#323b44",
+    "#38434c": "#46515a",
+    "#0c120d": "#1a1814",
+    "#162013": "#2e2c29",
+    "#0d1813": "#1a1814",
+    "#162a20": "#32302d",
+    "#1a1814": "#2e2c29",
+    "#2b271f": "#32302d",
+    "#141910": "#2a2720",
+    "#1c2415": "#2e2c29",
+    "#0e160e": "#1a1814",
+    "#121c12": "#2a2720",
+    "#232015": "#2e2c29",
+    "#2a2720": "#32302d",
+    "#312d25": "#3d3a36",
+    "#27231b": "#2e2c29",
+    "#311913": "#2e2c29",
+    "#34481f": "#3f443a",
+    "#3f443a": "#4f4b45",
+    "#6f7566": "#857f75",
+    "#2a3944": "#38434c",
+    "#3f5866": "#48545e"
+   },
+   "desert": {
+    "#8a6c2e": "#93803f",
+    "#5c4a22": "#634a30",
+    "#6b5a30": "#7d6040",
+    "#7a5a24": "#7d6040"
+   },
+   "rock": {
+    "#0f0e0c": "#1a1814",
+    "#0a0908": "#1a1814",
+    "#2e2c29": "#3d3a36",
+    "#3d3a36": "#4f4b45",
+    "#4f4b45": "#66615a",
+    "#5a5448": "#66615a",
+    "#6f6858": "#857f75",
+    "#8f8672": "#a59c88",
+    "#32302d": "#3d3a36",
+    "#070a0f": "#14181c",
+    "#0b1118": "#14181c",
+    "#060507": "#15120f",
+    "#15120f": "#1a1814",
+    "#100f13": "#14181c",
+    "#170d0b": "#1a1814",
+    "#0c120d": "#1a1814"
+   },
+   "ash_waste": {
+    "#0f0e0c": "#1a1814",
+    "#0a0908": "#15120f",
+    "#2e2c29": "#3d3a36",
+    "#3d3a36": "#4f4b45",
+    "#4f4b45": "#66615a",
+    "#2a3643": "#38434c",
+    "#3a4a5a": "#48545e",
+    "#1f1610": "#27231b",
+    "#2b1f16": "#312d25",
+    "#3b2a1c": "#39332a",
+    "#4d3724": "#4e493d",
+    "#634a30": "#5a5448",
+    "#7d6040": "#7b735f",
+    "#3f6d57": "#6f7566",
+    "#2a4a3c": "#3f443a",
+    "#a59c88": "#aea48f",
+    "#7b735f": "#857f75",
+    "#5a5448": "#66615a",
+    "#4a3d22": "#4e493d",
+    "#4e493d": "#5a5448",
+    "#6f6858": "#857f75",
+    "#8f8672": "#a59c88",
+    "#14181c": "#222930",
+    "#222930": "#2a333b",
+    "#323b44": "#38434c",
+    "#46515a": "#48545e",
+    "#32302d": "#3d3a36",
+    "#39332a": "#3d3a36",
+    "#070a0f": "#14181c",
+    "#0b1118": "#14181c",
+    "#060507": "#15120f",
+    "#15120f": "#1a1814",
+    "#201b15": "#2a2720",
+    "#100f13": "#14181c",
+    "#1b1820": "#222930",
+    "#170d0b": "#1a1814",
+    "#2a1410": "#2b1f16",
+    "#2a333b": "#323b44",
+    "#38434c": "#46515a",
+    "#0c120d": "#1a1814",
+    "#162013": "#2a2720",
+    "#0d1813": "#1a1814",
+    "#162a20": "#1a2e26",
+    "#1a1814": "#2a2720",
+    "#2b271f": "#32302d",
+    "#141910": "#27231b",
+    "#1c2415": "#312d25",
+    "#0e160e": "#1a1814",
+    "#121c12": "#2a2720",
+    "#232015": "#2a2720",
+    "#2a2720": "#32302d",
+    "#312d25": "#3d3a36",
+    "#27231b": "#2e2c29",
+    "#311913": "#2b1f16",
+    "#34481f": "#3f443a",
+    "#3f443a": "#4f4b45",
+    "#6f7566": "#857f75",
+    "#2a3944": "#38434c",
+    "#3f5866": "#48545e"
+   }
+  }
+ },
+ "validation": {
+  "Z0": {
+   "class_px": {
+    "water": 43461,
+    "void": 29518,
+    "plain": 17549,
+    "forest": 954,
+    "swamp": 2146,
+    "desert": 1361,
+    "rock": 12310,
+    "snow_ice": 530,
+    "lava": 772,
+    "ash_waste": 2839
+   },
+   "base_colors": 38,
+   "spring": {
+    "colors": 42,
+    "changed_px": 11677,
+    "off_palette": 0
+   },
+   "summer": {
+    "colors": 39,
+    "changed_px": 2674,
+    "off_palette": 0
+   },
+   "autumn": {
+    "colors": 40,
+    "changed_px": 6227,
+    "off_palette": 0
+   },
+   "winter": {
+    "colors": 26,
+    "changed_px": 39169,
+    "off_palette": 0
+   }
+  },
+  "Z1-1": {
+   "class_px": {
+    "water": 57181,
+    "void": 4197,
+    "plain": 13962,
+    "forest": 140,
+    "swamp": 6608,
+    "desert": 0,
+    "rock": 27478,
+    "snow_ice": 1190,
+    "lava": 684,
+    "ash_waste": 0
+   },
+   "base_terrain_colors": 52,
+   "spring": {
+    "terrain_colors": 45,
+    "combined_with_overlay": 56
+   },
+   "summer": {
+    "terrain_colors": 50,
+    "combined_with_overlay": 61
+   },
+   "autumn": {
+    "terrain_colors": 47,
+    "combined_with_overlay": 58
+   },
+   "winter": {
+    "terrain_colors": 25,
+    "combined_with_overlay": 36
+   }
+  },
+  "Z1-2": {
+   "class_px": {
+    "water": 4387,
+    "void": 8,
+    "plain": 32054,
+    "forest": 855,
+    "swamp": 11570,
+    "desert": 1027,
+    "rock": 33711,
+    "snow_ice": 0,
+    "lava": 1735,
+    "ash_waste": 26093
+   },
+   "base_terrain_colors": 42,
+   "spring": {
+    "terrain_colors": 44,
+    "combined_with_overlay": 65
+   },
+   "summer": {
+    "terrain_colors": 42,
+    "combined_with_overlay": 63
+   },
+   "autumn": {
+    "terrain_colors": 42,
+    "combined_with_overlay": 63
+   },
+   "winter": {
+    "terrain_colors": 25,
+    "combined_with_overlay": 46
+   }
+  },
+  "Z1-3": {
+   "class_px": {
+    "water": 42294,
+    "void": 17890,
+    "plain": 21730,
+    "forest": 2216,
+    "swamp": 752,
+    "desert": 0,
+    "rock": 19039,
+    "snow_ice": 7207,
+    "lava": 241,
+    "ash_waste": 71
+   },
+   "base_terrain_colors": 44,
+   "spring": {
+    "terrain_colors": 42,
+    "combined_with_overlay": 62
+   },
+   "summer": {
+    "terrain_colors": 43,
+    "combined_with_overlay": 63
+   },
+   "autumn": {
+    "terrain_colors": 44,
+    "combined_with_overlay": 64
+   },
+   "winter": {
+    "terrain_colors": 23,
+    "combined_with_overlay": 43
+   }
+  },
+  "Z1-4": {
+   "class_px": {
+    "water": 15325,
+    "void": 158,
+    "plain": 50554,
+    "forest": 2786,
+    "swamp": 0,
+    "desert": 0,
+    "rock": 21101,
+    "snow_ice": 1,
+    "lava": 1171,
+    "ash_waste": 20344
+   },
+   "base_terrain_colors": 44,
+   "spring": {
+    "terrain_colors": 44,
+    "combined_with_overlay": 63
+   },
+   "summer": {
+    "terrain_colors": 44,
+    "combined_with_overlay": 63
+   },
+   "autumn": {
+    "terrain_colors": 40,
+    "combined_with_overlay": 59
+   },
+   "winter": {
+    "terrain_colors": 22,
+    "combined_with_overlay": 41
+   }
+  },
+  "Z1-5": {
+   "class_px": {
+    "water": 37932,
+    "void": 399,
+    "plain": 21463,
+    "forest": 8851,
+    "swamp": 0,
+    "desert": 0,
+    "rock": 42602,
+    "snow_ice": 0,
+    "lava": 193,
+    "ash_waste": 0
+   },
+   "base_terrain_colors": 43,
+   "spring": {
+    "terrain_colors": 33,
+    "combined_with_overlay": 53
+   },
+   "summer": {
+    "terrain_colors": 41,
+    "combined_with_overlay": 61
+   },
+   "autumn": {
+    "terrain_colors": 34,
+    "combined_with_overlay": 54
+   },
+   "winter": {
+    "terrain_colors": 20,
+    "combined_with_overlay": 40
+   }
+  },
+  "Z1-6": {
+   "class_px": {
+    "water": 52272,
+    "void": 542,
+    "plain": 29398,
+    "forest": 85,
+    "swamp": 0,
+    "desert": 419,
+    "rock": 16741,
+    "snow_ice": 0,
+    "lava": 2844,
+    "ash_waste": 9139
+   },
+   "base_terrain_colors": 46,
+   "spring": {
+    "terrain_colors": 46,
+    "combined_with_overlay": 63
+   },
+   "summer": {
+    "terrain_colors": 46,
+    "combined_with_overlay": 63
+   },
+   "autumn": {
+    "terrain_colors": 44,
+    "combined_with_overlay": 61
+   },
+   "winter": {
+    "terrain_colors": 26,
+    "combined_with_overlay": 43
+   }
+  },
+  "Z1-7": {
+   "class_px": {
+    "water": 34534,
+    "void": 2434,
+    "plain": 33882,
+    "forest": 959,
+    "swamp": 898,
+    "desert": 14820,
+    "rock": 11630,
+    "snow_ice": 0,
+    "lava": 1584,
+    "ash_waste": 10699
+   },
+   "base_terrain_colors": 48,
+   "spring": {
+    "terrain_colors": 47,
+    "combined_with_overlay": 62
+   },
+   "summer": {
+    "terrain_colors": 48,
+    "combined_with_overlay": 63
+   },
+   "autumn": {
+    "terrain_colors": 45,
+    "combined_with_overlay": 60
+   },
+   "winter": {
+    "terrain_colors": 29,
+    "combined_with_overlay": 44
+   }
+  },
+  "Z1-8a": {
+   "class_px": {
+    "water": 42786,
+    "void": 43561,
+    "plain": 15788,
+    "forest": 192,
+    "swamp": 717,
+    "desert": 0,
+    "rock": 8396,
+    "snow_ice": 0,
+    "lava": 0,
+    "ash_waste": 0
+   },
+   "base_terrain_colors": 48,
+   "spring": {
+    "terrain_colors": 41,
+    "combined_with_overlay": 49
+   },
+   "summer": {
+    "terrain_colors": 46,
+    "combined_with_overlay": 54
+   },
+   "autumn": {
+    "terrain_colors": 41,
+    "combined_with_overlay": 49
+   },
+   "winter": {
+    "terrain_colors": 21,
+    "combined_with_overlay": 30
+   }
+  },
+  "Z1-8b": {
+   "class_px": {
+    "water": 67434,
+    "void": 33312,
+    "plain": 4620,
+    "forest": 0,
+    "swamp": 0,
+    "desert": 0,
+    "rock": 6074,
+    "snow_ice": 0,
+    "lava": 0,
+    "ash_waste": 0
+   },
+   "base_terrain_colors": 35,
+   "spring": {
+    "terrain_colors": 28,
+    "combined_with_overlay": 39
+   },
+   "summer": {
+    "terrain_colors": 33,
+    "combined_with_overlay": 44
+   },
+   "autumn": {
+    "terrain_colors": 31,
+    "combined_with_overlay": 42
+   },
+   "winter": {
+    "terrain_colors": 16,
+    "combined_with_overlay": 27
+   }
+  }
+ }
+}
