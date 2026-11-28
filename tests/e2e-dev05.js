@@ -279,7 +279,7 @@ function sameCity(dom, want) {
   await fresh(page, base);
   const qs = await page.evaluate(() => {
     const G = window.SHL; const S = G.state; const day = G.dayOf(S.t);
-    // 造齊四種單：長期獵殺（起手固定單）、有期限獵殺（腐骨沼＝中高）、收集（無險級）、送貨（押金）
+    // 造齊四種單：長期獵殺（起手固定單）、有期限獵殺（腐骨沼＝高）、收集（無險級）、送貨（押金）
     S.quests = S.quests.filter((q) => q.town !== 'huiyao' || q.fixed);
     S.quests.push({ id: 'tq_leech', town: 'huiyao', kind: 'kill', enemy: 'leech', need: 2, g: '蛭', ic: 'leech', title: '獵殺沼蛭 ×2', reward: 34, due: day + 1, fixed: false, prog: 0, status: 'open' });
     S.quests.push({ id: 'tq_col', town: 'huiyao', kind: 'collect', item: 'herb_zx', need: 4, g: '草', ic: 'herb_zx', title: '收購止血草 ×4', reward: 18, due: day + 1, fixed: false, prog: 0, status: 'open' });
