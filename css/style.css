@@ -403,3 +403,250 @@ body.dragging, body.dragging * { cursor: grabbing !important; }
 .packgrid .cell > .gl, .groundgrid .cell > .gl { padding-bottom: 9px; }
 [data-testid=slot-bag] > .gl { padding-bottom: 10px; }
 .rcard .rmat > .gl { padding-bottom: 12px; }
+
+/* ============================================================
+ * v0.3：城鎮平面圖與建築內部、探查、勢力聲望、戰鬥行動列與演出、記事
+ * （以下規則覆寫上方同名規則）
+ * ============================================================ */
+.jade { color: var(--jade); }
+h3, h4 { margin: 10px 0 4px; font-size: 13px; color: var(--ink); border-bottom: 1px solid var(--line-soft); padding-bottom: 2px; }
+h4 { margin-top: 0; }
+.stc { display: inline-flex; width: 20px; height: 20px; align-items: center; justify-content: center; border: 1px solid var(--line); background: #100f0c; font-size: 11px; font-weight: 700; color: var(--red); flex: none; }
+.note { position: absolute; left: 0; width: 784px; font-size: 12px; line-height: 19px; color: var(--ink-2); }
+
+/* ---------- 左欄：戰鬥中的出手位、勢力聲望 ---------- */
+.cell.hand { border-color: var(--gold); box-shadow: 0 0 8px rgba(201, 162, 74, .55), inset 0 0 8px rgba(201, 162, 74, .25); cursor: pointer; }
+.cell.hand:hover { background: #2e2816; }
+.cell .hb { position: absolute; right: 1px; top: 1px; width: 14px; height: 14px; background: var(--gold); color: #171512; font-size: 10px; line-height: 14px; text-align: center; font-weight: 700; }
+.reps { position: absolute; left: 6px; top: 564px; width: 228px; height: 108px; }
+.rep { height: 34px; margin-bottom: 2px; border: 1px solid var(--line-soft); background: var(--cell); display: flex; align-items: center; gap: 6px; padding: 0 6px; cursor: help; }
+.rep .rn { width: 52px; font-size: 12px; white-space: nowrap; }
+.rep b { width: 20px; text-align: right; color: var(--gold); font-size: 13px; }
+.rep .pb { position: relative; flex: 1; height: 5px; border: 1px solid var(--line); background: #0f0e0c; }
+.rep .pb > i { position: absolute; left: 0; top: 0; bottom: 0; background: var(--gold); }
+.rep .rx { width: 26px; font-size: 10px; color: var(--ink-3); white-space: nowrap; }
+
+/* ---------- 右欄：狀態列、委託與傳聞（兩行大字） ---------- */
+.portrait .px { image-rendering: pixelated; }
+.strow { position: absolute; left: 8px; top: 141px; width: 204px; height: 22px; display: flex; align-items: center; gap: 3px; }
+.strow .stt { margin-left: auto; font-size: 11px; color: var(--ink-2); white-space: nowrap; }
+.jhead { position: absolute; left: 8px; width: 204px; height: 16px; display: flex; justify-content: space-between; align-items: center; cursor: pointer; font-size: 12px; }
+.jhead b { color: var(--ink); }
+.jhead:hover b { color: var(--gold); }
+.jent { position: absolute; left: 8px; width: 204px; height: 32px; border: 1px solid var(--line-soft); background: var(--cell); display: flex; align-items: center; gap: 6px; padding: 0 5px; cursor: pointer; }
+.jent:hover { border-color: var(--gold); }
+.jent.sub { cursor: default; font-size: 12px; }
+.jent.done { border-color: var(--jade); }
+.jent.rum { border-color: #4a2a25; }
+.jent .jt { flex: 1; min-width: 0; line-height: 14px; }
+.jent .jt b { display: block; font-size: 12px; white-space: nowrap; }
+.jent .jt .js { display: block; font-size: 11px; color: var(--ink-3); white-space: nowrap; }
+.jent .rw { font-size: 12px; font-weight: 700; color: var(--gold); white-space: nowrap; }
+.jent .rw.red { color: var(--red); }
+
+/* ---------- 出身 ---------- */
+.ocard .oface { position: absolute; right: 12px; top: 12px; width: 52px; height: 52px; border: 1px solid var(--line); background: #100f0c; display: flex; align-items: center; justify-content: center; }
+
+/* ---------- 世界地圖 ---------- */
+.map { background-color: #100f0c; background-size: 100% 100%; }
+.region { color: rgba(216, 207, 189, .2); text-shadow: 0 1px 0 rgba(0, 0, 0, .5); pointer-events: none; }
+.legend { background: rgba(16, 15, 12, .9); }
+.mapsw { position: absolute; right: 8px; top: 8px; z-index: 6; height: 24px; background: rgba(16, 15, 12, .92); border-color: var(--gold); color: var(--gold); }
+.mnode { background: rgba(23, 21, 18, .92); }
+.mnode.secret { border-style: dashed; }
+.mlabel { background: rgba(16, 15, 12, .92); }
+.exd { position: absolute; width: 68px; height: 6px; display: flex; justify-content: center; gap: 3px; z-index: 3; pointer-events: none; }
+.exd i { width: 6px; height: 6px; border: 1px solid #6e6656; background: rgba(11, 10, 8, .8); }
+.exd i.on { background: var(--gold); border-color: var(--gold); }
+.departbar .dhint { flex: 1; }
+.departbar .dexp { height: 36px; margin-left: auto; }
+.departbar .dexp + .go { margin-left: 0; }
+.map.cont { background: #070605; }
+.contmap { position: absolute; left: 58px; top: 6px; width: 680px; height: 540px; background-color: #0b0a08; background-size: 100% 100%; }
+.cchip { position: absolute; width: 72px; height: 20px; border: 1px solid var(--line); background: rgba(16, 15, 12, .88); font-family: var(--serif); font-size: 12px; display: flex; align-items: center; justify-content: center; cursor: help; white-space: nowrap; }
+.cchip.on { border-color: var(--gold); color: var(--gold); font-weight: 700; }
+.chere { position: absolute; width: 80px; height: 18px; background: var(--gold); color: #171512; font-size: 11px; font-weight: 700; display: flex; align-items: center; justify-content: center; white-space: nowrap; }
+.ccap { position: absolute; left: 8px; bottom: 6px; height: 20px; padding: 0 8px; background: rgba(11, 10, 8, .85); border: 1px solid var(--line-soft); font-size: 11px; color: var(--ink-2); display: flex; align-items: center; white-space: nowrap; z-index: 5; }
+
+/* ---------- 城鎮：平面圖（街上） ---------- */
+.plan { position: absolute; left: 0; top: 0; width: 796px; height: 520px; background: var(--hatch); background-size: 100% 100%; border-bottom: 1px solid var(--line-soft); overflow: hidden; }
+.pname2 { position: absolute; left: 6px; top: 6px; height: 26px; padding: 0 14px; border: 1px solid var(--gold); background: rgba(16, 15, 12, .92); color: var(--gold); font-family: var(--serif); font-size: 15px; font-weight: 700; letter-spacing: 3px; display: flex; align-items: center; z-index: 4; white-space: nowrap; }
+.plan .leave, .wildscene .leave { top: 6px; bottom: auto; right: 6px; width: auto; height: 26px; z-index: 4; }
+.bld span { gap: 6px; }
+.bld em { font-style: normal; font-size: 10px; color: var(--ink-3); }
+.bld:hover em { color: var(--gold-d); }
+.bld .bmark, .fig .bmark { font-style: normal; width: 14px; height: 14px; background: var(--gold); color: #171512; font-size: 11px; font-weight: 700; display: inline-flex; align-items: center; justify-content: center; margin-left: 4px; }
+.bld.gate span { border-style: dashed; color: var(--ink-2); }
+.fig { position: absolute; width: 32px; height: 32px; cursor: pointer; z-index: 3; }
+.fig .px { filter: drop-shadow(0 2px 1px rgba(0, 0, 0, .7)); }
+.fig > span { position: absolute; left: 50%; top: 34px; transform: translateX(-50%); height: 16px; padding: 0 6px; border: 1px solid var(--line); background: rgba(16, 15, 12, .9); font-size: 11px; display: flex; align-items: center; white-space: nowrap; }
+.fig:hover > span, .fig.on > span { border-color: var(--gold); color: var(--gold); }
+.fig:hover .px { filter: drop-shadow(0 0 4px rgba(201, 162, 74, .9)); }
+.sdlg { position: absolute; left: 98px; top: 392px; width: 600px; height: 120px; border: 1px solid var(--gold); background: rgba(19, 18, 16, .97); box-shadow: 0 6px 20px rgba(0, 0, 0, .7); z-index: 6; }
+.sface { position: absolute; left: 10px; top: 10px; width: 76px; height: 76px; border: 1px solid var(--line); background: #100f0c; display: flex; align-items: center; justify-content: center; }
+.nofc { font-family: var(--serif); font-size: 28px; color: var(--gold); }
+.sname { position: absolute; left: 10px; top: 92px; width: 76px; text-align: center; white-space: nowrap; }
+.sname b { font-size: 12px; }
+.sname .sub { display: none; }
+.stext { position: absolute; left: 98px; top: 10px; width: 490px; height: 66px; font-size: 13px; line-height: 21px; color: var(--ink); }
+.sbtns { position: absolute; left: 98px; top: 84px; display: flex; gap: 6px; }
+.townbar { position: absolute; left: 6px; top: 526px; width: 782px; height: 40px; border: 1px solid var(--line); background: var(--cell); display: flex; align-items: center; gap: 8px; padding: 0 8px; }
+.townbar .tdesc { flex: 1; font-size: 12px; white-space: nowrap; }
+.townbar .btn { height: 28px; }
+
+/* ---------- 城鎮：建築內部 ---------- */
+.bhead { position: absolute; left: 0; top: 0; width: 796px; height: 132px; border-bottom: 1px solid var(--line-soft); background: linear-gradient(#1f1c17, #171512); }
+.bface { position: absolute; left: 10px; top: 10px; width: 104px; height: 104px; border: 1px solid var(--gold-d); background: #100f0c; display: flex; align-items: center; justify-content: center; }
+.btitle { position: absolute; left: 126px; top: 10px; width: 170px; }
+.btitle b { display: block; font-family: var(--serif); font-size: 18px; color: var(--gold); letter-spacing: 2px; white-space: nowrap; }
+.btitle > span { display: block; font-size: 12px; color: var(--ink-2); white-space: nowrap; margin-top: 3px; }
+.btitle .bfac { display: flex; align-items: center; gap: 4px; color: var(--ink-3); margin-top: 6px; }
+.bsay { position: absolute; left: 304px; top: 12px; width: 372px; height: 104px; border: 1px solid var(--line); background: #100f0c; padding: 8px 12px; font-size: 13px; line-height: 21px; }
+.bsay::before { content: ""; position: absolute; left: -7px; top: 22px; width: 12px; height: 12px; background: #100f0c; border-left: 1px solid var(--line); border-bottom: 1px solid var(--line); transform: rotate(45deg); }
+.bbtns { position: absolute; right: 8px; top: 12px; width: 96px; display: flex; flex-direction: column; gap: 8px; }
+.bbtns .btn { height: 36px; }
+.tpanel { top: 138px; height: 498px; }
+.ibox { width: 254px; }
+.ibox.dis { border-style: dashed; color: var(--ink-3); cursor: default; }
+.cell.rlock { opacity: .55; }
+.rrow { position: absolute; left: 0; width: 784px; height: 30px; border: 1px solid var(--line-soft); background: var(--cell); display: flex; align-items: center; gap: 8px; padding: 0 6px 0 10px; }
+.rrow .rtx { flex: 1; font-size: 12px; white-space: nowrap; }
+.rrow .btn { height: 22px; }
+.hint { color: var(--jade); }
+.rcardL { position: absolute; left: 0; width: 784px; height: 56px; border: 1px solid var(--line-soft); background: var(--cell); padding: 5px 10px; }
+.rcardL b { display: block; font-size: 12px; }
+.rcardL > span { display: block; font-size: 12px; line-height: 16px; white-space: nowrap; }
+.dcard { position: absolute; width: 254px; height: 50px; border: 1px solid var(--line); background: var(--cell); display: flex; align-items: center; gap: 8px; padding: 0 8px; }
+.dcard.wide { width: 778px; height: 56px; }
+.dcard .bt { flex: 1; min-width: 0; }
+.dcard .bt b, .dcard .bt > span { display: block; white-space: nowrap; }
+
+/* ---------- 配方卡（精簡，一列五張） ---------- */
+.recipes { height: 118px; }
+.rcard { top: 24px; width: 150px; height: 88px; }
+.rcard .ric { left: 6px; top: 6px; width: 38px; height: 38px; }
+.rcard .rnm { left: 50px; top: 6px; font-size: 12px; white-space: nowrap; }
+.rcard .ref { left: 50px; top: 25px; white-space: nowrap; }
+.rcard .rmat { left: 6px; top: 50px; width: 32px; height: 32px; }
+.rcard .rarr { left: 44px; top: 56px; }
+.rcard .rmk { right: 6px; top: 50px; width: 78px; height: 32px; padding: 0; }
+
+/* ---------- 荒野、地城 ---------- */
+.gbtn { width: auto; flex: 1; min-width: 0; }
+.gbtn.off { border-style: dashed; color: var(--ink-3); }
+.gbtn.off .px { opacity: .35; }
+.floors { left: 60px; width: 676px; gap: 12px; }
+.floor { width: auto; flex: 1; }
+.dgdesc { left: 60px; }
+.dgact .btn.gold, .dgact .btn.dis { font-weight: 400; }
+
+/* ---------- 戰鬥：舞台、狀態牌、行動列、演出 ---------- */
+.cstage { height: 470px; overflow: hidden; }
+.cflash { position: absolute; left: 0; top: 0; right: 0; bottom: 0; background: radial-gradient(ellipse at 50% 60%, rgba(200, 70, 58, 0) 40%, rgba(200, 70, 58, .55)); opacity: 0; pointer-events: none; z-index: 5; }
+.cflash.on { animation: cflash .45s ease-out; }
+@keyframes cflash { 0% { opacity: 1; } 100% { opacity: 0; } }
+.cstage.shake { animation: cshake .28s; }
+.cstage.shake2 { animation: cshake2 .4s; }
+@keyframes cshake { 0%, 100% { transform: translate(0, 0); } 25% { transform: translate(-5px, 2px); } 50% { transform: translate(4px, -2px); } 75% { transform: translate(-2px, 1px); } }
+@keyframes cshake2 { 0%, 100% { transform: translate(0, 0); } 15% { transform: translate(-10px, 4px); } 35% { transform: translate(9px, -4px); } 55% { transform: translate(-6px, 3px); } 75% { transform: translate(4px, -1px); } }
+.enemy { top: 40px; height: 380px; }
+.enemy .est { position: absolute; left: 0; width: 200px; top: 46px; height: 16px; display: flex; justify-content: center; gap: 2px; }
+.enemy .est .stc { width: 16px; height: 16px; border: 0; background: transparent; }
+.enemy .intent { top: 66px; }
+.enemy .intent.poison { border-color: #8c6fb0; color: #c9b3e6; }
+.enemy .body { top: 138px; transition: transform .12s; }
+.enemy::after { top: 320px; }
+.enemy.hit .body { animation: ehit .3s; }
+@keyframes ehit { 0% { transform: translateX(0); filter: brightness(3) drop-shadow(0 6px 4px rgba(0, 0, 0, .6)); } 30% { transform: translateX(-10px); } 60% { transform: translateX(8px); filter: brightness(1.4) drop-shadow(0 6px 4px rgba(0, 0, 0, .6)); } 100% { transform: translateX(0); } }
+.enemy.lunge .body { animation: elunge .34s; }
+@keyframes elunge { 0% { transform: translateY(0) scale(1); } 45% { transform: translateY(26px) scale(1.16); } 100% { transform: translateY(0) scale(1); } }
+.enemy.dying { transition: opacity .45s, filter .45s; opacity: .2; filter: grayscale(1); }
+.fxs { position: absolute; left: 28px; top: 150px; width: 144px; height: 144px; z-index: 4; animation: fxpop .34s ease-out forwards; }
+.fxc { position: absolute; left: 302px; top: 150px; width: 192px; height: 192px; z-index: 6; animation: fxpop .4s ease-out forwards; }
+@keyframes fxpop { 0% { opacity: 0; transform: scale(.5) rotate(-12deg); } 25% { opacity: 1; transform: scale(1.1) rotate(0); } 100% { opacity: 0; transform: scale(1.25); } }
+.fnum { position: absolute; left: 0; right: 0; top: 150px; text-align: center; font-size: 22px; font-weight: 700; color: #fff; text-shadow: 0 0 4px #000, 0 2px 0 #000, 2px 0 0 #000, -2px 0 0 #000; pointer-events: none; z-index: 7; white-space: nowrap; animation: fnum .9s ease-out forwards; }
+.fnum.crit { font-size: 30px; color: var(--gold); }
+.fnum.bad { color: #ff8a7a; }
+.fnum.miss, .fnum.txt { font-size: 16px; color: var(--ink); }
+.fnum.txt.bad, .fnum.bad.txt { color: #ff8a7a; }
+.fnum.heal { color: #8fd6a8; }
+.fnum.dot { font-size: 17px; color: #c9b3e6; }
+@keyframes fnum { 0% { opacity: 0; transform: translateY(10px) scale(.7); } 15% { opacity: 1; transform: translateY(0) scale(1.15); } 30% { transform: translateY(-6px) scale(1); } 100% { opacity: 0; transform: translateY(-54px); } }
+.plate { position: absolute; left: 8px; top: 398px; width: 262px; height: 64px; border: 1px solid var(--gold-d); background: rgba(16, 15, 12, .92); z-index: 4; }
+.plate .fnum { top: -34px; }
+.pface { position: absolute; left: 6px; top: 6px; width: 52px; height: 52px; border: 1px solid var(--line); background: #0b0a08; display: flex; align-items: center; justify-content: center; }
+.pbars { position: absolute; left: 66px; top: 7px; width: 188px; height: 30px; }
+.php { position: absolute; left: 0; top: 0; width: 130px; height: 12px; border: 1px solid #000; background: #0f0e0c; }
+.php > i { position: absolute; left: 0; top: 0; bottom: 0; background: var(--hp); transition: width .2s; }
+.phpn { position: absolute; left: 136px; top: -2px; font-size: 12px; font-weight: 700; white-space: nowrap; }
+.pfat { position: absolute; left: 0; top: 18px; width: 130px; height: 6px; border: 1px solid #000; background: #0f0e0c; }
+.pfat > i { position: absolute; left: 0; top: 0; bottom: 0; background: var(--fat); }
+.pfatn { position: absolute; left: 136px; top: 13px; font-size: 11px; color: var(--ink-2); white-space: nowrap; }
+.pst { position: absolute; left: 66px; top: 38px; height: 20px; display: flex; gap: 2px; }
+.enemy .ehp > i { transition: width .2s; }
+.chint { left: 8px; top: 478px; width: 780px; height: 38px; border: 1px solid var(--line-soft); background: #100f0c; padding: 0 10px; display: flex; align-items: center; font-size: 12px; color: var(--ink-2); white-space: nowrap; overflow: hidden; }
+.rbar { top: 476px; }
+.abar { top: 522px; height: 60px; gap: 4px; align-items: stretch; }
+.act { width: 54px; height: 60px; flex: none; justify-content: flex-start; padding-top: 6px; gap: 1px; }
+.act .px { width: 30px; height: 30px; }
+.act .gl { font-size: 18px; line-height: 30px; height: 30px; font-weight: 700; }
+.act .an { font-size: 10px; line-height: 13px; color: var(--ink-2); white-space: nowrap; }
+.act .k { left: 2px; top: 0; }
+.act .c { right: 2px; top: 0; }
+.act .c.ft { color: var(--fat); font-weight: 400; }
+.act .cd { position: absolute; left: 0; top: 0; right: 0; bottom: 0; background: rgba(11, 10, 8, .78); color: var(--ink); font-size: 22px; font-weight: 700; display: flex; align-items: center; justify-content: center; }
+.act.k-attack { border-color: var(--gold); }
+.act.k-tech, .act.k-skill { border-color: #6b5a8c; }
+.act.k-item { border-color: #3d6a55; }
+.act.locked .px, .act.locked .gl { opacity: .25; filter: grayscale(1); }
+.act[disabled] .px { opacity: .4; }
+.act.retreat { width: 64px; margin-left: auto; }
+
+/* ---------- 記事／人物面板 ---------- */
+.jtabs { display: flex; gap: 6px; margin-bottom: 8px; }
+.jtabs button { height: 26px; padding: 0 14px; border: 1px solid var(--line); background: #100f0c; color: var(--ink-2); }
+.jtabs button.on { border-color: var(--gold); color: var(--gold); font-weight: 700; background: #2a2416; }
+.jbody { height: 536px; overflow-y: auto; padding-right: 8px; }
+.jtabs + .jbody { height: 502px; }
+.jrow { display: flex; gap: 12px; align-items: flex-start; border: 1px solid var(--line-soft); background: var(--cell); padding: 8px 10px; margin-bottom: 6px; font-size: 13px; }
+.jrow.done { border-color: var(--jade); }
+.jrow p { margin: 3px 0 0; font-size: 12px; line-height: 19px; color: var(--ink-2); }
+.jrow p.jade { color: var(--jade); }
+.cx { border-left: 2px solid var(--gold-d); padding: 2px 0 2px 10px; margin: 6px 0; }
+.cx b { font-family: var(--serif); font-size: 14px; color: var(--gold); }
+.cx p { margin: 2px 0 0; font-size: 13px; line-height: 21px; color: var(--ink); }
+.cx.unk { border-left-color: var(--line-soft); }
+.cx.unk b { color: var(--ink-3); font-family: inherit; font-size: 12px; }
+.ctechs { display: grid; grid-template-columns: repeat(3, 1fr); gap: 4px; }
+.ctech { display: flex; gap: 8px; align-items: flex-start; border: 1px solid var(--line-soft); padding: 4px 6px; opacity: .55; }
+.ctech.got { opacity: 1; border-color: var(--line); background: var(--cell); }
+.ctech b { font-size: 12px; }
+.ctech em { font-style: normal; font-size: 10px; color: var(--ink-3); margin-left: 6px; }
+.ctech span { display: block; font-size: 11px; line-height: 15px; color: var(--ink-2); }
+.cprofs { height: auto; overflow: visible; }
+.cgrp h3 { display: none; }
+
+/* 路人對話框開著時，收起平面圖上的名牌，避免和對話重疊 */
+.plan.mute .bld span, .plan.mute .fig > span { display: none; }
+.plan.mute .bld { pointer-events: none; }
+.act .cd { bottom: auto; height: 40px; }
+
+/* ---------- v0.3.1：勢力欄（可容納任意數量）、勢力總覽 ---------- */
+.lhead[data-a] { cursor: pointer; }
+.lhead .lnk { color: var(--ink-3); }
+.lhead[data-a]:hover .lnk, .lhead[data-a]:hover b { color: var(--gold); }
+.reps { top: 564px; height: 108px; overflow-y: auto; overflow-x: hidden; scrollbar-width: thin; scrollbar-color: var(--line) transparent; }
+.rep { height: 20px; margin-bottom: 2px; gap: 5px; padding: 0 5px; cursor: pointer; }
+.rep:hover { border-color: var(--gold); }
+.rep .gl { width: 16px; text-align: center; font-size: 11px; font-weight: 700; color: var(--ink-2); }
+.rep .rn { width: auto; flex: none; max-width: 76px; overflow: hidden; font-size: 11px; }
+.rep .pb { height: 4px; }
+.rep b { width: 22px; font-size: 12px; }
+.fcard { display: flex; gap: 12px; border: 1px solid var(--line-soft); background: var(--cell); padding: 10px 12px; margin-bottom: 8px; }
+.fic { width: 44px; height: 44px; flex: none; border: 1px solid var(--line); background: #100f0c; display: flex; align-items: center; justify-content: center; font-size: 18px; font-weight: 700; color: var(--gold); }
+.fbd { flex: 1; font-size: 13px; }
+.fbd p { margin: 4px 0 0; font-size: 12px; line-height: 19px; color: var(--ink-2); }
+.fbd p.sub { color: var(--ink-3); }
+.fperks { display: flex; gap: 6px; margin-top: 6px; flex-wrap: wrap; }
+.fperks span { border: 1px solid var(--line-soft); padding: 1px 8px; font-size: 11px; color: var(--ink-3); }
+.fperks span.got { border-color: var(--jade); color: var(--jade); }
