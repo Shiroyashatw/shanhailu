@@ -486,6 +486,66 @@ window.SHL_DATA = (function () {
     REFUGEE0: { camp: 60, inTotal: 0, settledTotal: 0, soldTotal: 0, soldToday: 0, soldYday: 0 },
   };
 
+  // ===== 題材文字表（DEV-05；可替換資料檔） =====
+  // 假設：分檔檔名與切點待 mumi（製作人 16:46 裁決第 1 項）；本包先集中放在這一處，ui.js 只讀這張表，不寫死句子。
+  // 來源：city.* ＝ docs/design/batch1/city-status-copy-v0.1.csv（字串 key 照 CSV）；map.* ＝ UI-02/wording-map-commission.md §1；
+  //       quest.* ＝ wording-map §2；腳程懸浮＝mumi 原句（16:29 拍板、16:46 裁決第 1 項）。駐軍四檔名在 WORLD.GARRISON_NAMES（DEV-02），不在此重複。
+  // {名稱} 為代入欄位，名稱對齊 brief 欄位（SPEC-01 §7.6）。
+  const TEXT = {
+    city: {
+      title: '城況', collapse: '收合',
+      label: { prosperity: '繁榮', order: '治安', treasury: '財庫', garrison: '駐軍', bandit: '匪勢' },
+      // §7.1 換算：值 < 上界即落在該檔（最後一檔上界 Infinity）
+      prosperity: [[25, '荒涼'], [40, '冷清'], [60, '平常'], [75, '熱鬧'], [Infinity, '繁華']],
+      order: [[25, '混亂'], [45, '不安'], [65, '尚可'], [85, '安穩'], [Infinity, '太平']],
+      bandit: [[15, '絕跡'], [35, '零星'], [60, '猖獗'], [Infinity, '橫行']],
+      trend: { up: '較昨日升', down: '較昨日降', flat: '與昨日持平' },
+      delta: { up: '較昨日+{N}', down: '較昨日−{N}', flat: '與昨日持平' },
+      arrow: { up: '↑', down: '↓', flat: '' },
+      treasury: { debt: '欠餉', full: '滿庫', tight: '吃緊', ok: '足餉' },
+      treasuryIn: '今日收入{treasuryIn}兩', treasuryOut: '今日支出{treasuryOut}兩', treasuryNet: '今日淨額{treasuryNet}兩',
+      treasuryAmount: '現額{T}兩', taxcut: '稅收抽成，餘{taxCutDays}天',
+      rescue: '已求援，得銀{rescueAmt}兩',
+      garrisonAid: '資助加派中，餘{aidDaysLeft}天', garrisonDebt: '欠餉，降一檔',
+      why: {
+        WHY_TIDE: '繁榮{trend}，因獸潮壓境', WHY_HURT: '繁榮{trend}，因獸潮過後鎮上受創', WHY_REPEL: '繁榮{trend}，因擊退獸潮',
+        WHY_DEBT: '繁榮{trend}，因欠餉，駐軍降一檔', WHY_BANDIT: '繁榮{trend}，因匪勢{bandit}', WHY_RENLU: '繁榮{trend}，因難民被販走',
+        WHY_AID: '繁榮{trend}，因資助巡邏加派駐軍', WHY_ORDER_UP: '繁榮{trend}，因治安轉好', WHY_ORDER_DOWN: '繁榮{trend}，因治安轉差',
+        WHY_REVERT: '繁榮{trend}，因市面回穩', WHY_NONE: '繁榮{trend}，因市面小起落',
+      },
+      // 交易稅率顯示（SPEC-01 §4.3 5%；草稿 UI-02-02 展開末行）。數字由 WORLD.TRADE_TAX 代入
+      tradeTax: '交易稅 {pct}%',
+      // 假設：第一次日結（00:00）之前 brief 還是空的；SPEC 未定這時要顯示什麼，本包不自行補算，只顯示這兩句
+      pendingTier: '待日結', pending: '第一次日結（00:00）後才有今日收支',
+      // 原本放在鎮上說明列的兩句（沿用原文，只搬位置到平面圖頂端警示條，對照 UI-02-03）
+      hurt: '獸潮過後一片狼藉：貨架剩一半、客棧漲價。', tide: '獸潮期間，藥水漲價五成。',
+      toggleHint: '點開看收支、駐軍與匪勢',
+    },
+    // 地圖趕路（底列與圖上氣泡同一套詞；wording-map §1）
+    map: {
+      hours: '路程', food: '飽食', fat: '疲累', risk: '危險', speed: '腳程',
+      hoursVal: '{hours} 小時', foodVal: '−{food}', fatVal: '+{fat}', speedVal: '×{mult}',
+      bubble1: '路程 {hours} 小時・飽食 −{food}', bubble2: '疲累 +{fat}・危險 {riskName}',
+      // 懸浮說明：腳程為 mumi 原句；其餘四句為 wording-map §1 擬案（路程一句把「時辰」改「時數」，見 PR 說明）
+      hint: {
+        hours: '依這條路線的基礎時數與目前負重算出，是這次出發會耗掉的時數。',
+        food: '趕路會消耗飽食；降到過低時，生命不再回復。',
+        fat: '趕路會累積疲累；過高時命中與趕路都會變慢。',
+        risk: '這條路上遇襲的高低；夜間、負重過高或走野徑時較容易遇險。',
+        speed: '負重、裝備與疲累會影響趕路速度',
+      },
+    },
+    // 鎮公所委託單（wording-map §2）
+    quest: {
+      target: '目標', reward: '報酬', whereHere: '送到此地交付', whereBring: '帶回此地交付', due: '時限', risk: '風險',
+      rewardVal: '{reward} 兩', depositVal: '・押金 {deposit} 兩',
+      dueLong: '長期', dueToday: '今日截止', dueLeft: '剩 {n} 天',
+      riskVal: '危險 {level}', riskNone: '危險 未定',
+      failDeadline: '逾期則撕榜', failDeposit: '逾期押金沒收', failNone: '失敗罰則未定',
+      take: '揭榜', deliver: '交付', claimed: '已交付', delivering: '送達', progress: '進度 {a}/{b}',
+    },
+  };
+
   // ---------- 營火／藥爐配方 ----------
   const RECIPES = [
     { id: 'r_hp', out: 'pot_hp', g: '創', name: '金創藥水', eff: '命 +30', mat: 'herb_zx', n: 2, where: '營火／藥爐', fireOnly: false, h: 1 },
@@ -569,5 +629,5 @@ window.SHL_DATA = (function () {
   const SLOT_NAMES = { main: '主手', off: '副手', head: '頭盔', chest: '胸甲', gloves: '手套', boots: '靴子', amulet: '護身符', ring1: '左戒', ring2: '右戒', belt: '腰帶', bag: '背包', cart: '馬車' };
   const SLOT_GLYPH = { main: '刃', off: '盾', head: '冠', chest: '甲', gloves: '手', boots: '靴', amulet: '符', ring1: '戒', ring2: '戒', belt: '帶', bag: '囊', cart: '車' };
 
-  return { ITEMS, SKILLS, TECHS, BASES, AFFIXES, UNIQUES, LEGENDS, RARITY, ENEMIES, NODES, EDGES, REGION_LABELS, WILDS, DUNGEONS, PRICES, PLACES, BUILDINGS, ITEM_CLASS, NPCS, FACTIONS, EXPLORE, CODEX_CATS, BOUNTIES, QUEST_GEN, RUMOR, TIDE, SLEEP, WORLD, RECIPES, EVENTS, ATTRS, PROFS, PROF_GROUPS, WTYPE_NAMES, ORIGINS, SEASONS, YEAR_NAMES, EQ_SLOTS, SLOT_NAMES, SLOT_GLYPH };
+  return { ITEMS, SKILLS, TECHS, BASES, AFFIXES, UNIQUES, LEGENDS, RARITY, ENEMIES, NODES, EDGES, REGION_LABELS, WILDS, DUNGEONS, PRICES, PLACES, BUILDINGS, ITEM_CLASS, NPCS, FACTIONS, EXPLORE, CODEX_CATS, BOUNTIES, QUEST_GEN, RUMOR, TIDE, SLEEP, WORLD, TEXT, RECIPES, EVENTS, ATTRS, PROFS, PROF_GROUPS, WTYPE_NAMES, ORIGINS, SEASONS, YEAR_NAMES, EQ_SLOTS, SLOT_NAMES, SLOT_GLYPH };
 })();

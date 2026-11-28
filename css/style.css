@@ -650,3 +650,59 @@ h4 { margin-top: 0; }
 .fperks { display: flex; gap: 6px; margin-top: 6px; flex-wrap: wrap; }
 .fperks span { border: 1px solid var(--line-soft); padding: 1px 8px; font-size: 11px; color: var(--ink-3); }
 .fperks span.got { border-color: var(--jade); color: var(--jade); }
+
+/* ---------- DEV-05 城況簡報（UI-02-01／02／03；套現有色票，不照灰階稿白底） ---------- */
+.citybox { position: absolute; left: 6px; top: 526px; width: 782px; height: 56px; border: 1px solid var(--line); background: var(--cell); z-index: 6; }
+.citybox.open { top: 440px; height: 262px; box-shadow: 0 -4px 12px rgba(0, 0, 0, .55); }
+.citybox.alarm { border-color: var(--red); }
+.citybox .crow { display: flex; align-items: center; gap: 8px; height: 54px; padding: 0 6px; }
+.citybox .ctog { width: 56px; height: 44px; font-family: var(--serif); font-size: 15px; font-weight: 700; color: var(--gold); border-color: var(--gold-d); flex: none; }
+.citybox.alarm .ctog { color: var(--red); border-color: var(--red); }
+.ctile { flex: 1; min-width: 0; height: 44px; border: 1px solid var(--line); background: #100f0c; display: flex; align-items: center; gap: 10px; padding: 0 10px; white-space: nowrap; overflow: hidden; }
+.ctile .cl { font-size: 12px; color: var(--ink-2); }
+.ctile .cv { font-size: 16px; font-weight: 700; color: var(--ink); font-family: var(--serif); }
+.ctile .car { font-style: normal; margin-left: 4px; color: var(--gold); }
+.ctile .cs { margin-left: auto; font-size: 13px; color: var(--ink-2); }
+.ctile.bad { border-color: var(--red); }
+.ctile.bad .cv, .ctile.bad .car { color: var(--red); }
+.citybox .cexp, .citybox .cclose { width: 112px; height: 44px; font-size: 14px; flex: none; }
+.citybox .cnone { flex: 1; padding-left: 8px; }
+.citybox .cnone { overflow: hidden; text-overflow: ellipsis; font-size: 12px; }
+.cdetail { border-top: 1px solid var(--line-soft); padding: 6px 12px; }
+.cline { display: flex; gap: 20px; font-size: 15px; line-height: 28px; white-space: nowrap; }
+.cline.cwhy { color: var(--ink); font-family: var(--serif); }
+.cline.dim { font-size: 14px; color: var(--ink-2); }
+.crescue { height: 30px; border: 1px solid var(--red); background: var(--red-d); color: #ffd9d2; font-size: 15px; font-weight: 700; display: flex; align-items: center; padding: 0 10px; margin-bottom: 4px; }
+.cwarn { position: absolute; left: 200px; top: 6px; width: 396px; height: 26px; border: 1px solid var(--red); background: rgba(16, 15, 12, .92); color: var(--red); font-size: 13px; font-weight: 700; display: flex; align-items: center; justify-content: center; z-index: 4; white-space: nowrap; }
+
+/* ---------- DEV-05 地圖趕路用詞（UI-02-05） ---------- */
+.departbar .dname { width: 112px; }
+.departbar .vpill { width: 84px; height: 44px; flex-direction: column; align-items: flex-start; justify-content: center; gap: 0; padding: 0 6px; cursor: help; }
+.departbar .vpill .vl { font-size: 11px; color: var(--ink-2); border-bottom: 1px dotted var(--ink-3); line-height: 14px; }
+.departbar .vpill b { font-size: 14px; line-height: 20px; }
+.departbar .vpill.hot .vl { color: var(--red); border-bottom-color: var(--red); }
+.tipbubble.two { display: block; height: auto; text-align: center; line-height: 18px; padding: 2px 8px; font-size: 12px; }
+.hintbox { position: absolute; right: 6px; top: 38px; width: 300px; border: 1px solid var(--gold); background: #100f0c; padding: 8px 10px; z-index: 6; pointer-events: none; box-shadow: 0 4px 12px rgba(0, 0, 0, .7); }
+.hintbox b { display: block; font-size: 15px; color: var(--gold); margin-bottom: 4px; }
+.hintbox span { font-size: 13px; line-height: 19px; color: var(--ink); }
+.loadbar .spd { cursor: help; }
+
+/* ---------- DEV-05 委託單（UI-02-06） ---------- */
+.qgrid { position: absolute; left: 0; top: 18px; width: 784px; height: 452px; overflow-y: auto; display: grid; grid-template-columns: repeat(3, 254px); grid-auto-rows: 218px; gap: 8px 10px; align-content: start; }
+.qsheet { position: relative; border: 1px solid var(--line); background: var(--cell); padding: 6px 8px; display: flex; flex-direction: column; gap: 4px; }
+.qsheet.ready { border-color: var(--jade); }
+.qsheet .ql { font-size: 11px; color: var(--ink-3); margin-right: 8px; }
+.qtar { border-bottom: 1px solid var(--line-soft); padding-bottom: 3px; white-space: nowrap; overflow: hidden; }
+.qtar b { font-size: 15px; font-family: var(--serif); color: var(--ink); }
+.qwhere { font-size: 13px; color: var(--ink-2); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.qrow { height: 24px; border: 1px solid var(--line-soft); background: #100f0c; display: flex; align-items: center; padding: 0 6px; font-size: 13px; white-space: nowrap; }
+.qrow b { font-size: 14px; }
+.qrow.urgent { border-color: var(--red); }
+.qrow.urgent b { color: var(--red); }
+.qrisk { border: 1px solid var(--line); background: #13110e; padding: 3px 6px; font-size: 13px; }
+.qrisk b { font-size: 14px; }
+.qrisk .qfail { color: var(--ink-2); font-size: 12px; }
+.qrisk.none b { color: var(--ink-2); }
+.qrisk.high { border: 2px solid var(--red); }
+.qrisk.high b, .qrisk.high .qfail { color: var(--red); }
+.qsheet .qbtn { margin-top: auto; height: 36px; font-size: 14px; font-weight: 700; }

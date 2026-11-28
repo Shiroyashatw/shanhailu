@@ -1332,6 +1332,36 @@ window.SHL = (function () {
     if (x > 0) { t.T = r2(t.T + x); t.acc.tax += x; }
     return x;
   }
+  // ================= 城況簡報（DEV-05；SPEC-01 §7） =================
+  // 只讀 brief 與日結後的 P、O、B，照 §7.1 門檻（D.TEXT.city）對成檔名；不重算任何稅、收支、趨勢或主因。
+  // 待裁：§7.6 brief 沒有 P、O、B 欄位，§7.1 卻要顯示繁榮／治安／匪勢的檔名與數字；本包讀 towns[tid].P／O 與 region.B
+  // （UI-02 README §3 的資料來源欄同此），它們只在日結時更新，與同次 brief 一致。
+  function tierIdx(tab, v) { const i = tab.findIndex((r) => v < r[0]); return i < 0 ? tab.length - 1 : i; }
+  function cityView(tid) {
+    const t = townOf(tid || S.loc); if (!t) return null;
+    const C = D.TEXT.city, b = t.brief || {}, has = b.day !== undefined, B = S.world.region.B;
+    const pi = tierIdx(C.prosperity, t.P), oi = tierIdx(C.order, t.O), bi = tierIdx(C.bandit, B);
+    return {
+      tid: tid || S.loc, has, brief: b,
+      P: Math.round(t.P), O: Math.round(t.O), B: Math.round(B),
+      pIdx: pi, pName: C.prosperity[pi][1], oIdx: oi, oName: C.order[oi][1], bIdx: bi, bName: C.bandit[bi][1],
+      // 第一次日結前 brief 為空：駐軍檔讀起手的 Geff（＝Gnom），其餘收支不顯示
+      gName: garrisonName(has ? b.Geff : t.Geff),
+    };
+  }
+  // 委託單風險塊（UI-02 wording-map §2）：只用現有資料。獵殺取目的地 WILDS／DUNGEONS 的 risk（多地點取較高檔）；
+  // 收集、送貨、獸潮沒有險級欄 → null（畫面寫「危險 未定」）；沒有 due 的長期委託沒有失敗罰則 → null（「失敗罰則未定」）。
+  const RISK_ORDER = ['低', '中', '中高', '極高'];
+  function questRisk(q) {
+    let nodes = [];
+    if (q.kind === 'kill') {
+      const names = (D.QUEST_GEN.where[q.enemy] || '').split('・');
+      nodes = Object.keys(D.NODES).filter((id) => names.includes(D.NODES[id].name));
+    } else if (q.kind === 'clear') nodes = [q.dungeon];
+    const lv = nodes.map((id) => (D.WILDS[id] || D.DUNGEONS[id] || {}).risk).filter((r) => RISK_ORDER.includes(r))
+      .sort((a, b) => RISK_ORDER.indexOf(b) - RISK_ORDER.indexOf(a))[0] || null;
+    return { level: lv, high: lv === '中高' || lv === '極高', fail: !q.due ? null : q.kind === 'deliver' ? 'deposit' : 'deadline' };
+  }
   function tideInfo() {
     const td = S.world.tide; if (!td || !tideOn()) return null;
     return { town: td.town, kills: td.kills, need: td.need, left: td.end - dayOf(S.t) + 1 };
@@ -1950,7 +1980,7 @@ window.SHL = (function () {
   return {
     get state() { return S; },
     init, on, restart, save, wipeSave, readRaw, SAVE_KEY,
-    fmtTime, fmtClock, fmtDate, dayOf, isNight, seasonOf, ageOf, wakeTime, garrisonName, sPub, riskR,
+    fmtTime, fmtClock, fmtDate, dayOf, isNight, seasonOf, ageOf, wakeTime, garrisonName, sPub, riskR, cityView, questRisk,
     maxHp, carryCap, totalWt, loadBand, speedMult, armor, weaponDmg, weaponType, hitChance, dodgeChance, critChance, bagCap,
     attrVal, attrProgress, profLv, profProgress, perk,
     eqBase, eqValue, itemWt, itemName, itemGlyph, itemIcon, countItem, affixSum, reqUnmet, slotFits,
