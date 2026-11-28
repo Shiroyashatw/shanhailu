@@ -249,7 +249,7 @@ window.SHL = (function () {
   }
   // ================= 取名（DEV-01／UI-01） =================
   // 硬規則（UI-01 §4）：姓 1–2 字、名 1–2 字，合計 2–4 個中文字；只收 CJK 統一漢字；不收空白、符號、英數。
-  // 不做「不得與命名 NPC 同名」檢查；基本禁字表（三、七、九、滿、衡）本包不實作（與預設「沈衡」衝突，待裁）。
+  // 不做「不得與命名 NPC 同名」檢查；禁字表這批不做（製作人 16:46 裁決第 3 項），預設「沈衡」維持合法。
   const CJK = /^[\u3400-\u4DBF\u4E00-\u9FFF\u{20000}-\u{2A6DF}\u{2A700}-\u{2EBEF}\u{30000}-\u{3134F}]$/u;
   function nameErrors(sur, given) {
     const a = Array.from(String(sur == null ? '' : sur)), b = Array.from(String(given == null ? '' : given));
@@ -267,8 +267,8 @@ window.SHL = (function () {
   // 隨機鈕：整池 60 組抽一組，不依身分、性別或風格篩選。
   // 假設：UI 層的隨機不使用 S.rng（避免改動遊戲內亂數序列），用 Math.random。
   function randomName() { const p = D.NAME_POOL[Math.floor(Math.random() * D.NAME_POOL.length)]; return { sur: p[0], given: p[1] }; }
-  // 舊存檔後備名：以 S.seed 決定（同一存檔每次讀到同一組），不用 S.rng
-  function fallbackName(seed) { const p = D.NAME_POOL[(seed >>> 0) % D.NAME_POOL.length]; return { sur: p[0], given: p[1] }; }
+  // 舊存檔後備名：固定「沈衡」（製作人 16:46 裁決第 2 項；living-world v0.2 §6、UI-01）。名池只給新開局「隨機」鈕用。
+  function fallbackName() { return { sur: D.NAME_DEFAULT.sur, given: D.NAME_DEFAULT.given }; }
   function hasNameStruct(n) { return !!(n && typeof n === 'object' && typeof n.sur === 'string' && typeof n.given === 'string' && n.sur && n.given); }
   // 標題頁點「平民」卡 → 中欄取名頁
   function chooseOrigin(id) {
@@ -362,8 +362,8 @@ window.SHL = (function () {
     const w = readRaw();
     if (!w || w.schema !== SCHEMA || !w.state || w.state.dead) return false;
     S = w.state;
-    // DEV-01 舊存檔後備名（本批唯一的舊檔例外）：沒有姓名結構時，從名池以 seed 取一組並寫回
-    if (!hasNameStruct(S.name)) { S.name = fallbackName(S.seed); save(); }
+    // DEV-01 舊存檔後備名（本批唯一的舊檔例外）：沒有姓名結構時，寫入固定「沈衡」並寫回
+    if (!hasNameStruct(S.name)) { S.name = fallbackName(); save(); }
     return true;
   }
 

@@ -724,21 +724,27 @@ async function exploreUntil(page, pred, max) {
   await noOrigin('人物 overlay');
   await shot(page, '26-char-overlay.png');
   await click(page, 'sys-char');
-  // 舊存檔：沒有姓名結構（舊版存的是字串「沈衡」，或沒有 name 欄）→ 讀檔時從名池以 seed 取後備名並寫回
-  const seedNow = s.seed;
-  const expect = pool[(seedNow >>> 0) % 60];
-  const reloadWith = async (mut) => {
-    await page.evaluate((m) => { const w = JSON.parse(localStorage.getItem('shanhailu.save')); if (m === 'string') w.state.name = '沈衡'; else delete w.state.name; localStorage.setItem('shanhailu.save', JSON.stringify(w)); }, mut);
+  // 舊存檔：沒有姓名結構（舊版存的是字串「沈衡」，或沒有 name 欄）→ 讀檔時後備名固定「沈衡」並寫回（製作人 16:46 裁決第 2 項）
+  const expect = ['沈', '衡'];
+  const seedOrig = s.seed;
+  const reloadWith = async (mut, seed) => {
+    await page.evaluate(([m, sd]) => { const w = JSON.parse(localStorage.getItem('shanhailu.save')); if (m === 'string') w.state.name = '沈衡'; else if (m === 'other') w.state.name = '郝朔'; else delete w.state.name; if (sd != null) w.state.seed = sd; localStorage.setItem('shanhailu.save', JSON.stringify(w)); }, [mut, seed == null ? null : seed]);
     await page.goto(base + 'index.html?fx=0'); await page.waitForSelector('[data-testid=town]'); await settle(page);
     return page.evaluate(() => ({ name: window.SHL.state.name, saved: JSON.parse(localStorage.getItem('shanhailu.save')).state.name, right: document.querySelector('[data-testid=pname]').textContent }));
   };
+  const SHEN = JSON.stringify({ sur: '沈', given: '衡' });
   let fb = await reloadWith('string');
-  check('舊存檔（name 為字串）載入：後備名取自名池、依 seed 決定並寫回存檔', JSON.stringify(fb.name) === JSON.stringify({ sur: expect[0], given: expect[1] }) && JSON.stringify(fb.saved) === JSON.stringify(fb.name) && fb.right === expect[0] + expect[1], fb);
+  check('舊存檔（name 為字串）載入：後備名固定「沈衡」並寫回存檔、右欄顯示「沈衡」', JSON.stringify(fb.name) === SHEN && JSON.stringify(fb.saved) === SHEN && fb.right === expect[0] + expect[1], fb);
   await page.goto(base + 'index.html?fx=0'); await page.waitForSelector('[data-testid=town]');
   const fb2 = await page.evaluate(() => window.SHL.state.name);
   fb = await reloadWith('missing');
-  check('舊存檔後備名穩定：同一存檔重讀、或 name 欄整個不見，都得到同一組', JSON.stringify(fb2) === JSON.stringify(fb.name) && JSON.stringify(fb.name) === JSON.stringify({ sur: expect[0], given: expect[1] }), fb.name);
-  check('後備名用 seed 而非亂數：fallbackName 對同一 seed 永遠同一組', (await page.evaluate((sd) => [0, 1, 2].map(() => JSON.stringify(window.SHL.fallbackName(sd))), seedNow)).every((x) => x === JSON.stringify({ sur: expect[0], given: expect[1] })));
+  check('舊存檔後備名穩定：同一存檔重讀、或 name 欄整個不見，都得到「沈衡」', JSON.stringify(fb2) === SHEN && JSON.stringify(fb.name) === SHEN, fb.name);
+  const seedFb = [];
+  for (const sd of [1, 7, 12345, 987654321]) seedFb.push(JSON.stringify((await reloadWith('missing', sd)).name));
+  fb = await reloadWith('other', seedOrig); // 最後一次讀檔把 seed 還原，不影響後續測試
+  check('後備名不依 seed、不抽名池：不同 seed 的無姓名存檔、或舊字串非「沈衡」，一律讀成「沈衡」', seedFb.every((x) => x === SHEN) && JSON.stringify(fb.name) === SHEN, seedFb.concat(JSON.stringify(fb.name)));
+  check('fallbackName() 固定回傳「沈衡」，且「沈衡」不在名池內', (await page.evaluate(() => [0, 1, 2].map((sd) => JSON.stringify(window.SHL.fallbackName(sd))))).every((x) => x === SHEN) && !pool.some((r) => r[0] + r[1] === '沈衡'));
+  check('禁字表本批不做：nameErrors 不攔「沈衡」，也不攔三、七、九、滿、衡', await page.evaluate(() => window.SHL.nameErrors('沈', '衡').length === 0 && ['三', '七', '九', '滿', '衡'].every((c) => window.SHL.nameErrors('沈', c).length === 0)));
   await page.evaluate(() => { window.SHL.state.name = { sur: '歐陽', given: '明月' }; window.SHL.save(); });
   await page.goto(base + 'index.html?fx=0'); await page.waitForSelector('[data-testid=town]'); await settle(page);
   check('有姓名結構的存檔讀回不被改寫', JSON.stringify((await st(page)).name) === JSON.stringify({ sur: '歐陽', given: '明月' }));
