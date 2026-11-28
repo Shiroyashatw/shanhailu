@@ -1,6 +1,6 @@
 /* 《山海錄》灰盒 v0.3 — 自動化互動驗證（Node + Playwright，headless Chromium）
  * 用法：node tests/e2e.js [--shots]
- *   --shots  另存 1280×720 實機截圖至 docs/evidence/shots-v03/
+ *   --shots  另存 1280×720 實機截圖至 docs/evidence/shots-v03/（環境變數 SHOTS_DIR 可改目錄）
  * 驗證：1280×720 單屏無捲動／無溢出／無文字重疊、三欄 240/796/220、24 小時制；
  *       城鎮平面圖（建築、路人、老闆、各種服務）、每個地點可走可探查、隱藏地點、大陸圖、見聞錄、勢力聲望；
  *       戰鬥行動列（武器／招式／技能／道具）、點人形武器出手、狀態、演出佇列、棄物撤退；
@@ -13,7 +13,8 @@ const path = require('path');
 const { chromium } = require('playwright');
 
 const ROOT = path.resolve(__dirname, '..');
-const SHOTS = path.join(ROOT, 'docs/evidence/shots-v03');
+// SHOTS_DIR 環境變數可改寫截圖目錄（DEV-02：寫到 docs/evidence/shots-shanhailu-dev02-1128/，不覆蓋 shots-v03）
+const SHOTS = process.env.SHOTS_DIR ? path.resolve(ROOT, process.env.SHOTS_DIR) : path.join(ROOT, 'docs/evidence/shots-v03');
 const WANT_SHOTS = process.argv.includes('--shots');
 const SEED = 20261127;
 
@@ -109,7 +110,7 @@ async function shot(page, name) {
   if (!WANT_SHOTS) return;
   fs.mkdirSync(SHOTS, { recursive: true });
   await page.screenshot({ path: path.join(SHOTS, name), clip: { x: 0, y: 0, width: 1280, height: 720 } });
-  console.log('SHOT  docs/evidence/shots-v03/' + name);
+  console.log('SHOT  ' + path.relative(ROOT, path.join(SHOTS, name)));
 }
 
 

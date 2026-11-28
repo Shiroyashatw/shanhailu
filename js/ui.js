@@ -866,6 +866,12 @@
     el.appendChild(f);
   }
   function pulse(el, cls) { if (!el) return; el.classList.remove(cls); void el.offsetWidth; el.classList.add(cls); }
+  // 戰鬥紅閃 cflash 預算：任意 1 秒 ≤ 3 次（batch1 X-g 甲；rollout-plan DEV-02）。兩次閃光至少相隔 350ms（≥ 334ms，留一格影格的餘裕），太近的那次只略過閃光，震動與數字照播。
+  const CFLASH_GAP = 350; let lastCflash = -1e9;
+  function flashOnce(stage) {
+    const now = performance.now(); if (now - lastCflash < CFLASH_GAP) return;
+    lastCflash = now; pulse(stage.querySelector('.cflash'), 'on');
+  }
   function setEhp(el, hp) { if (!el) return; const max = +el.getAttribute('data-max') || 1; const bar = el.querySelector('.ehp > i'); const num = el.querySelector('.ehpn'); if (bar) bar.style.width = (Math.max(0, hp / max) * 100).toFixed(1) + '%'; if (num) num.textContent = Math.max(0, hp) + '/' + max; }
   function setPhp(el, hp) { if (!el) return; const max = +el.getAttribute('data-max') || 1; const bar = el.querySelector('.php > i'); const num = el.querySelector('.phpn'); if (bar) bar.style.width = (Math.max(0, hp / max) * 100).toFixed(1) + '%'; if (num) num.textContent = Math.max(0, hp) + '/' + max; }
   function showFx(e) {
@@ -885,7 +891,7 @@
       case 'e_dot': pulse(en, 'hit'); setEhp(en, e.hp); floatOn(en, '−' + e.d, 'dot'); break;
       case 'e_act': pulse(en, 'lunge'); break;
       case 'e_hit': {
-        pulse(stage, e.heavy ? 'shake2' : 'shake'); pulse(stage.querySelector('.cflash'), 'on'); setPhp(plate, e.php); floatOn(plate, '−' + e.d, e.heavy ? 'crit bad' : 'dmg bad');
+        pulse(stage, e.heavy ? 'shake2' : 'shake'); flashOnce(stage); setPhp(plate, e.php); floatOn(plate, '−' + e.d, e.heavy ? 'crit bad' : 'dmg bad');
         if (IC.has('fx_claw')) { const s = document.createElement('i'); s.className = 'px fxc ic-fx_claw'; stage.appendChild(s); }
         break;
       }

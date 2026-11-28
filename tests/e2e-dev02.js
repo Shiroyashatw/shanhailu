@@ -38,6 +38,9 @@ function check(name, ok, detail) {
   console.log((ok ? 'PASS' : 'FAIL') + '  ' + name + (detail !== undefined && detail !== '' ? '  — ' + (typeof detail === 'string' ? detail : JSON.stringify(detail)) : ''));
 }
 async function shot(page, name) {
+  // 截圖前做版面稽核：1280×720 單屏無捲動、三欄 240／796／220
+  const lay = await page.evaluate(() => { const w = (id) => document.getElementById(id).getBoundingClientRect().width; return { sw: document.documentElement.scrollWidth, sh: document.documentElement.scrollHeight, c: [w('col-left'), w('col-center'), w('col-right')] }; });
+  check('[' + name + '] 1280×720 單屏無捲動、三欄 240/796/220', lay.sw <= 1280 && lay.sh <= 720 && lay.c.join('/') === '240/796/220', lay);
   if (!WANT_SHOTS) return;
   fs.mkdirSync(SHOTS, { recursive: true });
   await page.screenshot({ path: path.join(SHOTS, name), clip: { x: 0, y: 0, width: 1280, height: 720 } });
@@ -103,6 +106,251 @@ async function fresh(page, base, q) {
     // 飽食／疲累語意不變（food 10、fat 0、noRegen）：客棧睡完疲累 0、生命回滿
     const keep = await page.evaluate(() => { const G = window.SHL; const S = G.state; S.loc = 'huiyao'; S.townTab = 'hy_inn'; S.scene = 'town'; S.t = 20 * 1440 + 22 * 60; S.food = 80; S.fat = 60; S.hp = 10; G.service('rest'); return { food: S.food, fat: S.fat, hp: S.hp, max: G.maxHp() }; });
     check('[sleep] 客棧歇息：飽食 −10、疲累清零、生命回滿（沿用現況）', keep.food === 70 && keep.fat === 0 && keep.hp === keep.max, keep);
+  }
+
+  // ===== A. 單日結算（SPEC-01 §10 AC-A；NOISE=0） =====
+  if (want('town')) {
+    await fresh(page, base);
+    const st0 = await page.evaluate(() => { const S = window.SHL.state; return { towns: JSON.parse(JSON.stringify(S.world.towns)), region: S.world.region, reserved: { wanted: S.wanted, hostility: S.hostility, jurisdiction: S.jurisdiction, influence: S.influence }, heavyOps: S.world.heavyOps, refugee: S.world.refugee }; });
+    const h0 = st0.towns.huiyao, d0 = st0.towns.duyin;
+    check('§3 起手值：灰窯 P50／T200／O55／Gnom1／Geff1、渡陰 P45／T300／O60／Gnom2／Geff2；F、Lpat、debt、rescueCd、taxCut 皆 0',
+      h0.P === 50 && h0.T === 200 && h0.O === 55 && h0.Gnom === 1 && h0.Geff === 1 && d0.P === 45 && d0.T === 300 && d0.O === 60 && d0.Gnom === 2 && d0.Geff === 2 &&
+      [h0, d0].every((t) => t.F === 0 && t.Lpat === 0 && t.debt === 0 && t.rescueCd === 0 && t.taxCut === 0), { h0, d0 });
+    check('§3.2 區域起手：B 30、crew 4、crewCtr 0、crewWiped false；heavyOps {0,0}；refugee camp 60',
+      st0.region.B === 30 && st0.region.crew === 4 && st0.region.crewCtr === 0 && st0.region.crewWiped === false && st0.heavyOps.season === 0 && st0.heavyOps.n === 0 && st0.refugee.camp === 60, { region: st0.region, heavyOps: st0.heavyOps, refugee: st0.refugee });
+    check('§1 預留欄位：S.wanted {}、S.hostility {}、S.jurisdiction null、S.influence {}', JSON.stringify(st0.reserved) === '{"wanted":{},"hostility":{},"jurisdiction":null,"influence":{}}', st0.reserved);
+    // AC-A1／A7：起手第 1 天無事件結算（走真的 passTime 跨 00:00 → newDay(2)）
+    const a1 = await page.evaluate(() => { const G = window.SHL; G._debug.setNoise(false); G._debug.passTime(16); const S = G.state; return { t: G.fmtTime(S.t), h: S.world.towns.huiyao, d: S.world.towns.duyin, B: S.world.region.B }; });
+    check('AC-A1 灰窯第 1 天結算：T = 207.96、P／O 不變', a1.h.T === 207.96 && a1.h.P === 50 && a1.h.O === 55 && a1.B === 30, { T: a1.h.T, P: a1.h.P, O: a1.h.O, B: a1.B, at: a1.t });
+    check('AC-A1 渡陰第 1 天結算：T = 314.81、P／O 不變', a1.d.T === 314.81 && a1.d.P === 45 && a1.d.O === 60, { T: a1.d.T, P: a1.d.P, O: a1.d.O });
+    const b = a1.h.brief;
+    check('AC-A7（依 §7.2 手算）灰窯第 1 天 brief：Inc 22.96、treasuryIn 23、Out 15、Net +8、tier ok、trend flat、whyCode null（AC-A7 原文 18／+3 為 v0.2 殘值，待裁）',
+      b.Inc === 22.96 && b.treasuryIn === 23 && b.treasuryOut === 15 && b.treasuryNet === 8 && b.treasuryTier === 'ok' && b.trend === 'flat' && b.whyCode === null && b.dT === 7.96 && b.Geff === 1 && b.day === 2, b);
+    check('§7.6 brief 欄位齊全', ['dP', 'dO', 'trend', 'whyCode', 'T', 'dT', 'treasuryIn', 'treasuryOut', 'treasuryNet', 'Inc', 'tax', 'fines', 'rescueAmt', 'upkeepPaid', 'bountyPaid', 'overflow', 'treasuryTier', 'Geff', 'debtToday', 'debtDays', 'aidToday', 'aidDaysLeft', 'aidFund', 'rescueToday', 'taxCutDays', 'taxCutAmt'].every((k) => k in b), Object.keys(b).length);
+    // AC-A7：同日玩家在灰窯賣 100 兩 → treasuryIn 28、Net +13（§7.2）
+    await fresh(page, base);
+    const a5 = await page.evaluate(() => {
+      const G = window.SHL; const S = G.state; G._debug.setNoise(false);
+      S.scene = 'town'; S.loc = 'huiyao'; S.townTab = 'hy_market';
+      // 造一件行情價剛好整數的貨：以天星分號收購價 p 的倍數湊 100／19／39
+      const k = Object.keys(window.SHL_DATA.ITEMS).find((x) => window.SHL_DATA.ITEMS[x].type !== 'quest' && G.sellPrice({ k: x, n: 1 }) === 1);
+      const out = { k };
+      const sellN = (n) => {
+        S.pack = S.pack.map(() => null); S.pack[0] = { k, n };
+        const s0 = S.silver, T0 = S.world.towns.huiyao.T, p0 = G.sellPrice({ k, n: 1 });
+        G.sell(0, n);
+        return { got: S.silver - s0, dT: Math.round((S.world.towns.huiyao.T - T0) * 100) / 100, p1: G.sellPrice({ k, n: 1 }), p0, log: S.log[S.log.length - 1].text };
+      };
+      out.s100 = sellN(100); out.s19 = sellN(19); out.s39 = sellN(39);
+      out.accTax = S.world.towns.huiyao.acc.tax;
+      G._debug.passTime(16);
+      out.brief = S.world.towns.huiyao.brief;
+      return out;
+    });
+    check('AC-A5 賣 100 兩 → 玩家得 95、灰窯 T +5、日誌附「（交易稅 5 兩）」', !!a5.k && a5.s100.got === 95 && a5.s100.dT === 5 && a5.s100.log.includes('（交易稅 5 兩）'), a5.s100);
+    check('AC-A5 賣 19 兩 → 稅 0（得 19）；賣 39 兩 → 稅 1（得 38）', a5.s19.got === 19 && a5.s19.dT === 0 && !a5.s19.log.includes('交易稅') && a5.s39.got === 38 && a5.s39.dT === 1, { s19: a5.s19, s39: a5.s39 });
+    check('AC-J1 交易稅不改 sellPrice 顯示的行情價', a5.s100.p0 === a5.s100.p1 && a5.s39.p0 === a5.s39.p1, { before: a5.s100.p0, after: a5.s100.p1 });
+    check('AC-A7（§7.2）同日賣 100＋19＋39 兩：當日交易稅 6 進 brief.tax，treasuryIn = round(22.96+6) = 29、Net +14', a5.brief.tax === 6 && a5.brief.treasuryIn === 29 && a5.brief.treasuryNet === 14, { tax: a5.brief.tax, In: a5.brief.treasuryIn, Net: a5.brief.treasuryNet });
+    const tradeOnlyInTowns = await page.evaluate(() => { const G = window.SHL; const S = G.state; const T0 = JSON.stringify(S.world.towns); S.loc = 'poxiao'; const x = G._debug.tradeTax(100); return { x, same: T0 === JSON.stringify(S.world.towns) }; });
+    check('假設：破曉營（非兩鎮）賣出不課交易稅', tradeOnlyInTowns.x === 0 && tradeOnlyInTowns.same, tradeOnlyInTowns);
+
+    // AC-A4：欠餉與求援（灰窯 T=10、Inc 設 0）＋ AC-A7 的求援 brief
+    await fresh(page, base);
+    const a4 = await page.evaluate(() => {
+      const G = window.SHL; const S = G.state; G._debug.setNoise(false); G._debug.HOOKS.taxMult.huiyao = 0;
+      const t = S.world.towns.huiyao; t.T = 10; const rows = [];
+      for (let d = 2; d <= 5; d++) { G._debug.townTick(d); rows.push({ d, Geff: t.Geff, T: t.T, debt: t.debt, taxCut: t.taxCut, rescueCd: t.rescueCd, b: { rescueToday: t.brief.rescueToday, rescueAmt: t.brief.rescueAmt, taxCutDays: t.brief.taxCutDays, debtDays: t.brief.debtDays, tier: t.brief.treasuryTier, debtToday: t.brief.debtToday } }); }
+      delete G._debug.HOOKS.taxMult.huiyao;
+      return rows;
+    });
+    check('AC-A4 日 1、2：Geff 0、T 維持 10、debt 1、2', a4[0].Geff === 0 && a4[0].T === 10 && a4[0].debt === 1 && a4[1].Geff === 0 && a4[1].T === 10 && a4[1].debt === 2 && a4[0].b.tier === 'debt', a4.slice(0, 2));
+    check('AC-A4 日 3：debt 3 觸發求援，T = 100、taxCut 10、rescueCd 20', a4[2].T === 100 && a4[2].taxCut === 10 && a4[2].rescueCd === 20 && a4[2].debt === 0, a4[2]);
+    check('AC-A7 求援日 brief：rescueToday、rescueAmt 90、taxCutDays 10、debtDays 0', a4[2].b.rescueToday === true && a4[2].b.rescueAmt === 90 && a4[2].b.taxCutDays === 10 && a4[2].b.debtDays === 0, a4[2].b);
+    check('AC-A4 日 4 起付得起：Geff 回 1、T 85', a4[3].Geff === 1 && a4[3].T === 85 && a4[3].b.taxCutDays === 9, a4[3]);
+
+    // AC-A6：S_pub
+    const a6 = await page.evaluate(() => { const G = window.SHL; G.restart(20261127, 'drifter'); const S = G.state; const h = G.sPub('huiyao'), d = G.sPub('duyin'); const t = S.world.towns.huiyao; const o = t.O, g = t.Geff; t.O = 30; t.Geff = 0; const low = G.sPub('huiyao'); t.O = o; t.Geff = g; return { h, d, low }; });
+    check('AC-A6 S_pub：灰窯起手 1.00、渡陰起手 1.21、O=30／Geff=0 時 0.65', near(a6.h, 1.0, 1e-9) && Math.round(a6.d * 100) / 100 === 1.21 && Math.round(a6.low * 100) / 100 === 0.65, a6);
+
+    // AC-A7 資助加派 aidDaysLeft、AC-A2（機制部分：直接把 F 設 100，不經資助行動；資助按鈕屬 DEV-04）
+    const a2 = await page.evaluate(() => {
+      const G = window.SHL; G.restart(20261127, 'drifter'); const S = G.state; G._debug.setNoise(false);
+      const t = S.world.towns.huiyao; t.F = 100; const rows = [];
+      for (let d = 2; d <= 6; d++) { G._debug.townTick(d); rows.push({ d, O: t.O, P: t.P, F: t.F, Geff: t.Geff, left: t.brief.aidDaysLeft, aid: t.brief.aidToday, why: t.brief.whyCode }); }
+      return rows;
+    });
+    check('AC-A7 資助 100 兩（F=100）aidDaysLeft 日 1–5 為 4／3／2／1／0', a2.map((r) => r.left).join('/') === '4/3/2/1/0' && a2.slice(0, 4).every((r) => r.Geff === 2) && a2[4].Geff === 1, a2.map((r) => r.left + '@G' + r.Geff));
+    check('AC-A2（機制部分，F 直接設值）灰窯逐日 O：56.00、56.90、57.71（±0.01）；F 日 4 後 = 0', near(a2[0].O, 56.0, 0.01) && near(a2[1].O, 56.9, 0.01) && near(a2[2].O, 57.71, 0.01) && a2[3].F === 0, a2.slice(0, 4).map((r) => r.O + '／F' + r.F));
+
+    // 駐軍四檔顯示名（SPEC-01 §7.1／§7.6；完成標準 6）
+    const gn = await page.evaluate(() => { const G = window.SHL; G.restart(20261127, 'drifter'); const S = G.state; G._debug.setNoise(false); S.world.towns.duyin.F = 100; G._debug.townTick(2); const b = S.world.towns.duyin.brief; return { names: [0, 1, 2, 3].map(G.garrisonName), table: window.SHL_DATA.WORLD.GARRISON_NAMES, Geff: b.Geff, name: G.garrisonName(b.Geff) }; });
+    check('駐軍第 3 檔顯示名為「守備」（四檔：無／自衛隊／巡邏隊／守備，data.js 單一表）', gn.names.join('／') === '無／自衛隊／巡邏隊／守備' && gn.table[3] === '守備' && gn.names[3] === '守備', gn.names);
+    check('渡陰資助加派到第 3 檔：brief.Geff = 3 → 「守備」', gn.Geff === 3 && gn.name === '守備', gn);
+
+    // 兩鎮每天會變；e2e 走過一天結算（雜訊開啟，經客棧歇息跨日）
+    await fresh(page, base);
+    const day = await page.evaluate(() => {
+      const G = window.SHL; const S = G.state; const rows = [];
+      const snap = () => ({ day: G.dayOf(S.t), h: Object.assign({}, S.world.towns.huiyao, { brief: undefined, acc: undefined }), d: Object.assign({}, S.world.towns.duyin, { brief: undefined, acc: undefined }), hb: S.world.towns.huiyao.brief, db: S.world.towns.duyin.brief });
+      rows.push(snap());
+      for (let i = 0; i < 6; i++) {
+        G._debug.passTime(Math.max(0, (22 * 60 - (S.t % 1440)) / 60)); // 走到當日 22:00
+        S.scene = 'town'; S.loc = 'huiyao'; S.townTab = 'hy_inn'; S.silver = 999; S.dead = null; S.hp = G.maxHp(); S.food = 100;
+        G.service('rest'); rows.push(snap());
+      }
+      return { rows, log: S.log.filter((l) => /新的一天|歇了一夜/.test(l.text)).slice(-4).map((l) => G.fmtTime(l.t) + ' ' + l.text) };
+    });
+    const r = day.rows;
+    const tChanges = r.slice(1).every((x, i) => x.h.T !== r[i].h.T && x.d.T !== r[i].d.T);
+    const pChanged = r.slice(1).some((x, i) => x.h.P !== r[i].h.P) && r.slice(1).some((x, i) => x.d.P !== r[i].d.P);
+    check('兩鎮每天會變：6 個日結，兩鎮財庫每天都變、繁榮都有起伏', tChanges && pChanged, r.map((x) => 'D' + x.day + ' 灰' + x.h.P + '/' + x.h.T + ' 渡' + x.d.P + '/' + x.d.T).join('；'));
+    check('e2e 走過一天結算：客棧 22:00 歇息 → 次日 08:00，日結 brief.day 逐日遞增', r.slice(1).every((x, i) => x.day === r[i].day + 1 && x.hb.day === x.day && x.db.day === x.day), r.map((x) => x.day + ':' + (x.hb.day || '-')));
+    check('日誌時間 24 小時制（新的一天在 00:00，起床 08:00）', day.log.some((l) => /^第 \d+ 日 00:00 第 \d+ 日 00:00，新的一天/.test(l)) && day.log.every((l) => /^第 \d+ 日 ([01]\d|2[0-3]):[0-5]\d /.test(l)) && !day.log.join('').match(/[子丑寅卯辰巳午未申酉戌亥]時/), day.log);
+
+    // 一次 passTime 跨 ≥2 個日界：逐日補算，與逐日推進的結果完全一致（SPEC-01 §2）
+    const multi = await page.evaluate(() => {
+      const G = window.SHL; const pick = (S) => JSON.stringify({ towns: S.world.towns, region: S.world.region, tide: S.world.tide, next: S.world.next, hurt: S.world.hurt });
+      G.restart(777, 'drifter'); G._debug.passTime(64); const a = pick(G.state); const n1 = G.state.log.filter((l) => l.text.includes('新的一天')).length;
+      G.restart(777, 'drifter'); for (let i = 0; i < 8; i++) G._debug.passTime(8); const b = pick(G.state);
+      return { same: a === b, n1, day: G.dayOf(G.state.t), bday: G.state.world.towns.huiyao.brief.day };
+    });
+    check('一次 passTime 跨 3 個日界：逐日補算 3 次，結果與 8 小時 ×8 逐段推進完全一致', multi.same && multi.n1 === 3 && multi.bday === 4, multi);
+
+    // 防失控：上下限（P 15–80、O 0–100、每日 ±3、T ≥ 0 且 ≤ T_CAP）
+    const clampT = await page.evaluate(() => {
+      const G = window.SHL; G.restart(99, 'drifter'); const S = G.state;
+      const W = S.world, h = W.towns.huiyao, d = W.towns.duyin;
+      h.P = 79.9; h.O = 100; h.T = 99999; d.P = 15.2; d.O = 0.5; d.T = 0; d.Gnom = 2;
+      let worst = 0, viol = [], remitLogs = 0;
+      const nLog0 = S.log.length;
+      for (let day = 2; day <= 121; day++) {
+        const y = { hP: h.P, hO: h.O, dP: d.P, dO: d.O };
+        G._debug.townTick(day);
+        worst = Math.max(worst, Math.abs(h.P - y.hP), Math.abs(h.O - y.hO), Math.abs(d.P - y.dP), Math.abs(d.O - y.dO));
+        [h, d].forEach((t, i) => { const cap = 90 * [0, 15, 40, 90][t.Gnom]; if (t.P < 15 || t.P > 80 || t.O < 0 || t.O > 100 || t.T < 0 || t.T > cap + 1e-9) viol.push(day + ':' + i); });
+      }
+      remitLogs = S.log.slice(nLog0).filter((l) => l.text.includes('上繳鎮西將軍府')).length;
+      return { worst: Math.round(worst * 100) / 100, viol: viol.slice(0, 5), remitLogs, hT: h.T };
+    });
+    check('防失控：極端起點跑 120 天，P 15–80、O 0–100、T 0–T_CAP、每日變動 ≤ 3', !clampT.viol.length && clampT.worst <= 3 + 1e-9, clampT);
+    check('§5.5 上繳：灰窯 T 灌到 99999 → 夾回 T_CAP 1350；「上繳」日誌 120 天 ≤ 12 次（每 10 天最多一次）', clampT.hT <= 1350 && clampT.remitLogs >= 1 && clampT.remitLogs <= 12, clampT);
+  }
+
+  // ===== R. 遇險率的治安修正 R 與封頂 0.85（SPEC-01 §4.8「套用」列；rollout-plan DEV-02「只乘治安修正」） =====
+  if (want('risk')) {
+    await fresh(page, base);
+    const rk = await page.evaluate(() => {
+      const G = window.SHL; const S = G.state; const W = S.world;
+      const out = { road0: G.riskR(false), wild0: G.riskR(true) };
+      S.loc = 'huiyao'; S.scene = 'map';
+      out.prevWild = G.travelPreview('chakou');
+      W.region.B = 45; W.towns.huiyao.O = 50; W.towns.duyin.O = 50; out.wildE3 = G.riskR(true);
+      // 最壞組合：B 100、O 0（R_wild 1.8 上限）、夜、超載、獸潮、多段野徑
+      W.region.B = 100; W.towns.huiyao.O = 0; W.towns.duyin.O = 0; out.wildMax = G.riskR(true);
+      S.t = 22 * 60; W.tide = { town: 'huiyao', start: 1, end: 2, kills: 0, need: 4 };
+      const far = Object.keys(window.SHL_DATA.NODES).map((id) => ({ id, p: G.travelPreview(id) })).filter((x) => x.p.edges.length > 1 && x.p.wild);
+      out.cap = far.length ? far[0].p.risk : null; out.capId = far.length ? far[0].id : null;
+      out.allCap = Object.keys(window.SHL_DATA.NODES).every((id) => G.travelPreview(id).risk <= 0.85 + 1e-12);
+      return out;
+    });
+    check('起手 R_road = R_wild = 1（遇險率與現況相同）', rk.road0 === 1 && rk.wild0 === 1 && near(rk.prevWild.risk, 0.22, 1e-12), { road: rk.road0, wild: rk.wild0, risk: rk.prevWild.risk });
+    check('R_wild：B=45、Ō=50 → 1.255（AC-E3 的 R 部分）', near(rk.wildE3, 1.255, 1e-9), rk.wildE3);
+    check('遇險封頂 0.85 在所有乘項之後（最壞組合 R_wild=1.8、夜、獸潮、多段野徑 → 0.85）', rk.wildMax === 1.8 && rk.cap === 0.85 && rk.allCap, rk);
+  }
+
+  // ===== J. 相容與存檔（SPEC-01 §10 AC-J） =====
+  if (want('save')) {
+    await fresh(page, base);
+    const before = await page.evaluate(() => { const G = window.SHL; const S = G.state; S.world.towns.huiyao.F = 77; S.world.towns.duyin.Lpat = 2; S.wanted = { huiyao: { k: 1 } }; S.influence = { dawn: 3 }; S.jurisdiction = 'huiyao'; S.hostility = { x: 1 }; G._debug.passTime(16); S.world.towns.duyin.debt = 1; G.save(); return JSON.stringify({ towns: S.world.towns, region: S.world.region, heavyOps: S.world.heavyOps, refugee: S.world.refugee, wanted: S.wanted, hostility: S.hostility, jurisdiction: S.jurisdiction, influence: S.influence }); });
+    await page.goto(base + 'index.html?fx=0'); await page.waitForSelector('[data-testid=town]');
+    const after = await page.evaluate(() => { const S = window.SHL.state; return JSON.stringify({ towns: S.world.towns, region: S.world.region, heavyOps: S.world.heavyOps, refugee: S.world.refugee, wanted: S.wanted, hostility: S.hostility, jurisdiction: S.jurisdiction, influence: S.influence }); });
+    check('AC-J2 日結後存檔、讀檔：world.towns、region、F（77 兩，日結加派後餘 52）、Lpat、debt、預留欄位完全一致', before === after && after.includes('"F":52') && after.includes('"Lpat":2'), before === after ? after.length + ' 字元' : { before, after });
+    // AC-J5：沒有 world.towns 的存檔 → 以起手值補、不丟錯
+    const errs0 = consoleErrors.length;
+    await page.evaluate(() => { const w = window.SHL.readRaw(); delete w.state.world.towns; delete w.state.world.region; delete w.state.world.heavyOps; delete w.state.world.refugee; delete w.state.wanted; delete w.state.hostility; delete w.state.jurisdiction; delete w.state.influence; localStorage.setItem(window.SHL.SAVE_KEY, JSON.stringify(w)); });
+    await page.goto(base + 'index.html?fx=0'); await page.waitForSelector('[data-testid=town]');
+    const j5 = await page.evaluate(() => { const G = window.SHL; const S = G.state; const ok1 = S.world.towns.huiyao.T === 200 && S.world.towns.duyin.P === 45 && S.world.region.B === 30 && S.jurisdiction === null && JSON.stringify(S.wanted) === '{}'; G._debug.passTime(24); return { ok1, t: G.fmtTime(S.t), T: S.world.towns.huiyao.T, day: S.world.towns.huiyao.brief.day }; });
+    check('AC-J5 讀到沒有 world.towns 的存檔：以起手值補、可照常日結、不丟錯', j5.ok1 && j5.day >= 2 && consoleErrors.length === errs0, j5);
+  }
+
+  // ===== J3／J4：同 seed 同操作重現、wrnd 不消耗 S.rng =====
+  if (want('repro')) {
+    const script = async () => page.evaluate(() => {
+      const G = window.SHL; const S = G.state;
+      G.setTab('hy_market');
+      const bi = S.pack.findIndex((x) => x && x.k === 'bread'); if (bi >= 0) G.sell(bi, 1);
+      G.setTab('hy_inn'); G._debug.passTime(13); G.service('rest');
+      G.toMap(); G.selectDest('chakou'); G.travel();
+      for (let i = 0; i < 3; i++) G._debug.passTime(20);
+      const c = JSON.parse(JSON.stringify(S)); delete c.meta; return JSON.stringify(c);
+    });
+    await fresh(page, base); const run1 = await script();
+    await fresh(page, base); const run2 = await script();
+    check('AC-J3 同 seed 同操作兩次：整份狀態 100% 相同（含世界擲骰）', run1 === run2 && run1.length > 1000, run1.length + ' 字元');
+    const j4 = await page.evaluate(() => {
+      const G = window.SHL; const D = window.SHL_DATA;
+      const runOnce = (burn) => {
+        G.restart(424242, 'drifter'); const S = G.state; const tides = [];
+        for (let d = 0; d < 40; d++) { for (let k = 0; k < burn; k++) G._debug.rnd(); G._debug.passTime(24); if (S.world.tide && !tides.some((x) => x.start === S.world.tide.start)) tides.push(Object.assign({}, S.world.tide, { kills: 0 })); S.hp = G.maxHp(); S.food = 100; S.fat = 0; S.dead = null; }
+        return { tides: JSON.stringify(tides.map((t) => [t.start, t.end, t.town])), pn: JSON.stringify([S.world.towns.huiyao.P, S.world.towns.duyin.P]) };
+      };
+      const a = runOnce(0), b = runOnce(37);
+      // 世界函式本身不動 S.rng
+      G.restart(5, 'drifter'); const S = G.state; S.world.next = 2; const r0 = S.rng; G._debug.worldTick(2); G._debug.townTick(2); G._debug.worldTick(4); G._debug.townTick(3); const r1 = S.rng;
+      return { a, b, rngSame: r0 === r1, n: JSON.parse(a.tides).length, w: G._debug.wrnd('tide-town', 9, 0) === G._debug.wrnd('tide-town', 9, 0) };
+    });
+    check('AC-J4（wrnd 隔離部分）worldTick／townTick 不消耗 S.rng；wrnd 同參數同值', j4.rngSame && j4.w, j4.rngSame);
+    check('AC-J4（wrnd 隔離部分）每天多耗 37 次 S.rng：40 天內獸潮開始日、結束日、目標鎮與 PNOISE 結果完全相同（有無資助的完整比較待 DEV-04）', j4.a.tides === j4.b.tides && j4.a.pn === j4.b.pn && j4.n >= 3, j4.a.tides);
+  }
+
+  // ===== C. 戰鬥 cflash 每秒次數（完成標準 4；最壞情況：4 隻最快的敵人、敵我連續行動、持續傷害） =====
+  if (want('cflash')) {
+    for (const mode of ['natural', 'mash200', 'mash250', 'mash300', 'mash350']) {
+      await page.goto(base + 'index.html?seed=' + SEED + '&fresh=1&origin=drifter'); // 演出開啟
+      await page.waitForSelector('[data-testid=town]');
+      await page.evaluate(() => {
+        // 以 CSS 動畫實際開播（animationstart, animationName = cflash）計次，這是玩家真的看到的閃光
+        window.__flash = [];
+        document.addEventListener('animationstart', (ev) => { if (ev.animationName === 'cflash') window.__flash.push(performance.now()); }, true);
+        const G = window.SHL; const S = G.state;
+        S.attr.shen = 1; // 壓低閃避，讓敵方幾乎每下都命中（最壞情況）
+        G._debug.startCombat(['bug', 'bug', 'bug', 'bug'], { type: 'wild', node: 'chakou' }, {});
+        S.combat.bleed = 99; S.combat.poison = 99; // 持續傷害每回合都跳
+        S.combat.enemies.forEach((e) => (e.hp = e.max = 99999));
+        G.save(); G.setProfTab(S.profTab); // 觸發重繪
+      });
+      await page.waitForSelector('[data-testid=combat]');
+      const t0 = Date.now();
+      while (Date.now() - t0 < (mode === 'natural' ? 17000 : 8000)) {
+        await page.evaluate(() => { const S = window.SHL.state; S.hp = 99999; S.fat = 0; if (S.combat) S.combat.enemies.forEach((e) => { const hv = Math.random() < 0.5; e.intent = { k: hv ? 'heavy' : 'atk', range: hv ? [8, 12] : [3, 6] }; e.stag = 0; e.charged = false; }); });
+        if (mode === 'natural') {
+          await page.click('[data-testid=act-wait]').catch(() => {});
+          await page.waitForTimeout(4200); // 等整串演出播完（4 敵 e_act＋e_hit、持續傷害）再出手
+        } else {
+          await page.keyboard.press('1'); // 1 號鍵＝第一個行動（普攻）；鍵盤會先 flushFx 再出手
+          await page.waitForTimeout(+mode.slice(4) - 15);
+        }
+      }
+      const ts = await page.evaluate(() => window.__flash.slice());
+      let max = 0, at = 0;
+      for (let i = 0; i < ts.length; i++) { let j = i; while (j < ts.length && ts[j] - ts[i] < 1000) j++; if (j - i > max) { max = j - i; at = i; } }
+      const gaps = ts.slice(1).map((x, i) => Math.round(x - ts[i]));
+      check('[cflash/' + (mode === 'natural' ? '等演出播完再出手' : '連按鍵盤（每 ' + mode.slice(4) + 'ms）') + '] 任意 1 秒滑動視窗內 cflash ≤ 3 次', max <= 3 && (mode !== 'natural' || ts.length > 5), { total: ts.length, maxPerSec: max, minGapMs: gaps.length ? Math.min(...gaps) : null, sampleGaps: gaps.slice(at, at + 6) });
+    }
+  }
+
+  // ===== 截圖（1280×720；本包無對應 UI 草稿） =====
+  if (want('shots')) {
+    await fresh(page, base);
+    await page.evaluate(() => { const G = window.SHL; const S = G.state; G._debug.passTime(14); G.setTab('hy_inn'); G.service('rest'); G.setOverlay('log'); });
+    await page.waitForSelector('[data-testid=overlay-log]');
+    await shot(page, 'dev02-01-inn-rest-log.png');
+    await page.evaluate(() => { const G = window.SHL; G.setOverlay('log'); G.setTab(null); });
+    await shot(page, 'dev02-02-next-day-town.png');
+    await page.evaluate(() => { const G = window.SHL; G._debug.startCombat(['bug', 'wolf'], { type: 'wild', node: 'chakou' }, {}); G.save(); G.setProfTab(G.state.profTab); });
+    await page.waitForSelector('[data-testid=combat]');
+    await page.click('[data-testid=act-attack]'); await page.waitForTimeout(200);
+    await shot(page, 'dev02-03-combat.png');
   }
 
   check('console 0 error', consoleErrors.length === 0, consoleErrors.slice(0, 5));
