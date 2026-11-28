@@ -795,10 +795,18 @@ window.SHL = (function () {
     commit();
   }
   function pay(n) { if (S.silver < n) { log('銀兩不足。', 'bad'); emit(); return false; } S.silver -= n; return true; }
+  // 歇息起床時刻（SPEC-TIME v0.4 §11 B1、§12 E11；Q-T7 乙）：wake = min(max(now+6h, 下一個 08:00), now+13h)
+  // 舊式 dayOf(now)*1440+480 的 dayOf 從 1 起算，永遠是「次日」08:00（00:00 就寢睡 32 小時）。
+  // 假設：「下一個 08:00」含當下（恰 08:00 就寢＝08:00 本身），對齊 sim/lib/time.js 的 wakeNew（n8 < now 才加一天）。
+  // 13 小時上限為建議值、未經模擬（SPEC-TIME §17 T7 待重驗）。純函式，不改 S。
+  function wakeTime(now) {
+    let n8 = Math.floor(now / 1440) * 1440 + D.SLEEP.wakeMin;
+    if (n8 < now) n8 += 1440;
+    return Math.min(Math.max(now + D.SLEEP.minH * 60, n8), now + D.SLEEP.maxH * 60);
+  }
   function sleepToMorning() {
-    const now = S.t; let next = (dayOf(now)) * 1440 + 8 * 60;
-    if (next - now < 6 * 60) next += 1440;
-    passTime((next - now) / 60, { food: 10, fat: 0, noRegen: true });
+    const now = S.t;
+    passTime((wakeTime(now) - now) / 60, { food: 10, fat: 0, noRegen: true });
   }
   function innCost() {
     const m = townHurt(S.loc) ? 2 : 1;
@@ -1764,7 +1772,7 @@ window.SHL = (function () {
   return {
     get state() { return S; },
     init, on, restart, save, wipeSave, readRaw, SAVE_KEY,
-    fmtTime, fmtClock, fmtDate, dayOf, isNight, seasonOf, ageOf,
+    fmtTime, fmtClock, fmtDate, dayOf, isNight, seasonOf, ageOf, wakeTime,
     maxHp, carryCap, totalWt, loadBand, speedMult, armor, weaponDmg, weaponType, hitChance, dodgeChance, critChance, bagCap,
     attrVal, attrProgress, profLv, profProgress, perk,
     eqBase, eqValue, itemWt, itemName, itemGlyph, itemIcon, countItem, affixSum, reqUnmet, slotFits,
