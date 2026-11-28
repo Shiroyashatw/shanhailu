@@ -39,6 +39,14 @@
 - `js/ui.js`：三欄渲染、戰鬥演出、拖拉、縮放
 - `tests/e2e.js`：Playwright 自動化互動驗證
 
+## 繪圖
+新增或修改任何圖（圖示、頭像、敵人、場景、地圖）時，照 `.claude/skills/shanhai-pixel-art/SKILL.md` 的流程做。Claude Code 在這個 repo 裡會自動載入這個 skill。附帶兩支腳本：
+
+```
+node .claude/skills/shanhai-pixel-art/scripts/check.js np_ pl_                # 結構檢查（尺寸、調色盤、id）
+node .claude/skills/shanhai-pixel-art/scripts/sheet.js --out /tmp/s.png np_   # 放大總覽圖，供親眼檢查
+```
+
 ## 驗證
 ```
 node tests/e2e.js          # 只跑驗證
