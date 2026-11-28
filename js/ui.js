@@ -27,6 +27,9 @@
 
   function pos(x, y, w, h) { return 'left:' + x + 'px;top:' + y + 'px;width:' + w + 'px;height:' + h + 'px;'; }
   // 像素 ICON；沒有圖就退回文字代號
+  // SPEC-TIME 7.1b／AC 21：四檔險級（D.TIME.RISK_TIERS，即 riskTier() 的值域）共用一張色表 rk0–rk3（css），
+  // 路程 travelPreview 與荒野、地城標頭都走這裡；hot 只在「高」「極高」。
+  function riskCls(tier) { return ' rk' + D.TIME.RISK_TIERS.indexOf(tier) + (tier === '高' || tier === '極高' ? ' hot' : ''); }
   function ico(id, glyph, size) {
     if (id && IC.has(id)) return '<i class="px ic-' + id + '"' + (size ? ' style="width:' + size + 'px;height:' + size + 'px"' : '') + '></i>';
     return '<span class="gl">' + (glyph || '') + '</span>';
@@ -397,7 +400,7 @@
     if (p) {
       const n = D.NODES[dest];
       h += '<div class="dic">' + ico(n.ic, n.g, 32) + '</div><div class="dname"><b>' + n.name + '</b><span class="sub">經 ' + p.via + '</span></div>';
-      h += '<div class="vpill"><span class="ic">時</span>' + p.hours + ' 小時</div><div class="vpill"><span class="ic">食</span>−' + p.food + '</div><div class="vpill"><span class="ic">疲</span>+' + p.fat + '</div><div class="vpill' + (p.riskName === '高' || p.riskName === '極高' ? ' hot' : '') + '"><span class="ic">險</span>' + p.riskName + '</div><div class="vpill"><span class="ic">負</span>×' + p.mult.toFixed(2) + '</div>';
+      h += '<div class="vpill"><span class="ic">時</span>' + p.hours + ' 小時</div><div class="vpill"><span class="ic">食</span>−' + p.food + '</div><div class="vpill"><span class="ic">疲</span>+' + p.fat + '</div><div class="vpill' + riskCls(p.riskName) + '" data-testid="route-risk"><span class="ic">險</span>' + p.riskName + '</div><div class="vpill"><span class="ic">負</span>×' + p.mult.toFixed(2) + '</div>';
       h += '<button class="btn dark go" data-a="travel" data-testid="btn-travel">前往</button>';
     } else {
       const n = D.NODES[S.loc];
@@ -654,7 +657,7 @@
   function sceneWild(S) {
     const W = D.WILDS[S.loc]; const ns = G.nodeState(S.loc);
     let h = '<div class="wildscene' + scn('wild_' + S.loc) + '" data-testid="wild">';
-    h += '<div class="stagehead"><span class="pill">' + D.NODES[S.loc].name + '</span><span class="pill">險 ' + W.risk + '</span>' + (G.tideInfo() ? '<span class="pill hot">獸潮</span>' : '') + '</div>';
+    h += '<div class="stagehead"><span class="pill">' + D.NODES[S.loc].name + '</span><span class="pill' + riskCls(W.risk) + '" data-testid="head-risk">險 ' + W.risk + '</span>' + (G.tideInfo() ? '<span class="pill hot">獸潮</span>' : '') + '</div>';
     h += '<button class="btn" style="position:absolute;right:6px;top:6px;font-weight:700" data-a="toMap" data-testid="btn-leave">離開・地圖</button>';
     h += rumorChips(S);
     G.wildPoints(S.loc).forEach((p) => {
@@ -683,7 +686,7 @@
     const DG = D.DUNGEONS[S.loc]; const st = S.dungeon;
     const cleared = st.clearedDay === G.dayOf(S.t);
     let h = '<div class="dgscene' + scn('dg_' + S.loc) + '" data-testid="dungeon">';
-    h += '<div class="stagehead"><span class="pill">' + D.NODES[S.loc].name + '</span><span class="pill' + (DG.risk === '極高' ? ' hot' : '') + '">險 ' + DG.risk + '</span>' + (DG.mist ? '<span class="pill hot">血霧：每層侵蝕 +' + DG.mist + '</span>' : '') + '</div>';
+    h += '<div class="stagehead"><span class="pill">' + D.NODES[S.loc].name + '</span><span class="pill' + riskCls(DG.risk) + '" data-testid="head-risk">險 ' + DG.risk + '</span>' + (DG.mist ? '<span class="pill hot">血霧：每層侵蝕 +' + DG.mist + '</span>' : '') + '</div>';
     h += rumorChips(S);
     h += '<div class="dgdesc">' + DG.scene + '</div>';
     h += '<div class="floors">';

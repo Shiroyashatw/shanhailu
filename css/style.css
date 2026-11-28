@@ -18,6 +18,7 @@
   --r-blue: #5b8fc9;
   --r-rare: #d6b24a;
   --r-legend: #e07a2e;
+  --risk-x: #ff3b5c; /* 險級「極高」：暫定，待 UIUX 定稿 */
   --hp: #b5382c;
   --food: #c9a24a;
   --fat: #6b7fa8;
@@ -241,6 +242,13 @@ body.dragging, body.dragging * { cursor: grabbing !important; }
 .departbar .dname b { display: block; font-size: 14px; }
 .vpill { width: 84px; height: 28px; border: 1px solid var(--line); background: #100f0c; display: flex; align-items: center; gap: 4px; padding: 0 4px; font-size: 12px; white-space: nowrap; }
 .vpill.hot { border-color: var(--red); color: var(--red); }
+/* SPEC-TIME 7.1b／AC 21：四檔險級色表（低／中／高／極高），路程與荒野、地城標頭共用；hot 只加框 */
+.pill.rk0, .vpill.rk0 { color: var(--jade); }
+.pill.rk1, .vpill.rk1 { color: var(--gold); }
+.pill.rk2, .vpill.rk2 { color: var(--red); }
+.pill.rk3, .vpill.rk3 { color: var(--risk-x); }
+.pill.rk2.hot, .vpill.rk2.hot, .pill.rk3.hot, .vpill.rk3.hot { border-color: currentColor; }
+.pill.rk3.hot, .vpill.rk3.hot { font-weight: 700; }
 .vpill .ic { border: 1px solid var(--line); color: var(--ink-2); width: 16px; height: 16px; font-size: 10px; display: inline-flex; align-items: center; justify-content: center; font-weight: 700; }
 .departbar .go { margin-left: auto; width: 104px; height: 36px; font-size: 14px; }
 

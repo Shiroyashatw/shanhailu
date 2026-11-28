@@ -538,6 +538,53 @@ async function fresh(page, base, q) {
     check('fix4 自造情境測後 EDGES／NODES 已還原', rk.out.restored);
   }
 
+  // ===== V. fix5：四檔險級共用一張色表（SPEC-TIME 7.1b、AC 21；數值 18:25 裁定）；hot 只在高、極高 =====
+  if (want('fix5')) {
+    await fresh(page, base);
+    const TIERS = ['低', '中', '高', '極高'];
+    const look = (sel) => page.evaluate((sel) => { const e = document.querySelector(sel); if (!e) return null; const cs = getComputedStyle(e); return { text: e.textContent, color: cs.color, border: cs.borderTopColor, hot: e.classList.contains('hot'), cls: e.className }; }, sel);
+    // 荒野、地城標頭：逐一進入全部荒野與地城
+    const ids = await page.evaluate(() => { const D = window.SHL_DATA; return Object.keys(D.WILDS).map((k) => [k, 'wild', D.WILDS[k].risk]).concat(Object.keys(D.DUNGEONS).map((k) => [k, 'dungeon', D.DUNGEONS[k].risk])); });
+    const head = {};
+    for (const [id, kind, tier] of ids) {
+      await page.evaluate((id) => { const G = window.SHL; const S = G.state; S.known[id] = true; S.combat = null; S.event = null; S.dead = null; S.overlay = null; S.loc = id; G.enterHere(); }, id);
+      await page.waitForSelector('[data-testid=' + kind + ']');
+      head[id] = Object.assign({ tier, kind }, await look('[data-testid=head-risk]'));
+      if (WANT_SHOTS && ['jiku', 'liekou', 'chakou'].includes(id)) {
+        const dir5 = path.join(ROOT, 'docs/evidence/shots-shanhailu-dev02-fix5-1128');
+        fs.mkdirSync(dir5, { recursive: true });
+        const f = path.join(dir5, 'fix5-head-' + { jiku: '2-high-jiku', liekou: '3-extreme-liekou', chakou: '0-low-chakou' }[id] + '.png');
+        await page.screenshot({ path: f, clip: { x: 0, y: 0, width: 1280, height: 720 } });
+        console.log('SHOT  ' + path.relative(ROOT, f));
+      }
+    }
+    // 路程 travelPreview：在地圖上找出四檔各一條路線（白天／黑夜 × 各目的地），讀出發條「險」格
+    const route = {};
+    for (const hh of [12, 23]) for (const to of ['yizhan', 'chakou', 'qingwu', 'jiku', 'fuzhao']) {
+      const name = await page.evaluate(([hh, to]) => {
+        const G = window.SHL; const S = G.state; S.combat = null; S.event = null; S.dead = null; S.overlay = null;
+        S.loc = 'huiyao'; G.enterHere(); S.t = Math.floor(S.t / 1440) * 1440 + hh * 60; S.known[to] = true;
+        G.toMap(); G.selectDest(to); return G.travelPreview(to).riskName;
+      }, [hh, to]);
+      if (route[name]) continue;
+      const el = await look('[data-testid=route-risk]');
+      route[name] = Object.assign({ at: hh + ':00・' + to }, el);
+    }
+    const sample = TIERS.map((t) => [t, Object.keys(head).find((k) => head[k].tier === t)]);
+    check('[AC 21] 荒野／地城四檔各有一處（低／中／高／極高）', sample.every(([, k]) => k), Object.fromEntries(sample));
+    check('[AC 21] travelPreview 四檔各找到一條路線', TIERS.every((t) => route[t]), Object.fromEntries(TIERS.map((t) => [t, route[t] && route[t].at])));
+    const colors = TIERS.map((t) => route[t] && route[t].color);
+    check('[AC 21] 四檔顏色互不相同', new Set(colors).size === 4, Object.fromEntries(TIERS.map((t, i) => [t, colors[i]])));
+    TIERS.forEach((t, i) => {
+      const bad = Object.keys(head).filter((k) => head[k].tier === t && head[k].color !== colors[i]);
+      check('[AC 21] 「' + t + '」：所有荒野、地城標頭顏色與 travelPreview 同檔一致（' + colors[i] + '）', route[t] && !bad.length, { route: route[t], heads: Object.fromEntries(Object.keys(head).filter((k) => head[k].tier === t).map((k) => [k, head[k].color])) });
+    });
+    const hotBad = Object.keys(head).filter((k) => head[k].hot !== (head[k].tier === '高' || head[k].tier === '極高'));
+    check('hot 只在「高」「極高」：荒野、地城標頭 ' + Object.keys(head).length + ' 處', !hotBad.length, Object.fromEntries(Object.keys(head).map((k) => [k, head[k].tier + (head[k].hot ? '・hot' : '')])));
+    check('hot 只在「高」「極高」：travelPreview 四檔', TIERS.every((t) => route[t] && route[t].hot === (t === '高' || t === '極高')), Object.fromEntries(TIERS.map((t) => [t, route[t] && route[t].hot])));
+    check('腐骨沼（荒野）、沉淵祭窟（地城）標頭為「高」色且 hot', ['fuzhao', 'jiku'].every((k) => head[k].text === '險 高' && head[k].color === colors[2] && head[k].hot), { fuzhao: head.fuzhao, jiku: head.jiku });
+  }
+
   // ===== 截圖（1280×720；本包無對應 UI 草稿） =====
   if (want('shots')) {
     await fresh(page, base);
