@@ -459,6 +459,85 @@ async function fresh(page, base, q) {
     check('自造情境測後 EDGES／NODES 已還原', syn.restored);
   }
 
+  // ===== U. fix4：「中高」改「高」（數值 18:14 裁定、SPEC-TIME AC 21）；route() 第三、四層 tie-break =====
+  if (want('fix4')) {
+    await fresh(page, base);
+    const ids = await page.evaluate(() => { const D = window.SHL_DATA; return { wilds: Object.keys(D.WILDS), dgs: Object.keys(D.DUNGEONS), data: JSON.stringify({ w: D.WILDS, d: D.DUNGEONS, n: D.NODES, t: D.TIME }) }; });
+    check('[AC 21] 資料 WILDS／DUNGEONS／NODES／TIME 不含「中高」', !ids.data.includes('中高'));
+    const seen = {};
+    for (const id of ids.wilds.concat(ids.dgs)) {
+      await page.evaluate((id) => { const G = window.SHL; const S = G.state; S.known[id] = true; S.combat = null; S.event = null; S.dead = null; S.overlay = null; S.loc = id; G.enterHere(); }, id);
+      await page.waitForSelector(ids.wilds.includes(id) ? '[data-testid=wild]' : '[data-testid=dungeon]');
+      seen[id] = await page.evaluate(() => ({ body: document.body.innerText, pill: [...document.querySelectorAll('.stagehead .pill')].map((e) => e.textContent).find((t) => t.startsWith('險 ')) }));
+    }
+    const bad = Object.keys(seen).filter((k) => seen[k].body.includes('中高'));
+    check('[AC 21] 逐一進入全部荒野 ' + ids.wilds.length + ' 處、地城 ' + ids.dgs.length + ' 處，畫面不出現「中高」', bad.length === 0 && Object.keys(seen).length === ids.wilds.length + ids.dgs.length, { bad, pills: Object.fromEntries(Object.keys(seen).map((k) => [k, seen[k].pill])) });
+    check('[AC 21] 原「中高」的腐骨沼（荒野）、沉淵祭窟（地城）現顯示「險 高」', seen.fuzhao.pill === '險 高' && seen.jiku.pill === '險 高', { fuzhao: seen.fuzhao.pill, jiku: seen.jiku.pill });
+    if (WANT_SHOTS) {
+      await page.evaluate(() => { const G = window.SHL; const S = G.state; S.loc = 'jiku'; G.enterHere(); });
+      await page.waitForSelector('[data-testid=dungeon]');
+      const dirFix4 = path.join(ROOT, 'docs/evidence/shots-shanhailu-dev02-fix4-1128');
+      fs.mkdirSync(dirFix4, { recursive: true });
+      await page.screenshot({ path: path.join(dirFix4, 'fix4-jiku-risk-high.png'), clip: { x: 0, y: 0, width: 1280, height: 720 } });
+      console.log('SHOT  ' + path.relative(ROOT, path.join(dirFix4, 'fix4-jiku-risk-high.png')));
+    }
+    // 一段日誌：灰窯出發走到腐骨沼、露宿、再進沉淵祭窟，打開日誌掃字
+    const lg = await page.evaluate(() => {
+      const G = window.SHL; const S = G.state;
+      S.loc = 'huiyao'; G.enterHere(); S.hp = G.maxHp(); S.food = 100; S.fat = 0;
+      G.toMap(); G.selectDest('fuzhao'); G.travel();
+      S.combat = null; S.event = null; S.dead = null; S.loc = 'fuzhao'; G.enterHere(); G.camp();
+      S.combat = null; S.event = null; S.dead = null; S.loc = 'jiku'; G.enterHere();
+      S.overlay = null; G.setOverlay('log');
+      return { n: S.log.length, text: S.log.map((l) => l.text).join('\n') };
+    });
+    await page.waitForSelector('[data-testid=overlay-log]');
+    const logScr = await page.evaluate(() => document.body.innerText);
+    check('[AC 21] 日誌（含趕路、露宿、進地城共 ' + lg.n + ' 行）與日誌畫面不出現「中高」', lg.n > 0 && !lg.text.includes('中高') && !logScr.includes('中高'), lg.text.split('\n').slice(-6));
+    await page.evaluate(() => window.SHL.setOverlay('log'));
+
+    // route() 第三層（險值）、第四層（節點 id 序列）tie-break；每案 × EDGES 正常／反轉 × NODES 正常／反轉 × 端點對調
+    const rk = await page.evaluate(() => {
+      const G = window.SHL; const D = window.SHL_DATA; const S = G.state;
+      S.loc = 'huiyao'; S.scene = 'map'; S.t = Math.floor(S.t / 1440) * 1440 + 12 * 60; S.combat = null; S.event = null;
+      const cases = {
+        // 丙：直達野徑 2h（1 段野徑、單段 0.22×R）vs 經岔口 野徑 1h＋官道 1h（1 段野徑、多段 0.30×R）；節點序列字典序反而偏向經岔口 → 須由險值決定
+        丙: { edges: [{ a: 'huiyao', b: 'duyin', h: 2 }, { a: 'huiyao', b: 'chakou', h: 1 }, { a: 'chakou', b: 'duyin', h: 1, road: true }], go: 'huiyao,duyin', back: 'duyin,huiyao' },
+        // 丁：經驛站 野徑 1h＋官道 1h vs 經岔口 野徑 1h＋官道 1h：時數、野徑段數、險值都相同 → 節點 id 字典序小者（chakou < yizhan）
+        丁: { edges: [{ a: 'huiyao', b: 'yizhan', h: 1 }, { a: 'yizhan', b: 'duyin', h: 1, road: true }, { a: 'huiyao', b: 'chakou', h: 1 }, { a: 'chakou', b: 'duyin', h: 1, road: true }], go: 'huiyao,chakou,duyin', back: 'duyin,chakou,huiyao' },
+      };
+      // 丁的回程為 duyin→chakou(官道)→huiyao(野徑)，與 duyin→yizhan→huiyao 同樣三項相同
+      const keep = D.EDGES.slice(); const ks = Object.keys(D.NODES), vs = ks.map((k) => D.NODES[k]);
+      const setN = (rev) => { ks.forEach((k) => delete D.NODES[k]); (rev ? ks.slice().reverse() : ks).forEach((k) => (D.NODES[k] = vs[ks.indexOf(k)])); };
+      const seq = (from, e) => [from].concat(e.stops).join();
+      const out = {}, info = {};
+      Object.keys(cases).forEach((c) => [0, 1].forEach((er) => [0, 1].forEach((nr) => [0, 1].forEach((sw) => {
+        D.EDGES.length = 0;
+        let list = er ? cases[c].edges.slice().reverse() : cases[c].edges.slice();
+        if (sw) list = list.map((e) => Object.assign({}, e, { a: e.b, b: e.a }));
+        list.forEach((e) => D.EDGES.push(e)); setN(nr);
+        const go = G.route('huiyao', 'duyin'), back = G.route('duyin', 'huiyao');
+        const k = c + (er ? '・EDGES 反轉' : '・EDGES 正常') + (nr ? '・NODES 反轉' : '') + (sw ? '・端點對調' : '');
+        out[k] = seq('huiyao', go) === cases[c].go && seq('duyin', back) === cases[c].back;
+        if (!er && !nr && !sw) {
+          // 對照：兩條候選的（時數, 野徑段數, 險值三位）
+          const cand = c === '丙' ? [[list[0]], [list[1], list[2]]] : [[list[0], list[1]], [list[2], list[3]]];
+          info[c] = { go: seq('huiyao', go), back: seq('duyin', back), cand: cand.map((p) => [p.reduce((x, y) => x + y.h, 0), p.filter((y) => !y.road).length, Math.floor(G.routeRisk(p) * 1000 + 0.5 + 1e-9)]) };
+        } else if (!out[k]) info[k] = { go: seq('huiyao', go), back: seq('duyin', back) };
+      }))));
+      D.EDGES.length = 0; keep.forEach((e) => D.EDGES.push(e)); setN(0);
+      out.restored = D.EDGES.every((e, i) => e === keep[i]) && Object.keys(D.NODES).join() === ks.join();
+      return { out, info };
+    });
+    const ok = (c) => Object.keys(rk.out).filter((k) => k.startsWith(c));
+    const ci = rk.info.丙, di = rk.info.丁;
+    check('自造情境丙成立：兩條候選時數、野徑段數相同（2h、1 段），險值不同', ci && ci.cand[0][0] === ci.cand[1][0] && ci.cand[0][1] === ci.cand[1][1] && ci.cand[0][2] !== ci.cand[1][2], ci);
+    check('route() 第三層：時數、野徑段數相同 → 選險值低的（直達野徑）；× EDGES 正常／反轉 × NODES 正常／反轉 × 端點對調，來回 8 組全同', ok('丙').length === 8 && ok('丙').every((k) => rk.out[k]), rk.info);
+    check('自造情境丁成立：兩條候選時數、野徑段數、險值三位全同', di && JSON.stringify(di.cand[0]) === JSON.stringify(di.cand[1]), di);
+    check('route() 第四層：三項全同 → 選節點 id 序列字典序小的（經 chakou）；× EDGES 正常／反轉 × NODES 正常／反轉 × 端點對調，來回 8 組全同', ok('丁').length === 8 && ok('丁').every((k) => rk.out[k]), rk.info);
+    check('fix4 自造情境測後 EDGES／NODES 已還原', rk.out.restored);
+  }
+
   // ===== 截圖（1280×720；本包無對應 UI 草稿） =====
   if (want('shots')) {
     await fresh(page, base);

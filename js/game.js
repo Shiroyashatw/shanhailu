@@ -696,10 +696,10 @@ window.SHL = (function () {
     return out;
   }
   function route(from, to) {
-    // Dijkstra：以基礎時數為權重，只走已知的地點
-    // SPEC-TIME 7.1b／AC 20 tie-break：權重是（總時數, 野徑段數）的字典序——總時數相同時野徑段數少的優先，全官道最優先；
-    // 不依賴 NODES／EDGES 的排列順序（兩鍵都相同的路線才可能因順序不同而換條，兩者時數與險級基礎相同）
-    const dist = {}, wild = {}, prev = {}, Q = Object.keys(D.NODES).filter(known);
+    // Dijkstra 先求（總時數, 野徑段數）字典序最短，只走已知的地點；再在所有並列最短路線中依序比
+    // (3) 路線險值 risk3(routeRisk)（以呼叫當下的時段、負重、獸潮、R 計）較低者，(4) 節點 id 序列字典序較小者。
+    // SPEC-TIME 7.1b／AC 20、數值 18:14 裁定：結果不隨 NODES／EDGES 的排列順序或邊的端點寫法改變。
+    const dist = {}, wild = {}, Q = Object.keys(D.NODES).filter(known);
     Q.forEach((k) => { dist[k] = Infinity; wild[k] = Infinity; }); dist[from] = 0; wild[from] = 0;
     const better = (h1, w1, h2, w2) => h1 < h2 || (h1 === h2 && w1 < w2);
     const left = new Set(Q);
@@ -708,20 +708,43 @@ window.SHL = (function () {
       left.delete(u);
       neighbors(u).forEach(([v, e]) => {
         const h = dist[u] + e.h, w = wild[u] + (e.road ? 0 : 1);
-        if (better(h, w, dist[v], wild[v])) { dist[v] = h; wild[v] = w; prev[v] = [u, e]; }
+        if (better(h, w, dist[v], wild[v])) { dist[v] = h; wild[v] = w; }
       });
     }
-    const edges = []; const stops = []; let c = to;
-    while (c !== from && prev[c]) { edges.unshift(prev[c][1]); stops.unshift(c); c = prev[c][0]; }
-    edges.stops = stops;
+    // 由終點倒推所有並列最短路線（只沿「剛好達到最短值」的邊）
+    const paths = [];
+    const walk = (c, edges, nodes) => {
+      if (c === from) { paths.push({ edges, nodes: [from].concat(nodes) }); return; }
+      neighbors(c).forEach(([u, e]) => {
+        if (nodes.includes(u) || dist[u] + e.h !== dist[c] || wild[u] + (e.road ? 0 : 1) !== wild[c]) return;
+        walk(u, [e].concat(edges), [c].concat(nodes));
+      });
+    };
+    if (from !== to && dist[to] < Infinity) walk(to, [], []);
+    const seq = (x, y) => { for (let i = 0; i < Math.min(x.length, y.length); i++) if (x[i] !== y[i]) return x[i] < y[i] ? -1 : 1; return x.length - y.length; };
+    paths.forEach((p) => (p.r = risk3(routeRisk(p.edges))));
+    paths.sort((x, y) => x.r - y.r || seq(x.nodes, y.nodes));
+    const edges = paths.length ? paths[0].edges : [];
+    edges.stops = paths.length ? paths[0].nodes.slice(1) : [];
     return edges;
   }
-  // SPEC-TIME 7.1b 路程險級：先封頂 RISK_CAP，再 half-up 取三位（以千分位整數比較，防浮點：0.1495 → 150 →「中」），
+  // 路線險值：封頂 RISK_CAP 後的值（未取位）。travelPreview 與 route() 的第三層 tie-break 共用。
+  function routeRisk(edges) {
+    const band = loadBand();
+    const wild = edges.some((e) => !e.road);
+    let risk = wild ? (edges.length > 1 ? 0.3 : 0.22) : 0.04;
+    if (isNight(S.t)) risk *= 2;
+    if (band.id === 'heavy' || band.id === 'over') risk *= 1.4;
+    if (wild && perk('jiao', 25)) risk *= 0.8;
+    if (wild && tideOn()) risk *= 1.5;
+    // SPEC-01 §4.8「套用」：多乘治安／匪勢修正 R，封頂 0.85 在所有乘項之後做一次（夜間仍用現況 isNight；SPEC-TIME 7.1 屬 DEV-TIME）
+    return Math.min(D.WORLD.RISK_CAP, risk * riskR(wild));
+  }
+  // SPEC-TIME 7.1b：先封頂 RISK_CAP，再 half-up 取三位，回傳千分位整數（防浮點：0.1495 → 150）
+  function risk3(risk) { return Math.floor(Math.min(D.WORLD.RISK_CAP, risk) * 1000 + 0.5 + 1e-9); }
   // 依 D.TIME.RISK_CUTS 半開區間分四檔。所有用到路程險級的地方都走這一個函式。
   function riskTier(risk) {
-    const r = Math.min(D.WORLD.RISK_CAP, risk);
-    const k = Math.floor(r * 1000 + 0.5 + 1e-9);
-    const cuts = D.TIME.RISK_CUTS; let i = 0;
+    const k = risk3(risk), cuts = D.TIME.RISK_CUTS; let i = 0;
     while (i < cuts.length && k >= Math.round(cuts[i] * 1000)) i++;
     return D.TIME.RISK_TIERS[i];
   }
@@ -735,14 +758,8 @@ window.SHL = (function () {
     const fat = Math.round(3 * hours * band.fat * xingRed * (1 - affixSum('fatred') / 100));
     const food = 4 * hours;
     const wild = edges.some((e) => !e.road);
-    let risk = wild ? (edges.length > 1 ? 0.3 : 0.22) : 0.04;
-    if (isNight(S.t)) risk *= 2;
-    if (band.id === 'heavy' || band.id === 'over') risk *= 1.4;
-    if (wild && perk('jiao', 25)) risk *= 0.8;
-    if (wild && tideOn()) risk *= 1.5;
-    // SPEC-01 §4.8「套用」：多乘治安／匪勢修正 R，封頂 0.85 在所有乘項之後做一次（夜間仍用現況 isNight；SPEC-TIME 7.1 屬 DEV-TIME）
     const R = riskR(wild);
-    risk = Math.min(D.WORLD.RISK_CAP, risk * R);
+    const risk = routeRisk(edges);
     const riskName = riskTier(risk);
     const via = edges.length > 1 ? D.NODES[edges.stops[0]].name : (edges[0] && edges[0].road ? '官道' : '野徑');
     return { edges, hours, fat, food, risk, riskName, mult: sm, via, wild, R };
@@ -2023,7 +2040,7 @@ window.SHL = (function () {
     clickPack, unequip, useItem, pickupGround, drag, identify, identifyFee, chooseOrigin,
     backToTitle, confirmName, nameErrors, fullName, identity, randomName, fallbackName, wantedPoster,
     place, bld, inBld, known, repOk, repOf, knownFactions, LORE,
-    selectDest, travel, travelPreview, riskTier, toMap, enterHere, route, setMapView,
+    selectDest, travel, travelPreview, riskTier, routeRisk, toMap, enterHere, route, setMapView,
     explore, exploreInfo, exploreChance, wildPoints,
     setTab, selectShop, setQty, buy, sell, sellPrice, buyPrice, buysHere, rowLocked, shopRows, townPrice, avgPrice, innRest, innSoup, innCost, townHurt, service,
     talk, streetTalk, streetClose, cheapRumor,
