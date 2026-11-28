@@ -106,12 +106,14 @@ body.dragging, body.dragging * { cursor: grabbing !important; }
 
 /* ---------- 右欄 ---------- */
 .portrait { position: absolute; left: 8px; top: 8px; width: 60px; height: 60px; border: 1px solid var(--line); background: var(--hatch); display: flex; align-items: center; justify-content: center; color: var(--gold); font-family: var(--serif); font-size: 15px; font-weight: 700; letter-spacing: 2px; }
-.pname { position: absolute; left: 76px; top: 6px; font-size: 15px; font-weight: 700; white-space: nowrap; }
-.pname .page { font-size: 11px; font-weight: 400; color: var(--ink-3); margin-left: 8px; }
+.pname { position: absolute; left: 76px; top: 4px; font-size: 15px; font-weight: 700; white-space: nowrap; display: flex; flex-direction: column; }
+/* UI-01 §4／製作人 17:04 (7)：右欄名字兩行——第一行全名、第二行「身分・N歲」 */
+.pname .pfull { line-height: 16px; height: 16px; }
+.pname .page { font-size: 11px; font-weight: 400; color: var(--ink-3); line-height: 13px; height: 13px; }
 .pill { position: absolute; height: 20px; border: 1px solid var(--line); font-size: 11px; display: flex; align-items: center; justify-content: center; white-space: nowrap; background: #100f0c; }
 .pill.date { color: var(--jade); }
 .pill.hot { border-color: var(--red); color: var(--red); }
-.silver { position: absolute; left: 76px; top: 52px; height: 18px; display: flex; align-items: center; gap: 4px; font-weight: 700; font-size: 13px; color: var(--gold); }
+.silver { position: absolute; left: 76px; top: 58px; height: 18px; display: flex; align-items: center; gap: 4px; font-weight: 700; font-size: 13px; color: var(--gold); }
 .vit { position: absolute; left: 8px; width: 204px; height: 16px; display: flex; align-items: center; gap: 6px; }
 .vit .gl { width: 16px; text-align: center; font-size: 10px; font-weight: 700; }
 .vit .bar { position: relative; width: 120px; height: 8px; border: 1px solid var(--line); background: #0f0e0c; }
@@ -189,6 +191,32 @@ body.dragging, body.dragging * { cursor: grabbing !important; }
 .ocard .oa { color: var(--jade); }
 .ocard .op { color: var(--gold); }
 .ocard .og { color: var(--ink-3); margin-top: auto; }
+/* 標題頁只剩一張「平民」卡（DEV-01） */
+.ogrid.one { left: 287px; width: 222px; grid-template-columns: 222px; }
+.ocard .olabel { color: var(--ink-3); font-size: 12px; }
+
+/* ---------- 取名頁（DEV-01／UI-01 SHL-UI01-01；位置取自草稿標註，座標相對中欄） ---------- */
+.naming > * { position: absolute; z-index: 1; }
+.nm-title { left: 240px; top: 34px; width: 316px; text-align: center; font-family: var(--serif); font-size: 32px; font-weight: 700; letter-spacing: 32px; text-indent: 32px; color: var(--gold); text-shadow: 0 2px 0 #000; }
+.nm-id { left: 250px; top: 94px; width: 296px; height: 64px; border: 1px solid var(--line); background: rgba(23, 21, 18, .94); }
+.nm-id .nm-face { position: absolute; left: 8px; top: 7px; width: 50px; height: 50px; border: 1px solid var(--line); background: #100f0c; display: flex; align-items: center; justify-content: center; font-family: var(--serif); font-size: 18px; color: var(--ink-2); }
+.nm-id .nm-idl { position: absolute; left: 70px; top: 9px; font-size: 12px; color: var(--ink-3); }
+.nm-id b { position: absolute; left: 70px; top: 28px; font-family: var(--serif); font-size: 18px; letter-spacing: 4px; color: var(--ink); }
+.nm-lead { left: 48px; top: 174px; width: 700px; text-align: center; font-size: 16px; color: var(--ink-2); }
+.nm-lab { top: 218px; width: 140px; text-align: center; font-size: 16px; font-weight: 700; color: var(--ink); }
+.nm-in { top: 244px; width: 140px; height: 52px; border: 2px solid var(--ink-3); background: #100f0c; color: var(--ink); font-family: var(--serif); font-size: 24px; font-weight: 700; text-align: center; outline: none; padding: 0 6px; }
+.nm-in:focus { border-color: var(--gold); }
+.nm-hint { top: 302px; width: 140px; text-align: center; font-size: 16px; color: var(--ink-3); }
+.nm-prev { left: 176px; top: 330px; width: 304px; height: 32px; display: flex; align-items: center; gap: 24px; white-space: nowrap; }
+.nm-prev span { font-size: 16px; color: var(--ink-3); }
+.nm-prev b { font-family: var(--serif); font-size: 24px; color: var(--gold); letter-spacing: 2px; }
+.nm-rand { left: 176px; top: 382px; width: 140px; height: 48px; font-size: 16px; }
+.nm-ok { left: 336px; top: 382px; width: 200px; height: 48px; font-size: 16px; font-weight: 700; }
+.nm-ok:disabled { opacity: .35; cursor: not-allowed; }
+.nm-pool { left: 48px; top: 440px; width: 700px; text-align: center; font-size: 16px; color: var(--ink-3); }
+.nm-rule { left: 48px; top: 466px; width: 700px; text-align: center; font-size: 16px; line-height: 22px; color: var(--ink-2); }
+.nm-rule .red { color: var(--red); }
+.nm-back { left: 300px; top: 520px; width: 196px; height: 44px; font-size: 16px; border-style: dashed; }
 
 /* ---------- 世界地圖 ---------- */
 .map { position: absolute; left: 0; top: 0; width: 796px; height: 560px; border-bottom: 1px solid var(--line-soft); overflow: hidden; background: radial-gradient(ellipse at 45% 55%, #1c1915 0, #100f0c 85%); }

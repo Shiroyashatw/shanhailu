@@ -1,0 +1,60 @@
+﻿字串key,SPEC狀態或門檻,文案,字數,備註
+city.label.prosperity,SPEC-01 v0.2 §7.1 繁榮,繁榮,2,與 UI-02 現稿一致
+city.label.order,SPEC-01 v0.2 §7.1 治安,治安,2,
+city.label.treasury,SPEC-01 v0.2 §7.1 財庫,財庫,2,
+city.label.garrison,SPEC-01 v0.2 §7.1 駐軍,駐軍,2,列名維持「駐軍」；第 3 檔已改名「守備」（#6 已定）
+city.label.bandit,SPEC-01 v0.2 §7.1 匪勢（區域）,匪勢,2,區域值，兩鎮同值
+city.prosperity.1,P < 25,荒涼,2,由差到好：荒涼→冷清→平常→熱鬧→繁華；五檔皆 2 字。門檻為手算值，之後驗算可能微調
+city.prosperity.2,25 ≤ P < 40,冷清,2,
+city.prosperity.3,40 ≤ P < 60,平常,2,起手 50／45 都落在此檔
+city.prosperity.4,60 ≤ P < 75,熱鬧,2,
+city.prosperity.5,P ≥ 75,繁華,2,`Pcap` = 80，可達
+city.trend.up,brief.trend = up（dP ≥ 0.5）,較昨日升,4,因果句的 {trend} 只用升／降；持平不進因果句
+city.trend.down,brief.trend = down（dP ≤ −0.5）,較昨日降,4,與「升」字數相同
+city.trend.flat,brief.trend = flat（|dP| < 0.5）；whyCode = null,與昨日持平,5,持平時只顯示這句，不出因果句（§7.5）。不用「較昨日持平」，語法不通
+city.delta.up,dP 升；數字行可帶數字（X-h）,較昨日+{N},5（以最長值計）,{N} 為 dP 四捨五入的整數（SPEC §3：顯示一律四捨五入）。每日變動上限 ±3，故 {N} 為 1 位數、整句 5 字。符號半形 +，全形數學負號用 −（U+2212），沿用 UI-02 現稿。因果句不帶數字
+city.delta.down,dP 降,較昨日−{N},5（以最長值計）,同上
+city.delta.flat,dP 持平,與昨日持平,5,同 city.trend.flat
+city.order.1,O < 25,混亂,2,由差到好：混亂→不安→尚可→安穩→太平；五檔皆 2 字
+city.order.2,25 ≤ O < 45,不安,2,
+city.order.3,45 ≤ O < 65,尚可,2,起手 55／60 都落在此檔
+city.order.4,65 ≤ O < 85,安穩,2,
+city.order.5,O ≥ 85,太平,2,
+city.bandit.1,B < 15,絕跡,2,方向與前兩組相反：數字越高越壞。UIUX 若用顏色，請反向
+city.bandit.2,15 ≤ B < 35,零星,2,起手 30 在此檔
+city.bandit.3,35 ≤ B < 60,猖獗,2,同時是 WHY_BANDIT 的成立線（B ≥ 35）
+city.bandit.4,B ≥ 60,橫行,2,
+city.garrison.0,Geff = 0,無,1,v0.2 已寫明對應。與本檔先前照列序對的結果一致，檔名不改
+city.garrison.1,Geff = 1,自衛隊,3,
+city.garrison.2,Geff = 2,巡邏隊,3,
+city.garrison.3,Geff = 3,守備,2,MVP 編制 ≤ 2，資助加派最多到 3。2026-11-28 16:10 mumi 定由「駐軍」改名「守備」
+city.garrison.aid,brief.aidToday 為真；X＝brief.aidDaysLeft（§7.6：含今日，最後一天＝1，0＝今日無加派）,資助加派中，餘{aidDaysLeft}天,10（以最長值計）,與欠餉不會同日成立（§5.2）。最長餘 20 天（灰窯 Fcap＝500、差額 25），剛好 10 字。變數名對齊 brief 欄位
+city.garrison.debt,brief.debtToday 為真（布林：今日沒付足編制軍費而降檔）。與 debtDays（連續欠餉天數，求援當日歸 0）不是同一個欄位,欠餉，降一檔,6,§7.1 原文；日誌作「欠餉，駐軍降一檔」
+city.treasury.debt,序 1：debt（今日欠餉，debtToday）,欠餉,2,四檔皆 2 字。由緊到寬：欠餉→吃緊→足餉→滿庫（判定序是欠餉→滿庫→吃緊→足餉）
+city.treasury.full,序 2：full（T ≥ T_CAP，含今日有上繳）。灰窯 ≥ 1350、渡陰 ≥ 3600,滿庫,2,灰窯 120 天內碰不到（§9 E6）
+city.treasury.tight,序 3：tight（T < 3 × need，剩不到 3 天軍費）。灰窯 < 45、渡陰 < 120,吃緊,2,採用數值設計師建議。理由見第 3 節
+city.treasury.ok,序 4：ok（其餘）。灰窯 45–1349、渡陰 120–3599；Gnom＝0 時一律 ok,足餉,2,起手灰窯 203、渡陰 303 都落在此檔
+city.treasury.in,brief.treasuryIn（今日收入合計：基礎稅 Inc＋當日交易稅＋罰金與贖款＋求援撥款。不含資助）,今日收入{treasuryIn}兩,9（以最長值計）,§7.1 稱「今日收入合計」，§11 作「今日收入」。為符合展開數字行 ≤ 10 字，用短名；4 位數時 9 字。若加「合計」且數字 4 位會到 11 字
+city.treasury.out,brief.treasuryOut（今日支出合計：實付軍費＋賞金實付＋上繳）,今日支出{treasuryOut}兩,9（以最長值計）,同上，用 §11 短名
+city.treasury.net,brief.treasuryNet ＝ treasuryIn − treasuryOut（今日淨額）。資助不計入（進 F 不進 T）,今日淨額{treasuryNet}兩,10（以最長值計）,正數加半形 +，負數用 −（U+2212）；為 0 時寫「0」（SPEC 未規定符號，沿用舊假設）。最長「今日淨額−3600兩」＝10 字。舊欄位 brief.dT 改為測試用實際變動，UI 不讀
+city.treasury.amount,日結後現額 round(T)（§7.1、§7.6）,現額{T}兩,7（以最長值計）,T 最大 3600（渡陰 T_CAP），7 字。舊文案是「{T}兩」，現依 §11 加上「現額」以免與收支三行混淆
+city.treasury.taxcut,brief.taxCutDays > 0 時，財庫展開加一行。X＝taxCutDays（求援當日＝10，最後一次被抽的那天日結後為 0，不再顯示）。rescueCd 不顯示,稅收抽成，餘{taxCutDays}天,9（以最長值計）,由備用句改為正式版。變數名對齊 brief.taxCutDays。最長 9 字。當日被抽金額 brief.taxCutAmt 供 UI 選用，本檔不另寫一句，以免與這行重複
+city.rescue.today,brief.rescueToday；文案可帶 brief.rescueAmt（灰窯 90、渡陰 240）與抽成天數 10。§11 暫名「已求援」,已求援，得銀{rescueAmt}兩,10（以最長值計）,正式版。抽成另見展開行「稅收抽成，餘10天」，不擠進警示條。最長（渡陰 240）10 字，≤ 16。不寫破曉或天星（MVP 只做抽成、不選邊）。已刪舊備用句「財庫見底，鎮上求援」「求援得銀{N}兩，稅收抽成{days}天」
+city.why.tide,序 1：該鎮今日在獸潮期；只解釋降（`WHY_TIDE`）,繁榮{trend}，因獸潮壓境,12（以最長值計）,範例：「繁榮較昨日降，因獸潮壓境」
+city.why.hurt,序 2：該鎮受創中；只解釋降（`WHY_HURT`）,繁榮{trend}，因獸潮過後鎮上受創,16（以最長值計）,範例：「繁榮較昨日降，因獸潮過後鎮上受創」
+city.why.repel,序 3：今日擊退成功（玩家殺滿或自衛）；只解釋升（`WHY_REPEL`）,繁榮{trend}，因擊退獸潮,12（以最長值計）,範例：「繁榮較昨日升，因擊退獸潮」
+city.why.debt,序 4：今日欠餉降檔（debtToday）；只解釋降（`WHY_DEBT`）,繁榮{trend}，因欠餉，駐軍降一檔,16（以最長值計）,範例：「繁榮較昨日降，因欠餉，駐軍降一檔」
+city.why.bandit,序 5：B ≥ 35（猖獗以上）；只解釋降（`WHY_BANDIT`）,繁榮{trend}，因匪勢{bandit},12（以最長值計）,範例：「繁榮較昨日降，因匪勢猖獗」；橫行時改末二字
+city.why.renlu,序 6：渡陰關昨日有人被賣（refugee.soldYday > 0，§5.10）；只解釋降（`WHY_RENLU`，新）,繁榮{trend}，因難民被販走,13（以最長值計）,範例：「繁榮較昨日降，因難民被販走」。用已定名「販人」的「販」與「難民」（關內難民棚）；不寫四階職稱，因條件是成交本身，不看是哪一階經手
+city.why.aid,序 7：今日資助加派中（aidToday）；只解釋升（`WHY_AID`）,繁榮{trend}，因資助巡邏加派駐軍,16（以最長值計）,範例：「繁榮較昨日升，因資助巡邏加派駐軍」
+city.why.order_up,序 8：治安昨日變動 ≥ +1；只解釋升（`WHY_ORDER_UP`）,繁榮{trend}，因治安轉好,12（以最長值計）,範例：「繁榮較昨日升，因治安轉好」
+city.why.order_down,序 9：治安昨日變動 ≤ −1；只解釋降（`WHY_ORDER_DOWN`）,繁榮{trend}，因治安轉差,12（以最長值計）,範例：「繁榮較昨日降，因治安轉差」
+city.why.revert,序 10：其餘、dP 與 (P* − P昨) 同向（朝常態回穩）；升或降（`WHY_REVERT`，新）,繁榮{trend}，因市面回穩,12（以最長值計）,範例：「繁榮較昨日升，因市面回穩」「繁榮較昨日降，因市面回穩」
+city.why.none,序 11：其餘（市面小起落，即 PNOISE）；升或降（`WHY_NONE`）,繁榮{trend}，因市面小起落,13（以最長值計）,範例：「繁榮較昨日升，因市面小起落」。舊文案「無大事」已不符 v0.2 定義，故改
+city.quest.bandit.title.2,剿匪委託 bandit ×2，賞金 36 兩（§4.9）,獵殺劫匪 ×2,7,採用 §11 暫名。地點另見 where
+city.quest.bandit.title.4,剿匪委託 bandit ×4，賞金 76 兩（§4.9）,獵殺劫匪 ×4,7,同上
+city.quest.bandit.where,where['bandit']（§4.9、§5.9）,野徑一帶,4,兩種剿匪題與救援（有據點版）共用
+city.quest.rescue.title,救援委託 kind:'rescue'，兩種內容共用此題（§5.9、§11）,救回被擄的人,6,採用 §11 暫名。6 字。賞金 36 兩、破曉聲望 +1 是機制數字，不寫進標題，以免與板面酬勞欄重複
+city.quest.rescue.body.crew,crew ≥ 1：殺 bandit ×2（野徑一帶）並帶回被擄者,野徑一帶，獵殺劫匪 ×2，救回被擄的人,19,有據點版正文
+city.quest.rescue.body.search,crew < 1：改為野外搜救（探查 2 小時）,野外搜救，探查2小時，尋回被擄的人,17,無據點版正文。數字與單位不留空格；用 24 小時制的「小時」，不用時辰
+city.quest.rescue.tag.search,無據點版的短標，用以和有據點版區別（§11「野外搜救版」）,野外搜救,4,4 字。若板面只靠正文區別，可不顯示

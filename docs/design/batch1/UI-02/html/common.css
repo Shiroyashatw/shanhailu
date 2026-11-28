@@ -1,0 +1,64 @@
+
+*{box-sizing:border-box}
+html,body{margin:0;padding:0;background:#fff;color:#000;font-family:"Noto Sans CJK TC","Noto Sans CJK","Noto Sans",sans-serif;-webkit-font-smoothing:antialiased}
+.page{display:flex;gap:16px;padding:20px;width:2136px;align-items:flex-start}
+.stage{position:relative;width:1280px;height:720px;flex:0 0 1280px;overflow:hidden;background:#fff;outline:1px solid #000}
+.b{position:absolute;border:1px solid #8a8a8a;background:#f7f7f7}
+.b.z{background:#fafafa}.b.p{background:#fff;border-color:#555}.b.in{background:#eeeeee}
+.b.sel{border:2px solid #000;background:#e8e8e8}.b.dash{border-style:dashed;background:#fff}
+.b.off{border-style:dashed;background:#fbfbfb}.b.pri{background:#2b2b2b;border-color:#000}
+.b.scrim{background:rgba(0,0,0,.35);border:none}.b.tip{background:#fff;border:1px solid #000;box-shadow:2px 2px 0 #bbb}
+.b.modal{background:#fff;border:2px solid #000}.b.warn{border:2px solid #be1414;background:#fff}
+.b.ic{background:#e4e4e4;border:1px solid #9a9a9a}
+.b.ic::after{content:"";position:absolute;inset:0;background:linear-gradient(to top right,transparent 49%,#b5b5b5 50%,transparent 51%)}
+.b.round{border-radius:50%}
+.b.fill{background:#444;border-color:#444}
+.b.fill2{background:#888;border-color:#888}
+.b.art{background:repeating-linear-gradient(135deg,#f4f4f4 0 6px,#ececec 6px 12px);border:1px solid #b0b0b0}
+.hr{position:absolute;height:1px;background:#9a9a9a}
+.vr{position:absolute;width:1px;background:#9a9a9a}
+.ln{position:absolute;background:#9a9a9a;transform-origin:0 50%;pointer-events:none}
+.tx{position:absolute;white-space:nowrap;overflow:hidden;color:#000;z-index:3}
+.tx.ml{white-space:normal}
+.tx.c{text-align:center}.tx.r{text-align:right}
+.dim{color:#555}.off{color:#8a8a8a}.red{color:#be1414}.wh{color:#fff}
+.term{text-decoration:underline dotted #000;text-underline-offset:3px}
+.f10{font:400 10px/14px "Noto Sans CJK TC","Noto Sans CJK","Noto Sans",sans-serif}.f10b{font:700 10px/14px "Noto Sans CJK TC","Noto Sans CJK","Noto Sans",sans-serif}
+.f11{font:400 11px/15px "Noto Sans CJK TC","Noto Sans CJK","Noto Sans",sans-serif}.f11b{font:700 11px/15px "Noto Sans CJK TC","Noto Sans CJK","Noto Sans",sans-serif}
+.f12{font:400 12px/16px "Noto Sans CJK TC","Noto Sans CJK","Noto Sans",sans-serif}.f12b{font:700 12px/16px "Noto Sans CJK TC","Noto Sans CJK","Noto Sans",sans-serif}.f13{font:400 13px/18px "Noto Sans CJK TC","Noto Sans CJK","Noto Sans",sans-serif}
+.f14{font:400 14px/20px "Noto Sans CJK TC","Noto Sans CJK","Noto Sans",sans-serif}.f14b{font:700 14px/20px "Noto Sans CJK TC","Noto Sans CJK","Noto Sans",sans-serif}.f16{font:400 16px/22px "Noto Sans CJK TC","Noto Sans CJK","Noto Sans",sans-serif}.f16b{font:700 16px/22px "Noto Sans CJK TC","Noto Sans CJK","Noto Sans",sans-serif}.f18{font:400 18px/24px "Noto Sans CJK TC","Noto Sans CJK","Noto Sans",sans-serif}.f18b{font:700 18px/24px "Noto Sans CJK TC","Noto Sans CJK","Noto Sans",sans-serif}
+.bd{position:absolute;z-index:60;min-width:18px;height:13px;padding:0 2px;background:#fff;border:1px solid #be1414;color:#be1414;font:700 9px/11px "Noto Sans Mono CJK TC","Noto Sans CJK TC","Noto Sans CJK","Noto Sans",sans-serif;text-align:center}
+.stage-wrap{flex:0 0 1280px;width:1280px}.stamp{margin-top:6px;display:inline-block;border:1px solid #000;background:#fff;padding:0 6px;font:700 11px/16px "Noto Sans CJK TC","Noto Sans CJK","Noto Sans",sans-serif}
+.legend{width:780px;flex:0 0 780px;font:400 11px/15px "Noto Sans CJK TC","Noto Sans CJK","Noto Sans",sans-serif;color:#000}
+.legend h1{font:700 16px/22px "Noto Sans CJK TC","Noto Sans CJK","Noto Sans",sans-serif;margin:0 0 2px}
+.legend .sub{color:#333;margin:0 0 6px}
+.legend .cols{column-count:2;column-gap:14px}
+.legend .it{break-inside:avoid;margin:0 0 5px;padding-left:28px;position:relative}
+.legend .it b.n{position:absolute;left:0;top:1px;border:1px solid #be1414;color:#be1414;font:700 9px/11px "Noto Sans Mono CJK TC","Noto Sans CJK TC","Noto Sans CJK","Noto Sans",sans-serif;padding:0 2px;min-width:20px;text-align:center}
+.legend .it .nm{font-weight:700}
+.legend .it .g{color:#333}
+.legend .note{border-top:1px solid #999;margin-top:6px;padding-top:4px;color:#222}
+.legend .note p{margin:0 0 3px}
+.b.dot{background:#be1414;border:1px solid #be1414;border-radius:50%}
+.b.glow{border:2px solid #000;background:transparent;box-shadow:0 0 0 4px #d6d6d6}
+.b.cap{background:#fff;border:1px solid #000;border-radius:12px;box-shadow:2px 2px 0 #bbb}
+.b.ell{border:1px dashed #9a9a9a;background:transparent;border-radius:50%}
+.b.tick{background:#000;border:none}
+.b.terr{border:1px dashed #c4c4c4;background:repeating-linear-gradient(45deg,#ededed 0 2px,transparent 2px 8px);border-radius:46%}
+.b.mtn{border:none;background:transparent;width:0;height:0}
+.b.map{background:#fbfbfb;border:1px solid #8a8a8a}
+.b.ghost{background:transparent;border:1px dashed #9a9a9a}
+.b.enemy{border:2px dashed #555;background:repeating-linear-gradient(135deg,#e9e9e9 0 5px,#dedede 5px 10px);border-radius:40% 40% 8px 8px}
+.b.chip{background:#fff;border:1px solid #777;border-radius:2px}
+.b.rd{background:#fff;border:1px solid #be1414}
+.b.rfill{background:#be1414;border-color:#be1414}
+.b.lock{border:1px dashed #9a9a9a;background:repeating-linear-gradient(135deg,#fff 0 4px,#f0f0f0 4px 8px)}
+.b.dk{background:#000;border-color:#000}
+.ln.road{height:3px!important;background:#222}
+.ln.trail{height:0!important;background:transparent;border-top:2px dashed #555}
+.ln.selr{height:5px!important;background:#000}
+.ln.river{height:6px!important;background:#e2e2e2}
+.f9{font:400 9px/12px "Noto Sans CJK TC","Noto Sans CJK","Noto Sans",sans-serif}.f9b{font:700 9px/12px "Noto Sans CJK TC","Noto Sans CJK","Noto Sans",sans-serif}
+.f20{font:400 20px/26px "Noto Sans CJK TC","Noto Sans CJK","Noto Sans",sans-serif}.f20b{font:700 20px/26px "Noto Sans CJK TC","Noto Sans CJK","Noto Sans",sans-serif}.f22b{font:700 22px/28px "Noto Sans CJK TC","Noto Sans CJK","Noto Sans",sans-serif}
+.big{font:700 28px/34px "Noto Sans CJK TC","Noto Sans CJK","Noto Sans",sans-serif;color:#d2d2d2;letter-spacing:6px}
+.legend .extra{margin-top:8px;border-top:1px solid #999;padding-top:6px}
