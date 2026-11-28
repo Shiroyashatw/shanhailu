@@ -172,6 +172,12 @@ async function fresh(page, base, opts) {
     check('起手 B = 30、crew = 4（§3.2）', r.r0.B === 30 && r.r0.crew === 4, r.r0);
     check('AC-E1 起手殺 4 名劫匪：B 30 → 20、crew 4 → 2（立即，不等日結）', r.r1.B === 20 && r.r1.crew === 2, r.r1);
     check('剿匪後 R_wild 隨新 B 變動（DEV-02 的 R 只接輸入，未重做）：B=20、Ō=57.5 → 0.88', near(r.r1.risk, 0.88, 1e-9), r.r1.risk);
+    const e3 = await page.evaluate(() => {
+      const G = window.SHL; const S = G.state; const W = S.world;
+      W.region.B = 45; W.towns.huiyao.O = 50; W.towns.duyin.O = 50; S.loc = 'huiyao'; S.t = 22 * 60;
+      const p = G.travelPreview('chakou'); return { R: p.R, risk: p.risk };
+    });
+    check('AC-E3 B=45、Ō=50 時夜間野徑單段 0.22 × 1.255 × 2 = 0.552（R 由 DEV-02 套用，本包只供 B／O）', near(e3.R, 1.255, 1e-9) && near(e3.risk, 0.5522, 1e-9), e3);
     // E2：重開局，逐日記錄 B 與 crew
     await fresh(page, base, { noise: false });
     const ser = await page.evaluate(() => {
