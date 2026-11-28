@@ -1,0 +1,12 @@
+52758a01912a9d689094572a38f3635237106fca
+# git diff --stat cbef823 HEAD -- js css tests index.html
+ js/data.js                    |  15 +-
+ js/game.js                    | 137 ++++++++++--
+ js/ui.js                      |   2 +
+ tests/e2e-dev04.js            | 501 ++++++++++++++++++++++++++++++++++++++++++
+ tests/e2e.js                  |   3 +-
+ tests/measure-dev04-bandit.js |  50 +++++
+ 6 files changed, 686 insertions(+), 22 deletions(-)
+# SCHEMA/migrate 相關差異（應為空）：
+(無)
+# 合併衝突：無（git merge --no-ff origin/main 自動合併 js/game.js、js/ui.js）

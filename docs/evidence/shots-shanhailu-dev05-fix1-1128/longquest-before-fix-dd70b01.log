@@ -1,0 +1,14 @@
+FAIL  [AC-E10] 報酬 40 兩（<100）→ 30 日：第 d+29 日仍在（剩 1 天），第 d+30 日 00:00 撕榜  — {"id":"b_wolf","N":30,"aliveLast":true,"left":null,"gone":false,"goneLater":false,"rep":20,"same":true,"evs":[],"perk":115}
+FAIL  [驗收 34] 逾期發 longquest_expire；聲望 20 → 20（不跌破）；銀兩、善惡、通緝不變  — {"id":"b_wolf","N":30,"aliveLast":true,"left":null,"gone":false,"goneLater":false,"rep":20,"same":true,"evs":[],"perk":115}
+PASS  [驗收 34] 報酬 +15%（聲望 ≥20）不因逾期罰暫停  — 115
+FAIL  [AC-E10] 破曉聲望 21 逾期後 20（rep'＝max(rep−1, 已達門檻)）  — {"rep":21,"gone":false}
+FAIL  [AC-E10] 破曉聲望 10 逾期後 10（rep'＝max(rep−1, 已達門檻)）  — {"rep":10,"gone":false}
+FAIL  [AC-E10] 破曉聲望 5 逾期後 4（rep'＝max(rep−1, 已達門檻)）  — {"rep":5,"gone":false}
+FAIL  [AC-E10] 破曉聲望 0 逾期後 0（rep'＝max(rep−1, 已達門檻)）  — {"rep":0,"gone":false}
+FAIL  [AC-E10] 報酬 150 兩（≥100）→ 60 日：第 d+59 日仍在、第 d+60 日撕榜，聲望 3 → 2  — {"id":"b_jiku","N":60,"aliveLast":true,"left":null,"gone":false,"goneLater":false,"rep":3,"same":true,"evs":[],"perk":100}
+PASS  [AC-E10] 私人委託（軍牌）不適用、不逾期（130 日後仍在，聲望不變）  — {"still":true,"rep":5,"left":null}
+FAIL  [AC-E10] 起手灰髯狼 ×3 接單日＝第 1 日；第 30 日（d+29）完成者不撕榜  — {"kept":true,"days":[3,4,2]}
+PASS  一般單期限不變：收集 3、獵殺 4、送貨 2 日  — [3,4,2]
+PASS  console 0 error  — []
+
+結果：4/12 PASS，8 FAIL

@@ -1,0 +1,23 @@
+52758a01912a9d689094572a38f3635237106fca
+# cmd: node docs/evidence/shots-shanhailu-check16-1128/check16.js
+SHOT  c16-01-town-walkers-patrol-a.png
+SHOT  c16-02-town-walkers-patrol-b-1500ms.png
+PASS  DEV-03 並存：灰窯 Geff 2 有 2 名巡邏與路人走動者  — {"patrol":2,"anon":5}
+PASS  DEV-03 並存：1.5 秒後走動者位置有變  — {"a":[336,487,665,487,557,836,719],"b":[370,488,683,488,557,874,715]}
+PASS  AC-E12 鎮上主畫面無「剿匪」鈕／字樣（B 90）  — []
+PASS  資料：kill 類只來自既有 8 張模板，無劫匪題／野徑一帶  — {"bad":[],"kills":69,"pool":8,"kinds":{"huiyao":{"collect":45,"kill":35,"deliver":20},"duyin":{"collect":45,"kill":35,"deliver":20},"poxiao":{"kill":100}}}
+PASS  資料：兩鎮委託種類基礎權重 collect 45／kill 35／deliver 20  — {"huiyao":{"collect":45,"kill":35,"deliver":20},"duyin":{"collect":45,"kill":35,"deliver":20},"poxiao":{"kill":100}}
+SHOT  c16-03-board-huiyao.png
+PASS  AC-E12 huiyao 委託板畫面（hy_board）無「獵殺劫匪」「野徑一帶」「剿匪」  — {"tab":"hy_board"}
+SHOT  c16-04-board-duyin.png
+PASS  AC-E12 duyin 委託板畫面（dy_board）無「獵殺劫匪」「野徑一帶」「剿匪」  — {"tab":"dy_board"}
+SHOT  c16-05-bandit-ambush-event.png
+PASS  野徑「劫匪攔路」事件畫面出現
+SHOT  c16-06-bandit-combat.png
+SHOT  c16-07-bandit-loot.png
+PASS  劫匪攔路入戰（敵人＝劫匪）  — ["bandit"]
+PASS  擊殺劫匪掉落 3–7 兩、匪勢 B −2.5  — {"silver":7,"dB":-2.5}
+PASS  劫匪攔路 200 次擊殺掉落全在 3–7 兩  — {"bad":0,"seen":[3,4,5,6,7]}
+PASS  無頁面錯誤  — []
+RESULT ALL PASS
+# exit: 0

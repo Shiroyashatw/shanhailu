@@ -41,3 +41,4 @@
 | --- | --- |
 | 2026-11-28 | 依 `main @ dd3843b` 的 `docs/design/GDD-v0.3.md` 拆成分冊並建索引；v0.2（`GDD-v0.2.md`）與 v0.1 已過時，保留作歷史，不動。 |
 | 2026-11-28 | 逐項對照實作程式，出入列於 [discrepancies.md](discrepancies.md)；GDD 原文筆誤見該檔 B 區。 |
+| 2026-11-28 19:59 | mumi 拍板：不做手機版，只做 Steam 與網頁版。寫入 [01 定位與設計支柱](01-overview.md)「平台」。 |

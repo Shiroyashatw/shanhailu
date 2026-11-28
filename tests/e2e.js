@@ -350,7 +350,8 @@ async function exploreUntil(page, pred, max) {
   await click(page, 'btn-region');
   await click(page, 'node-yizhan');
   const tipTxt = await page.textContent('[data-testid=route-tip]');
-  check('#4 原本的路口（官道驛站）現在可以當目的地', (await st(page)).dest === 'yizhan' && /\d+ 小時・食 −\d+・疲 \+\d+・險 [低中高]/.test(tipTxt), tipTxt);
+  // DEV-05：地點詳情縮寫改全名（UI-02-05、wording-map §1），斷言由「N 小時・食 −N・疲 +N・險 X」改為完整用詞
+  check('#4 原本的路口（官道驛站）現在可以當目的地', (await st(page)).dest === 'yizhan' && /路程 \d+ 小時・飽食 −\d+\s*疲累 \+\d+・危險 [低中高]/.test(tipTxt), tipTxt);
   check('出發條顯示 5 個數值膠囊＋前往', (await page.$$('.departbar .vpill')).length === 5 && (await has(page, 'btn-travel')));
   await audit(page, '世界地圖');
   await shot(page, '08-worldmap.png');
@@ -606,7 +607,8 @@ async function exploreUntil(page, pred, max) {
   s = await st(page);
   check('獸潮開始：自動掛上「擊退獸潮」、右欄日期變成警示', !!s.world.tide && s.quests.some((q) => q.kind === 'tide' && q.status === 'active') && (await page.textContent('[data-testid=date]')) === '獸潮');
   await audit(page, '獸潮期間');
-  await page.evaluate(() => { const G = window.SHL; const S = G.state; G._debug.worldTick(S.world.tide.end + 1); G.save(); G.enterHere(); });
+  // DEV-04（SPEC-01 §4.7／§5.4，Q4 甲）起守軍會自衛擊退（P_DEF[Geff]）；斷言不變，只把目標鎮昨日駐軍設 0 檔（P_DEF 0）固定走「沒擊退」這條（AC-J1 列出）
+  await page.evaluate(() => { const G = window.SHL; const S = G.state; if (S.world.towns) S.world.towns[S.world.tide.town].Geff = 0; G._debug.worldTick(S.world.tide.end + 1); G.save(); G.enterHere(); });
   s = await st(page);
   check('獸潮沒擊退：城鎮受創', !s.world.tide && Object.keys(s.world.hurt).length === 1 && !s.quests.some((q) => q.kind === 'tide'));
   await page.evaluate(() => { window.SHL.state.world.hurt = {}; window.SHL.save(); });
