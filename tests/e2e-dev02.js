@@ -103,9 +103,49 @@ async function fresh(page, base, q) {
       return { lo, hi, bad };
     });
     check('[sleep] 一日 144 個就寢時刻：睡眠 6–13 小時、皆不長於舊規則', sweep.lo === 6 && sweep.hi === 13 && !sweep.bad.length, sweep);
-    // 飽食／疲累語意不變（food 10、fat 0、noRegen）：客棧睡完疲累 0、生命回滿
+    // 疲累語意不變（fat 0、noRegen）：客棧睡完疲累 0、生命回滿；飽食改 1.25×睡眠時數（SPEC-TIME §6.2）：22:00→08:00 共 10 小時 −12.5
     const keep = await page.evaluate(() => { const G = window.SHL; const S = G.state; S.loc = 'huiyao'; S.townTab = 'hy_inn'; S.scene = 'town'; S.t = 20 * 1440 + 22 * 60; S.food = 80; S.fat = 60; S.hp = 10; G.service('rest'); return { food: S.food, fat: S.fat, hp: S.hp, max: G.maxHp() }; });
-    check('[sleep] 客棧歇息：飽食 −10、疲累清零、生命回滿（沿用現況）', keep.food === 70 && keep.fat === 0 && keep.hp === keep.max, keep);
+    check('[sleep] 客棧歇息 10 小時：飽食 80 → 67.5（整數存值 68）、疲累清零、生命回滿', Math.abs(keep.food - (80 - 12.5)) <= 0.5 && keep.fat === 0 && keep.hp === keep.max, keep);
+
+    // ---- SPEC-TIME §6.2：睡眠飽食扣減 = 1.25 × 睡眠時數（取代固定 10；起床公式不變） ----
+    // S.food 依現況每次 passTime 後取整數，故實際狀態容許 ±0.5；純函式 sleepFoodCost 要恰等於 1.25×小時
+    const pure = await page.evaluate(() => { const G = window.SHL; return [13, 6, 9.5, 12, 8].map((h) => ({ h, cost: G._debug.sleepFoodCost ? G._debug.sleepFoodCost(h) : null })); });
+    check('[sleep/飽食] sleepFoodCost(h) 恰為 1.25×h（13→16.25、6→7.5、9.5→11.875、12→15、8→10）', pure.every((r) => r.cost !== null && Math.abs(r.cost - 1.25 * r.h) < 1e-9), pure);
+    const foodCases = [
+      // [標籤, 日序, 時, 分, 睡眠小時]（春季，無冬季 ×1.25）
+      ['08:10 就寢 13 小時（上限）', 4, 8, 10, 13],
+      ['03:00 就寢 6 小時（下限）', 4, 3, 0, 6],
+      ['22:30 就寢 9.5 小時（中間）', 4, 22, 30, 9.5],
+      ['20:00 就寢 12 小時', 4, 20, 0, 12],
+    ];
+    for (const entry of ['rest', 'bunk']) {
+      for (const [label, d, hh, mm, h] of foodCases) {
+        const r = await sleepAt(entry, d, hh, mm);
+        const food = await page.evaluate(() => window.SHL.state.food);
+        const want = 100 - 1.25 * h;
+        check('[sleep/飽食/' + entry + '] ' + label + '：飽食 100 → ' + want + '（1.25×' + h + '）', r.slept === h && Math.abs(food - want) <= 0.5, { slept: r.slept, food, want });
+      }
+    }
+    // 冬季現況乘數照舊（SPEC-TIME §6.2「冬季 以上全部 ×1.25」）：第 95 日 22:00 → 08:00，10 小時 × 1.25 × 1.25 = 15.625
+    const wint = await sleepAt('rest', 94, 22, 0);
+    const wfood = await page.evaluate(() => window.SHL.state.food);
+    check('[sleep/飽食/rest] 冬季 10 小時：飽食 100 → 84.375（1.25×10×冬季 1.25）', wint.slept === 10 && Math.abs(wfood - (100 - 15.625)) <= 0.5, { slept: wint.slept, food: wfood });
+
+    // ---- SPEC-TIME Q7／§6.5：客棧 rest、營帳 bunk 睡覺時生存扣血 hp 最低留 1（露宿、茶攤小憩不在此保護） ----
+    const starve = (entry) => page.evaluate((entry) => {
+      const G = window.SHL; const S = G.state;
+      S.dead = null; S.combat = null; S.event = null; S.food = 0; S.fat = 50; S.hp = 10; S.silver = 999; S.scene = 'town';
+      if (entry === 'rest') { S.loc = 'huiyao'; S.townTab = 'hy_inn'; } else { S.loc = 'poxiao'; S.townTab = 'px_medic'; }
+      S.t = 6 * 1440 + 22 * 60; const t0 = S.t; G.service(entry);
+      return { dead: !!S.dead, hp: S.hp, max: G.maxHp(), slept: (S.t - t0) / 60 };
+    }, entry);
+    const sr = await starve('rest');
+    check('[sleep/Q7/rest] 飽食 0、hp 10 在客棧睡 10 小時（扣血 30）不會死，醒來生命回滿', !sr.dead && sr.slept === 10 && sr.hp === sr.max, sr);
+    const sb = await starve('bunk');
+    check('[sleep/Q7/bunk] 飽食 0、hp 10 在營帳通鋪睡 10 小時不會死，醒來 hp = 1 + 30 = 31', !sb.dead && sb.slept === 10 && sb.hp === 31, sb);
+    // 對照：保護只給 rest／bunk；一般 passTime（露宿、等待）同樣條件仍會餓死
+    const ctl = await page.evaluate(() => { const G = window.SHL; const S = G.state; S.dead = null; S.food = 0; S.fat = 50; S.hp = 10; G._debug.passTime(10); return { dead: !!S.dead, hp: S.hp }; });
+    check('[sleep/Q7 對照] 不經 rest／bunk 的 10 小時（飽食 0、hp 10）仍會死：保護只限客棧與營帳', ctl.dead, ctl);
   }
 
   // ===== A. 單日結算（SPEC-01 §10 AC-A；NOISE=0） =====

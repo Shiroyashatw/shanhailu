@@ -481,6 +481,8 @@ window.SHL = (function () {
     if (S.food <= 0) { S.hp -= 3 * hours; S.stats.cause = '餓死荒野'; }
     else if (S.food >= 30 && !opts.noRegen) S.hp = Math.min(maxHp(), S.hp + 1 * hours);
     if (S.fat >= 100) { S.hp -= 2 * hours; S.stats.cause = '力竭倒地'; }
+    // SPEC-TIME Q7：hpFloor 只由客棧 rest／營帳 bunk 傳入，生存扣血最低留到此值（店家叫醒、灌湯）；露宿與一般等待不傳
+    if (opts.hpFloor !== undefined && S.hp < opts.hpFloor) S.hp = opts.hpFloor;
     S.food = Math.round(S.food); S.fat = Math.round(S.fat); S.hp = Math.round(S.hp);
     // SPEC-01 §2：一次 passTime 跨 ≥2 個日界時逐日補算；每次日結看到的 S.t 是該日 00:00（SPEC-TIME B2）
     const endT = S.t, endDay = dayOf(endT);
@@ -889,9 +891,11 @@ window.SHL = (function () {
     if (n8 < now) n8 += 1440;
     return Math.min(Math.max(now + D.SLEEP.minH * 60, n8), now + D.SLEEP.maxH * 60);
   }
-  function sleepToMorning() {
-    const now = S.t;
-    passTime((wakeTime(now) - now) / 60, { food: 10, fat: 0, noRegen: true });
+  // SPEC-TIME §6.2：睡眠（客棧、傷兵帳）飽食 1.25／小時（取代整夜固定 10）；冬季 ×1.25 仍由 passTime 照現況套用
+  function sleepFoodCost(hours) { return 1.25 * hours; }
+  function sleepToMorning(opts) {
+    const now = S.t; const hours = (wakeTime(now) - now) / 60; // 起床公式不變（wakeTime）
+    passTime(hours, Object.assign({ food: sleepFoodCost(hours), fat: 0, noRegen: true }, opts || {}));
   }
   function innCost() {
     const m = townHurt(S.loc) ? 2 : 1;
@@ -903,7 +907,7 @@ window.SHL = (function () {
     const c = innCost();
     switch (k) {
       case 'rest': if (!inBld('inn') || !pay(c.rest)) return;
-        sleepToMorning(); S.hp = maxHp(); S.fat = 0; if (S.corrupt) { S.corrupt = Math.max(0, S.corrupt - 10); S.hp = maxHp(); }
+        sleepToMorning({ hpFloor: 1 }); S.hp = maxHp(); S.fat = 0; if (S.corrupt) { S.corrupt = Math.max(0, S.corrupt - 10); S.hp = maxHp(); }
         log('歇了一夜，疲累清零、生命回滿。', 'good'); break;
       case 'soup': if (!inBld('inn') || !pay(c.soup)) return;
         S.food = clamp(S.food + 30, 0, 100); passTime(0.5, { food: 0, fat: 0 }); log('喝了碗熱湯，飽食 +30'); break;
@@ -916,7 +920,7 @@ window.SHL = (function () {
       case 'cleanse': if (!inBld('medic')) return; if (!S.corrupt) { log('你身上沒有侵蝕。'); return emit(); } if (!pay(c.cleanse)) return;
         passTime(2, { fat: 5 }); S.corrupt = 0; log('放血、敷藥、灌湯。侵蝕退了。', 'good'); break;
       case 'bunk': if (!inBld('medic') || !pay(c.bunk)) return;
-        sleepToMorning(); S.fat = 0; S.hp = Math.min(maxHp(), S.hp + 30); log('在營帳的通鋪睡了一夜，疲累清零、生命 +30。', 'good'); break;
+        sleepToMorning({ hpFloor: 1 }); S.fat = 0; S.hp = Math.min(maxHp(), S.hp + 30); log('在營帳的通鋪睡了一夜，疲累清零、生命 +30。', 'good'); break;
       case 'drill': {
         const P = PROF[arg]; if (!inBld('drill') || !P || P.grp !== 'wu') return; if (!pay(c.drill)) return;
         passTime(4, { fat: 20 }); if (S.dead) return commit();
@@ -2013,7 +2017,7 @@ window.SHL = (function () {
     craft, canCraftHere, gather, gatherFat, camp, nodeState, dungeonDelve,
     combatAction, combatActions, combatOrder, takeFx, toggleRetreat, toggleDrop, retreatChance, selWt, setTarget, playerSpeed, lootDone,
     eventChoose, eventDone, setOverlay, setProfTab, setJournalTab, sysCamp,
-    _debug: { passTime, addItem, die, startCombat, newEq, gainProf, addRumor, worldTick, lootEq, addRep, addCodex, addCorrupt,
+    _debug: { passTime, sleepFoodCost, addItem, die, startCombat, newEq, gainProf, addRumor, worldTick, lootEq, addRep, addCodex, addCorrupt,
       townTick, newDay, wrnd, tradeTax, HOOKS, setNoise: (on) => { NOISE = !!on; }, rnd },
   };
 })();
