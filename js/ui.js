@@ -637,23 +637,9 @@
     if (!list.length) h += '<div class="note" style="top:24px">板上空空如也，明天再來看看。</div>';
     const act = G.activeQuests().filter((q) => q.town !== S.loc && !(q.kind === 'deliver' && q.to === S.loc)).map((q) => q.title + '（' + D.NODES[q.town].name + '）').join('、');
     h += '<div class="note" style="top:306px">每天補到 3 張，過期撕榜。完成委託會提高破曉軍團的聲望。' + (act ? '你在別處還有：' + cut(act, 40) : '') + '</div>';
-    h += aidCard(S);
     return h;
   }
-  // DEV-04 資助巡邏（SPEC-01 §4.6、§5.7）：只在兩鎮的委託板建築出現；投資巡邏所不在第一批，不畫
-  function aidCard(S) {
-    const a = G.aidInfo(); if (!a) return '';
-    const G1 = G.garrisonName(a.Gnom), G2 = G.garrisonName(Math.min(a.Gnom + 1, 3));
-    const sub = a.can ? '指定軍費 ' + Math.round(a.F) + '／' + a.Fcap + ' 兩・每 ' + a.step + ' 兩加派一檔 1 天（' + G1 + '→' + G2 + '，下次日結起）・今日破曉聲望 +' + a.repToday + '／3'
-      : '駐軍已是最高一檔，收不下資助。';
-    let h = '<div class="ttl" style="left:0;top:330px">資助巡邏・' + D.NODES[a.town].name + '</div>';
-    h += '<div class="dcard wide" style="left:0;top:348px" data-testid="aid-card" title="捐的錢進鎮上的指定軍費，只用來加派巡邏，拿不回來。每 100 兩破曉軍團聲望 +1，每日最多 +3。">' + ico('f_dawn', '曉', 32) + '<span class="bt"><b>出錢讓鎮上多派一隊巡邏</b><span class="sub" data-testid="aid-sub">' + sub + '</span></span>';
-    a.units.forEach((n) => {
-      const ok = a.can && a.room > 0 && S.silver >= Math.min(n, a.room);
-      h += '<button class="btn' + (ok ? ' gold' : ' dis') + '" ' + (ok ? '' : 'disabled') + ' data-a="aid" data-v="' + n + '" data-testid="aid-' + n + '">' + n + ' 兩</button>';
-    });
-    return h + '</div>';
-  }
+  // DEV-04 資助巡邏：函式在 game.js（aidInfo／aidPatrol）；按鈕位置在 DEV-05 城況簡報（製作人 17:52），由較晚進 main 的那包接線，本包不放鈕
 
   // ---------- 傳聞現場（荒野／地城共用） ----------
   function rumorChips(S) {

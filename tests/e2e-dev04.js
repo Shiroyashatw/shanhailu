@@ -1,10 +1,11 @@
 /* 《山海錄》DEV-04 斷路幫與獸潮連動 — 新增驗收（Node + Playwright，headless Chromium）
  * 用法：node tests/e2e-dev04.js [--shots]
  *   --shots  另存 1280×720 實機截圖至 docs/evidence/shots-shanhailu-dev04-1128/（可用環境變數 SHOTS_DIR 覆寫）
- * 依據：docs/design/batch1/specs/SPEC-01.md v0.4（§4.6、§4.7、§4.8、§4.9、§5.4、§5.6、§5.7、§10 AC-E、AC-A2／A3、AC-D1、AC-J2／J4）、
+ * 依據：docs/design/batch1/specs/SPEC-01.md v0.5（含 18:19 剿匪單延後、AC-E12；§4.6、§4.7、§4.8、§4.9、§5.4、§5.6、§5.7、§10 AC-E、AC-A2／A3、AC-D1、AC-J2／J4）、
  *       rollout-plan-v0.1.md 第 115 行（DEV-04）、decisions-producer-1128-1646.md 第 5、6 項、specs/CHANGELOG.md（S4、劫匪掉落）。
  * 既有 tests/e2e.js、tests/e2e-dev02.js 不動斷言；本檔只放 DEV-04 的新斷言。
- * 不在本檔：AC-E7（遇險封頂，DEV-02 已測，本包不重做 R／0.85）；AC-E8 與 S4 重跑（需數值模擬環境，待數值設計師）。
+ * 不在本檔：AC-E7（遇險封頂，DEV-02 已測，本包不重做 R／0.85）；AC-E5、AC-E8（v0.5 18:19：延後到第 4 期匪窩，第一批不驗）。
+ * TODO：S4／AC-E8 劫匪地點與每頭搜尋時間待數值結論，本輪不動。
  */
 'use strict';
 const http = require('http');
@@ -138,10 +139,11 @@ async function fresh(page, base, opts) {
   // ===== data.js 同步（S4c：掉落 3–7、賞金 24／36；平民專用） =====
   if (want('data')) {
     await fresh(page, base);
-    const d = await page.evaluate(() => { const D = window.SHL_DATA; return { silver: D.ENEMIES.bandit.silver, pool: D.QUEST_GEN.bandit.pool, where: D.QUEST_GEN.where.bandit, how: D.FACTIONS.dawn.how }; });
+    const d = await page.evaluate(() => { const D = window.SHL_DATA; return { silver: D.ENEMIES.bandit.silver, bq: D.QUEST_GEN.bandit, where: D.QUEST_GEN.where.bandit, kill: D.QUEST_GEN.kill.pool, kinds: D.QUEST_GEN.kinds, how: D.FACTIONS.dawn.how, ev: D.EVENTS.some((e) => e.id === 'bandit' && e.title === '劫匪攔路') }; });
     check('data.js 劫匪每頭掉落 bandit.silver = [3, 7]（原 8–20）', JSON.stringify(d.silver) === '[3,7]', d.silver);
-    check('data.js 剿匪委託賞金 ×2 = 24、×4 = 36（v0.2 為 36／76）', JSON.stringify(d.pool) === '[["bandit",2,24],["bandit",4,36]]', d.pool);
-    check('data.js 劫匪委託地點「野徑一帶」', d.where === '野徑一帶', d.where);
+    check('AC-E12 data.js 沒有剿匪單模板與「野徑一帶」地點（延後到第 4 期匪窩）', d.bq === undefined && d.where === undefined, { bq: d.bq, where: d.where });
+    check('data.js kill 模板仍為既有 8 張、不含劫匪；兩鎮委託種類權重 collect 45／kill 35／deliver 20', d.kill.length === 8 && !d.kill.some((x) => x[0] === 'bandit') && ['huiyao', 'duyin'].every((t) => JSON.stringify(d.kinds[t]) === '{"collect":45,"kill":35,"deliver":20}'), { kill: d.kill, kinds: d.kinds });
+    check('AC-E12 野徑旅途事件「劫匪攔路」仍在', d.ev === true);
     check('破曉軍團「如何漲聲望」加上資助巡邏（§11）', d.how.includes('資助巡邏'), d.how);
     // 實戰掉落：打 300 場單一劫匪，戰利品銀兩落在 3–7
     const drop = await page.evaluate(() => {
@@ -259,39 +261,54 @@ async function fresh(page, base, opts) {
     check('§5.6 B 每日向 B* 靠攏 10%、上限 ±3（Ō 20 → B* 48.75，B +1.875）', near(g.up, 1.875, 0.011), g.up);
   }
 
-  // ===== §4.9 委託與傳聞權重：AC-E5 =====
+  // ===== §4.9 委託與傳聞權重；AC-E12（剿匪單延後，kill 類只抽既有 8 張） =====
   if (want('quest')) {
     await fresh(page, base);
-    const q = await page.evaluate(() => {
-      const G = window.SHL; const S = G.state; const R = S.world.region;
-      const rate = (B, n) => { R.B = B; let hit = 0, x4 = 0; for (let d = 1; d <= n; d++) { const r = G._debug.banditDraw('huiyao', d, 0); if (r) { hit++; if (r[1] === 4) x4++; } } return { p: hit / n, x4: hit ? x4 / hit : 0, P: G.banditQuestP() }; };
-      return { b60: rate(60, 2000), b30: rate(30, 2000), b20: rate(20, 2000), b90: rate(90, 200) };
-    });
-    check('AC-E5 B = 60：kill 類改劫匪題約 50%（2000 抽，±3pp）', near(q.b60.p, 0.5, 0.03) && q.b60.P === 0.5, q.b60);
-    check('AC-E5 B = 30：約 12.5%（2000 抽，±3pp）', near(q.b30.p, 0.125, 0.03) && q.b30.P === 0.125, q.b30);
-    check('B ≤ 20 不出劫匪題；B 再高也封頂 50%；×2／×4 各半', q.b20.p === 0 && q.b90.P === 0.5 && near(q.b60.x4, 0.5, 0.05), { b20: q.b20, b90: q.b90.P, x4: q.b60.x4 });
     const k = await page.evaluate(() => {
       const G = window.SHL; const S = G.state; const D = window.SHL_DATA; const T = S.world.towns;
       // deliver 權重 20 × clamp(P/50, 0.4, 1.6)：用 genQuests 的實際結果看比例（P 80 vs 20）
       const share = (P) => { T.huiyao.P = P; let del = 0, all = 0; for (let d = 1; d <= 400; d++) { S.quests = S.quests.filter((x) => x.fixed); S.t = (d - 1) * 1440 + 8 * 60; G._debug.genQuests(); S.quests.filter((x) => x.town === 'huiyao' && !x.fixed).forEach((x) => { all++; if (x.kind === 'deliver') del++; }); } return del / all; };
       const hi = share(80), lo = share(20);
-      // 板上出現劫匪題：題名、地點、賞金
-      S.world.region.B = 60; let bq = null;
-      for (let d = 500; d < 700 && !bq; d++) { S.quests = S.quests.filter((x) => x.fixed); S.t = (d - 1) * 1440 + 8 * 60; G._debug.genQuests(); bq = S.quests.find((x) => x.kind === 'kill' && x.enemy === 'bandit' && x.town === 'huiyao'); }
-      const out = { hi, lo, bq: bq && { title: bq.title, reward: bq.reward, need: bq.need, where: G.questWhere(bq) } };
-      // 接下並剿匪：委託完成、B 降
-      if (bq) {
-        S.loc = 'huiyao'; S.scene = 'town'; S.townTab = 'hy_board'; G.questAct(bq.id);
-        const B0 = S.world.region.B;
-        G._debug.startCombat(Array(bq.need).fill('bandit'), { type: 'wild', node: 'chakou' }, {});
-        S.combat.enemies.forEach((e) => G._debug.killEnemy(e)); S.combat = null; S.scene = 'town';
-        out.done = { status: bq.status, dB: S.world.region.B - B0 };
-      }
-      return out;
+      // AC-E12 抽樣（每天先拿掉固定懸賞的 kill 單，免得同種去重擋住狼題，8 張都能抽到）：匪勢高（B 60、90）時 600 天兩鎮委託板，kill 類只出既有 8 張模板，不出劫匪題
+      T.huiyao.P = 50; const tpl = D.QUEST_GEN.kill.pool.map((x) => x.join()); const seen = {}; let kills = 0, bad = [], bandit = 0;
+      [60, 90].forEach((B) => { S.world.region.B = B; for (let d = 1000; d < 1300; d++) { S.quests = S.quests.filter((x) => x.fixed && x.kind !== 'kill'); S.t = (d - 1) * 1440 + 8 * 60; G._debug.genQuests();
+        S.quests.filter((x) => !x.fixed && x.kind === 'kill').forEach((x) => { kills++; const key = [x.enemy, x.need, x.reward].join(); seen[key] = 1; if (!tpl.includes(key)) bad.push(key); if (x.enemy === 'bandit' || /劫匪/.test(x.title) || G.questWhere(x) === '野徑一帶') bandit++; }); } });
+      return { hi, lo, kills, bad: bad.slice(0, 5), bandit, kinds: Object.keys(seen).length, seen: Object.keys(seen) };
     });
     check('§4.9 委託板 deliver 權重隨繁榮：P 80 的送貨占比高於 P 20', k.hi > k.lo + 0.08, { P80: k.hi, P20: k.lo });
-    check('委託板出現「獵殺劫匪」題：地點「野徑一帶」，×2 賞 24、×4 賞 36', !!k.bq && /^獵殺劫匪 ×[24]$/.test(k.bq.title) && k.bq.where === '野徑一帶' && ((k.bq.need === 2 && k.bq.reward === 24) || (k.bq.need === 4 && k.bq.reward === 36)), k.bq);
-    check('接下劫匪題並剿匪：委託達成、每殺 1 名 B −2.5', !!k.done && k.done.status === 'done' && near(k.done.dB, -2.5 * k.bq.need, 1e-9), k.done);
+    check('AC-E12 抽樣（B 60／90 各 300 天，所有委託板）：kill 類全部來自既有 8 張模板、無劫匪題／「野徑一帶」', k.kills > 300 && k.bad.length === 0 && k.bandit === 0 && k.kinds === 8, { kills: k.kills, bad: k.bad, bandit: k.bandit, templatesSeen: k.kinds, seen: k.seen });
+    // AC-E12 畫面：B 高時逐日開委託板，畫面不出現「獵殺劫匪」「野徑一帶」；鎮上各建築沒有「剿匪」鈕
+    const ui = await page.evaluate(async () => {
+      const G = window.SHL; const S = G.state; const D = window.SHL_DATA; const out = { boardHit: [], btnHit: [], tabs: 0 };
+      const tick = () => new Promise((r) => requestAnimationFrame(() => r()));
+      S.world.region.B = 90;
+      for (let d = 2000; d < 2030; d++) {
+        S.quests = S.quests.filter((x) => x.fixed); S.t = (d - 1) * 1440 + 8 * 60; G._debug.genQuests();
+        for (const town of ['huiyao', 'duyin']) {
+          S.loc = town; S.scene = 'town';
+          for (const bid of Object.keys(D.BUILDINGS).filter((k) => D.BUILDINGS[k].place === town)) { G.setTab(bid); await tick(); out.tabs++;
+            const txt = document.getElementById('app').innerText;
+            if (/獵殺劫匪|野徑一帶|剿匪單/.test(txt)) out.boardHit.push(bid);
+            document.querySelectorAll('#app button').forEach((x) => { if (/剿匪/.test(x.textContent)) out.btnHit.push(bid + ':' + x.textContent); });
+          }
+          G.setTab(null); await tick();
+          document.querySelectorAll('#app button').forEach((x) => { if (/剿匪/.test(x.textContent)) out.btnHit.push(town + ':' + x.textContent); });
+        }
+      }
+      S.loc = 'huiyao'; G.setTab(null);
+      return out;
+    });
+    check('AC-E12 畫面：B 90、30 天 × 兩鎮所有建築頁，委託板不出現「獵殺劫匪」「野徑一帶」', ui.tabs > 0 && ui.boardHit.length === 0, { tabs: ui.tabs, hit: ui.boardHit.slice(0, 5) });
+    check('AC-E12 畫面：鎮上（主畫面與各建築頁）沒有「剿匪」鈕', ui.btnHit.length === 0, ui.btnHit.slice(0, 5));
+    // AC-E12 野徑「劫匪攔路」照舊：迎戰 → 擊殺 → 掉落 3–7 兩、B −2.5
+    await fresh(page, base, { noise: false });
+    await page.evaluate(() => { const G = window.SHL; const S = G.state; S.loc = 'chakou'; S.event = { id: 'bandit', dest: 'chakou', result: null }; S.scene = 'event'; });
+    await page.evaluate(() => window.SHL.eventChoose('fight'));
+    const amb = await page.evaluate(() => { const G = window.SHL; const S = G.state; const B0 = S.world.region.B; const ids = S.combat ? S.combat.enemies.map((e) => e.id) : null;
+      if (S.combat) { S.combat.enemies.forEach((e) => G._debug.killEnemy(e)); G._debug.victory(); }
+      return { ids, dB: S.world.region.B - B0, silver: S.loot && S.loot.silver }; });
+    check('AC-E12 野徑「劫匪攔路」迎戰仍入戰、可擊殺：掉落 3–7 兩、B −2.5', JSON.stringify(amb.ids) === '["bandit"]' && amb.silver >= 3 && amb.silver <= 7 && near(amb.dB, -2.5, 1e-9), amb);
+    await page.evaluate(() => { const S = window.SHL.state; S.loot = null; S.combat = null; S.scene = 'town'; S.loc = 'huiyao'; });
     const rw = await page.evaluate(() => {
       const G = window.SHL; const S = G.state; const R = S.world.region; const D = window.SHL_DATA;
       const w = (c) => { R.crew = c; return G._debug.truthW(D.RUMOR.truth).guard; };
@@ -343,17 +360,38 @@ async function fresh(page, base, opts) {
     check('§4.7 目標鎮權重：兩鎮 O ≤ 80 各半；灰窯 O 100 → 約 2/3；兩鎮皆 100 → 各半（±5pp）', near(rs.tw.eq, 0.5, 0.05) && near(rs.tw.hi, 2 / 3, 0.05) && near(rs.tw.both, 0.5, 0.05), rs.tw);
   }
 
+  // ===== §5.4 獸潮擊退固定種子（數值設計師 17:49）：Geff > 0，seed 5 擊退成功不受創、seed 6 擊退失敗受創 =====
+  // 擲骰 wrnd('tide', 12, 0)（S.seed 混入）：seed 5 → 0.099 < P_DEF[1] 0.30；seed 6 → 0.917 ≥ 0.30。種子以 scratch 掃描 seed 1–30 找出
+  if (want('tideseed')) {
+    const runSeed = async (seed) => {
+      await page.goto(base + 'index.html?seed=' + seed + '&fresh=1&origin=drifter&fx=0');
+      await page.waitForSelector('[data-testid=town]');
+      return page.evaluate(() => {
+        const G = window.SHL; const S = G.state; const W = S.world; const T = W.towns; G._debug.setNoise(false);
+        W.tide = { town: 'huiyao', start: 10, end: 11, kills: 0, need: 4 }; W.hurt = {}; W.next = 1e9; T.huiyao.Geff = 1;
+        S.quests = S.quests.filter((x) => x.kind !== 'tide'); S.t = 11 * 1440;
+        const roll = G._debug.wrnd('tide', 12, 0); const P0 = T.huiyao.P, O0 = T.huiyao.O;
+        G._debug.worldTick(12); const td = G._debug.tideDelta('huiyao', 12); const hurt = W.hurt.huiyao || null;
+        G._debug.townTick(12);
+        return { seed: S.seed, roll, Geff: 1, hurt, hurtNow: G.townHurt('huiyao'), td, why: T.huiyao.brief.whyCode, dP: T.huiyao.P - P0, dO: T.huiyao.O - O0, log: S.log.slice(-4).map((l) => l.text) };
+      });
+    };
+    const ok = await runSeed(5), ng = await runSeed(6);
+    check('固定種子 seed 5（Geff 1）：守軍自衛擊退成功、灰窯不受創（ΔP +3、ΔO +2、WHY_REPEL）', ok.seed === 5 && ok.roll < 0.30 && ok.hurt === null && !ok.hurtNow && ok.td.p === 3 && ok.td.o === 2 && ok.why === 'WHY_REPEL' && ok.log.some((x) => /守軍擋下了獸潮/.test(x)), ok);
+    check('固定種子 seed 6（Geff 1）：擊退失敗、灰窯受創 2 天（受創日 ΔP −2、ΔO −1）', ng.seed === 6 && ng.roll >= 0.30 && ng.hurt === 13 && ng.hurtNow && ng.td.p === -2 && ng.td.o === -1 && ng.log.some((x) => /城鎮受創 2 天/.test(x)), ng);
+  }
+
   // ===== §4.6／§5.7 資助巡邏：AC-A2、聲望上限、Fcap、E3、只在委託板 =====
   if (want('aid')) {
     await fresh(page, base, { noise: false });
+    // 製作人 17:52：按鈕位置在 DEV-05 城況簡報，由較晚進 main 的那包接線；本包只提供 aidInfo／aidPatrol，畫面不放鈕
     await page.click('[data-testid=bld-hy_board]');
-    await page.waitForSelector('[data-testid=aid-card]');
-    const s0 = await page.evaluate(() => ({ silver: window.SHL.state.silver, rep: window.SHL.repOf('dawn') }));
-    await page.click('[data-testid=aid-50]'); // 開局 60 兩：先捐 50
-    const s1 = await page.evaluate(() => { const S = window.SHL.state; return { silver: S.silver, F: S.world.towns.huiyao.F, rep: window.SHL.repOf('dawn'), sub: document.querySelector('[data-testid=aid-sub]').textContent, dis100: document.querySelector('[data-testid=aid-100]').disabled }; });
-    check('委託板「資助巡邏」：點 50 兩 → 銀兩 −50、F +50、破曉聲望 +0.5（即時，不等日結）', s1.silver === s0.silver - 50 && s1.F === 50 && near(s1.rep - s0.rep, 0.5, 1e-9) && /指定軍費 50／500/.test(s1.sub), s1);
-    check('銀兩不夠時 100 兩鈕灰掉', s1.dis100 === true, s1);
-    await shot(page, 'dev04-03-aid-patrol.png');
+    await page.waitForFunction(() => window.SHL.state.townTab === 'hy_board');
+    await shot(page, 'dev04-03-board-no-bandit-no-aid.png');
+    const s0 = await page.evaluate(() => ({ silver: window.SHL.state.silver, rep: window.SHL.repOf('dawn'), card: !!document.querySelector('[data-testid=aid-card], [data-a=aid]') }));
+    check('DEV-04 不放「資助巡邏」鈕（位置在 DEV-05 城況簡報，較晚進 main 的包接線）', s0.card === false, s0);
+    const s1 = await page.evaluate(() => { const G = window.SHL; const S = G.state; const a = G.aidInfo(); G.aidPatrol(100); const after100 = S.silver; G.aidPatrol(50); return { a: a && { can: a.can, units: a.units, Fcap: a.Fcap }, after100, silver: S.silver, F: S.world.towns.huiyao.F, rep: G.repOf('dawn') }; }); // 開局 60 兩
+    check('aidPatrol(50)（開局 60 兩）→ 銀兩 −50、F +50、破曉聲望 +0.5（即時，不等日結）；100 兩銀不夠不扣', s1.after100 === s0.silver && s1.silver === s0.silver - 50 && s1.F === 50 && near(s1.rep - s0.rep, 0.5, 1e-9) && s1.a && s1.a.can && JSON.stringify(s1.a.units) === '[50,100,200]' && s1.a.Fcap === 500, s1);
     // AC-A2（重開，捐 100）
     await fresh(page, base, { noise: false });
     const a2 = await page.evaluate(() => {

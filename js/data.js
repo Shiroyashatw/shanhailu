@@ -418,10 +418,8 @@ window.SHL_DATA = (function () {
     kinds: { huiyao: { collect: 45, kill: 35, deliver: 20 }, duyin: { collect: 45, kill: 35, deliver: 20 }, poxiao: { kill: 100 } },
     collect: { days: 3, pool: [['herb_zx', 4], ['leaf_qx', 3], ['vine_du', 2], ['hide', 3], ['meat', 3], ['ore_fe', 2], ['ore_cu', 2], ['bog_iron', 2], ['leech_gland', 2]] },
     kill: { days: 4, pool: [['wolf', 2, 26], ['wolf', 3, 38], ['boar', 1, 22], ['boar', 2, 40], ['bug', 2, 16], ['leech', 2, 34], ['deserter', 1, 30], ['bogcorpse', 1, 44]] },
-    where: { wolf: '枯骨獸徑・青霧藥林', boar: '枯骨獸徑', bug: '青霧藥林', leech: '腐骨沼', deserter: '野徑岔口', bogcorpse: '腐骨沼', bandit: '野徑一帶' },
-    // DEV-04 剿匪委託（SPEC-01 v0.4 §4.9；S4c 定案）：kill 類抽中時以 p = clamp((B − b0)/span, 0, pMax) 改為劫匪題，兩檔各半。
-    // 賞金 24／36 為平民專用值（v0.2 為 36／76；第一輪 23／33 作廢）
-    bandit: { b0: 20, span: 80, pMax: 0.5, pool: [['bandit', 2, 24], ['bandit', 4, 36]] },
+    where: { wolf: '枯骨獸徑・青霧藥林', boar: '枯骨獸徑', bug: '青霧藥林', leech: '腐骨沼', deserter: '野徑岔口', bogcorpse: '腐骨沼' },
+    // 剿匪委託（SPEC-01 §4.9）延後到第 4 期匪窩（v0.5 18:19）；第一批不出剿匪單
     deliver: { days: 2, reward: 24, deposit: 10 },
   };
 

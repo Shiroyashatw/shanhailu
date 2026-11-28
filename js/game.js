@@ -1024,17 +1024,6 @@ window.SHL = (function () {
     if (!t || base.deliver === undefined) return base;
     return Object.assign({}, base, { deliver: base.deliver * clamp(t.P / 50, 0.4, 1.6) });
   }
-  function banditQuestP() {
-    const Bq = D.QUEST_GEN.bandit; const R = S.world.region; if (!R) return 0;
-    return clamp((R.B - Bq.b0) / Bq.span, 0, Bq.pMax);
-  }
-  // kill 類抽中時，以 p = clamp((B − 20)/80, 0, 0.5) 改為劫匪題（×2／×4 各半）。
-  // 假設：這兩次擲骰用 wrnd（以鎮、日、序號混合），不額外消耗 S.rng，讓既有流程的亂數序列不變
-  function banditDraw(town, day, i) {
-    if (wrnd('quest-bandit-' + town, day, i * 2) >= banditQuestP()) return null;
-    const pool = D.QUEST_GEN.bandit.pool;
-    return pool[Math.floor(wrnd('quest-bandit-' + town, day, i * 2 + 1) * pool.length)];
-  }
   function genQuests() {
     const day = dayOf(S.t); const G = D.QUEST_GEN;
     boardTowns().forEach((town) => {
@@ -1048,8 +1037,8 @@ window.SHL = (function () {
           if (S.quests.some((x) => x.town === town && x.kind === 'collect' && x.item === item && x.status !== 'claimed')) continue;
           Object.assign(q, { item, need: cnt, g: D.ITEMS[item].g, ic: item, title: '收購' + D.ITEMS[item].name + ' ×' + cnt, reward: Math.round(D.PRICES[D.PLACES[town].price][item] * cnt * 1.8) + 6, due: day + G.collect.days });
         } else if (kind === 'kill') {
-          // DEV-04（§4.9）：kill 類抽中時可能改為劫匪題；同種敵人去重沿用現況（Q-S5 甲）
-          const [enemy, cnt, reward] = banditDraw(town, day, guard) || pick(G.kill.pool);
+          // DEV-04（§4.9 v0.5 18:19）：剿匪單延後到第 4 期匪窩；kill 類只從既有 8 張獵殺模板抽
+          const [enemy, cnt, reward] = pick(G.kill.pool);
           if (S.quests.some((x) => x.kind === 'kill' && x.enemy === enemy && (x.status === 'open' || x.status === 'active'))) continue;
           Object.assign(q, { enemy, need: cnt, g: D.ENEMIES[enemy].g, ic: D.ENEMIES[enemy].ic || enemy, title: '獵殺' + D.ENEMIES[enemy].name + ' ×' + cnt, reward, due: day + G.kill.days });
         } else {
@@ -2156,12 +2145,12 @@ window.SHL = (function () {
     talk, streetTalk, streetClose, cheapRumor,
     questAct, questsHere, questReady, questReward, questWhere, trackedQuest, activeQuests,
     hearRumor, rumorsHere, traceRumor, investigate, tideInfo,
-    aidInfo, aidPatrol, banditQuestP,
+    aidInfo, aidPatrol,
     craft, canCraftHere, gather, gatherFat, camp, nodeState, dungeonDelve,
     combatAction, combatActions, combatOrder, takeFx, toggleRetreat, toggleDrop, retreatChance, selWt, setTarget, playerSpeed, lootDone,
     eventChoose, eventDone, setOverlay, setProfTab, setJournalTab, sysCamp,
     _debug: { passTime, sleepFoodCost, addItem, die, startCombat, newEq, gainProf, addRumor, worldTick, lootEq, addRep, addCodex, addCorrupt,
       townTick, newDay, wrnd, tradeTax, HOOKS, setNoise: (on) => { NOISE = !!on; }, rnd,
-      regionTick, banditKilled, tideDelta, tideTarget, truthW, liveTruth, genQuests, killEnemy, banditDraw, victory },
+      regionTick, banditKilled, tideDelta, tideTarget, truthW, liveTruth, genQuests, killEnemy, victory },
   };
 })();
