@@ -768,7 +768,9 @@ window.SHL = (function () {
     return Math.max(1, Math.round(p));
   }
   function rowLocked(row) { return !!row.rep && Object.keys(row.rep).some((f) => !repOk(f, row.rep[f])); }
-  function npcLine(npc, kind) { const L = LORE().NPC[npc]; if (!L) return ''; const a = L[kind]; return Array.isArray(a) ? (a.length ? pick(a) : '') : a || ''; }
+  // 台詞模板：{sur}＝玩家姓（S.name.sur；MVP 稱呼「{姓}客官」，製作人 17:04 (6)）
+  function fillLine(t) { return t ? String(t).replace(/\{sur\}/g, (S && S.name && S.name.sur) || '') : t; }
+  function npcLine(npc, kind) { const L = LORE().NPC[npc]; if (!L) return ''; const a = L[kind]; return fillLine(Array.isArray(a) ? (a.length ? pick(a) : '') : a || ''); }
   // 進建築（null＝回到街上）
   function setTab(t) {
     if (S.scene !== 'town' || S.combat) return;

@@ -205,12 +205,13 @@
     const face = 'pl_' + S.origin;
     // 名字：取名頁時即時預覽草稿（UI-01 Q2 甲）；其餘時候為 S.name 全名。第二段為「身分・N 歲」
     const nm = S.scene === 'naming' ? nameDraft.sur + nameDraft.given : G.fullName();
-    let h = '<div class="portrait">' + (IC.has(face) ? ico(face, '', 56) : (O || '無名')) + '</div><div class="pname"><span data-testid="pname">' + esc(nm) + '</span><span class="page" data-testid="age">' + (O ? O + '・' : '') + G.ageOf(S.t) + ' 歲</span></div>';
-    h += '<div class="pill" style="left:76px;top:28px;width:82px" data-testid="loc">' + D.NODES[S.loc].name + '</div>';
+    // 製作人 17:04 (7)：兩行（UI-01 圖 01／02、README §4）：第一行 {姓}{名}、第二行 {身分}・{年齡}歲
+    let h = '<div class="portrait">' + (IC.has(face) ? ico(face, '', 56) : (O || '無名')) + '</div><div class="pname" data-testid="pname-block"><span class="pfull" data-testid="pname">' + esc(nm) + '</span><span class="page" data-testid="age">' + (O ? O + '・' : '') + G.ageOf(S.t) + '歲</span></div>';
+    h += '<div class="pill" style="left:76px;top:35px;width:82px" data-testid="loc">' + D.NODES[S.loc].name + '</div>';
     const td = G.tideInfo();
-    h += '<div class="pill date' + (td ? ' hot' : '') + '" style="left:162px;top:28px;width:50px" data-testid="date"' + (td ? ' title="獸潮・' + D.NODES[td.town].name + '，剩 ' + td.left + ' 天"' : '') + '>' + (td ? '獸潮' : G.fmtDate(S.t)) + '</div>';
+    h += '<div class="pill date' + (td ? ' hot' : '') + '" style="left:162px;top:35px;width:50px" data-testid="date"' + (td ? ' title="獸潮・' + D.NODES[td.town].name + '，剩 ' + td.left + ' 天"' : '') + '>' + (td ? '獸潮' : G.fmtDate(S.t)) + '</div>';
     h += '<div class="silver">' + ico('ui_coin', '銀', 16) + '<span data-testid="silver">' + S.silver + '</span></div>';
-    h += '<div class="pill" style="left:122px;top:51px;width:90px;font-weight:700" data-testid="clock">' + G.fmtTime(S.t) + '</div>';
+    h += '<div class="pill" style="left:122px;top:57px;width:90px;font-weight:700" data-testid="clock">' + G.fmtTime(S.t) + '</div>';
     const vit = (ic, gl, v, max, y, crit, tid, cls, marks) => '<div class="vit ' + cls + (crit ? ' crit' : '') + '" style="top:' + y + 'px" data-testid="' + tid + '">' + ico(ic, gl, 16) + '<div class="bar"><i style="width:' + Math.max(0, Math.min(100, (v / max) * 100)).toFixed(1) + '%"></i>' + (marks || '') + '</div><span class="num">' + Math.max(0, Math.round(v)) + '/' + max + '</span></div>';
     h += vit('ui_hp', '命', S.hp, mh, 78, S.hp / mh <= 0.3, 'hp', 'v-hp');
     h += vit('ui_food', '食', S.food, 100, 98, S.food <= 20, 'food', 'v-food', '<b style="left:20%"></b>');

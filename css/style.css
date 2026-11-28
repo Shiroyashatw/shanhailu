@@ -106,12 +106,14 @@ body.dragging, body.dragging * { cursor: grabbing !important; }
 
 /* ---------- 右欄 ---------- */
 .portrait { position: absolute; left: 8px; top: 8px; width: 60px; height: 60px; border: 1px solid var(--line); background: var(--hatch); display: flex; align-items: center; justify-content: center; color: var(--gold); font-family: var(--serif); font-size: 15px; font-weight: 700; letter-spacing: 2px; }
-.pname { position: absolute; left: 76px; top: 6px; font-size: 15px; font-weight: 700; white-space: nowrap; }
-.pname .page { font-size: 11px; font-weight: 400; color: var(--ink-3); margin-left: 8px; }
+.pname { position: absolute; left: 76px; top: 4px; font-size: 15px; font-weight: 700; white-space: nowrap; display: flex; flex-direction: column; }
+/* UI-01 §4／製作人 17:04 (7)：右欄名字兩行——第一行全名、第二行「身分・N歲」 */
+.pname .pfull { line-height: 16px; height: 16px; }
+.pname .page { font-size: 11px; font-weight: 400; color: var(--ink-3); line-height: 13px; height: 13px; }
 .pill { position: absolute; height: 20px; border: 1px solid var(--line); font-size: 11px; display: flex; align-items: center; justify-content: center; white-space: nowrap; background: #100f0c; }
 .pill.date { color: var(--jade); }
 .pill.hot { border-color: var(--red); color: var(--red); }
-.silver { position: absolute; left: 76px; top: 52px; height: 18px; display: flex; align-items: center; gap: 4px; font-weight: 700; font-size: 13px; color: var(--gold); }
+.silver { position: absolute; left: 76px; top: 58px; height: 18px; display: flex; align-items: center; gap: 4px; font-weight: 700; font-size: 13px; color: var(--gold); }
 .vit { position: absolute; left: 8px; width: 204px; height: 16px; display: flex; align-items: center; gap: 6px; }
 .vit .gl { width: 16px; text-align: center; font-size: 10px; font-weight: 700; }
 .vit .bar { position: relative; width: 120px; height: 8px; border: 1px solid var(--line); background: #0f0e0c; }
