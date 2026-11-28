@@ -1,0 +1,4 @@
+HEAD 2985c81827927031279720e5497d45e287554b48
+SHOT fix2-01-map-preview-dawn.png {"clock":"第 1 日 06:00","dest":"qingwu","hours":2,"risk":0.375,"riskName":"高","R":1,"dom":"危險高"}
+SHOT fix2-02-map-preview-dusk.png {"clock":"第 1 日 17:00","dest":"qingwu","hours":2,"risk":0.44999999999999996,"riskName":"高","R":1,"dom":"危險高"}
+console errors: []
