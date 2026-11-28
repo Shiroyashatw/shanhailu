@@ -1,0 +1,10 @@
+set,n_scenarios,compare,viol_deadline_any,viol_A_overslept,viol_B_expired,viol_B_overslept,info_delay_per_scen_inf,info_delay_per_scen_both_done,info_matched_tide_capped,info_more_expired_while_asleep,info_fewer_done,info_zero_done_new_only,info_zero_done_old_only
+orig,200,v05_vs_v03,0,0,0,0,0,0,0,0,0,0,0
+orig,200,v05_vs_main,0,0,0,0,7,7,0,61,0,0,0
+orig,200,ref_v03_vs_main,0,0,0,0,7,7,0,61,0,0,0
+allday_grid,2400,v05_vs_v03,0,0,0,0,0,0,0,0,0,0,250
+allday_grid,2400,v05_vs_main,0,0,0,0,0,0,0,0,200,0,250
+allday_grid,2400,ref_v03_vs_main,0,0,0,0,0,0,0,0,200,0,0
+allday_rand,200,v05_vs_v03,0,0,0,0,21,21,27,47,97,0,0
+allday_rand,200,v05_vs_main,0,0,0,0,8,8,6,3,10,0,0
+allday_rand,200,ref_v03_vs_main,23,0,22,17,54,54,36,32,10,0,0

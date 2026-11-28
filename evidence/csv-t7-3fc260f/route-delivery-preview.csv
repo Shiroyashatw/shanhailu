@@ -1,0 +1,49 @@
+dir,variant,phase,route,type,base_h,via,risk,riskName
+huiyao→duyin,原圖,白天,huiyao-yizhan-duyin,全官道,4,官道驛站,0.040,低
+huiyao→duyin,原圖,黑夜,huiyao-yizhan-duyin,全官道,4,官道驛站,0.080,低
+huiyao→duyin,EDGES 反轉（含端點對調）,白天,huiyao-yizhan-duyin,全官道,4,官道驛站,0.040,低
+huiyao→duyin,EDGES 反轉（含端點對調）,黑夜,huiyao-yizhan-duyin,全官道,4,官道驛站,0.080,低
+huiyao→duyin,NODES 反轉,白天,huiyao-yizhan-duyin,全官道,4,官道驛站,0.040,低
+huiyao→duyin,NODES 反轉,黑夜,huiyao-yizhan-duyin,全官道,4,官道驛站,0.080,低
+huiyao→duyin,EDGES＋NODES 都反轉,白天,huiyao-yizhan-duyin,全官道,4,官道驛站,0.040,低
+huiyao→duyin,EDGES＋NODES 都反轉,黑夜,huiyao-yizhan-duyin,全官道,4,官道驛站,0.080,低
+duyin→huiyao,原圖,白天,duyin-yizhan-huiyao,全官道,4,官道驛站,0.040,低
+duyin→huiyao,原圖,黑夜,duyin-yizhan-huiyao,全官道,4,官道驛站,0.080,低
+duyin→huiyao,EDGES 反轉（含端點對調）,白天,duyin-yizhan-huiyao,全官道,4,官道驛站,0.040,低
+duyin→huiyao,EDGES 反轉（含端點對調）,黑夜,duyin-yizhan-huiyao,全官道,4,官道驛站,0.080,低
+duyin→huiyao,NODES 反轉,白天,duyin-yizhan-huiyao,全官道,4,官道驛站,0.040,低
+duyin→huiyao,NODES 反轉,黑夜,duyin-yizhan-huiyao,全官道,4,官道驛站,0.080,低
+duyin→huiyao,EDGES＋NODES 都反轉,白天,duyin-yizhan-huiyao,全官道,4,官道驛站,0.040,低
+duyin→huiyao,EDGES＋NODES 都反轉,黑夜,duyin-yizhan-huiyao,全官道,4,官道驛站,0.080,低
+huiyao→poxiao,原圖,白天,huiyao-yizhan-duyin-poxiao,全官道,6,官道驛站,0.040,低
+huiyao→poxiao,原圖,黑夜,huiyao-yizhan-duyin-poxiao,全官道,6,官道驛站,0.080,低
+huiyao→poxiao,EDGES 反轉（含端點對調）,白天,huiyao-yizhan-duyin-poxiao,全官道,6,官道驛站,0.040,低
+huiyao→poxiao,EDGES 反轉（含端點對調）,黑夜,huiyao-yizhan-duyin-poxiao,全官道,6,官道驛站,0.080,低
+huiyao→poxiao,NODES 反轉,白天,huiyao-yizhan-duyin-poxiao,全官道,6,官道驛站,0.040,低
+huiyao→poxiao,NODES 反轉,黑夜,huiyao-yizhan-duyin-poxiao,全官道,6,官道驛站,0.080,低
+huiyao→poxiao,EDGES＋NODES 都反轉,白天,huiyao-yizhan-duyin-poxiao,全官道,6,官道驛站,0.040,低
+huiyao→poxiao,EDGES＋NODES 都反轉,黑夜,huiyao-yizhan-duyin-poxiao,全官道,6,官道驛站,0.080,低
+poxiao→huiyao,原圖,白天,poxiao-duyin-yizhan-huiyao,全官道,6,渡陰關,0.040,低
+poxiao→huiyao,原圖,黑夜,poxiao-duyin-yizhan-huiyao,全官道,6,渡陰關,0.080,低
+poxiao→huiyao,EDGES 反轉（含端點對調）,白天,poxiao-duyin-yizhan-huiyao,全官道,6,渡陰關,0.040,低
+poxiao→huiyao,EDGES 反轉（含端點對調）,黑夜,poxiao-duyin-yizhan-huiyao,全官道,6,渡陰關,0.080,低
+poxiao→huiyao,NODES 反轉,白天,poxiao-duyin-yizhan-huiyao,全官道,6,渡陰關,0.040,低
+poxiao→huiyao,NODES 反轉,黑夜,poxiao-duyin-yizhan-huiyao,全官道,6,渡陰關,0.080,低
+poxiao→huiyao,EDGES＋NODES 都反轉,白天,poxiao-duyin-yizhan-huiyao,全官道,6,渡陰關,0.040,低
+poxiao→huiyao,EDGES＋NODES 都反轉,黑夜,poxiao-duyin-yizhan-huiyao,全官道,6,渡陰關,0.080,低
+duyin→poxiao,原圖,白天,duyin-poxiao,全官道,2,官道,0.040,低
+duyin→poxiao,原圖,黑夜,duyin-poxiao,全官道,2,官道,0.080,低
+duyin→poxiao,EDGES 反轉（含端點對調）,白天,duyin-poxiao,全官道,2,官道,0.040,低
+duyin→poxiao,EDGES 反轉（含端點對調）,黑夜,duyin-poxiao,全官道,2,官道,0.080,低
+duyin→poxiao,NODES 反轉,白天,duyin-poxiao,全官道,2,官道,0.040,低
+duyin→poxiao,NODES 反轉,黑夜,duyin-poxiao,全官道,2,官道,0.080,低
+duyin→poxiao,EDGES＋NODES 都反轉,白天,duyin-poxiao,全官道,2,官道,0.040,低
+duyin→poxiao,EDGES＋NODES 都反轉,黑夜,duyin-poxiao,全官道,2,官道,0.080,低
+poxiao→duyin,原圖,白天,poxiao-duyin,全官道,2,官道,0.040,低
+poxiao→duyin,原圖,黑夜,poxiao-duyin,全官道,2,官道,0.080,低
+poxiao→duyin,EDGES 反轉（含端點對調）,白天,poxiao-duyin,全官道,2,官道,0.040,低
+poxiao→duyin,EDGES 反轉（含端點對調）,黑夜,poxiao-duyin,全官道,2,官道,0.080,低
+poxiao→duyin,NODES 反轉,白天,poxiao-duyin,全官道,2,官道,0.040,低
+poxiao→duyin,NODES 反轉,黑夜,poxiao-duyin,全官道,2,官道,0.080,低
+poxiao→duyin,EDGES＋NODES 都反轉,白天,poxiao-duyin,全官道,2,官道,0.040,低
+poxiao→duyin,EDGES＋NODES 都反轉,黑夜,poxiao-duyin,全官道,2,官道,0.080,低

@@ -1,0 +1,17 @@
+variant,phase,brief_danger_sim,tier,worst_route_first
+原圖,清晨,0.375,高,huiyao-chakou-chishi
+原圖,白天,0.300,中,huiyao-chakou-chishi
+原圖,黃昏,0.450,高,huiyao-chakou-chishi
+原圖,黑夜,0.600,極高,huiyao-chakou-chishi
+EDGES 反轉（含端點對調）,清晨,0.375,高,huiyao-chakou-chishi
+EDGES 反轉（含端點對調）,白天,0.300,中,huiyao-chakou-chishi
+EDGES 反轉（含端點對調）,黃昏,0.450,高,huiyao-chakou-chishi
+EDGES 反轉（含端點對調）,黑夜,0.600,極高,huiyao-chakou-chishi
+NODES 反轉,清晨,0.375,高,huiyao-chakou-chishi
+NODES 反轉,白天,0.300,中,huiyao-chakou-chishi
+NODES 反轉,黃昏,0.450,高,huiyao-chakou-chishi
+NODES 反轉,黑夜,0.600,極高,huiyao-chakou-chishi
+EDGES＋NODES 都反轉,清晨,0.375,高,huiyao-chakou-chishi
+EDGES＋NODES 都反轉,白天,0.300,中,huiyao-chakou-chishi
+EDGES＋NODES 都反轉,黃昏,0.450,高,huiyao-chakou-chishi
+EDGES＋NODES 都反轉,黑夜,0.600,極高,huiyao-chakou-chishi

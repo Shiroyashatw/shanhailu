@@ -1,0 +1,5 @@
+season,n,p_ok,killed_in_fight,starved_or_frozen,no_meat_or_timeout,mean_hours_ok,mean_min_food,mean_max_cold
+春,50,1,0,0,0,4.960,10.160,4.160
+夏,50,1,0,0,0,4.760,10.960,0.260
+秋,50,1,0,0,0,4.960,10.160,6.640
+冬,50,1,0,0,0,5.160,4.200,18.140

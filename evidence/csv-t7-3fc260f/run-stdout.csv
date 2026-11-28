@@ -1,0 +1,450 @@
+line
+# T7 重跑（num-shl-t7-3fc260f）
+被驗 commit 3fc260f8a38a84b791b5260bad8f19f18ec8d321；工作樹 HEAD 3fc260f8a38a84b791b5260bad8f19f18ec8d321；工作樹 js/ index.html tests/ docs/ 對被驗 commit：相同
+## 0. diff 摘要
+### git diff 4bb6f26 3fc260f --stat -- js
+```
+"js/data.js |  4 +++-
+ js/game.js | 27 +++++++++++++++++++++------
+ js/ui.js   |  2 +-
+ 3 files changed, 25 insertions(+), 8 deletions(-)"
+```
+### git diff d0989ba 3fc260f --stat -- js data tests（repo 沒有 data/ 目錄）
+```
+"js/data.js         |  27 ++++++----
+ js/game.js         | 113 ++++++++++++++++++++++++++++++--------
+ js/lore.js         |   3 +-
+ js/ui.js           |  99 +++++++++++++++++++++++++++-------
+ tests/e2e-dev02.js | 130 ++++++++++++++++++++++++++++++++++++++++++--
+ tests/e2e.js       | 155 +++++++++++++++++++++++++++++++++++++++++++++++++----
+ 6 files changed, 460 insertions(+), 67 deletions(-)"
+```
+d0989ba→3fc260f js/game.js、js/data.js 的 hunk 所在函式（git 的 hunk 標頭）：window.SHL_DATA = (function () {｜window.SHL_DATA = (function () {｜window.SHL_DATA = (function () {｜window.SHL_DATA = (function () {｜window.SHL_DATA = (function () {｜window.SHL = (function () {｜window.SHL = (function () {｜window.SHL = (function () {｜window.SHL = (function () {｜window.SHL = (function () {｜window.SHL = (function () {｜window.SHL = (function () {｜window.SHL = (function () {｜window.SHL = (function () {｜window.SHL = (function () {｜window.SHL = (function () {｜window.SHL = (function () {｜window.SHL = (function () {｜window.SHL = (function () {｜window.SHL = (function () {｜window.SHL = (function () {｜window.SHL = (function () {｜window.SHL = (function () {｜window.SHL = (function () {｜window.SHL = (function () {｜window.SHL = (function () {｜window.SHL = (function () {｜window.SHL = (function () {
+4bb6f26→3fc260f js/ 的 hunk 所在函式：window.SHL_DATA = (function () {｜window.SHL_DATA = (function () {｜window.SHL = (function () {｜window.SHL = (function () {｜window.SHL = (function () {｜window.SHL = (function () {｜window.SHL = (function () {｜window.SHL = (function () {｜
+函式原文逐字比對（被驗 commit 對 d0989ba／對 4bb6f26）：
+| 函式 | 對 d0989ba | 對 4bb6f26 | 行數 |
+|---|---|---|---|
+| wakeTime | 同 | 同 | 5 |
+| sleepToMorning | 異 | 同 | 4 |
+| passTime | 異 | 同 | 24 |
+| newDay | 同 | 同 | 12 |
+| camp | 同 | 同 | 22 |
+| service | 異 | 同 | 58 |
+| checkDeath | 同 | 同 | 6 |
+| maxHp | 同 | 同 | 16 |
+| wrnd | 同 | 同 | 12 |
+| route | 異 | 異 | 21 |
+| travelPreview | 異 | 異 | 22 |
+## 1. 條件 1 全時段掃描（回歸）
+就寢時刻 10416（grid30 384、edge 32、random 10000；就寢日 1／5／30／31／90／120／121／240 + 隨機 1–240 日，seed 20261128）
+"睡眠時長 min 6.000 h、max 13.000 h、超出 [6,13] 個數 0"
+實作 vs 逐字複製 vs sim 重寫 不一致：0；完整路徑（rest 10416 點、bunk 非隨機 416 點）起床與 wakeTime 不一致：0；死亡：0；newDay 次數或 00:00 時刻不符：0；飽食（起始 80）與 round(80−1.25×h×冬) 不符：0
+| 規格點 | 就寢 | 規格起床 | 規格時數 | 實作起床 | 實作時數 | rest 完整路徑 | bunk 完整路徑 | 結論 |
+|---|---|---|---|---|---|---|---|---|
+| 20:00（第 5 日） | 第5日 20:00 | 第6日 08:00 | 12 | 第6日 08:00 | 12 | 第6日 08:00 | 第6日 08:00 | 過 |
+| 03:00 | 第5日 03:00 | 第5日 09:00 | 6 | 第5日 09:00 | 6 | 第5日 09:00 | 第5日 09:00 | 過 |
+| 07:00 | 第5日 07:00 | 第5日 13:00 | 6 | 第5日 13:00 | 6 | 第5日 13:00 | 第5日 13:00 | 過 |
+| 08:10 | 第5日 08:10 | 第5日 21:10 | 13 | 第5日 21:10 | 13 | 第5日 21:10 | 第5日 21:10 | 過 |
+| 00:00 | 第5日 00:00 | 第5日 08:00 | 8 | 第5日 08:00 | 8 | 第5日 08:00 | 第5日 08:00 | 過 |
+## 2. 條件 3：08:00 含當下與 07:59／08:01 邊界（回歸）
+| 情況 | 就寢 | 規格 v0.5 起床 | 實作起床 | 時數 | rest 完整路徑 | bunk 完整路徑 | 結論 |
+|---|---|---|---|---|---|---|---|
+| 07:59 | 第5日 07:59 | 第5日 13:59 | 第5日 13:59 | 6 | 第5日 13:59 | 第5日 13:59 | 過 |
+| 08:00 | 第5日 08:00 | 第5日 14:00 | 第5日 14:00 | 6 | 第5日 14:00 | 第5日 14:00 | 過 |
+| 08:01 | 第5日 08:01 | 第5日 21:01 | 第5日 21:01 | 13 | 第5日 21:01 | 第5日 21:01 | 過 |
+| 第 1 日 08:00（開局） | 第1日 08:00 |  | 第1日 14:00 | 6 | 第1日 14:00 | 第1日 14:00 | （無規格點） |
+| 跨日 00:00（第 5 日） | 第5日 00:00 |  | 第5日 08:00 | 8 | 第5日 08:00 | 第5日 08:00 | （無規格點） |
+| 23:59（第 4 日） | 第4日 23:59 |  | 第5日 08:00 | 8.017 | 第5日 08:00 | 第5日 08:00 | （無規格點） |
+| 02:00 | 第5日 02:00 |  | 第5日 08:00 | 6 | 第5日 08:00 | 第5日 08:00 | （無規格點） |
+| 02:01 | 第5日 02:01 |  | 第5日 08:01 | 6 | 第5日 08:01 | 第5日 08:01 | （無規格點） |
+| 19:00 | 第5日 19:00 |  | 第6日 08:00 | 13 | 第6日 08:00 | 第6日 08:00 | （無規格點） |
+| 19:01 | 第5日 19:01 |  | 第6日 08:00 | 12.983 | 第6日 08:00 | 第6日 08:00 | （無規格點） |
+## 3. 期限／過期類與延誤類（Q-T7b 甲）
+### 原情境（就寢 22:00±3h，seed 0–199）（情境數 200；「睡過頭」參考＝被驗實作）
+| 指標（每情境 60 天） | 新 v0.5（被驗實作） 平均／最大 | 舊 v0.3 平均／最大 | main 缺陷 平均／最大 |
+|---|---|---|---|
+| A 不處理：期限落在睡過頭時段 | 0.000／0.000 | 0.000／0.000 | 5.355／12.000 |
+| A 不處理：期限落在任何睡眠中 | 27.520／37.000 | 27.520／37.000 | 28.585／38.000 |
+| A 不處理：期限總數 | 33.645／41.000 | 33.645／41.000 | 33.775／42.000 |
+| B 有處理：過期件數 | 0.000／0.000 | 0.000／0.000 | 0.000／0.000 |
+| B 其中因睡過頭 | 0.000／0.000 | 0.000／0.000 | 0.000／0.000 |
+| B 其中睡著時過期 | 0.000／0.000 | 0.000／0.000 | 0.000／0.000 |
+| B 完成件數（每情境） | 37.755／47.000 | 37.755／47.000 | 33.185／43.000 |
+| B 完成件延誤：各情境平均的平均（只計有完成的情境） | 8.029／9.813 | 8.029／9.813 | 9.191／12.985 |
+| 資訊：配對獸潮延誤（未完成記到期，上一輪口徑） | 13.919／14.000 | 13.919／14.000 | 17.630／25.792 |
+| B 睡著錯過傳聞 | 0.000／0.000 | 0.000／0.000 | 4.560／9.000 |
+| B 總睡眠時數 | 598.148／626.667 | 598.148／626.667 | 725.209／789.333 |
+| B 單次最長睡眠 h | 12.943／13.000 | 12.943／13.000 | 31.952／32.000 |
+| B 單次最短睡眠 h | 7.081／7.833 | 7.081／7.833 | 8.224／8.667 |
+| 延誤類（全樣本、只算有完成件數） | 新 v0.5 | 舊 v0.3 | main 缺陷 |
+|---|---|---|---|
+| B 完成件「出現→完成」全樣本平均 h | 8.007 | 8.007 | 9.152 |
+| B 有完成件數（全組合計） | 7551 | 7551 | 6637 |
+| B 完成件數平均（每情境） | 37.755 | 37.755 | 33.185 |
+| B 0 完成情境數 | 0 | 0 | 0 |
+| 配對獸潮延誤 全樣本平均 h（只算完成） | 13.920 | 13.920 | 17.612 |
+| 完成的獸潮件數／獸潮總件數 | 1534／1534 | 1534／1534 | 1533／1534 |
+違反（新比舊更差的情境數）：對 v0.3 期限類 0（A 睡過頭 0、B 過期 0、B 因睡過頭 0）；資訊：逐情境延誤 0（0 完成記 +∞，上一輪口徑）／0（兩邊都有完成才比）、配對獸潮延誤 0、睡著時過期較多 0、完成件數較少 0、只有新 0 完成 0、只有舊 0 完成 0
+資訊：對 main 現況缺陷 期限類 0（A 睡過頭 0、B 過期 0、B 因睡過頭 0）；資訊：逐情境延誤 7（0 完成記 +∞，上一輪口徑）／7（兩邊都有完成才比）、配對獸潮延誤 0、睡著時過期較多 61、完成件數較少 0、只有新 0 完成 0、只有舊 0 完成 0
+參考：v0.3 對 main 期限類 0（A 睡過頭 0、B 過期 0、B 因睡過頭 0）；資訊：逐情境延誤 7（0 完成記 +∞，上一輪口徑）／7（兩邊都有完成才比）、配對獸潮延誤 0、睡著時過期較多 61、完成件數較少 0、只有新 0 完成 0、只有舊 0 完成 0
+### 全天格點（每天固定同一就寢分鐘，0:00–23:30 每 30 分 48 格 × seed 0–49）（情境數 2400；「睡過頭」參考＝被驗實作）
+| 指標（每情境 60 天） | 新 v0.5（被驗實作） 平均／最大 | 舊 v0.3 平均／最大 | main 缺陷 平均／最大 |
+|---|---|---|---|
+| A 不處理：期限落在睡過頭時段 | 0.000／0.000 | 3.700／43.000 | 9.565／43.000 |
+| A 不處理：期限落在任何睡眠中 | 17.690／43.000 | 22.130／43.000 | 27.995／43.000 |
+| A 不處理：期限總數 | 34.271／43.000 | 34.271／43.000 | 34.257／43.000 |
+| B 有處理：過期件數 | 0.000／0.000 | 1.065／17.000 | 1.065／17.000 |
+| B 其中因睡過頭 | 0.000／0.000 | 0.765／8.000 | 0.765／8.000 |
+| B 其中睡著時過期 | 0.000／0.000 | 1.065／17.000 | 1.065／17.000 |
+| B 完成件數（每情境） | 30.977／45.000 | 29.782／45.000 | 26.865／45.000 |
+| B 完成件延誤：各情境平均的平均（只計有完成的情境） | 9.890／19.714 | 15.206／58.429 | 16.771／58.429 |
+| 資訊：配對獸潮延誤（未完成記到期，上一輪口徑） | 10.521／14.000 | 18.982／48.000 | 22.459／48.000 |
+| B 睡著錯過傳聞 | 6.933／38.000 | 6.933／38.000 | 9.820／38.000 |
+| B 總睡眠時數 | 607.146／780.000 | 751.521／1410.000 | 917.500／1410.000 |
+| B 單次最長睡眠 h | 10.156／13.000 | 12.563／23.500 | 20.250／32.000 |
+| B 單次最短睡眠 h | 10.156／13.000 | 12.563／23.500 | 20.250／32.000 |
+| 延誤類（全樣本、只算有完成件數） | 新 v0.5 | 舊 v0.3 | main 缺陷 |
+|---|---|---|---|
+| B 完成件「出現→完成」全樣本平均 h | 10.708 | 14.619 | 16.539 |
+| B 有完成件數（全組合計） | 74345 | 71477 | 64477 |
+| B 完成件數平均（每情境） | 30.977 | 29.782 | 26.865 |
+| B 0 完成情境數 | 0 | 250 | 250 |
+| 配對獸潮延誤 全樣本平均 h（只算完成） | 10.521 | 15.179 | 18.971 |
+| 完成的獸潮件數／獸潮總件數 | 18384／18384 | 16253／18384 | 16181／18384 |
+違反（新比舊更差的情境數）：對 v0.3 期限類 0（A 睡過頭 0、B 過期 0、B 因睡過頭 0）；資訊：逐情境延誤 0（0 完成記 +∞，上一輪口徑）／0（兩邊都有完成才比）、配對獸潮延誤 0、睡著時過期較多 0、完成件數較少 0、只有新 0 完成 0、只有舊 0 完成 250
+資訊：對 main 現況缺陷 期限類 0（A 睡過頭 0、B 過期 0、B 因睡過頭 0）；資訊：逐情境延誤 0（0 完成記 +∞，上一輪口徑）／0（兩邊都有完成才比）、配對獸潮延誤 0、睡著時過期較多 0、完成件數較少 200、只有新 0 完成 0、只有舊 0 完成 250
+參考：v0.3 對 main 期限類 0（A 睡過頭 0、B 過期 0、B 因睡過頭 0）；資訊：逐情境延誤 0（0 完成記 +∞，上一輪口徑）／0（兩邊都有完成才比）、配對獸潮延誤 0、睡著時過期較多 0、完成件數較少 200、只有新 0 完成 0、只有舊 0 完成 0
+### 全天隨機（每次就寢在 0:00–23:59 均勻抽分鐘，seed 0–199）（情境數 200；「睡過頭」參考＝被驗實作）
+| 指標（每情境 60 天） | 新 v0.5（被驗實作） 平均／最大 | 舊 v0.3 平均／最大 | main 缺陷 平均／最大 |
+|---|---|---|---|
+| A 不處理：期限落在睡過頭時段 | 0.000／0.000 | 3.835／11.000 | 11.445／23.000 |
+| A 不處理：期限落在任何睡眠中 | 19.160／28.000 | 21.400／32.000 | 25.505／34.000 |
+| A 不處理：期限總數 | 33.880／42.000 | 33.930／42.000 | 34.025／42.000 |
+| B 有處理：過期件數 | 0.000／0.000 | 0.215／3.000 | 0.375／2.000 |
+| B 其中因睡過頭 | 0.000／0.000 | 0.145／2.000 | 0.270／2.000 |
+| B 其中睡著時過期 | 0.000／0.000 | 0.215／3.000 | 0.375／2.000 |
+| B 完成件數（每情境） | 30.080／40.000 | 30.455／40.000 | 26.065／36.000 |
+| B 完成件延誤：各情境平均的平均（只計有完成的情境） | 11.364／15.927 | 13.482／22.368 | 14.930／25.423 |
+| 資訊：配對獸潮延誤（未完成記到期，上一輪口徑） | 12.700／21.021 | 17.092／28.750 | 21.573／35.521 |
+| B 睡著錯過傳聞 | 7.540／16.000 | 6.855／15.000 | 11.140／17.000 |
+| B 總睡眠時數 | 655.068／740.500 | 731.558／859.333 | 893.339／965.500 |
+| B 單次最長睡眠 h | 13.000／13.000 | 23.509／23.833 | 31.630／32.000 |
+| B 單次最短睡眠 h | 6.000／6.000 | 6.000／6.000 | 8.580／11.000 |
+| 延誤類（全樣本、只算有完成件數） | 新 v0.5 | 舊 v0.3 | main 缺陷 |
+|---|---|---|---|
+| B 完成件「出現→完成」全樣本平均 h | 11.351 | 13.483 | 14.916 |
+| B 有完成件數（全組合計） | 6016 | 6091 | 5213 |
+| B 完成件數平均（每情境） | 30.080 | 30.455 | 26.065 |
+| B 0 完成情境數 | 0 | 0 | 0 |
+| 配對獸潮延誤 全樣本平均 h（只算完成） | 12.631 | 16.165 | 19.933 |
+| 完成的獸潮件數／獸潮總件數 | 1531／1534 | 1489／1534 | 1445／1534 |
+違反（新比舊更差的情境數）：對 v0.3 期限類 0（A 睡過頭 0、B 過期 0、B 因睡過頭 0）；資訊：逐情境延誤 21（0 完成記 +∞，上一輪口徑）／21（兩邊都有完成才比）、配對獸潮延誤 27、睡著時過期較多 47、完成件數較少 97、只有新 0 完成 0、只有舊 0 完成 0
+資訊：對 main 現況缺陷 期限類 0（A 睡過頭 0、B 過期 0、B 因睡過頭 0）；資訊：逐情境延誤 8（0 完成記 +∞，上一輪口徑）／8（兩邊都有完成才比）、配對獸潮延誤 6、睡著時過期較多 3、完成件數較少 10、只有新 0 完成 0、只有舊 0 完成 0
+參考：v0.3 對 main 期限類 23（A 睡過頭 0、B 過期 22、B 因睡過頭 17）；資訊：逐情境延誤 54（0 完成記 +∞，上一輪口徑）／54（兩邊都有完成才比）、配對獸潮延誤 36、睡著時過期較多 32、完成件數較少 10、只有新 0 完成 0、只有舊 0 完成 0
+### 門檻總表（對 v0.3）
+| 組 | 情境 | 期限類違反 | 判 | B 延誤平均 新 | 舊 | 判 | 獸潮延誤平均(完成) 新 | 舊 | 判 | 0 完成 新 | 舊 | 判 | 有完成件 新 | 舊 | 完成件平均 新 | 舊 | 資訊:逐情境延誤違反(+∞口徑) | 資訊:(兩邊有完成) | 資訊:配對獸潮(到期口徑) |
+|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
+| orig | 200 | 0 | 過 | 8.007 | 8.007 | 過 | 13.920 | 13.920 | 過 | 0 | 0 | 過 | 7551 | 7551 | 37.755 | 37.755 | 0 | 0 | 0 |
+| allday_grid | 2400 | 0 | 過 | 10.708 | 14.619 | 過 | 10.521 | 15.179 | 過 | 0 | 250 | 過 | 74345 | 71477 | 30.977 | 29.782 | 0 | 0 | 0 |
+| allday_rand | 200 | 0 | 過 | 11.351 | 13.483 | 過 | 12.631 | 16.165 | 過 | 0 | 0 | 過 | 6016 | 6091 | 30.080 | 30.455 | 21 | 21 | 27 |
+"## 4. 敏感度 maxH ∈ {11,12,13,14}（資訊；vm 實例內改 D.SLEEP.maxH；對 v0.3 比）"
+| maxH | 組 | n | 期限類違反 | B 過期 平均 | 最大 | 延誤平均 新 | v0.3 | 比 | 獸潮延誤(完成) 新 | v0.3 | 0 完成 新 | v0.3 | 完成件平均 新 | v0.3 | 資訊:逐情境延誤違反 | 20:00 睡 h | 08:10 睡 h | 全時段 h |
+|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
+| 11 | orig | 200 | 0 | 0 | 0 | 7.844 | 8.007 | 新≤舊 | 13.609 | 13.920 | 0 | 0 | 37.760 | 37.755 | 0 | 11 | 11 | 6–11 |
+| 11 | allday_grid | 2400 | 0 | 0 | 0 | 9.833 | 14.619 | 新≤舊 | 9.854 | 15.179 | 0 | 250 | 30.987 | 29.782 | 0 | 11 | 11 | 6–11 |
+| 11 | allday_rand | 200 | 0 | 0 | 0 | 10.915 | 13.483 | 新≤舊 | 11.639 | 16.165 | 0 | 0 | 29.620 | 30.455 | 15 | 11 | 11 | 6–11 |
+| 12 | orig | 200 | 0 | 0 | 0 | 7.959 | 8.007 | 新≤舊 | 13.844 | 13.920 | 0 | 0 | 37.755 | 37.755 | 0 | 12 | 12 | 6–12 |
+| 12 | allday_grid | 2400 | 0 | 0 | 0 | 10.165 | 14.619 | 新≤舊 | 10.188 | 15.179 | 0 | 250 | 30.987 | 29.782 | 0 | 12 | 12 | 6–12 |
+| 12 | allday_rand | 200 | 0 | 0 | 0 | 11.232 | 13.483 | 新≤舊 | 12.281 | 16.165 | 0 | 0 | 29.800 | 30.455 | 23 | 12 | 12 | 6–12 |
+| 13 | orig | 200 | 0 | 0 | 0 | 8.007 | 8.007 | 新≤舊 | 13.920 | 13.920 | 0 | 0 | 37.755 | 37.755 | 0 | 12 | 13 | 6–13 |
+| 13 | allday_grid | 2400 | 0 | 0 | 0 | 10.708 | 14.619 | 新≤舊 | 10.521 | 15.179 | 0 | 250 | 30.977 | 29.782 | 0 | 12 | 13 | 6–13 |
+| 13 | allday_rand | 200 | 0 | 0 | 0 | 11.351 | 13.483 | 新≤舊 | 12.631 | 16.165 | 0 | 0 | 30.080 | 30.455 | 21 | 12 | 13 | 6–13 |
+| 14 | orig | 200 | 0 | 0 | 0 | 8.007 | 8.007 | 新≤舊 | 13.920 | 13.920 | 0 | 0 | 37.755 | 37.755 | 0 | 12 | 14 | 6–14 |
+| 14 | allday_grid | 2400 | 0 | 0 | 0 | 11.132 | 14.619 | 新≤舊 | 10.854 | 15.179 | 0 | 250 | 30.975 | 29.782 | 0 | 12 | 14 | 6–14 |
+| 14 | allday_rand | 200 | 1 | 0.005 | 1 | 11.719 | 13.483 | 新≤舊 | 12.936 | 16.165 | 0 | 0 | 30.110 | 30.455 | 31 | 12 | 14 | 6–14 |
+## 5. 條件 4 wrnd 對齊（回歸）
+"種子 6 組 × 標籤 8 × 每組 24 個 (day,i)：比對 1152 個輸出，逐位不同 0 個"
+## 6. 開發 anyhour 腳本複算（資訊，重建版）
+mode=sim（新＝v0.3，舊＝v0.3）
+| 指標 | 新 複算 | 舊 複算 | 新 README | 舊 README | 一致 |
+|---|---|---|---|---|---|
+| A 睡過頭時段期限 | 0.000 | 0.000 | 0.000 | 0.000 | 是 |
+| A 全部期限（舊） | 34.175 | 34.175 | — | 34.175 | 是 |
+| B 過期 | 2.540 | 2.540 | 2.540 | 2.540 | 是 |
+| B 因睡過頭 | 0.000 | 0.000 | 0.000 | 0.000 | 是 |
+| B 完成件數 | 19.915 | 19.915 | 19.915 | 19.915 | 是 |
+| 睡 >13h 次數 | 47.390 | 47.390 | 47.390 | 47.390 | 是 |
+| 總睡眠時數 | 1100.813 | 1100.813 | 1100.813 | 1100.813 | 是 |
+| 睡著沒聽到傳聞 | 14.955 | 14.955 | 14.955 | 14.955 | 是 |
+mode=game（新＝DEV-02 wakeTime，舊＝v0.3）
+| 指標 | 新 複算 | 舊 複算 | 新 README | 舊 README | 一致 |
+|---|---|---|---|---|---|
+| A 睡過頭時段期限 | 0.000 | 15.580 | 0.000 | 15.580 | 是 |
+| A 全部期限（舊） | 34.095 | 34.175 | — | 34.175 | 是 |
+| B 過期 | 1.160 | 2.540 | 1.160 | 2.540 | 是 |
+| B 因睡過頭 | 0.000 | 2.250 | 0.000 | 2.250 | 是 |
+| B 完成件數 | 22.960 | 19.915 | 22.960 | 19.915 | 是 |
+| 睡 >13h 次數 | 0.000 | 47.390 | 0.000 | 47.390 | 是 |
+| 總睡眠時數 | 974.195 | 1100.813 | 974.195 | 1100.813 | 是 |
+| 睡著沒聽到傳聞 | 13.385 | 14.955 | 13.385 | 14.955 | 是 |
+## 7. 實作引用（被驗 commit 行號與原文）
+"- `js/data.js:457` const TIME = { RISK_CUTS: [0.15, 0.35, 0.60], RISK_TIERS: ['低', '中', '高', '極高'] };"
+"- `js/data.js:458` const SLEEP = { wakeMin: 8 * 60, minH: 6, maxH: 13 };"
+"- `js/data.js:480` R_ROAD: { kO: 0.015, lo: 0.5, hi: 1.5 }, R_WILD: { kB: 0.012, kO: 0.010, lo: 0.5, hi: 1.8 }, RISK_CAP: 0.85,"
+- `js/game.js:61` function isNight(t) { const h = hourOf(t); return h >= 20 || h < 5; }
+- `js/game.js:476` const foodMult = seasonOf(S.t) === 3 ? 1.25 : 1; // 冬季飽食消耗 +25%
+"- `js/game.js:477` S.food = clamp(S.food - (opts.food !== undefined ? opts.food : 4 * hours) * foodMult, 0, 100);"
+- `js/game.js:481` if (S.food <= 0) { S.hp -= 3 * hours; S.stats.cause = '餓死荒野'; }
+- `js/game.js:484` // SPEC-TIME Q7：hpFloor 只由客棧 rest／營帳 bunk 傳入，生存扣血最低留到此值（店家叫醒、灌湯）；露宿與一般等待不傳
+- `js/game.js:485` if (opts.hpFloor !== undefined && S.hp < opts.hpFloor) S.hp = opts.hpFloor;
+- `js/game.js:520` function checkDeath(cause) {
+- `js/game.js:693` function neighbors(id) {
+"- `js/game.js:698` function route(from, to) {"
+"- `js/game.js:704` const better = (h1, w1, h2, w2) => h1 < h2 || (h1 === h2 && w1 < w2);"
+- `js/game.js:721` function riskTier(risk) {
+- `js/game.js:746` const riskName = riskTier(risk);
+- `js/game.js:904` function wakeTime(now) {
+- `js/game.js:910` function sleepFoodCost(hours) { return 1.25 * hours; }
+- `js/game.js:911` function sleepToMorning(opts) {
+"- `js/game.js:913` passTime(hours, Object.assign({ food: sleepFoodCost(hours), fat: 0, noRegen: true }, opts || {}));"
+- `js/game.js:924` case 'rest': if (!inBld('inn') || !pay(c.rest)) return;
+"- `js/game.js:925` sleepToMorning({ hpFloor: 1 }); S.hp = maxHp(); S.fat = 0; if (S.corrupt) { S.corrupt = Math.max(0, S.corrupt - 10); S.hp = maxHp(); }"
+- `js/game.js:931` case 'nap': if (!inBld('tea') || !pay(c.nap)) return;
+- `js/game.js:937` case 'bunk': if (!inBld('medic') || !pay(c.bunk)) return;
+"- `js/game.js:938` sleepToMorning({ hpFloor: 1 }); S.fat = 0; S.hp = Math.min(maxHp(), S.hp + 30); log('在營帳的通鋪睡了一夜，疲累清零、生命 +30。', 'good'); break;"
+- `js/game.js:1530` function camp() {
+"- `js/game.js:1540` const risk = (night ? 0.25 : 0.12) * (D.WILDS[S.loc].risk === '低' ? 0.6 : 1) * (perk('ying', 25) ? 0.6 : 1) * (tideOn() ? 1.5 : 1);"
+"- `js/game.js:1542` passTime(8, { food: 16, fat: -rec });"
+hpFloor 在 js/game.js 出現 4 次：484、485、925、938
+寒冷狀態（cold／寒意／寒顫／S.cold）在 js/game.js 出現 0 次（實作沒有寒冷狀態，無法設定）
+## 8. 睡眠飽食 = 1.25 × 睡眠實際小時（冬 ×1.25）— 走 G.service 完整路徑
+具名案例（rest、bunk × 春、冬）：
+| 路徑 | 案例 | 季節 | 就寢 | 起床 | 睡 h | 預期 h | 冬倍率 | 規格扣 1.25×h×冬 | 實測未取整扣減 | 起始 80 的整數扣減 | 睡後飽食 | 起始 3 睡後(下限 0) | 花費 | 結論 |
+|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
+| rest | 20:00→12h | 春 第 5 日 | 第5日 20:00 | 第6日 08:00 | 12 | 12 | 1 | 15 | 15.000 | 15 | 65 | 0 | 8 | 過 |
+| bunk | 20:00→12h | 春 第 5 日 | 第5日 20:00 | 第6日 08:00 | 12 | 12 | 1 | 15 | 15.000 | 15 | 65 | 0 | 4 | 過 |
+| rest | 03:00→6h | 春 第 5 日 | 第5日 03:00 | 第5日 09:00 | 6 | 6 | 1 | 7.500 | 7.500 | 7 | 73 | 0 | 8 | 過 |
+| bunk | 03:00→6h | 春 第 5 日 | 第5日 03:00 | 第5日 09:00 | 6 | 6 | 1 | 7.500 | 7.500 | 7 | 73 | 0 | 4 | 過 |
+| rest | 00:00→8h | 春 第 5 日 | 第5日 00:00 | 第5日 08:00 | 8 | 8 | 1 | 10 | 10.000 | 10 | 70 | 0 | 8 | 過 |
+| bunk | 00:00→8h | 春 第 5 日 | 第5日 00:00 | 第5日 08:00 | 8 | 8 | 1 | 10 | 10.000 | 10 | 70 | 0 | 4 | 過 |
+| rest | 08:10→13h | 春 第 5 日 | 第5日 08:10 | 第5日 21:10 | 13 | 13 | 1 | 16.250 | 16.250 | 16 | 64 | 0 | 8 | 過 |
+| bunk | 08:10→13h | 春 第 5 日 | 第5日 08:10 | 第5日 21:10 | 13 | 13 | 1 | 16.250 | 16.250 | 16 | 64 | 0 | 4 | 過 |
+| rest | 08:00→6h | 春 第 5 日 | 第5日 08:00 | 第5日 14:00 | 6 | 6 | 1 | 7.500 | 7.500 | 7 | 73 | 0 | 8 | 過 |
+| bunk | 08:00→6h | 春 第 5 日 | 第5日 08:00 | 第5日 14:00 | 6 | 6 | 1 | 7.500 | 7.500 | 7 | 73 | 0 | 4 | 過 |
+| rest | 08:01→13h | 春 第 5 日 | 第5日 08:01 | 第5日 21:01 | 13 | 13 | 1 | 16.250 | 16.250 | 16 | 64 | 0 | 8 | 過 |
+| bunk | 08:01→13h | 春 第 5 日 | 第5日 08:01 | 第5日 21:01 | 13 | 13 | 1 | 16.250 | 16.250 | 16 | 64 | 0 | 4 | 過 |
+| rest | 20:00→12h | 冬 第 95 日 | 第95日 20:00 | 第96日 08:00 | 12 | 12 | 1.250 | 18.750 | 18.750 | 19 | 61 | 0 | 8 | 過 |
+| bunk | 20:00→12h | 冬 第 95 日 | 第95日 20:00 | 第96日 08:00 | 12 | 12 | 1.250 | 18.750 | 18.750 | 19 | 61 | 0 | 4 | 過 |
+| rest | 03:00→6h | 冬 第 95 日 | 第95日 03:00 | 第95日 09:00 | 6 | 6 | 1.250 | 9.375 | 9.375 | 9 | 71 | 0 | 16 | 過 |
+| bunk | 03:00→6h | 冬 第 95 日 | 第95日 03:00 | 第95日 09:00 | 6 | 6 | 1.250 | 9.375 | 9.375 | 9 | 71 | 0 | 4 | 過 |
+| rest | 00:00→8h | 冬 第 95 日 | 第95日 00:00 | 第95日 08:00 | 8 | 8 | 1.250 | 12.500 | 12.500 | 12 | 68 | 0 | 16 | 過 |
+| bunk | 00:00→8h | 冬 第 95 日 | 第95日 00:00 | 第95日 08:00 | 8 | 8 | 1.250 | 12.500 | 12.500 | 12 | 68 | 0 | 4 | 過 |
+| rest | 08:10→13h | 冬 第 95 日 | 第95日 08:10 | 第95日 21:10 | 13 | 13 | 1.250 | 20.313 | 20.313 | 20 | 60 | 0 | 16 | 過 |
+| bunk | 08:10→13h | 冬 第 95 日 | 第95日 08:10 | 第95日 21:10 | 13 | 13 | 1.250 | 20.313 | 20.313 | 20 | 60 | 0 | 4 | 過 |
+| rest | 08:00→6h | 冬 第 95 日 | 第95日 08:00 | 第95日 14:00 | 6 | 6 | 1.250 | 9.375 | 9.375 | 9 | 71 | 0 | 16 | 過 |
+| bunk | 08:00→6h | 冬 第 95 日 | 第95日 08:00 | 第95日 14:00 | 6 | 6 | 1.250 | 9.375 | 9.375 | 9 | 71 | 0 | 4 | 過 |
+| rest | 08:01→13h | 冬 第 95 日 | 第95日 08:01 | 第95日 21:01 | 13 | 13 | 1.250 | 20.313 | 20.313 | 20 | 60 | 0 | 16 | 過 |
+| bunk | 08:01→13h | 冬 第 95 日 | 第95日 08:01 | 第95日 21:01 | 13 | 13 | 1.250 | 20.313 | 20.313 | 20 | 60 | 0 | 4 | 過 |
+| rest | 秋→冬 第 90 日 20:00 | 交界 | 第90日 20:00 | 第91日 08:00 | 12 |  | 1.250 | 18.750 | 18.750 | 19 | 61 | 0 | 16 | 過 |
+| bunk | 秋→冬 第 90 日 20:00 | 交界 | 第90日 20:00 | 第91日 08:00 | 12 |  | 1.250 | 18.750 | 18.750 | 19 | 61 | 0 | 4 | 過 |
+| rest | 冬→春 第 120 日 20:00 | 交界 | 第120日 20:00 | 第121日 08:00 | 12 |  | 1 | 15 | 15.000 | 15 | 65 | 0 | 8 | 過 |
+| bunk | 冬→春 第 120 日 20:00 | 交界 | 第120日 20:00 | 第121日 08:00 | 12 |  | 1 | 15 | 15.000 | 15 | 65 | 0 | 4 | 過 |
+每 30 分一格全掃描（春第 5 日、冬第 95 日 × rest、bunk）：192 個案例，實測未取整扣減 ≠ 1.25×h×冬 或 整數結果 ≠ round(80−規格) 的個數 0；具名案例不符 0
+下限：起始飽食 3 睡後飽食不為 0 的個數 0（220 案例）
+sleepToMorning 原文含「food: 10」：否；實測扣減 = 規格 +10 的案例數 0
+sleepFoodCost(h)（_debug 匯出）：6→7.5、8→10、12→15、13→16.25
+## 9. hp 下限 1（rest／bunk 完整路徑）＋ 對 d0989ba 回歸
+| 路徑 | 案例 | 就寢 | 起床 | 睡 h | 睡前 hp | 睡前飽食 | 睡前疲累 | 睡前侵蝕 | 睡前 maxHp | 睡後 hp | 睡後飽食 | 睡後疲累 | 睡後侵蝕 | 睡後 maxHp | 死活 | 花費 | 規格預期 hp | hp 上界 | 結論 | d0989ba 死活 | d0989ba hp | d0989ba 飽食 | hp/疲/侵蝕 對 d0989ba |
+|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
+| rest | 飽食 0、hp 10、20:00 睡 12h（春） | 第5日 20:00 | 第6日 08:00 | 12 | 10 | 0 | 10 | 0 | 80 | 80 | 0 | 0 | 0 | 80 | 活 | 8 | 80 | 80 | 過 | 死（餓死荒野） | 80 | 0 | 舊版死亡 |
+| bunk | 飽食 0、hp 10、20:00 睡 12h（春） | 第5日 20:00 | 第6日 08:00 | 12 | 10 | 0 | 10 | 0 | 80 | 31 | 0 | 0 | 0 | 80 | 活 | 4 | 31 | 40 | 過 | 死（餓死荒野） | 30 | 0 | 舊版死亡 |
+| rest | 飽食 0、hp 1、20:00（春） | 第5日 20:00 | 第6日 08:00 | 12 | 1 | 0 | 10 | 0 | 80 | 80 | 0 | 0 | 0 | 80 | 活 | 8 | 80 | 80 | 過 | 死（餓死荒野） | 80 | 0 | 舊版死亡 |
+| bunk | 飽食 0、hp 1、20:00（春） | 第5日 20:00 | 第6日 08:00 | 12 | 1 | 0 | 10 | 0 | 80 | 31 | 0 | 0 | 0 | 80 | 活 | 4 | 31 | 31 | 過 | 死（餓死荒野） | 30 | 0 | 舊版死亡 |
+| rest | 飽食 0、hp 100（體 20，maxHp 110）、20:00（春） | 第5日 20:00 | 第6日 08:00 | 12 | 100 | 0 | 10 | 0 | 110 | 110 | 0 | 0 | 0 | 110 | 活 | 8 | 110 | 110 | 過 | 活 | 110 | 0 | 同 |
+| bunk | 飽食 0、hp 100（體 20，maxHp 110）、20:00（春） | 第5日 20:00 | 第6日 08:00 | 12 | 100 | 0 | 10 | 0 | 110 | 94 | 0 | 0 | 0 | 110 | 活 | 4 | 94 | 110 | 過 | 活 | 94 | 0 | 同 |
+| rest | 飽食 5、hp 10、08:10 睡 13h（中途歸零） | 第5日 08:10 | 第5日 21:10 | 13 | 10 | 5 | 10 | 0 | 80 | 80 | 0 | 0 | 0 | 80 | 活 | 8 | 80 | 80 | 過 | 死（餓死荒野） | 80 | 0 | 舊版死亡 |
+| bunk | 飽食 5、hp 10、08:10 睡 13h（中途歸零） | 第5日 08:10 | 第5日 21:10 | 13 | 10 | 5 | 10 | 0 | 80 | 31 | 0 | 0 | 0 | 80 | 活 | 4 | 31 | 40 | 過 | 死（餓死荒野） | 30 | 0 | 舊版死亡 |
+| rest | 飽食 0、hp 10、08:10 睡 13h（春） | 第5日 08:10 | 第5日 21:10 | 13 | 10 | 0 | 10 | 0 | 80 | 80 | 0 | 0 | 0 | 80 | 活 | 8 | 80 | 80 | 過 | 死（餓死荒野） | 80 | 0 | 舊版死亡 |
+| bunk | 飽食 0、hp 10、08:10 睡 13h（春） | 第5日 08:10 | 第5日 21:10 | 13 | 10 | 0 | 10 | 0 | 80 | 31 | 0 | 0 | 0 | 80 | 活 | 4 | 31 | 40 | 過 | 死（餓死荒野） | 30 | 0 | 舊版死亡 |
+| rest | 飽食 0、hp 10、03:00 睡 6h（春） | 第5日 03:00 | 第5日 09:00 | 6 | 10 | 0 | 10 | 0 | 80 | 80 | 0 | 0 | 0 | 80 | 活 | 8 | 80 | 80 | 過 | 死（餓死荒野） | 80 | 0 | 舊版死亡 |
+| bunk | 飽食 0、hp 10、03:00 睡 6h（春） | 第5日 03:00 | 第5日 09:00 | 6 | 10 | 0 | 10 | 0 | 80 | 31 | 0 | 0 | 0 | 80 | 活 | 4 | 31 | 40 | 過 | 死（餓死荒野） | 30 | 0 | 舊版死亡 |
+| rest | 飽食 0、hp 10、20:00（冬 第 95 日） | 第95日 20:00 | 第96日 08:00 | 12 | 10 | 0 | 10 | 0 | 80 | 80 | 0 | 0 | 0 | 80 | 活 | 8 | 80 | 80 | 過 | 死（餓死荒野） | 80 | 0 | 舊版死亡 |
+| bunk | 飽食 0、hp 10、20:00（冬 第 95 日） | 第95日 20:00 | 第96日 08:00 | 12 | 10 | 0 | 10 | 0 | 80 | 31 | 0 | 0 | 0 | 80 | 活 | 4 | 31 | 40 | 過 | 死（餓死荒野） | 30 | 0 | 舊版死亡 |
+| rest | 飽食 5、hp 10、08:10 睡 13h（冬 第 95 日） | 第95日 08:10 | 第95日 21:10 | 13 | 10 | 5 | 10 | 0 | 80 | 80 | 0 | 0 | 0 | 80 | 活 | 16 | 80 | 80 | 過 | 死（餓死荒野） | 80 | 0 | 舊版死亡 |
+| bunk | 飽食 5、hp 10、08:10 睡 13h（冬 第 95 日） | 第95日 08:10 | 第95日 21:10 | 13 | 10 | 5 | 10 | 0 | 80 | 31 | 0 | 0 | 0 | 80 | 活 | 4 | 31 | 40 | 過 | 死（餓死荒野） | 30 | 0 | 舊版死亡 |
+| rest | 飽食 0、hp 10、疲累 100（斷糧＋力竭）、20:00 | 第5日 20:00 | 第6日 08:00 | 12 | 10 | 0 | 100 | 0 | 80 | 80 | 0 | 0 | 0 | 80 | 活 | 16 | 80 | 80 | 過 | 死（力竭倒地） | 80 | 0 | 舊版死亡 |
+| bunk | 飽食 0、hp 10、疲累 100（斷糧＋力竭）、20:00 | 第5日 20:00 | 第6日 08:00 | 12 | 10 | 0 | 100 | 0 | 80 | 31 | 0 | 0 | 0 | 80 | 活 | 4 | 31 | 40 | 過 | 死（力竭倒地） | 30 | 0 | 舊版死亡 |
+| rest | 飽食 80、hp 10（不扣血，對照）、20:00 | 第5日 20:00 | 第6日 08:00 | 12 | 10 | 80 | 10 | 0 | 80 | 80 | 65 | 0 | 0 | 80 | 活 | 16 | 80 | 80 | 過 | 活 | 80 | 70 | 同 |
+| bunk | 飽食 80、hp 10（不扣血，對照）、20:00 | 第5日 20:00 | 第6日 08:00 | 12 | 10 | 80 | 10 | 0 | 80 | 40 | 65 | 0 | 0 | 80 | 活 | 4 | 40 | 40 | 過 | 活 | 40 | 70 | 同 |
+| rest | 飽食 80、hp 1（不扣血，對照）、20:00 | 第5日 20:00 | 第6日 08:00 | 12 | 1 | 80 | 10 | 0 | 80 | 80 | 65 | 0 | 0 | 80 | 活 | 16 | 80 | 80 | 過 | 活 | 80 | 70 | 同 |
+| bunk | 飽食 80、hp 1（不扣血，對照）、20:00 | 第5日 20:00 | 第6日 08:00 | 12 | 1 | 80 | 10 | 0 | 80 | 31 | 65 | 0 | 0 | 80 | 活 | 4 | 31 | 31 | 過 | 活 | 31 | 70 | 同 |
+| rest | 侵蝕 20、飽食 0、hp 10、20:00 | 第5日 20:00 | 第6日 08:00 | 12 | 10 | 0 | 10 | 20 | 60 | 70 | 0 | 0 | 10 | 70 | 活 | 16 | 70 | 70 | 過 | 死（餓死荒野） | 70 | 0 | 舊版死亡 |
+| bunk | 侵蝕 20、飽食 0、hp 10、20:00 | 第5日 20:00 | 第6日 08:00 | 12 | 10 | 0 | 10 | 20 | 60 | 31 | 0 | 0 | 20 | 60 | 活 | 4 | 31 | 40 | 過 | 死（餓死荒野） | 30 | 0 | 舊版死亡 |
+| rest | 侵蝕 5、飽食 80、hp 30、20:00 | 第5日 20:00 | 第6日 08:00 | 12 | 30 | 80 | 10 | 5 | 75 | 80 | 65 | 0 | 0 | 80 | 活 | 16 | 80 | 80 | 過 | 活 | 80 | 70 | 同 |
+| bunk | 侵蝕 5、飽食 80、hp 30、20:00 | 第5日 20:00 | 第6日 08:00 | 12 | 30 | 80 | 10 | 5 | 75 | 60 | 65 | 0 | 5 | 75 | 活 | 4 | 60 | 60 | 過 | 活 | 60 | 70 | 同 |
+hp 下限案例 26：不符 0、死亡 0；非死亡案例 hp/疲累/侵蝕 與 d0989ba 不同 0
+rest／bunk 回復量回歸（飽食 80、疲累 50、hp 10／40／79 × 每小時 24 格 × 2 路徑 = 144）：hp、疲累、起床、花費、死活 與 d0989ba 不同 0（飽食本來就該不同，不列入）
+## 10. 露宿（camp）與茶攤小憩（nap）：不得有 hp 下限 1 保護
+| 路徑 | 案例 | 開始 | 結束 | 前 hp | 前飽食 | 前疲累 | maxHp | 後 hp | 後飽食 | 後疲累 | 死活 | 夜警開戰 | 規格預期（無保護） | 規格飽食扣 | 實測飽食扣 | 結論 | d0989ba 死活 | d0989ba hp | d0989ba 飽食 | 對 d0989ba |
+|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
+| camp | 飽食 0、hp 10、20:00 露宿 8h（春 第 1 日） | 第1日 20:00 | 第2日 04:00 | 10 | 0 | 60 | 80 | 0 | 0 | 10 | 死（餓死荒野） | 否 | 死 | 16 | 0 | 過 | 死 | 0 | 0 | 同 |
+| camp | 飽食 0、hp 24、20:00（扣 24 剛好歸零） | 第1日 20:00 | 第2日 04:00 | 24 | 0 | 60 | 80 | 0 | 0 | 10 | 死（餓死荒野） | 否 | 死 | 16 | 0 | 過 | 死 | 0 | 0 | 同 |
+| camp | 飽食 0、hp 25、20:00 | 第1日 20:00 | 第2日 04:00 | 25 | 0 | 60 | 80 | 1 | 0 | 10 | 活 | 是 | 活 hp 1 | 16 | 0 | 過 | 活 | 1 | 0 | 同 |
+| camp | 飽食 0、hp 100（體 20，maxHp 110）、20:00 | 第1日 20:00 | 第2日 04:00 | 100 | 0 | 60 | 110 | 76 | 0 | 10 | 活 | 是 | 活 hp 76 | 16 | 0 | 過 | 活 | 76 | 0 | 同 |
+| camp | 一般：飽食 80、hp 50、20:00 | 第1日 20:00 | 第2日 04:00 | 50 | 80 | 60 | 80 | 58 | 64 | 10 | 活 | 是 | 活 hp 58 | 16 | 16 | 過 | 活 | 58 | 64 | 同 |
+| camp | 一般：飽食 80、hp 50、12:00 | 第1日 12:00 | 第1日 20:00 | 50 | 80 | 60 | 80 | 58 | 64 | 10 | 活 | 否 | 活 hp 58 | 16 | 16 | 過 | 活 | 58 | 64 | 同 |
+| camp | 飽食 0、hp 10、20:00（冬 第 95 日） | 第95日 20:00 | 第96日 04:00 | 10 | 0 | 60 | 80 | 0 | 0 | 10 | 死（餓死荒野） | 否 | 死 | 20 | 0 | 過 | 死 | 0 | 0 | 同 |
+| camp | 一般：飽食 80、hp 50、20:00（冬 第 95 日） | 第95日 20:00 | 第96日 04:00 | 50 | 80 | 60 | 80 | 58 | 60 | 10 | 活 | 否 | 活 hp 58 | 20 | 20 | 過 | 活 | 58 | 60 | 同 |
+| camp | 飽食 0、hp 10、疲累 100、20:00 | 第1日 20:00 | 第2日 04:00 | 10 | 0 | 100 | 80 | 0 | 0 | 50 | 死（餓死荒野） | 否 | 死 | 16 | 0 | 過 | 死 | 0 | 0 | 同 |
+| nap | 飽食 0、hp 5、10:00 小憩 2h | 第5日 10:00 | 第5日 12:00 | 5 | 0 | 60 | 80 | 0 | 0 | 40 | 死（餓死荒野） |  | 死 | 8 | 0 | 過 | 死 | 0 | 0 | 同 |
+| nap | 飽食 0、hp 6、10:00（扣 6 剛好歸零） | 第5日 10:00 | 第5日 12:00 | 6 | 0 | 60 | 80 | 0 | 0 | 40 | 死（餓死荒野） |  | 死 | 8 | 0 | 過 | 死 | 0 | 0 | 同 |
+| nap | 飽食 0、hp 10、10:00 | 第5日 10:00 | 第5日 12:00 | 10 | 0 | 60 | 80 | 4 | 0 | 40 | 活 |  | 活 hp 4 | 8 | 0 | 過 | 活 | 4 | 0 | 同 |
+| nap | 一般：飽食 80、hp 50、10:00 | 第5日 10:00 | 第5日 12:00 | 50 | 80 | 60 | 80 | 52 | 72 | 40 | 活 |  | 活 hp 52 | 8 | 8 | 過 | 活 | 52 | 72 | 同 |
+露宿／小憩案例 13：與「無保護」規格模型不符 0；與 d0989ba 不同 0
+露宿飽食未取整扣減：春 第 1 日 20:00 16.000；冬 第 95 日 20:00 20.000（規格 6.2：2／h×8＝16，冬 ×1.25＝20）
+| 露宿案例 | E10／7.1 規格 | 3fc260f 實作式 | d0989ba 實作式 | 3fc260f 實跑 4000 次夜警率 | d0989ba 實跑夜警率 | 逐次結果對 d0989ba | 實作對規格 |
+|---|---|---|---|---|---|---|---|
+| 20:00 睡 8h（赤石，中） | 0.250 | 0.250 | 0.250 | 0.250 | 0.250 | 同 | 符合 |
+| 12:00 睡 8h（赤石，中） | 0.120 | 0.250 | 0.250 | 0.253 | 0.253 | 同 | 不符 |
+| 17:00 睡 8h（赤石，中） | 0.226 | 0.250 | 0.250 | 0.239 | 0.239 | 同 | 不符 |
+| 20:00 睡 8h（青霧，低 ×0.6） | 0.150 | 0.150 | 0.150 | 0.153 | 0.153 | 同 | 符合 |
+"camp 遇險式原文：`const night = isNight(S.t) || isNight(S.t + 8 * 60); const risk = (night ? 0.25 : 0.12) * (D.WILDS[S.loc].risk === '低' ? 0.6 : 1) * (perk('ying', 25) ? 0.6 : 1) * (tideOn() ? 1.5 : 1);`"
+## 11. AC 20／route()（直接呼叫 G.riskTier、G.route、G.travelPreview）
+| 輸入 risk | 取位後（封頂 0.85、half-up 三位） | 預期檔 | 實作 riskTier | 結論 |
+|---|---|---|---|---|
+| 0.149 | 0.149 | 低 | 低 | 過 |
+| 0.15 | 0.150 | 中 | 中 | 過 |
+| 0.349 | 0.349 | 中 | 中 | 過 |
+| 0.35 | 0.350 | 高 | 高 | 過 |
+| 0.599 | 0.599 | 高 | 高 | 過 |
+| 0.6 | 0.600 | 極高 | 極高 | 過 |
+| 0.85 | 0.850 | 極高 | 極高 | 過 |
+| 0.1495 | 0.150 | 中 | 中 | 過 |
+| 0.3495 | 0.350 | 高 | 高 | 過 |
+| 0.5995 | 0.600 | 極高 | 極高 | 過 |
+| 0.1499 | 0.150 | 中 | 中 | 過 |
+| 0.14949 | 0.149 | 低 | 低 | 過 |
+| 0.9 | 0.850 | 極高 | 極高 | 過 |
+| 0.04 | 0.040 | 低 | 低 | 過 |
+| 0.08 | 0.080 | 低 | 低 | 過 |
+"RISK_CAP=0.85；RISK_CUTS=[0.15,0.35,0.6]；RISK_TIERS=[""低"",""中"",""高"",""極高""]"
+| 已知節點 | 圖的排列 | 路線對數 | 與原圖不同 | 差異（前 6） |
+|---|---|---|---|---|
+| 預設已知 | 原圖 | 156 | 0 |  |
+| 預設已知 | EDGES 反轉（含端點對調） | 156 | 0 |  |
+| 預設已知 | NODES 反轉 | 156 | 4 | chishi>guyao:chishi-chakou-qingwu-guyao→chishi-kugu-qingwu-guyao ; chishi>qingwu:chishi-chakou-qingwu→chishi-kugu-qingwu ; guyao>chishi:guyao-qingwu-chakou-chishi→guyao-qingwu-kugu-chishi ; qingwu>chishi:qingwu-chakou-chishi→qingwu-kugu-chishi |
+| 預設已知 | EDGES＋NODES 都反轉 | 156 | 4 | chishi>guyao:chishi-chakou-qingwu-guyao→chishi-kugu-qingwu-guyao ; chishi>qingwu:chishi-chakou-qingwu→chishi-kugu-qingwu ; guyao>chishi:guyao-qingwu-chakou-chishi→guyao-qingwu-kugu-chishi ; qingwu>chishi:qingwu-chakou-chishi→qingwu-kugu-chishi |
+| 預設已知 | EDGES 隨機打亂（含端點隨機對調） 50 種：有差異 0 種 | 156 | 0 |  |
+| 預設已知 | EDGES＋NODES 隨機打亂 50 種：有差異 29 種 | 156 | 見右（聯集） | chishi>guyao:chishi-chakou-qingwu-guyao→chishi-kugu-qingwu-guyao ; chishi>qingwu:chishi-chakou-qingwu→chishi-kugu-qingwu ; guyao>chishi:guyao-qingwu-chakou-chishi→guyao-qingwu-kugu-chishi ; qingwu>chishi:qingwu-chakou-chishi→qingwu-kugu-chishi |
+| 含隱藏節點 | 原圖 | 210 | 0 |  |
+| 含隱藏節點 | EDGES 反轉（含端點對調） | 210 | 0 |  |
+| 含隱藏節點 | NODES 反轉 | 210 | 4 | chishi>guyao:chishi-chakou-qingwu-guyao→chishi-kugu-qingwu-guyao ; chishi>qingwu:chishi-chakou-qingwu→chishi-kugu-qingwu ; guyao>chishi:guyao-qingwu-chakou-chishi→guyao-qingwu-kugu-chishi ; qingwu>chishi:qingwu-chakou-chishi→qingwu-kugu-chishi |
+| 含隱藏節點 | EDGES＋NODES 都反轉 | 210 | 4 | chishi>guyao:chishi-chakou-qingwu-guyao→chishi-kugu-qingwu-guyao ; chishi>qingwu:chishi-chakou-qingwu→chishi-kugu-qingwu ; guyao>chishi:guyao-qingwu-chakou-chishi→guyao-qingwu-kugu-chishi ; qingwu>chishi:qingwu-chakou-chishi→qingwu-kugu-chishi |
+| 含隱藏節點 | EDGES 隨機打亂（含端點隨機對調） 50 種：有差異 0 種 | 210 | 0 |  |
+| 含隱藏節點 | EDGES＋NODES 隨機打亂 50 種：有差異 29 種 | 210 | 見右（聯集） | chishi>guyao:chishi-chakou-qingwu-guyao→chishi-kugu-qingwu-guyao ; chishi>qingwu:chishi-chakou-qingwu→chishi-kugu-qingwu ; guyao>chishi:guyao-qingwu-chakou-chishi→guyao-qingwu-kugu-chishi ; qingwu>chishi:qingwu-chakou-chishi→qingwu-kugu-chishi |
+"時數平手的路線對（含隱藏節點；列舉全部簡單路徑，四層排序的最佳 vs 實作）：34 對；其中 (時數, 野徑段數) 仍平手 4 對；實作與四層最佳不同 0 對"
+| 路線 | 最短時數 | 同時數路線數 | 同時數同野徑數 | 同時數同野徑數的路線 | 四層最佳 | 實作 route() | 同異 | 分出的層 |
+|---|---|---|---|---|---|---|---|---|
+"| chakou→poxiao | 5 | 2 | 1 | chakou-yizhan-duyin-poxiao(w1,r0.3) | chakou-yizhan-duyin-poxiao | chakou-yizhan-duyin-poxiao | 同 | 第 2 層已分出 |"
+"| chishi→guyao | 5 | 2 | 2 | chishi-chakou-qingwu-guyao(w3,r0.3) / chishi-kugu-qingwu-guyao(w3,r0.3) | chishi-chakou-qingwu-guyao | chishi-chakou-qingwu-guyao | 同 | 第 4 層才分出 |"
+"| chishi→poxiao | 7 | 3 | 1 | chishi-chakou-yizhan-duyin-poxiao(w2,r0.3) | chishi-chakou-yizhan-duyin-poxiao | chishi-chakou-yizhan-duyin-poxiao | 同 | 第 2 層已分出 |"
+"| chishi→qingwu | 3 | 2 | 2 | chishi-chakou-qingwu(w2,r0.3) / chishi-kugu-qingwu(w2,r0.3) | chishi-chakou-qingwu | chishi-chakou-qingwu | 同 | 第 4 層才分出 |"
+"| duyin→fuzhao | 6 | 2 | 1 | duyin-yizhan-huiyao-fuzhao(w1,r0.3) | duyin-yizhan-huiyao-fuzhao | duyin-yizhan-huiyao-fuzhao | 同 | 第 2 層已分出 |"
+"| duyin→guzhong | 7 | 2 | 1 | duyin-yizhan-huiyao-fuzhao-guzhong(w2,r0.3) | duyin-yizhan-huiyao-fuzhao-guzhong | duyin-yizhan-huiyao-fuzhao-guzhong | 同 | 第 2 層已分出 |"
+"| duyin→huiyao | 4 | 2 | 1 | duyin-yizhan-huiyao(w0,r0.04) | duyin-yizhan-huiyao | duyin-yizhan-huiyao | 同 | 第 2 層已分出 |"
+"| duyin→jiku | 7 | 2 | 1 | duyin-yizhan-huiyao-fuzhao-jiku(w2,r0.3) | duyin-yizhan-huiyao-fuzhao-jiku | duyin-yizhan-huiyao-fuzhao-jiku | 同 | 第 2 層已分出 |"
+"| fuzhao→duyin | 6 | 2 | 1 | fuzhao-huiyao-yizhan-duyin(w1,r0.3) | fuzhao-huiyao-yizhan-duyin | fuzhao-huiyao-yizhan-duyin | 同 | 第 2 層已分出 |"
+"| fuzhao→poxiao | 8 | 3 | 1 | fuzhao-huiyao-yizhan-duyin-poxiao(w1,r0.3) | fuzhao-huiyao-yizhan-duyin-poxiao | fuzhao-huiyao-yizhan-duyin-poxiao | 同 | 第 2 層已分出 |"
+"| fuzhao→yizhan | 4 | 2 | 1 | fuzhao-huiyao-yizhan(w1,r0.3) | fuzhao-huiyao-yizhan | fuzhao-huiyao-yizhan | 同 | 第 2 層已分出 |"
+"| guyao→chishi | 5 | 2 | 2 | guyao-qingwu-chakou-chishi(w3,r0.3) / guyao-qingwu-kugu-chishi(w3,r0.3) | guyao-qingwu-chakou-chishi | guyao-qingwu-chakou-chishi | 同 | 第 4 層才分出 |"
+"| guzhong→duyin | 7 | 2 | 1 | guzhong-fuzhao-huiyao-yizhan-duyin(w2,r0.3) | guzhong-fuzhao-huiyao-yizhan-duyin | guzhong-fuzhao-huiyao-yizhan-duyin | 同 | 第 2 層已分出 |"
+"| guzhong→poxiao | 9 | 3 | 1 | guzhong-fuzhao-huiyao-yizhan-duyin-poxiao(w2,r0.3) | guzhong-fuzhao-huiyao-yizhan-duyin-poxiao | guzhong-fuzhao-huiyao-yizhan-duyin-poxiao | 同 | 第 2 層已分出 |"
+"| guzhong→yizhan | 5 | 2 | 1 | guzhong-fuzhao-huiyao-yizhan(w2,r0.3) | guzhong-fuzhao-huiyao-yizhan | guzhong-fuzhao-huiyao-yizhan | 同 | 第 2 層已分出 |"
+"| huiyao→duyin | 4 | 2 | 1 | huiyao-yizhan-duyin(w0,r0.04) | huiyao-yizhan-duyin | huiyao-yizhan-duyin | 同 | 第 2 層已分出 |"
+"| huiyao→poxiao | 6 | 3 | 1 | huiyao-yizhan-duyin-poxiao(w0,r0.04) | huiyao-yizhan-duyin-poxiao | huiyao-yizhan-duyin-poxiao | 同 | 第 2 層已分出 |"
+"| huiyao→yizhan | 2 | 2 | 1 | huiyao-yizhan(w0,r0.04) | huiyao-yizhan | huiyao-yizhan | 同 | 第 2 層已分出 |"
+"| jiku→duyin | 7 | 2 | 1 | jiku-fuzhao-huiyao-yizhan-duyin(w2,r0.3) | jiku-fuzhao-huiyao-yizhan-duyin | jiku-fuzhao-huiyao-yizhan-duyin | 同 | 第 2 層已分出 |"
+"| jiku→poxiao | 9 | 3 | 1 | jiku-fuzhao-huiyao-yizhan-duyin-poxiao(w2,r0.3) | jiku-fuzhao-huiyao-yizhan-duyin-poxiao | jiku-fuzhao-huiyao-yizhan-duyin-poxiao | 同 | 第 2 層已分出 |"
+"| jiku→yizhan | 5 | 2 | 1 | jiku-fuzhao-huiyao-yizhan(w2,r0.3) | jiku-fuzhao-huiyao-yizhan | jiku-fuzhao-huiyao-yizhan | 同 | 第 2 層已分出 |"
+"| poxiao→chakou | 5 | 2 | 1 | poxiao-duyin-yizhan-chakou(w1,r0.3) | poxiao-duyin-yizhan-chakou | poxiao-duyin-yizhan-chakou | 同 | 第 2 層已分出 |"
+"| poxiao→chishi | 7 | 3 | 1 | poxiao-duyin-yizhan-chakou-chishi(w2,r0.3) | poxiao-duyin-yizhan-chakou-chishi | poxiao-duyin-yizhan-chakou-chishi | 同 | 第 2 層已分出 |"
+"| poxiao→fuzhao | 8 | 3 | 1 | poxiao-duyin-yizhan-huiyao-fuzhao(w1,r0.3) | poxiao-duyin-yizhan-huiyao-fuzhao | poxiao-duyin-yizhan-huiyao-fuzhao | 同 | 第 2 層已分出 |"
+"| poxiao→guzhong | 9 | 3 | 1 | poxiao-duyin-yizhan-huiyao-fuzhao-guzhong(w2,r0.3) | poxiao-duyin-yizhan-huiyao-fuzhao-guzhong | poxiao-duyin-yizhan-huiyao-fuzhao-guzhong | 同 | 第 2 層已分出 |"
+"| poxiao→huiyao | 6 | 3 | 1 | poxiao-duyin-yizhan-huiyao(w0,r0.04) | poxiao-duyin-yizhan-huiyao | poxiao-duyin-yizhan-huiyao | 同 | 第 2 層已分出 |"
+"| poxiao→jiku | 9 | 3 | 1 | poxiao-duyin-yizhan-huiyao-fuzhao-jiku(w2,r0.3) | poxiao-duyin-yizhan-huiyao-fuzhao-jiku | poxiao-duyin-yizhan-huiyao-fuzhao-jiku | 同 | 第 2 層已分出 |"
+"| poxiao→yachao | 6 | 2 | 1 | poxiao-duyin-yizhan-chakou-yachao(w2,r0.3) | poxiao-duyin-yizhan-chakou-yachao | poxiao-duyin-yizhan-chakou-yachao | 同 | 第 2 層已分出 |"
+"| qingwu→chishi | 3 | 2 | 2 | qingwu-chakou-chishi(w2,r0.3) / qingwu-kugu-chishi(w2,r0.3) | qingwu-chakou-chishi | qingwu-chakou-chishi | 同 | 第 4 層才分出 |"
+"| yachao→poxiao | 6 | 2 | 1 | yachao-chakou-yizhan-duyin-poxiao(w2,r0.3) | yachao-chakou-yizhan-duyin-poxiao | yachao-chakou-yizhan-duyin-poxiao | 同 | 第 2 層已分出 |"
+"| yizhan→fuzhao | 4 | 2 | 1 | yizhan-huiyao-fuzhao(w1,r0.3) | yizhan-huiyao-fuzhao | yizhan-huiyao-fuzhao | 同 | 第 2 層已分出 |"
+"| yizhan→guzhong | 5 | 2 | 1 | yizhan-huiyao-fuzhao-guzhong(w2,r0.3) | yizhan-huiyao-fuzhao-guzhong | yizhan-huiyao-fuzhao-guzhong | 同 | 第 2 層已分出 |"
+"| yizhan→huiyao | 2 | 2 | 1 | yizhan-huiyao(w0,r0.04) | yizhan-huiyao | yizhan-huiyao | 同 | 第 2 層已分出 |"
+"| yizhan→jiku | 5 | 2 | 1 | yizhan-huiyao-fuzhao-jiku(w2,r0.3) | yizhan-huiyao-fuzhao-jiku | yizhan-huiyao-fuzhao-jiku | 同 | 第 2 層已分出 |"
+送貨六方向 × 4 種排列 × 白天／黑夜 travelPreview：48 筆，非全官道或險級不是「低」的 0
+| 方向 | 排列 | 時段 | 路線 | 類 | 基礎時數 | via | risk | riskName |
+|---|---|---|---|---|---|---|---|---|
+| huiyao→duyin | 原圖 | 白天 | huiyao-yizhan-duyin | 全官道 | 4 | 官道驛站 | 0.040 | 低 |
+| huiyao→duyin | 原圖 | 黑夜 | huiyao-yizhan-duyin | 全官道 | 4 | 官道驛站 | 0.080 | 低 |
+| huiyao→duyin | EDGES＋NODES 都反轉 | 白天 | huiyao-yizhan-duyin | 全官道 | 4 | 官道驛站 | 0.040 | 低 |
+| huiyao→duyin | EDGES＋NODES 都反轉 | 黑夜 | huiyao-yizhan-duyin | 全官道 | 4 | 官道驛站 | 0.080 | 低 |
+| duyin→huiyao | 原圖 | 白天 | duyin-yizhan-huiyao | 全官道 | 4 | 官道驛站 | 0.040 | 低 |
+| duyin→huiyao | 原圖 | 黑夜 | duyin-yizhan-huiyao | 全官道 | 4 | 官道驛站 | 0.080 | 低 |
+| duyin→huiyao | EDGES＋NODES 都反轉 | 白天 | duyin-yizhan-huiyao | 全官道 | 4 | 官道驛站 | 0.040 | 低 |
+| duyin→huiyao | EDGES＋NODES 都反轉 | 黑夜 | duyin-yizhan-huiyao | 全官道 | 4 | 官道驛站 | 0.080 | 低 |
+| huiyao→poxiao | 原圖 | 白天 | huiyao-yizhan-duyin-poxiao | 全官道 | 6 | 官道驛站 | 0.040 | 低 |
+| huiyao→poxiao | 原圖 | 黑夜 | huiyao-yizhan-duyin-poxiao | 全官道 | 6 | 官道驛站 | 0.080 | 低 |
+| huiyao→poxiao | EDGES＋NODES 都反轉 | 白天 | huiyao-yizhan-duyin-poxiao | 全官道 | 6 | 官道驛站 | 0.040 | 低 |
+| huiyao→poxiao | EDGES＋NODES 都反轉 | 黑夜 | huiyao-yizhan-duyin-poxiao | 全官道 | 6 | 官道驛站 | 0.080 | 低 |
+| poxiao→huiyao | 原圖 | 白天 | poxiao-duyin-yizhan-huiyao | 全官道 | 6 | 渡陰關 | 0.040 | 低 |
+| poxiao→huiyao | 原圖 | 黑夜 | poxiao-duyin-yizhan-huiyao | 全官道 | 6 | 渡陰關 | 0.080 | 低 |
+| poxiao→huiyao | EDGES＋NODES 都反轉 | 白天 | poxiao-duyin-yizhan-huiyao | 全官道 | 6 | 渡陰關 | 0.040 | 低 |
+| poxiao→huiyao | EDGES＋NODES 都反轉 | 黑夜 | poxiao-duyin-yizhan-huiyao | 全官道 | 6 | 渡陰關 | 0.080 | 低 |
+| duyin→poxiao | 原圖 | 白天 | duyin-poxiao | 全官道 | 2 | 官道 | 0.040 | 低 |
+| duyin→poxiao | 原圖 | 黑夜 | duyin-poxiao | 全官道 | 2 | 官道 | 0.080 | 低 |
+| duyin→poxiao | EDGES＋NODES 都反轉 | 白天 | duyin-poxiao | 全官道 | 2 | 官道 | 0.040 | 低 |
+| duyin→poxiao | EDGES＋NODES 都反轉 | 黑夜 | duyin-poxiao | 全官道 | 2 | 官道 | 0.080 | 低 |
+| poxiao→duyin | 原圖 | 白天 | poxiao-duyin | 全官道 | 2 | 官道 | 0.040 | 低 |
+| poxiao→duyin | 原圖 | 黑夜 | poxiao-duyin | 全官道 | 2 | 官道 | 0.080 | 低 |
+| poxiao→duyin | EDGES＋NODES 都反轉 | 白天 | poxiao-duyin | 全官道 | 2 | 官道 | 0.040 | 低 |
+| poxiao→duyin | EDGES＋NODES 都反轉 | 黑夜 | poxiao-duyin | 全官道 | 2 | 官道 | 0.080 | 低 |
+"排列造成的路線差異（兩種已知集合合計路線對次數）：{""base"":0,""edges"":0,""nodes"":8,""both"":8,""shufE"":0,""shufB"":232}"
+第 3、4 層合成例（四層規則預期：p→q 取 zz_p-zz_q（險 0.22 < 0.30）；r→s 取 zz_r-zz_a-zz_s（字典序小）；s→r 取 zz_s-zz_a-zz_r）：
+| 邊的排列 | p→q 路線 | p→q base | q→p 路線 | r→s 路線 | s→r 路線 |
+|---|---|---|---|---|---|
+| 原順序 | zz_p-zz_q | 0.220 | zz_q-zz_p | zz_r-zz_a-zz_s | zz_s-zz_a-zz_r |
+| EDGES 全反轉 | zz_p-zz_q | 0.220 | zz_q-zz_p | zz_r-zz_a-zz_s | zz_s-zz_a-zz_r |
+| L3：多段路線的邊放前面 | zz_p-zz_q | 0.220 | zz_q-zz_p | zz_r-zz_a-zz_s | zz_s-zz_a-zz_r |
+| L4：經 b 的邊放前面 | zz_p-zz_q | 0.220 | zz_q-zz_p | zz_r-zz_a-zz_s | zz_s-zz_a-zz_r |
+| NODES 反轉（zz_b 在 zz_a 前） | zz_p-zz_q | 0.220 | zz_q-zz_p | zz_r-zz_b-zz_s | zz_s-zz_b-zz_r |
+| EDGES＋NODES 都反轉 | zz_p-zz_q | 0.220 | zz_q-zz_p | zz_r-zz_b-zz_s | zz_s-zz_b-zz_r |
+第 3 層（險值）：各排列皆符合 是，隨排列改變 否；第 4 層（字典序）：皆符合 否，隨排列改變 是
+route() 原文（js/game.js:698）比較鍵：含總時數 dist 是、含野徑段數 wild 是、含險值（risk／riskTier／baseRisk） 否、含節點序列字典序（localeCompare／join 比較） 否
+briefDanger／「出城危險」在 js/、index.html 出現：0 次（被驗 commit 沒有實作 AC 22，無法直接呼叫）
+| 排列 | 時段 | briefDanger（sim 重建） | 檔 | 最險出城路線（第一個達到最大值者） |
+|---|---|---|---|---|
+| 原圖 | 清晨 | 0.375 | 高 | huiyao-chakou-chishi |
+| 原圖 | 白天 | 0.300 | 中 | huiyao-chakou-chishi |
+| 原圖 | 黃昏 | 0.450 | 高 | huiyao-chakou-chishi |
+| 原圖 | 黑夜 | 0.600 | 極高 | huiyao-chakou-chishi |
+| EDGES 反轉（含端點對調） | 清晨 | 0.375 | 高 | huiyao-chakou-chishi |
+| EDGES 反轉（含端點對調） | 白天 | 0.300 | 中 | huiyao-chakou-chishi |
+| EDGES 反轉（含端點對調） | 黃昏 | 0.450 | 高 | huiyao-chakou-chishi |
+| EDGES 反轉（含端點對調） | 黑夜 | 0.600 | 極高 | huiyao-chakou-chishi |
+| NODES 反轉 | 清晨 | 0.375 | 高 | huiyao-chakou-chishi |
+| NODES 反轉 | 白天 | 0.300 | 中 | huiyao-chakou-chishi |
+| NODES 反轉 | 黃昏 | 0.450 | 高 | huiyao-chakou-chishi |
+| NODES 反轉 | 黑夜 | 0.600 | 極高 | huiyao-chakou-chishi |
+| EDGES＋NODES 都反轉 | 清晨 | 0.375 | 高 | huiyao-chakou-chishi |
+| EDGES＋NODES 都反轉 | 白天 | 0.300 | 中 | huiyao-chakou-chishi |
+| EDGES＋NODES 都反轉 | 黃昏 | 0.450 | 高 | huiyao-chakou-chishi |
+| EDGES＋NODES 都反轉 | 黑夜 | 0.600 | 極高 | huiyao-chakou-chishi |
+sim 重建 briefDanger 的檔位在 4 種排列下不變：是（「最險路線」欄只列第一個達到最大值的路線；最大值有多條路線並列時，這欄跟著列舉順序走）
+## 12. 「中高」字串殘留（資訊）
+| 位置 | 次數 | 原文 |
+|---|---|---|
+"| js/data.js:245 | 1 | risk: '中高', scene: '退水的沼地，黑水底下全是骨頭。', |"
+"| js/data.js:273 | 1 | risk: '中高', scene: '沉在淵底的古祭窟，潮氣與血腥味混雜。', |"
+合計 2 次、2 行（掃描 index.html、js/data.js、js/game.js、js/icons.js、js/icons_more.js、js/icons_npc.js、js/lore.js、js/scenes.js、js/scenes_map.js、js/scenes_town.js、js/ui.js）
+## 結論旗標
+```
+"{""duration"":true,""path"":true,""specPts"":true,""cond3"":true,""deadline"":true,""delay"":true,""zero"":true,""wrnd"":true,""food"":true,""hp"":true,""recov"":true,""camp"":true,""ac20pts"":true,""tieDelivery"":true,""edgeOrder"":true,""nodeOrder"":false,""l3"":true,""l4"":false}"
+```

@@ -1,0 +1,7 @@
+edge_order,p_to_q,p_to_q_base,q_to_p,r_to_s,s_to_r
+原順序,zz_p-zz_q,0.220,zz_q-zz_p,zz_r-zz_a-zz_s,zz_s-zz_a-zz_r
+EDGES 全反轉,zz_p-zz_q,0.220,zz_q-zz_p,zz_r-zz_a-zz_s,zz_s-zz_a-zz_r
+L3：多段路線的邊放前面,zz_p-zz_q,0.220,zz_q-zz_p,zz_r-zz_a-zz_s,zz_s-zz_a-zz_r
+L4：經 b 的邊放前面,zz_p-zz_q,0.220,zz_q-zz_p,zz_r-zz_a-zz_s,zz_s-zz_a-zz_r
+NODES 反轉（zz_b 在 zz_a 前）,zz_p-zz_q,0.220,zz_q-zz_p,zz_r-zz_b-zz_s,zz_s-zz_b-zz_r
+EDGES＋NODES 都反轉,zz_p-zz_q,0.220,zz_q-zz_p,zz_r-zz_b-zz_s,zz_s-zz_b-zz_r

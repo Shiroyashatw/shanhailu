@@ -1,0 +1,35 @@
+pair,best_h,n_same_h,n_same_h_w,tied_routes,best_4layer,impl_route,impl_eq_best,decided_at
+chakou→poxiao,5,2,1,"chakou-yizhan-duyin-poxiao(w1,r0.3)",chakou-yizhan-duyin-poxiao,chakou-yizhan-duyin-poxiao,同,第 2 層已分出
+chishi→guyao,5,2,2,"chishi-chakou-qingwu-guyao(w3,r0.3) / chishi-kugu-qingwu-guyao(w3,r0.3)",chishi-chakou-qingwu-guyao,chishi-chakou-qingwu-guyao,同,第 4 層才分出
+chishi→poxiao,7,3,1,"chishi-chakou-yizhan-duyin-poxiao(w2,r0.3)",chishi-chakou-yizhan-duyin-poxiao,chishi-chakou-yizhan-duyin-poxiao,同,第 2 層已分出
+chishi→qingwu,3,2,2,"chishi-chakou-qingwu(w2,r0.3) / chishi-kugu-qingwu(w2,r0.3)",chishi-chakou-qingwu,chishi-chakou-qingwu,同,第 4 層才分出
+duyin→fuzhao,6,2,1,"duyin-yizhan-huiyao-fuzhao(w1,r0.3)",duyin-yizhan-huiyao-fuzhao,duyin-yizhan-huiyao-fuzhao,同,第 2 層已分出
+duyin→guzhong,7,2,1,"duyin-yizhan-huiyao-fuzhao-guzhong(w2,r0.3)",duyin-yizhan-huiyao-fuzhao-guzhong,duyin-yizhan-huiyao-fuzhao-guzhong,同,第 2 層已分出
+duyin→huiyao,4,2,1,"duyin-yizhan-huiyao(w0,r0.04)",duyin-yizhan-huiyao,duyin-yizhan-huiyao,同,第 2 層已分出
+duyin→jiku,7,2,1,"duyin-yizhan-huiyao-fuzhao-jiku(w2,r0.3)",duyin-yizhan-huiyao-fuzhao-jiku,duyin-yizhan-huiyao-fuzhao-jiku,同,第 2 層已分出
+fuzhao→duyin,6,2,1,"fuzhao-huiyao-yizhan-duyin(w1,r0.3)",fuzhao-huiyao-yizhan-duyin,fuzhao-huiyao-yizhan-duyin,同,第 2 層已分出
+fuzhao→poxiao,8,3,1,"fuzhao-huiyao-yizhan-duyin-poxiao(w1,r0.3)",fuzhao-huiyao-yizhan-duyin-poxiao,fuzhao-huiyao-yizhan-duyin-poxiao,同,第 2 層已分出
+fuzhao→yizhan,4,2,1,"fuzhao-huiyao-yizhan(w1,r0.3)",fuzhao-huiyao-yizhan,fuzhao-huiyao-yizhan,同,第 2 層已分出
+guyao→chishi,5,2,2,"guyao-qingwu-chakou-chishi(w3,r0.3) / guyao-qingwu-kugu-chishi(w3,r0.3)",guyao-qingwu-chakou-chishi,guyao-qingwu-chakou-chishi,同,第 4 層才分出
+guzhong→duyin,7,2,1,"guzhong-fuzhao-huiyao-yizhan-duyin(w2,r0.3)",guzhong-fuzhao-huiyao-yizhan-duyin,guzhong-fuzhao-huiyao-yizhan-duyin,同,第 2 層已分出
+guzhong→poxiao,9,3,1,"guzhong-fuzhao-huiyao-yizhan-duyin-poxiao(w2,r0.3)",guzhong-fuzhao-huiyao-yizhan-duyin-poxiao,guzhong-fuzhao-huiyao-yizhan-duyin-poxiao,同,第 2 層已分出
+guzhong→yizhan,5,2,1,"guzhong-fuzhao-huiyao-yizhan(w2,r0.3)",guzhong-fuzhao-huiyao-yizhan,guzhong-fuzhao-huiyao-yizhan,同,第 2 層已分出
+huiyao→duyin,4,2,1,"huiyao-yizhan-duyin(w0,r0.04)",huiyao-yizhan-duyin,huiyao-yizhan-duyin,同,第 2 層已分出
+huiyao→poxiao,6,3,1,"huiyao-yizhan-duyin-poxiao(w0,r0.04)",huiyao-yizhan-duyin-poxiao,huiyao-yizhan-duyin-poxiao,同,第 2 層已分出
+huiyao→yizhan,2,2,1,"huiyao-yizhan(w0,r0.04)",huiyao-yizhan,huiyao-yizhan,同,第 2 層已分出
+jiku→duyin,7,2,1,"jiku-fuzhao-huiyao-yizhan-duyin(w2,r0.3)",jiku-fuzhao-huiyao-yizhan-duyin,jiku-fuzhao-huiyao-yizhan-duyin,同,第 2 層已分出
+jiku→poxiao,9,3,1,"jiku-fuzhao-huiyao-yizhan-duyin-poxiao(w2,r0.3)",jiku-fuzhao-huiyao-yizhan-duyin-poxiao,jiku-fuzhao-huiyao-yizhan-duyin-poxiao,同,第 2 層已分出
+jiku→yizhan,5,2,1,"jiku-fuzhao-huiyao-yizhan(w2,r0.3)",jiku-fuzhao-huiyao-yizhan,jiku-fuzhao-huiyao-yizhan,同,第 2 層已分出
+poxiao→chakou,5,2,1,"poxiao-duyin-yizhan-chakou(w1,r0.3)",poxiao-duyin-yizhan-chakou,poxiao-duyin-yizhan-chakou,同,第 2 層已分出
+poxiao→chishi,7,3,1,"poxiao-duyin-yizhan-chakou-chishi(w2,r0.3)",poxiao-duyin-yizhan-chakou-chishi,poxiao-duyin-yizhan-chakou-chishi,同,第 2 層已分出
+poxiao→fuzhao,8,3,1,"poxiao-duyin-yizhan-huiyao-fuzhao(w1,r0.3)",poxiao-duyin-yizhan-huiyao-fuzhao,poxiao-duyin-yizhan-huiyao-fuzhao,同,第 2 層已分出
+poxiao→guzhong,9,3,1,"poxiao-duyin-yizhan-huiyao-fuzhao-guzhong(w2,r0.3)",poxiao-duyin-yizhan-huiyao-fuzhao-guzhong,poxiao-duyin-yizhan-huiyao-fuzhao-guzhong,同,第 2 層已分出
+poxiao→huiyao,6,3,1,"poxiao-duyin-yizhan-huiyao(w0,r0.04)",poxiao-duyin-yizhan-huiyao,poxiao-duyin-yizhan-huiyao,同,第 2 層已分出
+poxiao→jiku,9,3,1,"poxiao-duyin-yizhan-huiyao-fuzhao-jiku(w2,r0.3)",poxiao-duyin-yizhan-huiyao-fuzhao-jiku,poxiao-duyin-yizhan-huiyao-fuzhao-jiku,同,第 2 層已分出
+poxiao→yachao,6,2,1,"poxiao-duyin-yizhan-chakou-yachao(w2,r0.3)",poxiao-duyin-yizhan-chakou-yachao,poxiao-duyin-yizhan-chakou-yachao,同,第 2 層已分出
+qingwu→chishi,3,2,2,"qingwu-chakou-chishi(w2,r0.3) / qingwu-kugu-chishi(w2,r0.3)",qingwu-chakou-chishi,qingwu-chakou-chishi,同,第 4 層才分出
+yachao→poxiao,6,2,1,"yachao-chakou-yizhan-duyin-poxiao(w2,r0.3)",yachao-chakou-yizhan-duyin-poxiao,yachao-chakou-yizhan-duyin-poxiao,同,第 2 層已分出
+yizhan→fuzhao,4,2,1,"yizhan-huiyao-fuzhao(w1,r0.3)",yizhan-huiyao-fuzhao,yizhan-huiyao-fuzhao,同,第 2 層已分出
+yizhan→guzhong,5,2,1,"yizhan-huiyao-fuzhao-guzhong(w2,r0.3)",yizhan-huiyao-fuzhao-guzhong,yizhan-huiyao-fuzhao-guzhong,同,第 2 層已分出
+yizhan→huiyao,2,2,1,"yizhan-huiyao(w0,r0.04)",yizhan-huiyao,yizhan-huiyao,同,第 2 層已分出
+yizhan→jiku,5,2,1,"yizhan-huiyao-fuzhao-jiku(w2,r0.3)",yizhan-huiyao-fuzhao-jiku,yizhan-huiyao-fuzhao-jiku,同,第 2 層已分出

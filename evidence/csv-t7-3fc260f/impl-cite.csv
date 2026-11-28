@@ -1,0 +1,28 @@
+file_line,text
+js/data.js:457,"const TIME = { RISK_CUTS: [0.15, 0.35, 0.60], RISK_TIERS: ['低', '中', '高', '極高'] };"
+js/data.js:458,"const SLEEP = { wakeMin: 8 * 60, minH: 6, maxH: 13 };"
+js/data.js:480,"R_ROAD: { kO: 0.015, lo: 0.5, hi: 1.5 }, R_WILD: { kB: 0.012, kO: 0.010, lo: 0.5, hi: 1.8 }, RISK_CAP: 0.85,"
+js/game.js:61,function isNight(t) { const h = hourOf(t); return h >= 20 || h < 5; }
+js/game.js:476,const foodMult = seasonOf(S.t) === 3 ? 1.25 : 1; // 冬季飽食消耗 +25%
+js/game.js:477,"S.food = clamp(S.food - (opts.food !== undefined ? opts.food : 4 * hours) * foodMult, 0, 100);"
+js/game.js:481,if (S.food <= 0) { S.hp -= 3 * hours; S.stats.cause = '餓死荒野'; }
+js/game.js:484,// SPEC-TIME Q7：hpFloor 只由客棧 rest／營帳 bunk 傳入，生存扣血最低留到此值（店家叫醒、灌湯）；露宿與一般等待不傳
+js/game.js:485,if (opts.hpFloor !== undefined && S.hp < opts.hpFloor) S.hp = opts.hpFloor;
+js/game.js:520,function checkDeath(cause) {
+js/game.js:693,function neighbors(id) {
+js/game.js:698,"function route(from, to) {"
+js/game.js:704,"const better = (h1, w1, h2, w2) => h1 < h2 || (h1 === h2 && w1 < w2);"
+js/game.js:721,function riskTier(risk) {
+js/game.js:746,const riskName = riskTier(risk);
+js/game.js:904,function wakeTime(now) {
+js/game.js:910,function sleepFoodCost(hours) { return 1.25 * hours; }
+js/game.js:911,function sleepToMorning(opts) {
+js/game.js:913,"passTime(hours, Object.assign({ food: sleepFoodCost(hours), fat: 0, noRegen: true }, opts || {}));"
+js/game.js:924,case 'rest': if (!inBld('inn') || !pay(c.rest)) return;
+js/game.js:925,"sleepToMorning({ hpFloor: 1 }); S.hp = maxHp(); S.fat = 0; if (S.corrupt) { S.corrupt = Math.max(0, S.corrupt - 10); S.hp = maxHp(); }"
+js/game.js:931,case 'nap': if (!inBld('tea') || !pay(c.nap)) return;
+js/game.js:937,case 'bunk': if (!inBld('medic') || !pay(c.bunk)) return;
+js/game.js:938,"sleepToMorning({ hpFloor: 1 }); S.fat = 0; S.hp = Math.min(maxHp(), S.hp + 30); log('在營帳的通鋪睡了一夜，疲累清零、生命 +30。', 'good'); break;"
+js/game.js:1530,function camp() {
+js/game.js:1540,"const risk = (night ? 0.25 : 0.12) * (D.WILDS[S.loc].risk === '低' ? 0.6 : 1) * (perk('ying', 25) ? 0.6 : 1) * (tideOn() ? 1.5 : 1);"
+js/game.js:1542,"passTime(8, { food: 16, fat: -rec });"

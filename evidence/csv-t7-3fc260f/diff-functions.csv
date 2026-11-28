@@ -1,0 +1,12 @@
+function,vs_d0989ba,vs_4bb6f26,lines
+wakeTime,同,同,5
+sleepToMorning,異,同,4
+passTime,異,同,24
+newDay,同,同,12
+camp,同,同,22
+service,異,同,58
+checkDeath,同,同,6
+maxHp,同,同,16
+wrnd,同,同,12
+route,異,異,21
+travelPreview,異,異,22

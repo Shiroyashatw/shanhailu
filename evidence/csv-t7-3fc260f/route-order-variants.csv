@@ -1,0 +1,13 @@
+known,variant,pairs,diff_vs_original,diff_examples
+預設已知,原圖,156,0,
+預設已知,EDGES 反轉（含端點對調）,156,0,
+預設已知,NODES 反轉,156,4,chishi>guyao:chishi-chakou-qingwu-guyao→chishi-kugu-qingwu-guyao ; chishi>qingwu:chishi-chakou-qingwu→chishi-kugu-qingwu ; guyao>chishi:guyao-qingwu-chakou-chishi→guyao-qingwu-kugu-chishi ; qingwu>chishi:qingwu-chakou-chishi→qingwu-kugu-chishi
+預設已知,EDGES＋NODES 都反轉,156,4,chishi>guyao:chishi-chakou-qingwu-guyao→chishi-kugu-qingwu-guyao ; chishi>qingwu:chishi-chakou-qingwu→chishi-kugu-qingwu ; guyao>chishi:guyao-qingwu-chakou-chishi→guyao-qingwu-kugu-chishi ; qingwu>chishi:qingwu-chakou-chishi→qingwu-kugu-chishi
+預設已知,EDGES 隨機打亂（含端點隨機對調） 50 種：有差異 0 種,156,0,
+預設已知,EDGES＋NODES 隨機打亂 50 種：有差異 29 種,156,見右（聯集）,chishi>guyao:chishi-chakou-qingwu-guyao→chishi-kugu-qingwu-guyao ; chishi>qingwu:chishi-chakou-qingwu→chishi-kugu-qingwu ; guyao>chishi:guyao-qingwu-chakou-chishi→guyao-qingwu-kugu-chishi ; qingwu>chishi:qingwu-chakou-chishi→qingwu-kugu-chishi
+含隱藏節點,原圖,210,0,
+含隱藏節點,EDGES 反轉（含端點對調）,210,0,
+含隱藏節點,NODES 反轉,210,4,chishi>guyao:chishi-chakou-qingwu-guyao→chishi-kugu-qingwu-guyao ; chishi>qingwu:chishi-chakou-qingwu→chishi-kugu-qingwu ; guyao>chishi:guyao-qingwu-chakou-chishi→guyao-qingwu-kugu-chishi ; qingwu>chishi:qingwu-chakou-chishi→qingwu-kugu-chishi
+含隱藏節點,EDGES＋NODES 都反轉,210,4,chishi>guyao:chishi-chakou-qingwu-guyao→chishi-kugu-qingwu-guyao ; chishi>qingwu:chishi-chakou-qingwu→chishi-kugu-qingwu ; guyao>chishi:guyao-qingwu-chakou-chishi→guyao-qingwu-kugu-chishi ; qingwu>chishi:qingwu-chakou-chishi→qingwu-kugu-chishi
+含隱藏節點,EDGES 隨機打亂（含端點隨機對調） 50 種：有差異 0 種,210,0,
+含隱藏節點,EDGES＋NODES 隨機打亂 50 種：有差異 29 種,210,見右（聯集）,chishi>guyao:chishi-chakou-qingwu-guyao→chishi-kugu-qingwu-guyao ; chishi>qingwu:chishi-chakou-qingwu→chishi-kugu-qingwu ; guyao>chishi:guyao-qingwu-chakou-chishi→guyao-qingwu-kugu-chishi ; qingwu>chishi:qingwu-chakou-chishi→qingwu-kugu-chishi

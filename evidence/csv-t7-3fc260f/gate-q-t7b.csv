@@ -1,0 +1,4 @@
+set,n,deadline_viol_vs_v03,deadline_verdict,delay_pooled_new,delay_pooled_v03,delay_verdict,tide_done_pooled_new,tide_done_pooled_v03,tide_verdict,zero_done_new,zero_done_v03,zero_verdict,done_items_new,done_items_v03,done_mean_new,done_mean_v03,info_per_scen_delay_viol_inf,info_per_scen_delay_viol_both_done,info_tide_capped_viol
+orig,200,0,過,8.007,8.007,過,13.920,13.920,過,0,0,過,7551,7551,37.755,37.755,0,0,0
+allday_grid,2400,0,過,10.708,14.619,過,10.521,15.179,過,0,250,過,74345,71477,30.977,29.782,0,0,0
+allday_rand,200,0,過,11.351,13.483,過,12.631,16.165,過,0,0,過,6016,6091,30.080,30.455,21,21,27
