@@ -1,0 +1,13 @@
+model,divisor,median_nights_rep10,median_nights_rep20
+A,40,201,201
+B,40,37,74
+B-scan,40,37,74
+B-scan,30,29,59
+B-scan,25,24,48
+B-scan,20,19,38
+B-scan,15,15,29
+B-scan,12,11,22
+B-scan,10,9,19
+B-scan,8,8,15
+A-rerun,12,13,25
+B-rerun,12,11,22
