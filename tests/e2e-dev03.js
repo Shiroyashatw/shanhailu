@@ -78,7 +78,22 @@ async function setTown(page, loc, P, Geff) {
     };
   }, [loc, P, Geff]);
 }
-const posOf = (page, sel) => page.evaluate((sel) => Array.from(document.querySelectorAll(sel)).map((e) => { const r = e.getBoundingClientRect(); return [Math.round(r.left), Math.round(r.top)]; }), sel);
+const MIN_PATH = 30;
+// 每 100ms 取一次 .walker 左上角，共 31 點；回傳每人 { kind, path: 相鄰點距離總和(px), distinct: 出現過的不同座標數 }
+const walkPaths = (page) => page.evaluate(() => new Promise((res) => {
+  const els = Array.from(document.querySelectorAll('.walker'));
+  const tr = els.map(() => []);
+  let n = 0;
+  const tick = () => {
+    els.forEach((e, i) => { const r = e.getBoundingClientRect(); tr[i].push([Math.round(r.left), Math.round(r.top)]); });
+    if (++n < 31) return setTimeout(tick, 100);
+    res(tr.map((t, i) => {
+      let path = 0; for (let k = 1; k < t.length; k++) path += Math.hypot(t[k][0] - t[k - 1][0], t[k][1] - t[k - 1][1]);
+      return { kind: els[i].classList.contains('patrol') ? 'patrol' : 'anon', path: Math.round(path), distinct: new Set(t.map((p) => p.join(','))).size };
+    }));
+  };
+  tick();
+}));
 
 (async () => {
   const srv = await serve();
@@ -143,11 +158,22 @@ const posOf = (page, sel) => page.evaluate((sel) => Array.from(document.querySel
 
   // ===== 巡邏在街上走、路人也在走；重繪不讓人跳回起點 =====
   await setTown(page, 'huiyao', 80, 1);
-  const p0 = await posOf(page, '.walker'); await page.waitForTimeout(800); const p1 = await posOf(page, '.walker');
-  const movedPatrol = (await page.evaluate(() => document.querySelectorAll('.walker').length)) && p0[0] && p1[0] && (p0[0][0] !== p1[0][0] || p0[0][1] !== p1[0][1]);
-  const movedAll = p0.filter((p, i) => p1[i] && (p[0] !== p1[i][0] || p[1] !== p1[i][1])).length;
-  check('[走動] 灰窯巡邏 800ms 內位置有變（不是靜止立繪）', movedPatrol, { from: p0[0], to: p1[0] });
-  check('[走動] 灰窯 7 個走動者 800ms 內全部移動', movedAll === p0.length && p0.length === 7, { moved: movedAll, of: p0.length });
+  // 取樣 3 秒（每 100ms 一點，共 31 點），每人算累計路程；來回走折返、經過起點都不會讓路程變小。
+  // 最慢走動者 16px/s → 3 秒約 48px；只有步伐上下 1px 抖動時累計 ≤ 約 12px；門檻 30px 介於兩者之間。
+  const walks = await walkPaths(page);
+  check('[走動] 灰窯巡邏 3 秒內累計路程 > ' + MIN_PATH + 'px（不是靜止立繪）', walks.length && walks[0].kind === 'patrol' && walks[0].path > MIN_PATH, walks[0]);
+  check('[走動] 灰窯 7 個走動者 3 秒內每人累計路程都 > ' + MIN_PATH + 'px', walks.length === 7 && walks.every((w) => w.path > MIN_PATH), walks.map((w) => w.path + 'px/' + w.distinct + '點'));
+  // 負向檢查：另開一頁，只在測試頁把第 4 個走動者的路線屬性改壞（walkerStyle 回空 → 原地不動），同一斷言必須抓到它且只抓到它
+  {
+    const neg = await ctx.newPage();
+    await fresh(neg, base); await setTown(neg, 'huiyao', 80, 1);
+    await neg.evaluate(() => document.querySelectorAll('.walker')[3].setAttribute('data-plan', 'frozen'));
+    await neg.waitForTimeout(200); // 等 rAF 套用凍結後的位置，再開始取樣
+    const nw = await walkPaths(neg);
+    const caught = nw.map((w, i) => (w.path > MIN_PATH ? -1 : i)).filter((i) => i >= 0);
+    check('[走動・負向] 測試頁凍結第 4 個走動者，3 秒累計路程斷言只抓到它（其餘 6 人照走）', nw.length === 7 && caught.length === 1 && caught[0] === 3, nw.map((w) => w.path));
+    await neg.close();
+  }
   const inPlan = await page.evaluate(() => {
     const pr = document.querySelector('.plan').getBoundingClientRect();
     return Array.from(document.querySelectorAll('.walker')).every((e) => { const r = e.getBoundingClientRect(); return r.left >= pr.left - 1 && r.right <= pr.right + 1 && r.top >= pr.top - 1 && r.bottom <= pr.bottom + 1; });
