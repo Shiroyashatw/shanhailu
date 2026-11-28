@@ -1,0 +1,38 @@
+4e33d71f11574c16f2b6eed664e6014f7aa6b25f
+## diff -U3 hunks mentioning migrate/SCHEMA (js css index.html tests)
+0
+## rg -c '血霧' js css index.html
+total=0
+## rg -c '鎮公所' js css index.html
+total=0
+## rg -c '上香' js css index.html
+total=0
+## rg -c '老闆娘' js css index.html
+total=0
+## (reference, not counted) 線香/〈廟香〉
+js/icons_more.js:1
+js/lore.js:1
+js/game.js:2
+js/data.js:1
+js/ui.js:1
+## rg old paths excluding docs/
+rg_exit=1
+## docs/ changes outside docs/evidence vs e03947e
+count=0
+## all changed paths outside docs/
+js/data.js
+js/game.js
+js/icons_more.js
+js/lore.js
+js/scenes_map.js
+js/scenes_town.js
+js/ui.js
+tests/e2e-dev01b.js
+tests/e2e-dev02.js
+tests/e2e-dev03.js
+tests/e2e-dev04.js
+tests/e2e-dev05.js
+tests/e2e.js
+4e33d71f11574c16f2b6eed664e6014f7aa6b25f
+## git grep (incl. untracked-ignored-safe) old paths, excluding docs/
+git_grep_exit=1 (1 = no match)
