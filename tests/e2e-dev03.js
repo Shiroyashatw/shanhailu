@@ -1,7 +1,7 @@
 /* 《山海錄》DEV-03 路人與巡邏走動 — 新增驗收（Node + Playwright，headless Chromium）
  * 用法：node tests/e2e-dev03.js [--shots]
- *   --shots  另存 1280×720 實機截圖至 docs/evidence/shots-shanhailu-dev03-1128/（可用環境變數 SHOTS_DIR 覆寫）
- * 依據：docs/design/batch1/specs/SPEC-01.md v0.4（§6 路人與巡邏人數、§10 AC-D2、AC-J6、§13 DEV-03 列）、
+ *   --shots  另存 1280×720 實機截圖至 docs/evidence/shots-shanhailu-dev03-fix1-1128/（可用環境變數 SHOTS_DIR 覆寫）
+ * 依據：docs/design/batch1/specs/SPEC-01.md v0.5（§6、AC-D2、AC-J6 與 v0.4 同）（§6 路人與巡邏人數、§10 AC-D2、AC-J6、§13 DEV-03 列）、
  *       docs/design/batch1/rollout-plan-v0.1.md 第 114 行（DEV-03）與 5.1 DEV-03 列。
  * 既有 tests/e2e.js、tests/e2e-dev02.js 不動；本檔只放 DEV-03 的新斷言。
  */
@@ -12,7 +12,7 @@ const path = require('path');
 const { chromium } = require('playwright');
 
 const ROOT = path.resolve(__dirname, '..');
-const SHOTS = process.env.SHOTS_DIR ? path.resolve(ROOT, process.env.SHOTS_DIR) : path.join(ROOT, 'docs/evidence/shots-shanhailu-dev03-1128');
+const SHOTS = process.env.SHOTS_DIR ? path.resolve(ROOT, process.env.SHOTS_DIR) : path.join(ROOT, 'docs/evidence/shots-shanhailu-dev03-fix1-1128');
 const WANT_SHOTS = process.argv.includes('--shots');
 const SEED = 20261127;
 
@@ -119,7 +119,7 @@ const posOf = (page, sel) => page.evaluate((sel) => Array.from(document.querySel
     const G = window.SHL; const S = G.state; const bad = []; let n = 0;
     ['huiyao', 'duyin'].forEach((loc) => {
       S.scene = 'town'; S.loc = loc; S.street = null;
-      for (let P = 0; P <= 100; P += 5) for (let g = 0; g <= 3; g++) {
+      for (let P = 0; P <= 100; P++) for (let g = 0; g <= 3; g++) {
         S.world.towns[loc].P = P; S.world.towns[loc].Geff = g; G.setTab(null); n++;
         const plan = document.querySelector('.plan'); const c = G.crowd(loc);
         const all = plan.querySelectorAll('.fig, .walker').length; const pat = plan.querySelectorAll('.walker.patrol').length;
@@ -129,7 +129,7 @@ const posOf = (page, sel) => page.evaluate((sel) => Array.from(document.querySel
     });
     return { n, bad: bad.slice(0, 5) };
   });
-  check('[§6 掃描] 兩鎮 P=0..100（步 5）× Geff=0..3 共 ' + sweep.n + ' 組：同屏 ≤ 10、巡邏＝Geff、Nanon 照公式', sweep.bad.length === 0, sweep);
+  check('[§6 掃描] 兩鎮 P=0..100（步 1）× Geff=0..3 共 ' + sweep.n + ' 組：同屏 ≤ 10、巡邏＝Geff、Nanon 照公式', sweep.bad.length === 0, sweep);
 
   // ===== crowd() 唯讀：不改世界欄位、不改存檔 =====
   const ro = await page.evaluate(() => {
@@ -222,6 +222,20 @@ const posOf = (page, sel) => page.evaluate((sel) => Array.from(document.querySel
   await shot(page, 'dev03-05-duyin-high-P80-G3.png');
   await setTown(page, 'duyin', 20, 3); await page.waitForTimeout(1200);
   await shot(page, 'dev03-06-duyin-low-P20-G3.png');
+
+  // ===== 合併 DEV-02／DEV-01b 後：名字與險級標頭照舊（只看，不改它們） =====
+  await setTown(page, 'huiyao', 80, 1);
+  const merged = await page.evaluate(() => {
+    const G = window.SHL; const S = G.state; const D = window.SHL_DATA;
+    const pn = document.querySelector('[data-testid=pname]');
+    const town = { name: S.name && (S.name.sur + S.name.given), shown: pn && pn.textContent, walkers: document.querySelectorAll('.walker').length };
+    S.known.chakou = true; S.combat = null; S.event = null; S.dead = null; S.overlay = null; S.loc = 'chakou'; G.enterHere();
+    const hr = document.querySelector('[data-testid=head-risk]'); const tier = D.WILDS.chakou.risk;
+    return { town, tier, head: hr && hr.textContent, rk: hr && hr.classList.contains('rk' + D.TIME.RISK_TIERS.indexOf(tier)), walkers: document.querySelectorAll('.walker').length };
+  });
+  check('[合併後] 街景右欄名字（DEV-01b）＝S.name，走動者照樣在', merged.town.name && merged.town.shown === merged.town.name && merged.town.walkers === 7, merged.town);
+  check('[合併後] 出鎮到荒野：標頭險級（DEV-02 四檔色 rk0–rk3）與 riskTier 一致，荒野無走動者', merged.head === '險 ' + merged.tier && merged.rk && merged.walkers === 0, merged);
+  await shot(page, 'dev03-07-wild-head-risk-chakou.png');
 
   check('console 0 error', consoleErrors.length === 0, consoleErrors.slice(0, 5));
   await browser.close(); srv.close();

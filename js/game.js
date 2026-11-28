@@ -1307,7 +1307,7 @@ window.SHL = (function () {
     if (st.influence === undefined) st.influence = {};
   }
   function townOf(id) { return S.world.towns ? S.world.towns[id] || null : null; }
-  // ================= 路人與巡邏人數（SPEC-01 v0.4 §6；DEV-03） =================
+  // ================= 路人與巡邏人數（SPEC-01 v0.5 §6，與 v0.4 同；DEV-03） =================
   // Nnamed＝該鎮街上有職位者數（PLACES[tid].street 的人數：灰窯 3、渡陰 1）；Npatrol＝Geff（0–3，每檔 1 名上街）；
   // Nanon＝min(round(P/10), 10 − Nnamed − Npatrol)，同屏活動 NPC ≤ 10。只讀最近一次日結後的 P、Geff，不改任何世界欄位。
   // 假設：round 用 Math.round（.5 進位）；下限夾 0；時段係數依 SPEC-TIME（本包不定，不乘）。
