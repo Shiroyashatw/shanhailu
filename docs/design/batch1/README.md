@@ -23,7 +23,7 @@
 | `decisions-producer-1128-1727.md` | 製作人 17:30／mumi 17:27 拍板：腳程四檔與 hover 定稿、血霧→紅霧、鎮公所→鎮衙、委託險級、地面格繼續扣住 |
 | `UI-FX/` | `/workspace/shanhailu-batch1/UI-FX/`（含 `FX-LIST.md`／`FX-LIST.csv` 的 X12；`__pycache__`／`.pyc` 未放） |
 | `batch1-decisions-v0.1.md`、`city-status-copy-v0.1.csv`、`names-final-v0.1.csv`、`name-pool-v0.1.csv` | `/workspace/shanhai-sandbox-gdd/proposals/` |
-| `dev-string-replace-batch1-v0.1.md`、`dev-string-replace-batch1-v0.1.csv` | `/workspace/shanhai-sandbox-gdd/proposals/`（本地化編輯 17:42；64 條字串替換對照表，位置對 `8c8beb6`） |
+| `dev-string-replace-batch1-v0.1.md`、`dev-string-replace-batch1-v0.1.csv` | `/workspace/shanhai-sandbox-gdd/proposals/`（本地化編輯 17:49 更新為 76 條：17:27 本批 38、稍早已定 26、17:43 製作人答覆 12；位置對 `8c8beb6`；不含 `.bak-1743`） |
 | `dev05-strings-v0.1.md` | `/workspace/shanhai-sandbox-gdd/proposals/dev05-strings-v0.1.md`（本地化編輯 17:46／檔案標 17:50；DEV-05「尚無消息」與客棧「睡到 {wake}」定稿） |
 | `UI-01/`、`UI-02/` | `/workspace/shanhailu-batch1/UI-01/`、`UI-02/`（UI-02 含 `wording-map-commission.md`） |
 
@@ -43,3 +43,4 @@
 
 - 2026-11-28 17:40（台北時間 UTC+8）：四份規格升 v0.5（來源 `/workspace/shanhai-sandbox-gdd/proposals/specs/`）。`specs/SPEC-TIME.md`：7.1b 險級四檔（門檻 0.15／0.35／0.60）、7.2 腳程切點與兩位小數判檔、血霧→紅霧、B1／E11「下一個 08:00」含當下、§6.2 睡眠飽食 1.25×時數。`specs/SPEC-01.md`：4.8／4.9 委託險級、長期委託軟期限 30／60 日、AC-E9～E11。`specs/SPEC-02.md`：事件 `longquest_expire`、驗收第 34 條。`specs/SPEC-03.md` 新加入：2.1 行囊滿流程、DEV-09 驗收第 11 條。`specs/CHANGELOG.md` 同步放入 v0.5 段。`num-shl-b1-t3v5` 結果待回。 另放入 `dev-string-replace-batch1-v0.1.md` 與同名 `.csv`（本地化編輯 17:42；「17:27 本批」38、「稍早已定」26，共 64 條；位置對 `8c8beb6`）。全域字面替換以本表為依據，等 DEV-02～05 合併後由 textsweep1 執行。
 - 2026-11-28 17:46（台北時間 UTC+8）：放入 `dev05-strings-v0.1.md`（本地化編輯；第一次日結前「尚無消息」／「過了午夜才有各鎮消息」；客棧按鈕「睡到 {wake}」與 hover 定稿）。
+- 2026-11-28 17:49（台北時間 UTC+8）：更新 `dev-string-replace-batch1-v0.1.md` 與同名 `.csv` 為 76 條（新增「17:43 製作人答覆」12 條：腐骨沼／沉淵祭窟「中高」→「高」、路程 riskName 四檔、赤鴉→鴉首含 e2e、柳三娘職稱與老闆娘→老闆、溫姑→破曉醫官、小滿「傳令兵」不動）。舊版 `.bak-1743` 未上傳。
