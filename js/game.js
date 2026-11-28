@@ -1222,6 +1222,19 @@ window.SHL = (function () {
     if (st.influence === undefined) st.influence = {};
   }
   function townOf(id) { return S.world.towns ? S.world.towns[id] || null : null; }
+  // ================= 路人與巡邏人數（SPEC-01 v0.4 §6；DEV-03） =================
+  // Nnamed＝該鎮街上有職位者數（PLACES[tid].street 的人數：灰窯 3、渡陰 1）；Npatrol＝Geff（0–3，每檔 1 名上街）；
+  // Nanon＝min(round(P/10), 10 − Nnamed − Npatrol)，同屏活動 NPC ≤ 10。只讀最近一次日結後的 P、Geff，不改任何世界欄位。
+  // 假設：round 用 Math.round（.5 進位）；下限夾 0；時段係數依 SPEC-TIME（本包不定，不乘）。
+  const CROWD_MAX = 10;
+  function crowd(tid) {
+    const t = townOf(tid); const PL = D.PLACES[tid];
+    if (!t || !PL) return null;
+    const named = PL.street.length;
+    const patrol = clamp(t.Geff | 0, 0, 3);
+    const anon = Math.max(0, Math.min(Math.round(t.P / 10), CROWD_MAX - named - patrol));
+    return { P: t.P, Geff: t.Geff, named, patrol, anon, total: named + patrol + anon };
+  }
   function garrisonName(g) { return D.WORLD.GARRISON_NAMES[clamp(g | 0, 0, 3)]; }
   // §4.10 治安修正（給 SPEC-02／03）：用最近一次日結後的 O、Geff
   function sPub(tid) {
@@ -1950,7 +1963,7 @@ window.SHL = (function () {
   return {
     get state() { return S; },
     init, on, restart, save, wipeSave, readRaw, SAVE_KEY,
-    fmtTime, fmtClock, fmtDate, dayOf, isNight, seasonOf, ageOf, wakeTime, garrisonName, sPub, riskR,
+    fmtTime, fmtClock, fmtDate, dayOf, isNight, seasonOf, ageOf, wakeTime, garrisonName, sPub, riskR, crowd,
     maxHp, carryCap, totalWt, loadBand, speedMult, armor, weaponDmg, weaponType, hitChance, dodgeChance, critChance, bagCap,
     attrVal, attrProgress, profLv, profProgress, perk,
     eqBase, eqValue, itemWt, itemName, itemGlyph, itemIcon, countItem, affixSum, reqUnmet, slotFits,

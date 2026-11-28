@@ -9,6 +9,8 @@
   const Q = new URLSearchParams(location.search);
   // 戰鬥演出：?fx=0 關閉（自動化測試用）
   const FXON = Q.get('fx') !== '0';
+  // 街上走動的匿名路人與巡邏：?walk=0 關閉（只留有職位者＝DEV-03 之前的現況；AC-J6 影格比較的基準用）
+  const WALKON = Q.get('walk') !== '0';
   const $A = document.getElementById('app');
   const $L = document.getElementById('col-left');
   const $C = document.getElementById('col-center');
@@ -382,6 +384,71 @@
     const P = G.place(); const real = SC.spots && SC.spots[P.plan];
     return real && real.length >= P.street.length ? real : [[150, 320], [400, 290], [620, 330], [280, 420], [540, 430]];
   }
+  // ---------- 街上走動的匿名路人與巡邏（SPEC-01 §6；DEV-03） ----------
+  // 人數由 G.crowd(tid) 給（Nanon、Npatrol）；本段只負責畫、讓他們沿街來回走。
+  // 假設（規格沒寫死路徑與動畫）：每鎮手標幾條沿現有平面圖街道的折線（顯示像素，腳底中心），不改平面圖；
+  // 每人照編號分到一條線、來回走；位置只由「目前時間」算出，重繪 innerHTML 不會讓人跳回起點。
+  // 沿用既有人形圖示（fig_man／woman／elder／child；巡邏用 fig_soldier），不新增美術；不可點、不擋建築與有職位者。
+  const STREET_WALKS = {
+    plan_huiyao: [
+      [[70, 228], [300, 236], [520, 232], [760, 236]],          // 上排店面前的橫街
+      [[398, 506], [398, 400], [400, 300], [470, 236]],         // 出口直上井邊
+      [[250, 236], [252, 340], [262, 470]],                     // 窯神廟與藥鋪之間的西巷
+      [[320, 300], [480, 300], [480, 372], [320, 372], [320, 300]], // 井台一圈
+      [[560, 240], [600, 280], [760, 290]],                     // 鐵鋪前東街
+      [[470, 236], [480, 150], [488, 70]],                      // 鎮公所與客棧之間的北巷
+    ],
+    plan_duyin: [
+      [[398, 176], [398, 300], [398, 506]],                     // 關樓到關門的中軸大道
+      [[240, 240], [398, 236], [560, 240]],                     // 關市與酒肆前橫街
+      [[250, 330], [398, 326], [450, 300]],                     // 軍械坊前
+      [[230, 470], [398, 450], [560, 470]],                     // 南牆內側
+      [[250, 312], [330, 300], [360, 240]],                     // 關市前斜巷
+    ],
+  };
+  const ANON_FIGS = ['fig_man', 'fig_woman', 'fig_elder', 'fig_man', 'fig_child', 'fig_woman'];
+  function walkLen(pts) { let L = 0; for (let i = 1; i < pts.length; i++) L += Math.hypot(pts[i][0] - pts[i - 1][0], pts[i][1] - pts[i - 1][1]); return L; }
+  // 沿折線來回走：回傳 [x, y, 朝左?, 步伐 0/1]
+  function walkAt(pts, speed, phase, ms) {
+    const L = walkLen(pts); if (L <= 0) return [pts[0][0], pts[0][1], false, 0];
+    let s = ((phase * L * 2 + speed * ms / 1000) % (2 * L) + 2 * L) % (2 * L);
+    const back = s > L; if (back) s = 2 * L - s;
+    let i = 1; let seg = 0;
+    for (; i < pts.length; i++) { seg = Math.hypot(pts[i][0] - pts[i - 1][0], pts[i][1] - pts[i - 1][1]); if (s <= seg || i === pts.length - 1) break; s -= seg; }
+    const a = pts[i - 1], b = pts[i]; const f = seg > 0 ? Math.min(1, s / seg) : 0;
+    const dx = (b[0] - a[0]) * (back ? -1 : 1);
+    return [a[0] + (b[0] - a[0]) * f, a[1] + (b[1] - a[1]) * f, dx < 0, Math.floor(ms / 260) % 2];
+  }
+  function walkerStyle(el, ms) {
+    const plan = el.getAttribute('data-plan'); const r = STREET_WALKS[plan] && STREET_WALKS[plan][+el.getAttribute('data-r')];
+    if (!r) return '';
+    const p = walkAt(r, +el.getAttribute('data-sp'), +el.getAttribute('data-ph'), ms);
+    return 'translate(' + Math.round(p[0] - 16) + 'px,' + Math.round(p[1] - 32 - p[3]) + 'px)' + (p[2] ? ' scaleX(-1)' : '');
+  }
+  function walkersHtml(S, plan) {
+    const C = G.crowd(S.loc); const routes = STREET_WALKS[plan];
+    if (!WALKON || !C || !routes) return '';
+    const now = performance.now(); let h = '<div class="walkers" data-testid="walkers" data-anon="' + C.anon + '" data-patrol="' + C.patrol + '" data-named="' + C.named + '">';
+    const one = (kind, k, i, fig, sp) => {
+      const r = i % routes.length; const ph = ((i * 0.37 + k * 0.19) % 1).toFixed(3);
+      const attrs = { 'data-plan': plan, 'data-r': r, 'data-sp': sp, 'data-ph': ph };
+      const fake = { getAttribute: (a) => attrs[a] };
+      return '<div class="walker ' + kind + '" data-testid="walker-' + kind + '" data-plan="' + plan + '" data-r="' + r + '" data-sp="' + sp + '" data-ph="' + ph + '" style="transform:' + walkerStyle(fake, now) + '">' + ico(fig, kind === 'patrol' ? '巡' : '人', 32) + '</div>';
+    };
+    // 巡邏走大街（從第 0 條線起），步子穩；路人錯開路線與速度
+    for (let k = 0; k < C.patrol; k++) h += one('patrol', k, k * 2, 'fig_soldier', 22);
+    for (let k = 0; k < C.anon; k++) h += one('anon', k, k + 1, ANON_FIGS[k % ANON_FIGS.length], 16 + (k * 7) % 12);
+    return h + '</div>';
+  }
+  // 單一 rAF 迴圈：只更新畫面上現有的 .walker（≤ 10 個）的 transform
+  (function walkLoop() {
+    const step = (ms) => {
+      const els = $C.getElementsByClassName('walker');
+      for (let i = 0; i < els.length; i++) els[i].style.transform = walkerStyle(els[i], ms);
+      requestAnimationFrame(step);
+    };
+    if (WALKON && typeof requestAnimationFrame === 'function') requestAnimationFrame(step);
+  })();
   function npcFace(npc, size) { return IC.has(npc) ? ico(npc, '', size) : '<span class="gl nofc">' + D.NPCS[npc].name.slice(0, 1) + '</span>'; }
   function sceneTown(S) {
     return S.townTab ? sceneBuilding(S) : sceneStreet(S);
@@ -407,6 +474,7 @@
       const mark = q && (q.status === 'hidden' || G.questReady(q)) ? '<i class="bmark">!</i>' : '';
       h += '<div class="fig' + (S.street === npc ? ' on' : '') + '" data-a="street" data-v="' + npc + '" data-testid="npc-' + npc + '" style="left:' + (sp[0] - 16) + 'px;top:' + (sp[1] - 32) + 'px">' + ico(NP.fig || 'fig_man', NP.name.slice(0, 1), 32) + '<span>' + NP.name + mark + '</span></div>';
     });
+    h += walkersHtml(S, P.plan);
     if (S.street) h += streetDialog(S);
     h += '</div>';
     h += '<div class="townbar"><span class="tdesc">' + (hurt ? '<span class="red">獸潮過後一片狼藉：貨架剩一半、客棧漲價。</span>' : td ? '<span class="red">獸潮期間，藥水漲價五成。</span>' : P.desc) + '<span class="sub">　點建築進去，點路人交談。</span></span>' + exploreBtn(S) + '</div>';
