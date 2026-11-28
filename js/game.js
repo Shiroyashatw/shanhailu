@@ -59,12 +59,25 @@ window.SHL = (function () {
   function dayOf(t) { return Math.floor(t / 1440) + 1; }
   function hourOf(t) { return Math.floor((t % 1440) / 60); }
   function isNight(t) { const h = hourOf(t); return h >= 20 || h < 5; }
-  // SPEC-TIME 2.2：四時段（半開區間）；夜暗度 w 給 7.1b 顯示用險級（遇襲判定仍用 isNight，製作人 17:45 第 9 項）
+  // SPEC-TIME 2.2：四時段（半開區間）；夜暗度 w 見 D.TIME.DARK（7.1）
   function phaseOf(t) { const m = ((t % 1440) + 1440) % 1440; return m >= 300 && m < 480 ? 'dawn' : m >= 480 && m < 1020 ? 'day' : m >= 1020 && m < 1200 ? 'dusk' : 'night'; }
-  // 天候：DEV-TIME 尚未落地（weatherAt 不在程式裡），目前一律晴；之後由 DEV-TIME 換成 weatherAt(t)
+  // 天候：DEV-TIME 尚未落地（weatherAt 不在程式裡），目前一律晴。
+  // TODO(DEV-TIME)：weatherNow() 必須改為呼叫 weatherAt(t)；不要在別處另寫一套天氣邏輯（數值裁定：本輪維持晴）。
   function weatherNow(/* t */) { return 'clear'; }
-  // SPEC-TIME 7.1b 共用倍率 (1 + w_now) × wxRisk：briefDanger 與 travelPreview 顯示險級都只呼叫這一個
+  // SPEC-TIME 7.1b briefDanger 用的當下倍率 (1 + w_now) × wxRisk(當下)
   function dangerMult(t, wx) { return (1 + D.TIME.DARK[phaseOf(t)]) * D.TIME.WX_RISK[wx || weatherNow(t)]; }
+  // SPEC-TIME 7.1 行走倍率 (1 + mean(w)) × wxRisk：取行走期間 [t0, t0+mins)，mean(w) 按每段分鐘數加權，
+  // wxRisk 取期間最大值。時段邊界都在整點，逐整點切片即可（每片落在單一時段內）。
+  function walkMult(t0, mins) {
+    let t = t0, sumW = 0, wx = 0;
+    while (t < t0 + mins) {
+      const next = Math.min(t0 + mins, Math.floor(t / 60) * 60 + 60);
+      sumW += D.TIME.DARK[phaseOf(t)] * (next - t);
+      wx = Math.max(wx, D.TIME.WX_RISK[weatherNow(t)]);
+      t = next;
+    }
+    return (1 + sumW / mins) * wx;
+  }
   // 曆法：一季 30 天、一年 120 天；開局元年春第 1 日、20 歲
   function seasonOf(t) { return Math.floor((dayOf(t) - 1) / 30) % 4; }
   function yearOf(t) { return Math.floor((dayOf(t) - 1) / 120); }
@@ -714,7 +727,7 @@ window.SHL = (function () {
   }
   function route(from, to, roadOnly) {
     // Dijkstra 先求（總時數, 野徑段數）字典序最短，只走已知的地點；再在所有並列最短路線中依序比
-    // (3) 路線險值 risk3(routeRisk)（以呼叫當下的時段、負重、獸潮、R 計）較低者，(4) 節點 id 序列字典序較小者。
+    // (3) 路線險值 risk3(routeRisk)（以呼叫當下出發的整段路程、負重、獸潮、R 計）較低者，(4) 節點 id 序列字典序較小者。
     // SPEC-TIME 7.1b／AC 20、數值 18:14 裁定：結果不隨 NODES／EDGES 的排列順序或邊的端點寫法改變。
     const dist = {}, wild = {}, Q = Object.keys(D.NODES).filter(known);
     Q.forEach((k) => { dist[k] = Infinity; wild[k] = Infinity; }); dist[from] = 0; wild[from] = 0;
@@ -740,25 +753,26 @@ window.SHL = (function () {
     };
     if (from !== to && dist[to] < Infinity) walk(to, [], []);
     const seq = (x, y) => { for (let i = 0; i < Math.min(x.length, y.length); i++) if (x[i] !== y[i]) return x[i] < y[i] ? -1 : 1; return x.length - y.length; };
-    paths.forEach((p) => (p.r = risk3(routeRisk(p.edges))));
+    paths.forEach((p) => (p.r = risk3(routeRisk(p.edges, S.t))));
     paths.sort((x, y) => x.r - y.r || seq(x.nodes, y.nodes));
     const edges = paths.length ? paths[0].edges : [];
     edges.stops = paths.length ? paths[0].nodes.slice(1) : [];
     return edges;
   }
-  // 路線險值：封頂 RISK_CAP 後的值（未取位）。travelPreview 與 route() 的第三層 tie-break 共用。
   // risk_base：全程官道 0.04、含野徑單段 0.22、含野徑多段 0.30（遇襲、顯示、簡報、委託單共用）
   function riskBase(edges) { return edges.some((e) => !e.road) ? (edges.length > 1 ? 0.3 : 0.22) : 0.04; }
-  // mult 省略＝遇襲判定（isNight ×2，現況不改）；travelPreview 顯示險級傳 dangerMult()
-  function routeRisk(edges, mult) {
+  // 趕路時數：ceil(Σh ÷ M)，至少 1（判檔與算時間用同一個 M）
+  function walkHours(edges) { return Math.max(1, Math.ceil(edges.reduce((a, e) => a + e.h, 0) / paceMult())); }
+  // 路線險值（唯一公式；遇襲判定、travelPreview、route() 第三層都只呼叫這一個）：
+  // SPEC-TIME 7.1：risk_base × (1 + mean(w)) × wxRisk（整段路程），再乘超載、輕功、獸潮、R（SPEC-01 §4.8），
+  // 0.85 封頂在所有乘項之後只做一次。t0＝出發時刻；不再看出發當下 isNight（SPEC-01 第 2 節）。
+  function routeRisk(edges, t0) {
     const band = loadBand();
     const wild = edges.some((e) => !e.road);
-    let risk = riskBase(edges);
-    risk *= mult === undefined ? (isNight(S.t) ? 2 : 1) : mult;
+    let risk = riskBase(edges) * walkMult(t0, walkHours(edges) * 60);
     if (band.id === 'heavy' || band.id === 'over') risk *= 1.4;
     if (wild && perk('jiao', 25)) risk *= 0.8;
     if (wild && tideOn()) risk *= 1.5;
-    // SPEC-01 §4.8「套用」：多乘治安／匪勢修正 R，封頂 0.85 在所有乘項之後做一次（夜間仍用現況 isNight；SPEC-TIME 7.1 屬 DEV-TIME）
     return Math.min(D.WORLD.RISK_CAP, risk * riskR(wild));
   }
   // SPEC-TIME 7.1b：先封頂 RISK_CAP，再 half-up 取三位，回傳千分位整數（防浮點：0.1495 → 150）
@@ -771,20 +785,18 @@ window.SHL = (function () {
   }
   function travelPreview(to) {
     const edges = route(S.loc, to);
-    const base = edges.reduce((a, e) => a + e.h, 0);
     const sm = paceMult();
-    const hours = Math.max(1, Math.ceil(base / sm));
+    const hours = walkHours(edges);
     const band = loadBand();
     const xingRed = clamp(1 - profLv('jiao') * 0.003 - (S.skills.includes('jixing') ? 0.1 : 0), 0.4, 1);
     const fat = Math.round(3 * hours * band.fat * xingRed * (1 - affixSum('fatred') / 100));
     const food = 4 * hours;
     const wild = edges.some((e) => !e.road);
     const R = riskR(wild);
-    const risk = routeRisk(edges); // 遇襲判定用（isNight）
-    const shown = routeRisk(edges, dangerMult(S.t)); // 畫面險級：與 briefDanger 同一套 (1+w)×wxRisk
-    const riskName = riskTier(shown);
+    const risk = routeRisk(edges, S.t); // 畫面險級與 travel() 遇襲判定用同一個值
+    const riskName = riskTier(risk);
     const via = edges.length > 1 ? D.NODES[edges.stops[0]].name : (edges[0] && edges[0].road ? '官道' : '野徑');
-    return { edges, hours, fat, food, risk, shown, riskName, mult: sm, pace: paceName(sm), via, wild, R };
+    return { edges, hours, fat, food, risk, riskName, mult: sm, pace: paceName(sm), via, wild, R };
   }
   // SPEC-TIME 7.1b briefDanger「出城路險」：本鎮到每個已知目的地照 route() 的路線各算一次，取最高。
   // risk_base × R × (1 + w_now) × wxRisk × 獸潮 1.5（只乘含野徑的路線）；不含超載、詞綴；封頂後取三位分檔。
@@ -860,6 +872,7 @@ window.SHL = (function () {
     if (bandId !== 'light') gainProf('fuz', (bandId === 'normal' ? 4 : 6) * p.hours);
     log('自' + fromName + '出發，經' + p.via + '，' + p.hours + ' 小時後抵達' + D.NODES[to].name + '。');
     if (S.dead) return commit();
+    HOOKS.lastEncRisk = p.risk; // 只給測試讀：本趟遇襲判定實際用的 risk
     if (rnd() < p.risk) { startEvent(to); return commit(); }
     enterNode(to);
     commit();

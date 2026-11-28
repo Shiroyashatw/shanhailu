@@ -389,21 +389,57 @@ function sameCity(dom, want) {
   await shot(page, 'fix1-04-brief-danger-night.png');
   await expand(page, false);
 
-  // ===== 10. travelPreview 顯示險級＝同一套 (1+w)×wxRisk；遇襲判定仍用 isNight（17:45 第 9 項） =====
+  // ===== 10. travelPreview 險級與 briefDanger 同值；遇襲判定改整段路程 (1+mean(w))×wxRisk（SPEC-TIME 7.1、SPEC-01 第 2 節） =====
   const tp = await page.evaluate(() => {
     const G = window.SHL, S = G.state, d0 = Math.floor(S.t / 1440) * 1440;
     S.loc = 'huiyao'; const out = {};
-    [6, 12, 18, 22].forEach((h) => { S.t = d0 + h * 60; const p = G.travelPreview('qingwu'); const b = G.briefDanger('huiyao', { tide: false }).all.find((x) => x.dest === 'qingwu'); out[h] = { shown: Math.round(p.shown * 1000) / 1000, tier: p.riskName, enc: p.risk, brief: b.risk }; });
+    [6, 12, 18, 22].forEach((h) => { S.t = d0 + h * 60; const p = G.travelPreview('qingwu'); const b = G.briefDanger('huiyao', { tide: false }).all.find((x) => x.dest === 'qingwu'); out[h] = { shown: Math.round(p.risk * 1000) / 1000, tier: p.riskName, enc: p.risk, brief: b.risk }; });
     return out;
   });
   check('travelPreview 險級與 briefDanger 同值（輕裝、R=1）：清晨 0.375 高、白天 0.3 中、黃昏 0.45 高、黑夜 0.6 極高', [6, 12, 18, 22].every((h) => tp[h].shown === tp[h].brief) && [6, 12, 18, 22].map((h) => tp[h].tier).join() === '高,中,高,極高', tp);
-  check('遇襲判定仍用 isNight：清晨、白天、黃昏 0.30，黑夜 0.60', tp[6].enc === 0.3 && tp[12].enc === 0.3 && tp[18].enc === 0.3 && Math.abs(tp[22].enc - 0.6) < 1e-9, tp);
+  check('遇襲判定不再用出發當下 isNight（整趟同一時段）：清晨 0.375、白天 0.30、黃昏 0.45、黑夜 0.60', [[6, 0.375], [12, 0.3], [18, 0.45], [22, 0.6]].every(([h, v]) => Math.abs(tp[h].enc - v) < 1e-9), tp);
+
   // 地圖出發條：極高配色＋hot
   await page.evaluate(() => { const G = window.SHL; G.toMap(); G.selectDest('qingwu'); });
   await page.waitForSelector('[data-testid=route-risk]');
   const rr = await page.evaluate(() => { const e = document.querySelector('[data-testid=route-risk]'); const cs = getComputedStyle(e); return { t: e.querySelector('b').textContent, hot: e.classList.contains('hot'), bg: cs.backgroundColor, bd: cs.borderTopColor, bw: cs.borderTopWidth }; });
   check('地圖趕路列「極高」：hot、底 #5a1f1a、2px 邊框 #c8463a', rr.t === '極高' && rr.hot && rr.bg === 'rgb(90, 31, 26)' && rr.bd === 'rgb(200, 70, 58)' && rr.bw === '2px', rr);
   await shot(page, 'fix1-05-map-extreme.png');
+
+  // ===== 10b. 修正輪 2：preview 的 risk ＝ travel() 遇襲判定實際用的 risk（同一個 routeRisk） =====
+  const enc = await page.evaluate(() => {
+    const G = window.SHL, D = window.SHL_DATA, S = G.state, W = S.world, d0 = Math.floor(S.t / 1440) * 1440;
+    W.tide = null; W.next = G.dayOf(S.t) + 99; W.region.B = D.WORLD.B_REF; W.towns.huiyao.O = D.WORLD.O_MEAN; W.towns.duyin.O = D.WORLD.O_MEAN;
+    const out = {};
+    [[6, 0], [17, 0], [19, 0], [19, 30]].forEach(([h, m]) => {
+      S.loc = 'huiyao'; S.scene = 'map'; S.combat = null; S.event = null; S.dead = null; S.hp = G.maxHp(); S.food = 100; S.fat = 0;
+      S.t = d0 + h * 60 + m; W.tide = null; W.next = G.dayOf(S.t) + 99;
+      const p = G.travelPreview('qingwu');
+      G._debug.HOOKS.lastEncRisk = null; S.dest = 'qingwu'; G.travel();
+      out[h + ':' + m] = { preview: p.risk, roll: G._debug.HOOKS.lastEncRisk, hours: p.hours, tier: p.riskName, R: p.R };
+    });
+    return out;
+  });
+  const encOk = (k, v, tier) => enc[k].hours === 2 && enc[k].R === 1 && enc[k].roll === enc[k].preview && Math.abs(enc[k].preview - v) < 1e-9 && enc[k].tier === tier;
+  check('[同一趟路] 清晨 06:00 出發 灰窯→青霧（2h 全在清晨）：preview risk ＝ 遇襲判定 risk ＝ 0.30×1.25 ＝ 0.375 高', encOk('6:0', 0.375, '高'), enc['6:0']);
+  check('[同一趟路] 黃昏 17:00 出發（2h 全在黃昏）：preview ＝ 遇襲判定 ＝ 0.30×1.5 ＝ 0.45 高', encOk('17:0', 0.45, '高'), enc['17:0']);
+  check('[同一趟路] 跨時段 19:00 出發（1h 黃昏＋1h 黑夜，mean(w)=0.75）：preview ＝ 遇襲判定 ＝ 0.525 高', encOk('19:0', 0.525, '高'), enc['19:0']);
+  check('[同一趟路] 跨時段 19:30 出發（30 分黃昏＋90 分黑夜，按時長加權 mean(w)=0.875）：preview ＝ 遇襲判定 ＝ 0.5625 高', encOk('19:30', 0.5625, '高'), enc['19:30']);
+  // 0.85 封頂只在所有乘項之後做一次：夜 ×2、超載 ×1.4、獸潮 ×1.5 中間值 1.26 > 0.85，再乘輕功 ×0.8、R_wild 0.5 → 0.504（若中途先封頂會是 0.34）
+  const cap = await page.evaluate(() => {
+    const G = window.SHL, S = G.state, W = S.world, d0 = Math.floor(S.t / 1440) * 1440;
+    S.loc = 'huiyao'; S.scene = 'map'; S.combat = null; S.event = null; S.dead = null; S.t = d0 + 21 * 60;
+    S.prof.jiao.lv = 25; S.pack = S.pack.map(() => null); for (let i = 0; i < 200 && G.loadBand().id !== 'heavy'; i++) G._debug.addItem({ k: 'ore_fe', n: 2 });
+    const day = G.dayOf(S.t); W.tide = { town: 'huiyao', start: day, end: day + 1, kills: 0, need: 99 };
+    W.region.B = 0; W.towns.huiyao.O = 100; W.towns.duyin.O = 100;
+    const lo = G.travelPreview('qingwu');
+    W.region.B = 200; W.towns.huiyao.O = 0; W.towns.duyin.O = 0;
+    const hi = G.travelPreview('qingwu');
+    G._debug.HOOKS.lastEncRisk = null; S.dest = 'qingwu'; G.travel(); const roll = G._debug.HOOKS.lastEncRisk;
+    return { band: G.loadBand().id, lo: { risk: lo.risk, R: lo.R, hours: lo.hours }, hi: { risk: hi.risk, R: hi.R, hours: hi.hours }, roll };
+  });
+  check('[封頂只一次] 夜×2、超載×1.4、獸潮×1.5、輕功×0.8、R_wild 0.5：0.504（中途先封頂會得 0.34）', cap.band === 'heavy' && cap.lo.R === 0.5 && cap.lo.hours <= 8 && Math.abs(cap.lo.risk - 0.504) < 1e-9, cap);
+  check('[封頂只一次] 同條件 R_wild 1.8：乘完 1.81 → 封頂 0.85，遇襲判定同值', cap.hi.R === 1.8 && cap.hi.risk === 0.85 && cap.roll === 0.85, cap);
 
   // ===== 11. 委託險級 questTier（SPEC-01 4.9、AC-E9、AC-E11、SPEC-TIME 7.1b） =====
   await fresh(page, base);
