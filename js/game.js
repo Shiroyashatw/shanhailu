@@ -274,13 +274,15 @@ window.SHL = (function () {
   }
   // ================= 取名（DEV-01／UI-01） =================
   // 硬規則（UI-01 §4）：姓 1–2 字、名 1–2 字，合計 2–4 個中文字；只收 CJK 統一漢字；不收空白、符號、英數。
-  // 不做「不得與命名 NPC 同名」檢查；禁字表這批不做（製作人 16:46 裁決第 3 項），預設「沈衡」維持合法。
+  // 自訂名只再擋「整名（姓＋名）與 NAME_TAKEN 完全相同」（取名禁字規則定稿 v1.0 §3；2026-11-28 17:52 mumi 拍板）。
+  // 不攔單字、不攔「包含」，不做其他字面檢查：滿、衡、單獨數字字、姓釋、悟X、性別輩分字、難字、勢力特徵單字都放行；預設「沈衡」合法。
   const CJK = /^[\u3400-\u4DBF\u4E00-\u9FFF\u{20000}-\u{2A6DF}\u{2A700}-\u{2EBEF}\u{30000}-\u{3134F}]$/u;
   function nameErrors(sur, given) {
     const a = Array.from(String(sur == null ? '' : sur)), b = Array.from(String(given == null ? '' : given));
     const errs = [];
     if (!a.concat(b).every((ch) => CJK.test(ch))) errs.push('chars');
     if (a.length < 1 || a.length > 2 || b.length < 1 || b.length > 2) errs.push('length');
+    if (!errs.length && D.NAME_TAKEN.includes(a.join('') + b.join(''))) errs.push('taken');
     return errs;
   }
   // 全名：S.name = { sur, given }

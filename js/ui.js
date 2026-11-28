@@ -218,7 +218,7 @@
     h += vit('ui_fat', '疲', S.fat, 100, 118, S.fat >= 80, 'fat', 'v-fat', '<b style="left:80%"></b>');
     const band = G.loadBand(); const c = S.combat;
     const sts = [
-      ['st_bleed', '血', c && c.bleed > 0, '流血'], ['st_poison', '毒', c && c.poison > 0, '中毒'], ['', '餓', S.food < 20, '飢餓：回復停滯'], ['', '倦', S.fat >= 80, '力竭：命中與速度下降'],
+      ['st_bleed', '血', c && c.bleed > 0, '流血'], ['st_poison', '毒', c && c.poison > 0, '中毒'], ['', '餓', S.food < 20, '飢餓：回復停滯'], ['', '倦', S.fat >= 80, '力竭：命中與腳程下降'],
       ['', '重', band.id === 'heavy' || band.id === 'over', '超載'], ['st_corrupt', '蝕', S.corrupt > 0, '侵蝕 ' + S.corrupt + '：生命上限 −' + S.corrupt],
     ].filter((x) => x[2]);
     h += '<div class="strow" data-testid="statuses">' + sts.map((x) => '<span class="stc" title="' + x[3] + '">' + ico(x[0], x[1], 16) + '</span>').join('') + '<span class="stt">護甲 ' + G.armor() + '・傷 ' + G.weaponDmg().join('–') + '</span></div>';
@@ -306,7 +306,7 @@
     return h + '</div></div>';
   }
   // ---------- 取名頁（UI-01 SHL-UI01-01）：中欄專頁，不寫入名字直到「確定」 ----------
-  const NAME_MSG = { chars: '不可使用英數、空白或符號。', length: '合計須為 2–4 個中文字。' };
+  const NAME_MSG = { chars: '不可使用英數、空白或符號', length: '合計須為 2–4 個中文字', taken: '這個名字已經有人用了' };
   const NAME_RULE = '只收中文，合計 2–4 字。預設「沈衡」，不想改也可以直接確定。';
   let nameDraft = { sur: D.NAME_DEFAULT.sur, given: D.NAME_DEFAULT.given };
   function nameRuleHtml(errs) { return errs.length ? errs.map((e) => '<div class="red" data-testid="name-err-' + e + '">' + NAME_MSG[e] + '</div>').join('') : '<div>' + NAME_RULE + '</div>'; }
