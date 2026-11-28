@@ -1,0 +1,231 @@
+# git diff 3fc260f..57a5b83 --stat
+ docs/design/batch1/specs/CHANGELOG.md              |  46 ++
+ docs/design/batch1/specs/SPEC-01.md                |  12 +-
+ docs/design/batch1/specs/SPEC-TIME.md              |  29 +-
+ .../shots-shanhailu-check11b-1128/README.md        |  17 +
+ .../shots-shanhailu-check11b-1128/check11b.js      | 190 +++++++++
+ .../shots-shanhailu-check11b-1128/check11b.log     |  27 ++
+ .../diff-4bb6f26-3fc260f.txt                       |  32 ++
+ .../shots-shanhailu-check11b-1128/e2e-dev02.log    |  94 +++++
+ .../evidence/shots-shanhailu-check11b-1128/e2e.log | 464 +++++++++++++++++++++
+ .../map-preview-di.png                             | Bin 0 -> 314591 bytes
+ .../map-preview-gao.png                            | Bin 0 -> 313855 bytes
+ .../map-preview-jigao.png                          | Bin 0 -> 314599 bytes
+ .../map-preview-zhong.png                          | Bin 0 -> 313334 bytes
+ .../shots-shanhailu-dev02-fix4-1128/e2e-dev02.log  | 102 +++++
+ .../shots-shanhailu-dev02-fix4-1128/e2e.log        | 463 ++++++++++++++++++++
+ .../fix4-jiku-risk-high.png                        | Bin 0 -> 261716 bytes
+ js/data.js                                         |   4 +-
+ js/game.js                                         |  57 ++-
+ tests/e2e-dev02.js                                 |  79 ++++
+ 19 files changed, 1577 insertions(+), 39 deletions(-)
+
+# 程式部分 diff（js/ tests/ index.html css/）
+diff --git a/js/data.js b/js/data.js
+index a5df305..8f02049 100644
+--- a/js/data.js
++++ b/js/data.js
+@@ -242,7 +242,7 @@ window.SHL_DATA = (function () {
+   };
+ 
+   WILDS.fuzhao = {
+-    risk: '中高', scene: '退水的沼地，黑水底下全是骨頭。',
++    risk: '高', scene: '退水的沼地，黑水底下全是骨頭。',
+     points: [
+       { id: 'h1', kind: 'herb', item: 'vine_du', max: 2, x: 150, y: 230, label: '毒藤' },
+       { id: 'm1', kind: 'ore', item: 'bog_iron', max: 2, x: 330, y: 270, label: '沼鐵' },
+@@ -270,7 +270,7 @@ window.SHL_DATA = (function () {
+       boss: { scroll: 'scroll_beng', loot: { blue: 0.6, rare: 0.4 }, silver: [20, 30] },
+     },
+     jiku: {
+-      risk: '中高', scene: '沉在淵底的古祭窟，潮氣與血腥味混雜。',
++      risk: '高', scene: '沉在淵底的古祭窟，潮氣與血腥味混雜。',
+       floors: [['serpent'], ['serpent', 'corpse'], ['shaman']],
+       floorNames: ['一層', '二層', '祭壇'],
+       loot: { blue: 0.5, rare: 0.4, legend: 0.1 }, silver: [16, 30],
+diff --git a/js/game.js b/js/game.js
+index 96dd6b9..d456b2e 100644
+--- a/js/game.js
++++ b/js/game.js
+@@ -696,10 +696,10 @@ window.SHL = (function () {
+     return out;
+   }
+   function route(from, to) {
+-    // Dijkstra：以基礎時數為權重，只走已知的地點
+-    // SPEC-TIME 7.1b／AC 20 tie-break：權重是（總時數, 野徑段數）的字典序——總時數相同時野徑段數少的優先，全官道最優先；
+-    // 不依賴 NODES／EDGES 的排列順序（兩鍵都相同的路線才可能因順序不同而換條，兩者時數與險級基礎相同）
+-    const dist = {}, wild = {}, prev = {}, Q = Object.keys(D.NODES).filter(known);
++    // Dijkstra 先求（總時數, 野徑段數）字典序最短，只走已知的地點；再在所有並列最短路線中依序比
++    // (3) 路線險值 risk3(routeRisk)（以呼叫當下的時段、負重、獸潮、R 計）較低者，(4) 節點 id 序列字典序較小者。
++    // SPEC-TIME 7.1b／AC 20、數值 18:14 裁定：結果不隨 NODES／EDGES 的排列順序或邊的端點寫法改變。
++    const dist = {}, wild = {}, Q = Object.keys(D.NODES).filter(known);
+     Q.forEach((k) => { dist[k] = Infinity; wild[k] = Infinity; }); dist[from] = 0; wild[from] = 0;
+     const better = (h1, w1, h2, w2) => h1 < h2 || (h1 === h2 && w1 < w2);
+     const left = new Set(Q);
+@@ -708,20 +708,43 @@ window.SHL = (function () {
+       left.delete(u);
+       neighbors(u).forEach(([v, e]) => {
+         const h = dist[u] + e.h, w = wild[u] + (e.road ? 0 : 1);
+-        if (better(h, w, dist[v], wild[v])) { dist[v] = h; wild[v] = w; prev[v] = [u, e]; }
++        if (better(h, w, dist[v], wild[v])) { dist[v] = h; wild[v] = w; }
+       });
+     }
+-    const edges = []; const stops = []; let c = to;
+-    while (c !== from && prev[c]) { edges.unshift(prev[c][1]); stops.unshift(c); c = prev[c][0]; }
+-    edges.stops = stops;
++    // 由終點倒推所有並列最短路線（只沿「剛好達到最短值」的邊）
++    const paths = [];
++    const walk = (c, edges, nodes) => {
++      if (c === from) { paths.push({ edges, nodes: [from].concat(nodes) }); return; }
++      neighbors(c).forEach(([u, e]) => {
++        if (nodes.includes(u) || dist[u] + e.h !== dist[c] || wild[u] + (e.road ? 0 : 1) !== wild[c]) return;
++        walk(u, [e].concat(edges), [c].concat(nodes));
++      });
++    };
++    if (from !== to && dist[to] < Infinity) walk(to, [], []);
++    const seq = (x, y) => { for (let i = 0; i < Math.min(x.length, y.length); i++) if (x[i] !== y[i]) return x[i] < y[i] ? -1 : 1; return x.length - y.length; };
++    paths.forEach((p) => (p.r = risk3(routeRisk(p.edges))));
++    paths.sort((x, y) => x.r - y.r || seq(x.nodes, y.nodes));
++    const edges = paths.length ? paths[0].edges : [];
++    edges.stops = paths.length ? paths[0].nodes.slice(1) : [];
+     return edges;
+   }
+-  // SPEC-TIME 7.1b 路程險級：先封頂 RISK_CAP，再 half-up 取三位（以千分位整數比較，防浮點：0.1495 → 150 →「中」），
++  // 路線險值：封頂 RISK_CAP 後的值（未取位）。travelPreview 與 route() 的第三層 tie-break 共用。
++  function routeRisk(edges) {
++    const band = loadBand();
++    const wild = edges.some((e) => !e.road);
++    let risk = wild ? (edges.length > 1 ? 0.3 : 0.22) : 0.04;
++    if (isNight(S.t)) risk *= 2;
++    if (band.id === 'heavy' || band.id === 'over') risk *= 1.4;
++    if (wild && perk('jiao', 25)) risk *= 0.8;
++    if (wild && tideOn()) risk *= 1.5;
++    // SPEC-01 §4.8「套用」：多乘治安／匪勢修正 R，封頂 0.85 在所有乘項之後做一次（夜間仍用現況 isNight；SPEC-TIME 7.1 屬 DEV-TIME）
++    return Math.min(D.WORLD.RISK_CAP, risk * riskR(wild));
++  }
++  // SPEC-TIME 7.1b：先封頂 RISK_CAP，再 half-up 取三位，回傳千分位整數（防浮點：0.1495 → 150）
++  function risk3(risk) { return Math.floor(Math.min(D.WORLD.RISK_CAP, risk) * 1000 + 0.5 + 1e-9); }
+   // 依 D.TIME.RISK_CUTS 半開區間分四檔。所有用到路程險級的地方都走這一個函式。
+   function riskTier(risk) {
+-    const r = Math.min(D.WORLD.RISK_CAP, risk);
+-    const k = Math.floor(r * 1000 + 0.5 + 1e-9);
+-    const cuts = D.TIME.RISK_CUTS; let i = 0;
++    const k = risk3(risk), cuts = D.TIME.RISK_CUTS; let i = 0;
+     while (i < cuts.length && k >= Math.round(cuts[i] * 1000)) i++;
+     return D.TIME.RISK_TIERS[i];
+   }
+@@ -735,14 +758,8 @@ window.SHL = (function () {
+     const fat = Math.round(3 * hours * band.fat * xingRed * (1 - affixSum('fatred') / 100));
+     const food = 4 * hours;
+     const wild = edges.some((e) => !e.road);
+-    let risk = wild ? (edges.length > 1 ? 0.3 : 0.22) : 0.04;
+-    if (isNight(S.t)) risk *= 2;
+-    if (band.id === 'heavy' || band.id === 'over') risk *= 1.4;
+-    if (wild && perk('jiao', 25)) risk *= 0.8;
+-    if (wild && tideOn()) risk *= 1.5;
+-    // SPEC-01 §4.8「套用」：多乘治安／匪勢修正 R，封頂 0.85 在所有乘項之後做一次（夜間仍用現況 isNight；SPEC-TIME 7.1 屬 DEV-TIME）
+     const R = riskR(wild);
+-    risk = Math.min(D.WORLD.RISK_CAP, risk * R);
++    const risk = routeRisk(edges);
+     const riskName = riskTier(risk);
+     const via = edges.length > 1 ? D.NODES[edges.stops[0]].name : (edges[0] && edges[0].road ? '官道' : '野徑');
+     return { edges, hours, fat, food, risk, riskName, mult: sm, via, wild, R };
+@@ -2023,7 +2040,7 @@ window.SHL = (function () {
+     clickPack, unequip, useItem, pickupGround, drag, identify, identifyFee, chooseOrigin,
+     backToTitle, confirmName, nameErrors, fullName, identity, randomName, fallbackName, wantedPoster,
+     place, bld, inBld, known, repOk, repOf, knownFactions, LORE,
+-    selectDest, travel, travelPreview, riskTier, toMap, enterHere, route, setMapView,
++    selectDest, travel, travelPreview, riskTier, routeRisk, toMap, enterHere, route, setMapView,
+     explore, exploreInfo, exploreChance, wildPoints,
+     setTab, selectShop, setQty, buy, sell, sellPrice, buyPrice, buysHere, rowLocked, shopRows, townPrice, avgPrice, innRest, innSoup, innCost, townHurt, service,
+     talk, streetTalk, streetClose, cheapRumor,
+diff --git a/tests/e2e-dev02.js b/tests/e2e-dev02.js
+index aa2732b..79b4280 100644
+--- a/tests/e2e-dev02.js
++++ b/tests/e2e-dev02.js
+@@ -459,6 +459,85 @@ async function fresh(page, base, q) {
+     check('自造情境測後 EDGES／NODES 已還原', syn.restored);
+   }
+ 
++  // ===== U. fix4：「中高」改「高」（數值 18:14 裁定、SPEC-TIME AC 21）；route() 第三、四層 tie-break =====
++  if (want('fix4')) {
++    await fresh(page, base);
++    const ids = await page.evaluate(() => { const D = window.SHL_DATA; return { wilds: Object.keys(D.WILDS), dgs: Object.keys(D.DUNGEONS), data: JSON.stringify({ w: D.WILDS, d: D.DUNGEONS, n: D.NODES, t: D.TIME }) }; });
++    check('[AC 21] 資料 WILDS／DUNGEONS／NODES／TIME 不含「中高」', !ids.data.includes('中高'));
++    const seen = {};
++    for (const id of ids.wilds.concat(ids.dgs)) {
++      await page.evaluate((id) => { const G = window.SHL; const S = G.state; S.known[id] = true; S.combat = null; S.event = null; S.dead = null; S.overlay = null; S.loc = id; G.enterHere(); }, id);
++      await page.waitForSelector(ids.wilds.includes(id) ? '[data-testid=wild]' : '[data-testid=dungeon]');
++      seen[id] = await page.evaluate(() => ({ body: document.body.innerText, pill: [...document.querySelectorAll('.stagehead .pill')].map((e) => e.textContent).find((t) => t.startsWith('險 ')) }));
++    }
++    const bad = Object.keys(seen).filter((k) => seen[k].body.includes('中高'));
++    check('[AC 21] 逐一進入全部荒野 ' + ids.wilds.length + ' 處、地城 ' + ids.dgs.length + ' 處，畫面不出現「中高」', bad.length === 0 && Object.keys(seen).length === ids.wilds.length + ids.dgs.length, { bad, pills: Object.fromEntries(Object.keys(seen).map((k) => [k, seen[k].pill])) });
++    check('[AC 21] 原「中高」的腐骨沼（荒野）、沉淵祭窟（地城）現顯示「險 高」', seen.fuzhao.pill === '險 高' && seen.jiku.pill === '險 高', { fuzhao: seen.fuzhao.pill, jiku: seen.jiku.pill });
++    if (WANT_SHOTS) {
++      await page.evaluate(() => { const G = window.SHL; const S = G.state; S.loc = 'jiku'; G.enterHere(); });
++      await page.waitForSelector('[data-testid=dungeon]');
++      const dirFix4 = path.join(ROOT, 'docs/evidence/shots-shanhailu-dev02-fix4-1128');
++      fs.mkdirSync(dirFix4, { recursive: true });
++      await page.screenshot({ path: path.join(dirFix4, 'fix4-jiku-risk-high.png'), clip: { x: 0, y: 0, width: 1280, height: 720 } });
++      console.log('SHOT  ' + path.relative(ROOT, path.join(dirFix4, 'fix4-jiku-risk-high.png')));
++    }
++    // 一段日誌：灰窯出發走到腐骨沼、露宿、再進沉淵祭窟，打開日誌掃字
++    const lg = await page.evaluate(() => {
++      const G = window.SHL; const S = G.state;
++      S.loc = 'huiyao'; G.enterHere(); S.hp = G.maxHp(); S.food = 100; S.fat = 0;
++      G.toMap(); G.selectDest('fuzhao'); G.travel();
++      S.combat = null; S.event = null; S.dead = null; S.loc = 'fuzhao'; G.enterHere(); G.camp();
++      S.combat = null; S.event = null; S.dead = null; S.loc = 'jiku'; G.enterHere();
++      S.overlay = null; G.setOverlay('log');
++      return { n: S.log.length, text: S.log.map((l) => l.text).join('\n') };
++    });
++    await page.waitForSelector('[data-testid=overlay-log]');
++    const logScr = await page.evaluate(() => document.body.innerText);
++    check('[AC 21] 日誌（含趕路、露宿、進地城共 ' + lg.n + ' 行）與日誌畫面不出現「中高」', lg.n > 0 && !lg.text.includes('中高') && !logScr.includes('中高'), lg.text.split('\n').slice(-6));
++    await page.evaluate(() => window.SHL.setOverlay('log'));
++
++    // route() 第三層（險值）、第四層（節點 id 序列）tie-break；每案 × EDGES 正常／反轉 × NODES 正常／反轉 × 端點對調
++    const rk = await page.evaluate(() => {
++      const G = window.SHL; const D = window.SHL_DATA; const S = G.state;
++      S.loc = 'huiyao'; S.scene = 'map'; S.t = Math.floor(S.t / 1440) * 1440 + 12 * 60; S.combat = null; S.event = null;
++      const cases = {
++        // 丙：直達野徑 2h（1 段野徑、單段 0.22×R）vs 經岔口 野徑 1h＋官道 1h（1 段野徑、多段 0.30×R）；節點序列字典序反而偏向經岔口 → 須由險值決定
++        丙: { edges: [{ a: 'huiyao', b: 'duyin', h: 2 }, { a: 'huiyao', b: 'chakou', h: 1 }, { a: 'chakou', b: 'duyin', h: 1, road: true }], go: 'huiyao,duyin', back: 'duyin,huiyao' },
++        // 丁：經驛站 野徑 1h＋官道 1h vs 經岔口 野徑 1h＋官道 1h：時數、野徑段數、險值都相同 → 節點 id 字典序小者（chakou < yizhan）
++        丁: { edges: [{ a: 'huiyao', b: 'yizhan', h: 1 }, { a: 'yizhan', b: 'duyin', h: 1, road: true }, { a: 'huiyao', b: 'chakou', h: 1 }, { a: 'chakou', b: 'duyin', h: 1, road: true }], go: 'huiyao,chakou,duyin', back: 'duyin,chakou,huiyao' },
++      };
++      // 丁的回程為 duyin→chakou(官道)→huiyao(野徑)，與 duyin→yizhan→huiyao 同樣三項相同
++      const keep = D.EDGES.slice(); const ks = Object.keys(D.NODES), vs = ks.map((k) => D.NODES[k]);
++      const setN = (rev) => { ks.forEach((k) => delete D.NODES[k]); (rev ? ks.slice().reverse() : ks).forEach((k) => (D.NODES[k] = vs[ks.indexOf(k)])); };
++      const seq = (from, e) => [from].concat(e.stops).join();
++      const out = {}, info = {};
++      Object.keys(cases).forEach((c) => [0, 1].forEach((er) => [0, 1].forEach((nr) => [0, 1].forEach((sw) => {
++        D.EDGES.length = 0;
++        let list = er ? cases[c].edges.slice().reverse() : cases[c].edges.slice();
++        if (sw) list = list.map((e) => Object.assign({}, e, { a: e.b, b: e.a }));
++        list.forEach((e) => D.EDGES.push(e)); setN(nr);
++        const go = G.route('huiyao', 'duyin'), back = G.route('duyin', 'huiyao');
++        const k = c + (er ? '・EDGES 反轉' : '・EDGES 正常') + (nr ? '・NODES 反轉' : '') + (sw ? '・端點對調' : '');
++        out[k] = seq('huiyao', go) === cases[c].go && seq('duyin', back) === cases[c].back;
++        if (!er && !nr && !sw) {
++          // 對照：兩條候選的（時數, 野徑段數, 險值三位）
++          const cand = c === '丙' ? [[list[0]], [list[1], list[2]]] : [[list[0], list[1]], [list[2], list[3]]];
++          info[c] = { go: seq('huiyao', go), back: seq('duyin', back), cand: cand.map((p) => [p.reduce((x, y) => x + y.h, 0), p.filter((y) => !y.road).length, Math.floor(G.routeRisk(p) * 1000 + 0.5 + 1e-9)]) };
++        } else if (!out[k]) info[k] = { go: seq('huiyao', go), back: seq('duyin', back) };
++      }))));
++      D.EDGES.length = 0; keep.forEach((e) => D.EDGES.push(e)); setN(0);
++      out.restored = D.EDGES.every((e, i) => e === keep[i]) && Object.keys(D.NODES).join() === ks.join();
++      return { out, info };
++    });
++    const ok = (c) => Object.keys(rk.out).filter((k) => k.startsWith(c));
++    const ci = rk.info.丙, di = rk.info.丁;
++    check('自造情境丙成立：兩條候選時數、野徑段數相同（2h、1 段），險值不同', ci && ci.cand[0][0] === ci.cand[1][0] && ci.cand[0][1] === ci.cand[1][1] && ci.cand[0][2] !== ci.cand[1][2], ci);
++    check('route() 第三層：時數、野徑段數相同 → 選險值低的（直達野徑）；× EDGES 正常／反轉 × NODES 正常／反轉 × 端點對調，來回 8 組全同', ok('丙').length === 8 && ok('丙').every((k) => rk.out[k]), rk.info);
++    check('自造情境丁成立：兩條候選時數、野徑段數、險值三位全同', di && JSON.stringify(di.cand[0]) === JSON.stringify(di.cand[1]), di);
++    check('route() 第四層：三項全同 → 選節點 id 序列字典序小的（經 chakou）；× EDGES 正常／反轉 × NODES 正常／反轉 × 端點對調，來回 8 組全同', ok('丁').length === 8 && ok('丁').every((k) => rk.out[k]), rk.info);
++    check('fix4 自造情境測後 EDGES／NODES 已還原', rk.out.restored);
++  }
++
+   // ===== 截圖（1280×720；本包無對應 UI 草稿） =====
+   if (want('shots')) {
+     await fresh(page, base);
