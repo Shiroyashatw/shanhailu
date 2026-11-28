@@ -510,9 +510,11 @@ window.SHL = (function () {
     S.nodes = {}; // 採集點每日回復
     if (S.dungeon) S.dungeon.clearedDay = null;
     log(fmtTime(S.t) + '，新的一天：採集點與貨架已回補。');
+    // DEV-04：§5.6 用「昨日結束值」的 Ō、P̄；townTick 會先改寫 P、O，所以在它之前記下（DEV-02 流程順序不變）
+    const ySnap = townSnap();
     worldTick(day);
     townTick(day);
-    regionTick(day);
+    regionTick(day, ySnap);
     restockShops();
     questTick(day);
     rumorTick(day);
@@ -1091,19 +1093,26 @@ window.SHL = (function () {
   // ================= 委託（任務板） =================
   function questReward(q) { return Math.round(q.reward * (perk('yi', 25) ? 1.1 : 1) * (repOk('dawn', 20) ? 1.15 : 1)); }
   function boardTowns() { return Object.keys(D.PLACES).filter((p) => D.PLACES[p].board); }
+  // DEV-04（SPEC-01 §4.9）：委託板種類權重。deliver ×clamp(P/50, 0.4, 1.6)；P 用該鎮最近一次日結後的值（假設：questTick 在 townTick 之後）
+  function questKinds(town) {
+    const base = D.QUEST_GEN.kinds[town] || { kill: 100 }; const t = townOf(town);
+    if (!t || base.deliver === undefined) return base;
+    return Object.assign({}, base, { deliver: base.deliver * clamp(t.P / 50, 0.4, 1.6) });
+  }
   function genQuests() {
     const day = dayOf(S.t); const G = D.QUEST_GEN;
     boardTowns().forEach((town) => {
       let n = S.quests.filter((q) => q.town === town && !q.fixed && q.status === 'open').length;
       let guard = 0;
       while (n < G.perTown && guard++ < 16) {
-        const kind = pickW(G.kinds[town] || { kill: 100 });
+        const kind = pickW(questKinds(town));
         const q = { id: 'q' + (++S.uid), town, kind, fixed: false, prog: 0, status: 'open' };
         if (kind === 'collect') {
           const [item, cnt] = pick(G.collect.pool);
           if (S.quests.some((x) => x.town === town && x.kind === 'collect' && x.item === item && x.status !== 'claimed')) continue;
           Object.assign(q, { item, need: cnt, g: D.ITEMS[item].g, ic: item, title: '收購' + D.ITEMS[item].name + ' ×' + cnt, reward: Math.round(D.PRICES[D.PLACES[town].price][item] * cnt * 1.8) + 6, due: day + G.collect.days });
         } else if (kind === 'kill') {
+          // DEV-04（§4.9 v0.5 18:19）：剿匪單延後到第 4 期匪窩；kill 類只從既有 8 張獵殺模板抽
           const [enemy, cnt, reward] = pick(G.kill.pool);
           if (S.quests.some((x) => x.kind === 'kill' && x.enemy === enemy && (x.status === 'open' || x.status === 'active'))) continue;
           Object.assign(q, { enemy, need: cnt, g: D.ENEMIES[enemy].g, ic: D.ENEMIES[enemy].ic || enemy, title: '獵殺' + D.ENEMIES[enemy].name + ' ×' + cnt, reward, due: day + G.kill.days });
@@ -1210,6 +1219,14 @@ window.SHL = (function () {
     S.rumors.push(r);
     return r;
   }
+  // DEV-04（SPEC-01 §4.9）：「有人盤踞」權重 ×min(crew, 4)/4，其餘真相權重不變（起手 crew 4 ＝ 現況；crew 0 → 0）。
+  // 假設：乞兒傳聞（盤踞 20）同樣按比例縮放。
+  function truthW(w) {
+    const R = S.world.region; if (!R) return w;
+    return Object.assign({}, w, { guard: w.guard * Math.min(R.crew, D.WORLD.GUARD_CREW_FULL) / D.WORLD.GUARD_CREW_FULL });
+  }
+  // 查探當下的真相：盤踞而據點人手 < 1 → 當作「已被取走」（〔既有〕gone 結果；A-03 規則本身不改）
+  function liveTruth(r) { const R = S.world.region; return r.truth === 'guard' && R && R.crew < 1 ? 'gone' : r.truth; }
   function newRumor(weights) {
     const kind = pickW({ cache: 40, vein: 30, beast: 30 });
     const K = D.RUMOR.kinds[kind];
@@ -1223,7 +1240,7 @@ window.SHL = (function () {
     if (S.rumors.length >= D.RUMOR.max) { log('傳聞記得太多了，先去查證幾則再說。', 'bad'); return emit(); }
     if (S.silver < cost) { log('銀兩不足，請不起酒。', 'bad'); return emit(); }
     S.silver -= cost; S.freeRumor[S.loc] = day;
-    const r = newRumor(D.RUMOR.truth);
+    const r = newRumor(truthW(D.RUMOR.truth));
     passTime(0.5, { food: 0, fat: 0 });
     gainProf('tan', 6);
     log((cost ? '請了一輪酒（' + cost + ' 兩）。' : '') + '聽來一則' + D.RUMOR.kinds[r.kind].name + '傳聞：' + r.text);
@@ -1236,7 +1253,7 @@ window.SHL = (function () {
     if (S.scene !== 'town' || !S.street || D.NPCS[S.street].act !== 'rumor') return;
     if (S.rumors.length >= D.RUMOR.max) { log('傳聞記得太多了，先去查證幾則再說。', 'bad'); return emit(); }
     if (!pay(1)) return;
-    const r = newRumor({ true: 20, guard: 20, strong: 10, gone: 35, bait: 15 });
+    const r = newRumor(truthW({ true: 20, guard: 20, strong: 10, gone: 35, bait: 15 }));
     gainProf('tan', 3);
     log('給了一文錢。' + D.NPCS[S.street].name + '說：' + r.text);
     if (r.hint) log('（探聞）' + r.hint, 'good');
@@ -1256,7 +1273,7 @@ window.SHL = (function () {
     const r = S.rumors.find((x) => x.id === id); if (!r || r.node !== S.loc || r.traced || !perk('zong', 25)) return;
     passTime(0.5, { fat: 1 }); if (S.dead) return commit();
     r.traced = true; gainProf('zong', 5, 30);
-    log('（辨痕）' + D.RUMOR.trace[r.truth], 'good');
+    log('（辨痕）' + D.RUMOR.trace[liveTruth(r)], 'good');
     commit();
   }
   function rumorReward(r, tier) {
@@ -1285,12 +1302,13 @@ window.SHL = (function () {
     const ev = { id: 'rumor', rid: r.id, dest: S.loc, result: null, dyn: { title: '查探傳聞・' + K.name, text: '', opts: [] } };
     S.event = ev; S.scene = 'event';
     const done = (t, cls) => { ev.result = t; log(t, cls); };
-    if (r.truth === 'true') {
+    const truth = liveTruth(r);
+    if (truth === 'true') {
       if (r.kind === 'beast') {
         ev.dyn.text = '循著血跡找到了那頭異獸，牠身上帶著舊傷，正伏在石後喘息。';
         ev.dyn.opts = [{ k: 'r_hunt', label: '趁牠帶傷動手', note: '入戰・敵方半血' }, { k: 'r_leave', label: '放過牠', note: '傳聞保留' }];
       } else { ev.dyn.text = '傳聞是真的，東西就在那裡，四下無人。'; done('到手：' + grantRumor(r, 1), 'good'); }
-    } else if (r.truth === 'gone') {
+    } else if (truth === 'gone') {
       ev.dyn.text = '來晚了。地上只剩翻開的土和一口空箱。';
       S.rumors = S.rumors.filter((x) => x.id !== r.id);
       if (rnd() < 0.3 && S.rumors.length < D.RUMOR.max) {
@@ -1298,10 +1316,10 @@ window.SHL = (function () {
         const r2 = addRumor(k2, n2, 'true');
         done('箱底壓著半張字條：' + r2.text, 'good');
       } else done('一無所獲。');
-    } else if (r.truth === 'guard') {
+    } else if (truth === 'guard') {
       ev.dyn.text = '已經有人先到了：兩個劫匪守在那裡，還沒把東西搬走。';
       ev.dyn.opts = [{ k: 'r_fight', label: '動手搶', note: '入戰・劫匪 ×2' }, { k: 'r_talk', label: '開口談分帳', note: '說服檢定・成則付 10 兩' }, { k: 'r_leave', label: '退走', note: '傳聞保留' }];
-    } else if (r.truth === 'strong') {
+    } else if (truth === 'strong') {
       ev.dyn.text = '洞口蹲著一頭山魈，正啃著上一個來查探的人。牠還沒發現你。';
       ev.dyn.opts = [{ k: 'r_boss', label: '硬闖', note: '入戰・山魈' }, { k: 'r_sneak', label: '悄悄退走', note: '身法檢定' }];
     } else {
@@ -1351,23 +1369,31 @@ window.SHL = (function () {
   // ================= 世界事件：獸潮 =================
   function worldTick(day) {
     const W = S.world; const T = D.TIDE;
+    repelToday = null; // DEV-04：只代表「本次日結」的擊退（townTick 末尾也會清）
     if (W.tide && day > W.tide.end) {
       const td = W.tide; const q = S.quests.find((x) => x.kind === 'tide');
+      // DEV-04（§5.4）：玩家殺滿，或守軍自衛擊退（wrnd('tide', day) < P_DEF[昨日 Geff]，不吃 S.rng）
+      const tw = townOf(td.town); const gY = tw ? tw.Geff : 0;
       if (td.kills >= td.need) {
         if (q) { q.status = 'done'; q.due = null; }
         repelToday = td.town;
         log('獸潮退了。' + D.NODES[td.town].name + '守住了，委託板可領「擊退獸潮」的賞。', 'good');
+      } else if (tw && wrnd('tide', day, 0) < D.WORLD.P_DEF[clamp(gY, 0, 3)]) {
+        S.quests = S.quests.filter((x) => x.kind !== 'tide'); // 玩家沒殺滿不領賞，賞金委託照〔既有〕撕榜
+        repelToday = td.town;
+        log('守軍擋下了獸潮。', 'good');
       } else {
         S.quests = S.quests.filter((x) => x.kind !== 'tide');
-        W.hurt[td.town] = day + T.hurtDays - 1;
-        log('獸潮沖進了' + D.NODES[td.town].name + '。城鎮受創 ' + T.hurtDays + ' 天：貨架剩一半、客棧漲價。', 'bad');
+        const hd = tw && gY >= 2 ? D.WORLD.HURT_DAYS_G2 : T.hurtDays; // §4.7：駐軍 ≥ 2 檔受創縮為 1 天
+        W.hurt[td.town] = day + hd - 1;
+        log('獸潮沖進了' + D.NODES[td.town].name + '。城鎮受創 ' + hd + ' 天：貨架剩一半、客棧漲價。', 'bad');
       }
       W.tide = null; W.next = day + wri('tide-gap', day, 0, T.gap[0], T.gap[1]); // E4：不吃 S.rng
     }
     if (!W.tide && day === W.next - 1) log('山裡的獸群躁動不安，城裡人說明天怕有獸潮。', 'bad');
     if (!W.tide && day >= W.next) {
-      // E4：目標鎮改用 wrnd；權重維持現況各 1/2（§4.7 的 O>80 權重屬 DEV-04，接口：權重恆 1）
-      const town = D.TIDE.towns[Math.floor(wrnd('tide-town', day, 0) * D.TIDE.towns.length)];
+      // E4：目標鎮用 wrnd；DEV-04（§4.7）權重 w = 1 + max(0, O − 80)/20（用昨日 O；兩鎮皆 ≤ 80 時與現況各 1/2 相同）
+      const town = tideTarget(day);
       W.tide = { town, start: day, end: day + T.days - 1, kills: 0, need: T.need };
       S.quests.push({ id: 'tide' + day, town, kind: 'tide', g: '潮', ic: 'wolf', title: '擊退獸潮', need: T.need, reward: T.reward, due: W.tide.end, fixed: false, prog: 0, status: 'active' });
       log('獸潮來了，直撲' + D.NODES[town].name + '！為期 ' + T.days + ' 天：獸跡變多、野徑更險、藥水漲價。殺滿 ' + T.need + ' 頭野獸可領賞。', 'bad');
@@ -1428,8 +1454,21 @@ window.SHL = (function () {
     if (wild) return clamp(1 + Wd.R_WILD.kB * (B - Wd.B_REF) - Wd.R_WILD.kO * (Obar - Wd.O_MEAN), Wd.R_WILD.lo, Wd.R_WILD.hi);
     return clamp(1 - Wd.R_ROAD.kO * (Obar - Wd.O_MEAN), Wd.R_ROAD.lo, Wd.R_ROAD.hi);
   }
-  // 獸潮對 P／O 的日結變動（§4.7、§5.4）屬 DEV-04：只留接口，DEV-04 之前恆為 0
-  function tideDelta(/* tid, day */) { return { p: 0, o: 0 }; }
+  // DEV-04（§4.7、§5.3、§5.4）：獸潮日、受創日、擊退當日對 P／O 的日結變動（之後才套 ±3 上限）
+  function tideDelta(tid, day) {
+    const Wd = D.WORLD; let p = 0, o = 0;
+    if (inTide(tid, day)) { p += Wd.TIDE_DAY.p; o += Wd.TIDE_DAY.o; }
+    if (townHurt(tid)) { p += Wd.HURT_DAY.p; o += Wd.HURT_DAY.o; }
+    if (repelToday === tid) { p += Wd.REPEL.p; o += Wd.REPEL.o; }
+    return { p, o };
+  }
+  function tideTarget(day) {
+    const towns = D.TIDE.towns, Wd = D.WORLD;
+    const w = towns.map((tid) => { const t = townOf(tid); return t ? 1 + Math.max(0, t.O - Wd.TIDE_W_O) / Wd.TIDE_W_SPAN : 1; });
+    let u = wrnd('tide-town', day, 0) * w.reduce((a, b) => a + b, 0);
+    for (let i = 0; i < towns.length; i++) { u -= w[i]; if (u < 0) return towns[i]; }
+    return towns[towns.length - 1];
+  }
   function inTide(tid, day) { const td = S.world.tide; return !!(td && td.town === tid && day >= td.start && day <= td.end); }
   // §5 第 2 步：每鎮依序 5.1 稅 → 5.2 軍費與實際駐軍 → 5.3 目標與更新 → 5.5 上繳；全部用「昨日結束時」的 P、O、B（同步更新）
   function townTick(day) {
@@ -1514,9 +1553,66 @@ window.SHL = (function () {
     });
     repelToday = null;
   }
-  // §5 第 3 步 regionTick（§5.6 匪勢與人手）：只留接口。SPEC-01 §13 歸 DEV-04，任務書寫「匪勢 B 在 DEV-04 之前維持起手值」，
-  // 劫匪、crew、據點被端留給 DEV-04（製作人 16:46 裁決第 6 項：DEV-02 只做 R 乘項與 0.85 封頂）；本包不更新 B、crew（維持起手 30／4）。
-  function regionTick(/* day */) { /* 待 DEV-04 */ }
+  // ================= 斷路幫與匪勢（SPEC-01 v0.4 §4.8、§5.6、§5.7；DEV-04） =================
+  // R 乘項與 0.85 封頂由 DEV-02 的 riskR／travelPreview 負責（16:46 裁決第 6 項），本段只更新它讀的 B 與 O。
+  function townSnap() {
+    const W = S.world; if (!W.towns) return null;
+    const o = {}; D.WORLD.TOWNS.forEach((tid) => (o[tid] = { P: W.towns[tid].P, O: W.towns[tid].O })); return o;
+  }
+  // §5 第 3 步 regionTick（§5.6）：兩鎮結算完後，用昨日結束值算 B*，B 每日靠攏 10%（±3），人手每 5 天往 crewCap 靠 1
+  function regionTick(day, ySnap) {
+    const W = S.world, Wd = D.WORLD, R = W.region; if (!W.towns || !R) return;
+    const y = ySnap || townSnap();
+    const Ob = (y.huiyao.O + y.duyin.O) / 2, Pb = (y.huiyao.P + y.duyin.P) / 2;
+    const Bstar = clamp(Wd.B_REF - Wd.B_OF_O * (Ob - Wd.O_MEAN) - Wd.B_OF_P * (Pb - Wd.P_MEAN) + Wd.B_HIGH_K * Math.max(0, Ob - Wd.B_HIGH_O) + Wd.B_PER_CREW * (R.crew - Wd.CREW_REF), 0, 100);
+    const dB = clamp(Wd.K_REG * (Bstar - R.B), -Wd.DAY_CAP, Wd.DAY_CAP);
+    R.B = r2(clamp(R.B + dB, 0, 100));
+    R.crewCtr += 1;
+    if (R.crewCtr >= Wd.CREW_PERIOD) {
+      R.crewCtr = 0;
+      const cap = Ob >= Wd.CREW_CAP_O ? Wd.CREW_CAP[1] : Wd.CREW_CAP[0];
+      if (R.crew < cap) R.crew = Math.min(cap, R.crew + 1);
+      else if (R.crew > cap) R.crew = R.crew - 1;
+    }
+    if (R.crew >= 1) R.crewWiped = false;
+  }
+  // §4.8／§5.7：每殺 1 名劫匪 B −2.5、crew −0.5（下限 0，不受日結 ±3 限制）；crew 由 > 0 降到 0 時「據點被端」一次
+  function banditKilled() {
+    const R = S.world.region, Wd = D.WORLD; if (!R) return;
+    const before = R.crew;
+    R.B = r2(Math.max(0, R.B - Wd.KILL_B));
+    R.crew = r2(Math.max(0, R.crew - Wd.KILL_CREW));
+    if (before > 0 && R.crew <= 0 && !R.crewWiped) {
+      R.crewWiped = true; addRep('dawn', Wd.WIPE_REP);
+      log('斷路幫的據點被端了。破曉軍團聲望 +' + Wd.WIPE_REP + '。', 'good');
+    }
+  }
+  // §4.6／§5.7 資助巡邏：在委託板建築（灰窯鎮衙、渡陰破曉募兵處）捐 N 兩進 F（Fcap 500，超過只收到上限）；
+  // 破曉聲望 +N/100，每日合計 ≤ 3。加派一檔在日結（DEV-02 §5.2）生效。投資巡邏所（Lpat）不在第一批，只留欄位。
+  function aidInfo() {
+    const t = S.scene === 'town' ? townOf(S.loc) : null; if (!t || !inBld('board')) return null;
+    const Wd = D.WORLD; const day = dayOf(S.t); const ar = S.world.aidRep && S.world.aidRep.day === day ? S.world.aidRep.n : 0;
+    const d = Wd.UPKEEP[Math.min(t.Gnom + 1, 3)] - Wd.UPKEEP[t.Gnom];
+    return { town: S.loc, F: t.F, Fcap: Wd.F_CAP, room: Math.max(0, Wd.F_CAP - t.F), step: d, days: d > 0 ? Math.floor(t.F / d) : 0,
+      Gnom: t.Gnom, Geff: t.Geff, can: t.Gnom < 3, repToday: r2(ar), repLeft: r2(Math.max(0, Wd.AID_REP_DAY - ar)), units: Wd.AID_UNITS };
+  }
+  function aidPatrol(n) {
+    n = n | 0; const a = aidInfo(); if (!a || S.combat || S.dead) return;
+    if (!D.WORLD.AID_UNITS.includes(n)) return;
+    if (!a.can) { log('這裡的駐軍已是最高一檔，資助收不下。', 'bad'); return emit(); } // E3
+    const take = Math.min(n, a.room);
+    if (take <= 0) { log('指定軍費已滿（' + a.Fcap + ' 兩），先等它用掉一些。', 'bad'); return emit(); }
+    if (S.silver < take) { log('銀兩不足。', 'bad'); return emit(); }
+    const t = townOf(S.loc); const day = dayOf(S.t);
+    S.silver -= take; t.F = r2(t.F + take);
+    if (!S.world.aidRep || S.world.aidRep.day !== day) S.world.aidRep = { day, n: 0 };
+    const rep = Math.min(take * D.WORLD.AID_REP_PER, Math.max(0, D.WORLD.AID_REP_DAY - S.world.aidRep.n));
+    S.world.aidRep.n = r2(S.world.aidRep.n + rep);
+    if (rep > 0) addRep('dawn', rep);
+    const days = Math.floor(t.F / a.step);
+    log('資助' + D.NODES[S.loc].name + '巡邏 ' + take + ' 兩' + (take < n ? '（軍費已到上限，只收 ' + take + ' 兩）' : '') + '。指定軍費 ' + Math.round(t.F) + ' 兩，約可加派一檔 ' + days + ' 天，從下次日結起。' + (rep > 0 ? '破曉軍團聲望 +' + rep + '。' : ''), 'good');
+    commit();
+  }
   // 交易稅（§4.3、§5.7，Q1 乙）：只在賣出時扣，floor(得銀 × 5%) 進該鎮 T；買價與 sellPrice 顯示值不變
   function tradeTax(got) {
     const t = townOf(S.loc); if (!t) return 0; // 假設：只有兩鎮（灰窯、渡陰）課稅；破曉營等非鎮地點不課
@@ -1831,6 +1927,7 @@ window.SHL = (function () {
     log(e.name + '倒下了。', 'good');
     fx({ t: 'kill', i: e.idx });
     questProgress('kill', e.id);
+    if (e.id === 'bandit') banditKilled();
     if (E.beast) { questProgress('beast'); if (S.world.tide && tideOn()) S.world.tide.kills++; }
     if (E.drop && rnd() < E.drop[1]) S.combat.drops.push({ k: E.drop[0], n: 1 });
     if (hasUnique('kill_heal')) S.hp = Math.min(maxHp(), S.hp + 8);
@@ -2179,10 +2276,12 @@ window.SHL = (function () {
     talk, streetTalk, streetClose, cheapRumor,
     questAct, questsHere, questReady, questReward, questWhere, trackedQuest, activeQuests,
     hearRumor, rumorsHere, traceRumor, investigate, tideInfo,
+    aidInfo, aidPatrol,
     craft, canCraftHere, gather, gatherFat, camp, nodeState, dungeonDelve,
     combatAction, combatActions, combatOrder, takeFx, toggleRetreat, toggleDrop, retreatChance, selWt, setTarget, playerSpeed, lootDone,
     eventChoose, eventDone, setOverlay, setProfTab, setJournalTab, sysCamp,
     _debug: { passTime, sleepFoodCost, addItem, die, startCombat, newEq, gainProf, addRumor, worldTick, lootEq, addRep, addCodex, addCorrupt,
-      townTick, newDay, wrnd, tradeTax, HOOKS, setNoise: (on) => { NOISE = !!on; }, rnd },
+      townTick, newDay, wrnd, tradeTax, HOOKS, setNoise: (on) => { NOISE = !!on; }, rnd,
+      regionTick, banditKilled, tideDelta, tideTarget, truthW, liveTruth, genQuests, killEnemy, victory },
   };
 })();

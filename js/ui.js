@@ -773,6 +773,7 @@
     h += '<div class="note" style="top:474px" data-testid="quest-foot">' + Q.foot + (act ? '　你在別處還有：' + cut(act, 40) : '') + '</div>';
     return h;
   }
+  // DEV-04 資助巡邏：函式在 game.js（aidInfo／aidPatrol）；按鈕位置在 DEV-05 城況簡報（製作人 17:52），由較晚進 main 的那包接線，本包不放鈕
 
   // ---------- 傳聞現場（荒野／地城共用） ----------
   function rumorChips(S) {
@@ -1206,6 +1207,7 @@
       case 'identifyPay': return G.identify(+v, true);
       case 'hearRumor': return G.hearRumor();
       case 'bounty': return G.questAct(v);
+      case 'aid': return G.aidPatrol(+v);
       case 'trace': return G.traceRumor(v);
       case 'investigate': return G.investigate(v);
       case 'craft': return G.craft(v);
