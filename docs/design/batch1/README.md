@@ -19,6 +19,9 @@
 | `rollout-plan-v0.1.md` | `/workspace/shanhai-sandbox-gdd/proposals/rollout-plan-v0.1.md`（2026-11-28 16:13 版） |
 | `specs/SPEC-01.md`、`specs/SPEC-TIME.md`、`specs/SPEC-02.md`、`specs/CHANGELOG.md` | `/workspace/shanhai-sandbox-gdd/proposals/specs/`（SPEC-TIME v0.4；SPEC-01 v0.4，16:50 追加 AC-A7＝23／15／+8；SPEC-02 v0.4，16:41 更新含 K1 複驗；CHANGELOG 同步放入） |
 | `decisions-producer-1128-1646.md` | 遊戲製作人 16:46 裁決原文（7 項），後續 session 以本檔為準 |
+| `decisions-producer-1128-1726.md` | 製作人 17:04 裁決（DEV-01 說書人台詞、右欄兩行）與 17:26／mumi 17:25 批（DEV-02 cflash 間隔 ≥400ms，對照 UI-FX X12） |
+| `decisions-producer-1128-1727.md` | 製作人 17:30／mumi 17:27 拍板：腳程四檔與 hover 定稿、血霧→紅霧、鎮公所→鎮衙、委託險級、地面格繼續扣住 |
+| `UI-FX/` | `/workspace/shanhailu-batch1/UI-FX/`（含 `FX-LIST.md`／`FX-LIST.csv` 的 X12；`__pycache__`／`.pyc` 未放） |
 | `batch1-decisions-v0.1.md`、`city-status-copy-v0.1.csv`、`names-final-v0.1.csv`、`name-pool-v0.1.csv` | `/workspace/shanhai-sandbox-gdd/proposals/` |
 | `UI-01/`、`UI-02/` | `/workspace/shanhailu-batch1/UI-01/`、`UI-02/`（UI-02 含 `wording-map-commission.md`） |
 
@@ -26,10 +29,12 @@
 
 - 規格基準程式是 `main @ dd3843b`；UI 草稿對照的是 `main @ de91435231ed`。實作時以目前 main 為準，行號與位置可能已變，要先在目前 main 上確認。
 - `UI-01/`、`UI-02/` 的 `src/__pycache__/*.pyc`（Python 編譯快取）沒有放進來，其餘整個資料夾（PNG、`html/`、`src/*.py`、`_tools/`）照放。
-- 沒有放入 `SPEC-03.md`、`UI-FX/`、其他 `proposals/` 檔案與各種 `.bak-*` 舊版。
+- 沒有放入 `SPEC-03.md`、其他 `proposals/` 檔案與各種 `.bak-*` 舊版。`UI-FX/` 已於 17:28 補入（見後續更新）。
 - 草稿（UI-01、UI-02）是灰階版面稿，只定版面與互動，實作要套專案現有色票與字級，不照草稿的白底灰框。
 
 
 ## 後續更新
 
 - 2026-11-28 16:51（台北時間 UTC+8）：放進 `specs/SPEC-02.md`（16:41，K1 複驗已回並通過，新增 Q-K1d；Q-K1b／Q-K2d 本身已在 16:28 寫進上一版）、`specs/SPEC-01.md` 與 `specs/CHANGELOG.md`（檔案 mtime 16:48:30，正文標「v0.4 追加 16:50」：AC-A7 改為 `treasuryIn／Out／Net`＝23／15／+8，`T = 207.96`）。另增 `decisions-producer-1128-1646.md`（製作人 16:46 裁決 7 項原文）。與先前 brief 假設衝突時，以該裁決檔為準。
+- 2026-11-28 17:28（台北時間 UTC+8）：補入 `UI-FX/`（來源 `/workspace/shanhailu-batch1/UI-FX/`，不含 `__pycache__`／`.pyc`），以及 `decisions-producer-1128-1726.md`（17:04 的 DEV-01 第 6、7 項；17:26／mumi 17:25 批：cflash 節流在 `ui.js` 呈現層，每秒最多 3 次、間隔至少 400ms，對照 FX-LIST X12，不綁回合結構，這批其他地方一律不動戰鬥）。
+- 2026-11-28 17:31（台北時間 UTC+8）：另增 `decisions-producer-1128-1727.md`（製作人 17:30、mumi 17:27 拍板 6 項）。腳程改由 DEV-05 顯示「檔名 ×倍率」與定稿 hover；全域「血霧→紅霧」「鎮公所→鎮衙」等 DEV-02～05 合併後另開 textsweep；地面格與 DEV-DROP 繼續扣住。
