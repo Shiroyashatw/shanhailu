@@ -364,7 +364,7 @@ window.SHL_DATA = (function () {
     np_zhang: { name: '駝背張', title: '茶攤老闆' }, np_ma: { name: '馬六', title: '天星行商' },
     np_bone: { name: '撿骨師', title: '', codex: ['c_bonepicker'] }, np_chiya: { name: '赤鴉', title: '鴉衛', codex: ['c_crow', 'c_chiya'] },
     np_aman: { name: '阿滿', title: '乞兒', fig: 'fig_child', act: 'rumor' },
-    np_story: { name: '說書人', title: '', fig: 'fig_elder', codex: ['c_geo', 'c_gods'] },
+    np_story: { name: '灰窯說書人', title: '', fig: 'fig_elder', codex: ['c_geo', 'c_gods'] },
     np_miner: { name: '老礦工', title: '', fig: 'fig_man', codex: ['c_fall'] },
     np_refugee: { name: '難民婦人', title: '', fig: 'fig_woman', quest: 'b_refugee', codex: ['c_kiln'] },
     np_wounded: { name: '傷兵', title: '破曉軍團', fig: 'fig_soldier', codex: ['c_army'] },
@@ -552,14 +552,21 @@ window.SHL_DATA = (function () {
   ];
   const WTYPE_NAMES = { dao: '刀劍', qiang: '長兵', fu: '斧錘', gong: '弓弩' };
 
-  // ---------- 出身 ----------
+  // ---------- 身分（DEV-01 開局平民化：出身只剩「平民」一張卡，沿用舊「流民」數值） ----------
+  // 假設：內部 id 保留 'drifter'（存檔欄位 S.origin、頭像 pl_drifter 都沿用），畫面顯示「平民」。
+  // 假設：卡片說明沿用舊流民說明（UI-01 草稿只畫「身分／平民」，沒有給卡片說明文字）。
   const ORIGINS = [
-    { id: 'hunter', name: '獵戶', desc: '山裡長大，認得獸跡。', attr: { ling: 12, shen: 11, kou: 8 }, prof: { zong: 20, bo: 16, gong: 12 }, gear: ['bow', 'robe'], silver: 50 },
-    { id: 'herbalist', name: '藥童', desc: '跟過藥鋪師傅，識得百草。', attr: { wu: 12, ling: 11, li: 8 }, prof: { cai: 20, yao: 16, jian: 10 }, gear: ['blade_rust', 'robe'], silver: 50, items: [['pot_hp', 2]] },
-    { id: 'miner', name: '礦工', desc: '灰窯鎮的苦力，一身蠻力。', attr: { li: 12, ti: 12, kou: 8, wu: 8 }, prof: { kuang: 20, fuz: 16, fu: 12 }, gear: ['hammer', 'robe'], silver: 50 },
-    { id: 'deserter', name: '逃兵', desc: '從渡陰關逃下來，只會打仗。', attr: { li: 11, ti: 11, xin: 11, kou: 8, wu: 9 }, prof: { dao: 20, dun: 14, zhong: 10 }, gear: ['blade_short', 'buckler', 'robe'], silver: 25 },
-    { id: 'peddler', name: '行商', desc: '挑擔走街，嘴上功夫了得。', attr: { kou: 13, wu: 11, li: 8, ti: 9 }, prof: { yi: 20, jiao: 14, tan: 12 }, gear: ['blade_rust', 'robe'], silver: 110 },
-    { id: 'drifter', name: '流民', desc: '什麼都不會，什麼都能學。', attr: {}, prof: {}, gear: ['blade_rust', 'robe'], silver: 60 },
+    { id: 'drifter', name: '平民', desc: '什麼都不會，什麼都能學。', attr: {}, prof: {}, gear: ['blade_rust', 'robe'], silver: 60 },
+  ];
+  // 開局取名：預設名（不在池內）與整池 60 組（姓、名），原樣取自 docs/design/batch1/name-pool-v0.1.csv，順序與用字不改
+  const NAME_DEFAULT = { sur: '沈', given: '衡' };
+  const NAME_POOL = [
+    ['郝', '朔'], ['柏', '戎'], ['巢', '岩'], ['岳', '樵'], ['滕', '莽'], ['莘', '月'], ['茅', '葦'], ['紀', '谷'], ['卜', '雁'], ['芮', '秋'],
+    ['祁', '禾'], ['韋', '溪'], ['岑', '苗'], ['舒', '苓'], ['管', '沐'], ['譚', '荷'], ['尹', '若'], ['宓', '芹'], ['蒲', '穗'], ['杭', '柔'],
+    ['柯', '磐'], ['盧', '炭'], ['卓', '錘'], ['鈕', '魁'], ['裴', '厚'], ['井', '秀'], ['鄒', '桂'], ['竇', '香'], ['池', '蘭'], ['萬', '菊'],
+    ['賀', '固'], ['常', '垣'], ['靳', '北'], ['尚', '嶺'], ['解', '戈'], ['藺', '棠'], ['尤', '晴'], ['涂', '素'], ['步', '南'], ['成', '映'],
+    ['汪', '季航'], ['駱', '載行'], ['傅', '津渡'], ['盛', '車馬'], ['奚', '瀾舟'], ['鮑', '綺羅'], ['練', '晚泊'], ['邢', '繡織'], ['俞', '市南'], ['梅', '書柬'],
+    ['包', '拴'], ['黎', '河'], ['史', '陌'], ['安', '麥'], ['喬', '路'], ['倪', '招弟'], ['甘', '細妹'], ['戴', '盼兒'], ['宋', '芋頭'], ['翁', '阿彩'],
   ];
 
   const SEASONS = ['春', '夏', '秋', '冬'];
@@ -569,5 +576,5 @@ window.SHL_DATA = (function () {
   const SLOT_NAMES = { main: '主手', off: '副手', head: '頭盔', chest: '胸甲', gloves: '手套', boots: '靴子', amulet: '護身符', ring1: '左戒', ring2: '右戒', belt: '腰帶', bag: '背包', cart: '馬車' };
   const SLOT_GLYPH = { main: '刃', off: '盾', head: '冠', chest: '甲', gloves: '手', boots: '靴', amulet: '符', ring1: '戒', ring2: '戒', belt: '帶', bag: '囊', cart: '車' };
 
-  return { ITEMS, SKILLS, TECHS, BASES, AFFIXES, UNIQUES, LEGENDS, RARITY, ENEMIES, NODES, EDGES, REGION_LABELS, WILDS, DUNGEONS, PRICES, PLACES, BUILDINGS, ITEM_CLASS, NPCS, FACTIONS, EXPLORE, CODEX_CATS, BOUNTIES, QUEST_GEN, RUMOR, TIDE, SLEEP, WORLD, RECIPES, EVENTS, ATTRS, PROFS, PROF_GROUPS, WTYPE_NAMES, ORIGINS, SEASONS, YEAR_NAMES, EQ_SLOTS, SLOT_NAMES, SLOT_GLYPH };
+  return { ITEMS, SKILLS, TECHS, BASES, AFFIXES, UNIQUES, LEGENDS, RARITY, ENEMIES, NODES, EDGES, REGION_LABELS, WILDS, DUNGEONS, PRICES, PLACES, BUILDINGS, ITEM_CLASS, NPCS, FACTIONS, EXPLORE, CODEX_CATS, BOUNTIES, QUEST_GEN, RUMOR, TIDE, SLEEP, WORLD, RECIPES, EVENTS, ATTRS, PROFS, PROF_GROUPS, WTYPE_NAMES, ORIGINS, NAME_DEFAULT, NAME_POOL, SEASONS, YEAR_NAMES, EQ_SLOTS, SLOT_NAMES, SLOT_GLYPH };
 })();

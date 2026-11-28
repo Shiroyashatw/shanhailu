@@ -1,6 +1,6 @@
 /* 《山海錄》灰盒 v0.3 — 自動化互動驗證（Node + Playwright，headless Chromium）
  * 用法：node tests/e2e.js [--shots]
- *   --shots  另存 1280×720 實機截圖至 docs/evidence/shots-v03/（環境變數 SHOTS_DIR 可改目錄）
+ *   --shots  另存 1280×720 實機截圖至 docs/evidence/shots-v03/（可用環境變數 SHL_SHOTS_DIR 或 SHOTS_DIR 改寫到別的資料夾，路徑相對 repo 根目錄）
  * 驗證：1280×720 單屏無捲動／無溢出／無文字重疊、三欄 240/796/220、24 小時制；
  *       城鎮平面圖（建築、路人、老闆、各種服務）、每個地點可走可探查、隱藏地點、大陸圖、見聞錄、勢力聲望；
  *       戰鬥行動列（武器／招式／技能／道具）、點人形武器出手、狀態、演出佇列、棄物撤退；
@@ -13,8 +13,9 @@ const path = require('path');
 const { chromium } = require('playwright');
 
 const ROOT = path.resolve(__dirname, '..');
-// SHOTS_DIR 環境變數可改寫截圖目錄（DEV-02：寫到 docs/evidence/shots-shanhailu-dev02-1128/，不覆蓋 shots-v03）
-const SHOTS = process.env.SHOTS_DIR ? path.resolve(ROOT, process.env.SHOTS_DIR) : path.join(ROOT, 'docs/evidence/shots-v03');
+// SHL_SHOTS_DIR（DEV-01）或 SHOTS_DIR（DEV-02）環境變數可改寫截圖目錄，路徑相對 repo 根目錄；預設 shots-v03
+const SHOTS_REL = process.env.SHL_SHOTS_DIR || process.env.SHOTS_DIR || 'docs/evidence/shots-v03';
+const SHOTS = path.resolve(ROOT, SHOTS_REL);
 const WANT_SHOTS = process.argv.includes('--shots');
 const SEED = 20261127;
 
@@ -644,19 +645,139 @@ async function exploreUntil(page, pred, max) {
   s = await st(page);
   check('戰至永久死亡 → 墓誌銘', s.scene === 'dead' && (await has(page, 'epitaph')), s.dead && s.dead.cause);
   const epi = await page.textContent('[data-testid=epitaph]');
-  check('墓誌銘含死因、卒時、出身、享年、素質、探得與見聞', /死因/.test(epi) && /卒於第 \d+ 日 \d{2}:\d{2}/.test(epi) && /流民・享年 \d+/.test(epi) && /體魄 \d+/.test(epi) && /見聞 \d+\/25/.test(epi), epi.replace(/\s+/g, ' ').slice(0, 100));
+  check('墓誌銘含死因、卒時、出身、享年、素質、探得與見聞', /死因/.test(epi) && /卒於第 \d+ 日 \d{2}:\d{2}/.test(epi) && /平民出身・享年 \d+/.test(epi) && /體魄 \d+/.test(epi) && /見聞 \d+\/25/.test(epi), epi.replace(/\s+/g, ' ').slice(0, 100));
   check('純永久死亡：存檔已刪除', (await page.evaluate(() => localStorage.getItem('shanhailu.save'))) === null);
   await audit(page, '死亡墓誌銘');
   await shot(page, '20-death-epitaph.png');
   await click(page, 'btn-restart');
   s = await st(page);
-  check('一鍵重開：先選出身（6 種，各有頭像）', s.scene === 'origin' && (await page.$$('[data-testid^=origin-]')).length === 6 && (await page.$$('.oface .px')).length === 6);
-  await audit(page, '出身選擇');
+  check('一鍵重開：回到標題頁，只有一張「平民」卡（有頭像）', s.scene === 'origin' && (await page.$$('[data-testid^=origin-]')).length === 1 && (await page.$$('.oface .px')).length === 1 && (await page.textContent('[data-testid=origin-drifter]')).includes('平民'));
+  await audit(page, '標題頁');
   await shot(page, '00-origin.png');
-  await click(page, 'origin-hunter');
+  await shot(page, '21-title.png');
+
+  // ===== 18b. DEV-01 取名＋開局平民化 =====
+  const noOrigin = async (label) => { const t = await page.evaluate(() => document.getElementById('app').innerText.replace(/平民出身/g, '')); check('[' + label + '] 畫面上沒有「出身」兩字（墓誌副標「平民出身」除外）', !t.includes('出身'), (t.match(/.{0,8}出身.{0,8}/) || [''])[0]); };
+  await noOrigin('標題頁');
+  const odata = await page.evaluate(() => window.SHL_DATA.ORIGINS);
+  check('ORIGINS 只剩一張「平民」，沿用流民數值（素質全 10、銀 60、鏽刃＋布衣、無熟練度）', odata.length === 1 && odata[0].name === '平民' && odata[0].id === 'drifter' && Object.keys(odata[0].attr).length === 0 && Object.keys(odata[0].prof).length === 0 && odata[0].silver === 60 && odata[0].gear.join() === 'blade_rust,robe', odata.map((o) => o.id + ':' + o.name));
+  const csvRows = fs.readFileSync(path.join(ROOT, 'docs/design/batch1/name-pool-v0.1.csv'), 'utf8').replace(/^\uFEFF/, '').trim().split(/\r?\n/).slice(1).map((l) => l.split(','));
+  const pool = await page.evaluate(() => window.SHL_DATA.NAME_POOL);
+  check('NAME_POOL 與 name-pool-v0.1.csv 60 組（姓、名）逐組一致，且預設「沈衡」不在池內', csvRows.length === 60 && pool.length === 60 && csvRows.every((r, i) => pool[i][0] === r[2] && pool[i][1] === r[3] && r[2] + r[3] === r[4]) && !pool.some((p) => p[0] + p[1] === '沈衡'), pool.length);
+  await click(page, 'origin-drifter');
   s = await st(page);
-  check('選獵戶：回到灰窯鎮街上 第 1 日 08:00、滿血、新存檔', s.scene === 'town' && s.loc === 'huiyao' && s.t === 480 && s.hp === 80 && !s.dead && (await page.evaluate(() => !!localStorage.getItem('shanhailu.save'))));
-  check('獵戶起手：靈覺 12、追蹤 20、剝皮 16、獵弓', s.attr.ling === 12 && s.prof.zong.lv === 20 && s.prof.bo.lv === 16 && s.equip.main.base === 'bow');
+  const nameVals = async () => page.evaluate(() => ({ sur: document.querySelector('[data-testid=name-sur]').value, given: document.querySelector('[data-testid=name-given]').value, prev: document.querySelector('[data-testid=name-preview]').textContent, right: document.querySelector('[data-testid=pname]').textContent, age: document.querySelector('[data-testid=age]').textContent, ok: !document.querySelector('[data-testid=btn-name-confirm]').disabled, rule: document.querySelector('[data-testid=name-rule]').textContent }));
+  // 製作人 17:04 (7)：右欄名字兩行。第一行 {姓}{名}、第二行 {身分}・{年齡}歲；第二行在第一行正下方、同左緣；
+  // 兩行與地點／日期膠囊、銀兩、時鐘、命條都不重疊，且都在右欄（左 1054、寬 220）與 1280×720 之內（以 #col-right 實際框為準）
+  const twoLine = async (label, full) => {
+    const m = await page.evaluate(() => {
+      const r = (q) => { const e = document.querySelector(q); if (!e) return null; const b = e.getBoundingClientRect(); return { l: Math.round(b.left), t: Math.round(b.top), r: Math.round(b.right), b: Math.round(b.bottom), text: e.textContent }; };
+      return { name: r('[data-testid=pname]'), age: r('[data-testid=age]'), loc: r('[data-testid=loc]'), date: r('[data-testid=date]'), silver: r('.silver'), clock: r('[data-testid=clock]'), hp: r('[data-testid=hp]'), right: r('#col-right'), sw: document.documentElement.scrollWidth, sh: document.documentElement.scrollHeight };
+    });
+    const ov = (a, b) => a && b && a.l < b.r && b.l < a.r && a.t < b.b && b.t < a.b;
+    const others = ['loc', 'date', 'silver', 'clock', 'hp'];
+    const hits = []; for (const k of ['name', 'age']) for (const o of others) if (ov(m[k], m[o])) hits.push(k + '×' + o);
+    if (ov(m.name, m.age)) hits.push('name×age');
+    const inside = [m.name, m.age, m.loc, m.date].every((b) => b && m.right && b.l >= m.right.l && b.r <= m.right.r && b.t >= m.right.t && b.b <= Math.min(720, m.right.b));
+    check('[' + label + '] 右欄名字兩行：第一行「' + full + '」、第二行「平民・20歲」，第二行在第一行下方同左緣、不與膠囊／銀兩／時鐘／命條重疊、無全頁捲動',
+      m.name.text === full && m.age.text === '平民・20歲' && m.age.t >= m.name.b && m.age.l === m.name.l && !hits.length && inside && m.sw <= 1280 && m.sh <= 720,
+      JSON.stringify({ right: m.right, name: m.name, age: m.age, loc: m.loc, date: m.date, silver: m.silver, clock: m.clock, hp: m.hp, hits, sw: m.sw, sh: m.sh }));
+  };
+  let nv = await nameVals();
+  check('點「平民」卡進中欄取名頁：預設姓「沈」名「衡」、預覽與右欄即時顯示「沈衡・平民」、確定可按', s.scene === 'naming' && s.name === null && nv.sur === '沈' && nv.given === '衡' && nv.prev === '沈衡' && nv.right === '沈衡' && nv.age.startsWith('平民・') && nv.ok && (await has(page, 'name-identity')) && (await page.textContent('[data-testid=name-identity]')).includes('平民'), nv);
+  await audit(page, '取名頁（合法）');
+  await noOrigin('取名頁');
+  await shot(page, '22-naming-valid.png');
+  await click(page, 'btn-name-back');
+  s = await st(page);
+  check('返回標題：退回標題頁、不寫入名字、沒有存檔', s.scene === 'origin' && s.name === null && (await page.evaluate(() => localStorage.getItem('shanhailu.save'))) === null && (await page.$$('[data-testid^=origin-]')).length === 1);
+  await click(page, 'origin-drifter');
+  const typeName = async (sur, given) => { await page.fill('[data-testid=name-sur]', sur); await page.fill('[data-testid=name-given]', given); return nameVals(); };
+  const cases = [
+    ['ab', '衡', ['chars']], ['沈', '1', ['chars']], ['沈 ', '衡', ['chars']], ['沈', '衡!', ['chars']], ['沈', 'ㄅ', ['chars']],
+    ['', '衡', ['length']], ['沈', '', ['length']], ['沈', '衡衡衡', ['length']], ['歐陽司', '衡', ['length']], ['a', '衡衡衡', ['chars', 'length']],
+  ];
+  for (const [su, gi, want] of cases) {
+    nv = await typeName(su, gi);
+    const errs = await page.evaluate(() => Array.from(document.querySelectorAll('[data-testid^=name-err-]')).map((e) => e.getAttribute('data-testid').slice(9)));
+    check('取名不合法「' + su + '｜' + gi + '」：確定熄滅、顯示固定句 ' + want.join('＋'), !nv.ok && errs.join() === want.join() && (want.includes('chars') ? nv.rule.includes('不可使用英數、空白或符號。') : true) && (want.includes('length') ? nv.rule.includes('合計須為 2–4 個中文字。') : true), { errs, rule: nv.rule });
+  }
+  nv = await typeName('a', '衡衡衡');
+  check('不合法時點確定不會開局', (await page.evaluate(() => { window.SHL.confirmName('a', '衡衡衡'); return window.SHL.state.scene; })) === 'naming');
+  await audit(page, '取名頁（不合法提示）');
+  await shot(page, '23-naming-invalid.png');
+  for (const [su, gi] of [['沈', '衡'], ['包', '拴'], ['汪', '季航'], ['歐陽', '衡'], ['歐陽', '明月']]) {
+    nv = await typeName(su, gi);
+    check('取名合法「' + su + gi + '」：確定可按、預覽與右欄同步', nv.ok && nv.prev === su + gi && nv.right === su + gi && nv.rule.includes('只收中文'), nv);
+  }
+  const rng0 = (await st(page)).rng; const seen = new Set(); let allIn = true;
+  for (let i = 0; i < 40; i++) {
+    await page.click('[data-testid=btn-name-random]');
+    nv = await nameVals();
+    seen.add(nv.sur + nv.given);
+    if (!pool.some((p) => p[0] === nv.sur && p[1] === nv.given) || nv.prev !== nv.sur + nv.given || nv.right !== nv.prev || !nv.ok) allIn = false;
+  }
+  check('隨機鈕：抽到的都是名池 60 組之一、預覽與右欄同步、不動遊戲亂數 S.rng', allIn && seen.size > 5 && (await st(page)).rng === rng0, [...seen].slice(0, 6).join('、') + '…共 ' + seen.size + ' 種');
+  nv = await typeName('歐陽', '明月');
+  await twoLine('取名頁輸入中預覽', '歐陽明月');
+  await shot(page, '30-naming-preview-twoline.png');
+  await click(page, 'btn-name-confirm');
+  s = await st(page);
+  const savedName = await page.evaluate(() => JSON.parse(localStorage.getItem('shanhailu.save')).state.name);
+  check('確定後：S.name = { sur, given } 寫入存檔，在灰窯鎮街上 第 1 日 08:00、滿血', s.scene === 'town' && s.loc === 'huiyao' && s.t === 480 && s.hp === 80 && !s.dead && JSON.stringify(s.name) === JSON.stringify({ sur: '歐陽', given: '明月' }) && JSON.stringify(savedName) === JSON.stringify(s.name), s.name);
+  check('平民起手：素質全 10、無起手熟練度、鏽刃＋布衣、銀 60', Object.values(s.attr).every((v) => v === 10) && Object.values(s.prof).every((p) => p.lv === 0) && s.equip.main.base === 'blade_rust' && s.equip.chest.base === 'robe' && s.silver === 60 && s.origin === 'drifter');
+  check('日誌醒來句用自取名字：「歐陽明月（平民）在灰窯鎮醒來。」', s.log.some((l) => l.text.startsWith('歐陽明月（平民）在灰窯鎮醒來。')) && (await page.textContent('[data-testid=log]')).includes('歐陽明月（平民）在灰窯鎮醒來。'));
+  check('右欄頭像旁：全名＋「平民・N歲」（UI-01 §4 格式 {身分}・{年齡}歲）', (await page.textContent('[data-testid=pname]')) === '歐陽明月' && /^平民・\d+歲$/.test(await page.textContent('[data-testid=age]')), await page.textContent('.pname'));
+  await twoLine('開局後', '歐陽明月');
+  check('懸賞令欄位預留：名字可讀到（緝拿 {全名}，賞銀 n 兩，死活不論）', (await page.evaluate(() => window.SHL.wantedPoster(250).text)) === '緝拿 歐陽明月，賞銀 250 兩，死活不論');
+  await audit(page, '醒來（自取名字）');
+  await noOrigin('醒來街上');
+  await check24h(page, '醒來街上');
+  await shot(page, '24-wake-log-right.png');
+  // 製作人 17:04 (6)：灰窯說書人用玩家姓稱「{姓}客官」（UI-01 圖 02）。用非常見姓「歐陽」，不是預設「沈」
+  await click(page, 'npc-np_story');
+  const storySay = await page.textContent('[data-testid=say]');
+  const storyName = await page.textContent('[data-testid=street-dialog] .sname b');
+  check('說書人對白帶玩家姓：「歐陽客官，要在鎮裡聽段舊事嗎？」（名牌「灰窯說書人」）', storySay === '歐陽客官，要在鎮裡聽段舊事嗎？' && storyName === '灰窯說書人' && !(await page.textContent('[data-testid=street-dialog]')).includes('{sur}'), { storySay, storyName });
+  check('說書人對白模板放在資料檔 lore.js（ui.js 不寫死整句）', (await page.evaluate(() => window.SHL_LORE.NPC.np_story.greet.join('|'))) === '{sur}客官，要在鎮裡聽段舊事嗎？' && !fs.readFileSync(path.join(ROOT, 'js/ui.js'), 'utf8').includes('要在鎮裡聽段舊事'));
+  await twoLine('說書人對話時', '歐陽明月');
+  await audit(page, '說書人對話（歐陽客官）');
+  await shot(page, '31-storyteller-surname.png');
+  await click(page, 'btn-street-close');
+  await click(page, 'sys-log');
+  check('日誌 overlay：醒來句寫自取名字', (await page.textContent('[data-testid=overlay-log]')).includes('歐陽明月（平民）在灰窯鎮醒來。'));
+  await noOrigin('日誌 overlay');
+  await shot(page, '25-log-overlay.png');
+  await click(page, 'sys-log');
+  await click(page, 'sys-char');
+  check('人物 overlay：標題「人物・歐陽明月（平民・N 歲）」', /^人物・歐陽明月（平民・\d+ 歲）$/.test(await page.textContent('[data-testid=char-title]')), await page.textContent('[data-testid=char-title]'));
+  await noOrigin('人物 overlay');
+  await shot(page, '26-char-overlay.png');
+  await click(page, 'sys-char');
+  // 舊存檔：沒有姓名結構（舊版存的是字串「沈衡」，或沒有 name 欄）→ 讀檔時後備名固定「沈衡」並寫回（製作人 16:46 裁決第 2 項）
+  const expect = ['沈', '衡'];
+  const seedOrig = s.seed;
+  const reloadWith = async (mut, seed) => {
+    await page.evaluate(([m, sd]) => { const w = JSON.parse(localStorage.getItem('shanhailu.save')); if (m === 'string') w.state.name = '沈衡'; else if (m === 'other') w.state.name = '郝朔'; else delete w.state.name; if (sd != null) w.state.seed = sd; localStorage.setItem('shanhailu.save', JSON.stringify(w)); }, [mut, seed == null ? null : seed]);
+    await page.goto(base + 'index.html?fx=0'); await page.waitForSelector('[data-testid=town]'); await settle(page);
+    return page.evaluate(() => ({ name: window.SHL.state.name, saved: JSON.parse(localStorage.getItem('shanhailu.save')).state.name, right: document.querySelector('[data-testid=pname]').textContent }));
+  };
+  const SHEN = JSON.stringify({ sur: '沈', given: '衡' });
+  let fb = await reloadWith('string');
+  check('舊存檔（name 為字串）載入：後備名固定「沈衡」並寫回存檔、右欄顯示「沈衡」', JSON.stringify(fb.name) === SHEN && JSON.stringify(fb.saved) === SHEN && fb.right === expect[0] + expect[1], fb);
+  await page.goto(base + 'index.html?fx=0'); await page.waitForSelector('[data-testid=town]');
+  const fb2 = await page.evaluate(() => window.SHL.state.name);
+  fb = await reloadWith('missing');
+  check('舊存檔後備名穩定：同一存檔重讀、或 name 欄整個不見，都得到「沈衡」', JSON.stringify(fb2) === SHEN && JSON.stringify(fb.name) === SHEN, fb.name);
+  const seedFb = [];
+  for (const sd of [1, 7, 12345, 987654321]) seedFb.push(JSON.stringify((await reloadWith('missing', sd)).name));
+  fb = await reloadWith('other', seedOrig); // 最後一次讀檔把 seed 還原，不影響後續測試
+  check('後備名不依 seed、不抽名池：不同 seed 的無姓名存檔、或舊字串非「沈衡」，一律讀成「沈衡」', seedFb.every((x) => x === SHEN) && JSON.stringify(fb.name) === SHEN, seedFb.concat(JSON.stringify(fb.name)));
+  check('fallbackName() 固定回傳「沈衡」，且「沈衡」不在名池內', (await page.evaluate(() => [0, 1, 2].map((sd) => JSON.stringify(window.SHL.fallbackName(sd))))).every((x) => x === SHEN) && !pool.some((r) => r[0] + r[1] === '沈衡'));
+  check('禁字表本批不做：nameErrors 不攔「沈衡」，也不攔三、七、九、滿、衡', await page.evaluate(() => window.SHL.nameErrors('沈', '衡').length === 0 && ['三', '七', '九', '滿', '衡'].every((c) => window.SHL.nameErrors('沈', c).length === 0)));
+  await page.evaluate(() => { window.SHL.state.name = { sur: '歐陽', given: '明月' }; window.SHL.save(); });
+  await page.goto(base + 'index.html?fx=0'); await page.waitForSelector('[data-testid=town]'); await settle(page);
+  check('有姓名結構的存檔讀回不被改寫', JSON.stringify((await st(page)).name) === JSON.stringify({ sur: '歐陽', given: '明月' }));
 
   // ===== 19. 拖拉道具 =====
   const center = async (sel) => { const b = await (await page.$(sel)).boundingBox(); return [b.x + b.width / 2, b.y + b.height / 2]; };
@@ -695,7 +816,7 @@ async function exploreUntil(page, pred, max) {
   s = await st(page);
   check('拖拉：行囊→交易欄＝賣出', s.silver > s2.silver && cnt(s, 'bread') < cnt(s2, 'bread'));
   check('拖拉結束後沒有殘留的拖影', (await page.$$('.ghost, .dropok, .dragsrc')).length === 0);
-  await audit(page, '市集（獵戶）');
+  await audit(page, '市集（平民）');
 
   // ===== 20. 視窗等比縮放 =====
   for (const [vw, vh] of [[1280, 600], [1024, 576], [1600, 900], [900, 800]]) {
@@ -718,6 +839,18 @@ async function exploreUntil(page, pred, max) {
   await click(page, 'sys-log');
   await page.evaluate(() => { window.SHL._debug.passTime(14); window.SHL.save(); window.SHL.toMap(); });
   await check24h(page, '夜間 22:00');
+
+  // ===== 22. DEV-01：死亡日誌與墓誌銘用自取名字 =====
+  await page.evaluate(() => { const G = window.SHL; G.state.loc = 'huiyao'; G.enterHere(); G._debug.die('測試死因'); G.setProfTab(G.state.profTab); });
+  await settle(page);
+  s = await st(page);
+  check('死亡日誌：「{全名}死於{地名}：{死因}」', s.log.some((l) => l.text === '歐陽明月死於灰窯鎮：測試死因'), s.log.slice(-1)[0]);
+  check('墓誌銘題「歐陽明月之墓」、副標「平民出身・享年 N・卒於…」、epitaph.name 為全名字串', (await page.textContent('[data-testid=epitaph-title]')) === '歐陽明月之墓' && /^平民出身・享年 \d+・卒於第 \d+ 日 \d{2}:\d{2}・灰窯鎮$/.test(await page.textContent('[data-testid=epitaph-sub]')) && s.dead.epitaph && s.dead.epitaph.name === '歐陽明月' && s.dead.name === '歐陽明月', await page.textContent('[data-testid=epitaph-sub]'));
+  check('死亡後右欄名字仍在', (await page.textContent('[data-testid=pname]')) === '歐陽明月');
+  await audit(page, '墓誌銘（自取名字）');
+  await noOrigin('墓誌銘');
+  await check24h(page, '墓誌銘');
+  await shot(page, '27-epitaph-named.png');
 
   check('console 0 error', consoleErrors.length === 0, consoleErrors.slice(0, 5));
 
