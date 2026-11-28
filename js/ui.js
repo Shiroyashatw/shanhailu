@@ -906,11 +906,24 @@
     el.appendChild(f);
   }
   function pulse(el, cls) { if (!el) return; el.classList.remove(cls); void el.offsetWidth; el.classList.add(cls); }
-  // 戰鬥紅閃 cflash 預算：任意 1 秒 ≤ 3 次（batch1 X-g 甲；rollout-plan DEV-02）。兩次閃光至少相隔 350ms（≥ 334ms，留一格影格的餘裕），太近的那次只略過閃光，震動與數字照播。
-  const CFLASH_GAP = 350; let lastCflash = -1e9;
+  // 全屏閃光預算（呈現層節流，不綁回合結構）：17:26 裁決＋FX-LIST X12——每秒 ≤ 3 次、相鄰間隔 ≥ 400ms（原為 350ms），超過則收。
+  // 只決定「這一下要不要亮」，不碰戰鬥規則層（傷害、行動佇列、命中判定都不經過這裡）；被收掉的那次只略過閃光，震動與數字照播。
+  // 日後行動條或其他非命中的全屏閃光要沿用時，共用同一個 flashBudget 即可（同一預算、同一計數）。
+  // gap 另加約一影格（17ms）餘裕：閃光在下一個繪製影格才真正開播，加餘裕後玩家實際看到的開播間隔仍 ≥ 400ms。
+  function makeFlashBudget(opt) {
+    const gap = opt.gap + (opt.frameSlack || 0), perSec = opt.perSec; let hist = [];
+    return function allow() {
+      const now = performance.now();
+      hist = hist.filter((t) => now - t < 1000);
+      if (hist.length && now - hist[hist.length - 1] < gap) return false;
+      if (hist.length >= perSec) return false;
+      hist.push(now); return true;
+    };
+  }
+  const flashBudget = makeFlashBudget({ gap: 400, perSec: 3, frameSlack: 17 });
   function flashOnce(stage) {
-    const now = performance.now(); if (now - lastCflash < CFLASH_GAP) return;
-    lastCflash = now; pulse(stage.querySelector('.cflash'), 'on');
+    if (!flashBudget()) return;
+    pulse(stage.querySelector('.cflash'), 'on');
   }
   function setEhp(el, hp) { if (!el) return; const max = +el.getAttribute('data-max') || 1; const bar = el.querySelector('.ehp > i'); const num = el.querySelector('.ehpn'); if (bar) bar.style.width = (Math.max(0, hp / max) * 100).toFixed(1) + '%'; if (num) num.textContent = Math.max(0, hp) + '/' + max; }
   function setPhp(el, hp) { if (!el) return; const max = +el.getAttribute('data-max') || 1; const bar = el.querySelector('.php > i'); const num = el.querySelector('.phpn'); if (bar) bar.style.width = (Math.max(0, hp / max) * 100).toFixed(1) + '%'; if (num) num.textContent = Math.max(0, hp) + '/' + max; }

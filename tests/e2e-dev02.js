@@ -303,9 +303,10 @@ async function fresh(page, base, q) {
     check('AC-J4（wrnd 隔離部分）每天多耗 37 次 S.rng：40 天內獸潮開始日、結束日、目標鎮與 PNOISE 結果完全相同（有無資助的完整比較待 DEV-04）', j4.a.tides === j4.b.tides && j4.a.pn === j4.b.pn && j4.n >= 3, j4.a.tides);
   }
 
-  // ===== C. 戰鬥 cflash 每秒次數（完成標準 4；最壞情況：4 隻最快的敵人、敵我連續行動、持續傷害） =====
+  // ===== C. 戰鬥 cflash 預算（完成標準 4＋17:26 裁決／FX-LIST X12：每秒 ≤3 次、間隔 ≥400ms；最壞情況：4 隻最快的敵人、敵我連續行動、持續傷害） =====
   if (want('cflash')) {
-    for (const mode of ['natural', 'mash200', 'mash250', 'mash300', 'mash350']) {
+    const cflashLog = [];
+    for (const mode of ['natural', 'mash200', 'mash250', 'mash300', 'mash350', 'mash400']) {
       await page.goto(base + 'index.html?seed=' + SEED + '&fresh=1&origin=drifter'); // 演出開啟
       await page.waitForSelector('[data-testid=town]');
       await page.evaluate(() => {
@@ -335,8 +336,16 @@ async function fresh(page, base, q) {
       let max = 0, at = 0;
       for (let i = 0; i < ts.length; i++) { let j = i; while (j < ts.length && ts[j] - ts[i] < 1000) j++; if (j - i > max) { max = j - i; at = i; } }
       const gaps = ts.slice(1).map((x, i) => Math.round(x - ts[i]));
-      check('[cflash/' + (mode === 'natural' ? '等演出播完再出手' : '連按鍵盤（每 ' + mode.slice(4) + 'ms）') + '] 任意 1 秒滑動視窗內 cflash ≤ 3 次', max <= 3 && (mode !== 'natural' || ts.length > 5), { total: ts.length, maxPerSec: max, minGapMs: gaps.length ? Math.min(...gaps) : null, sampleGaps: gaps.slice(at, at + 6) });
+      const minGap = gaps.length ? Math.min(...gaps) : null;
+      const lbl = '[cflash/' + (mode === 'natural' ? '等演出播完再出手' : '連按鍵盤（每 ' + mode.slice(4) + 'ms）') + '] ';
+      const info = { total: ts.length, maxPerSec: max, minGapMs: minGap, sampleGaps: gaps.slice(at, at + 6) };
+      cflashLog.push(Object.assign({ mode }, info));
+      check(lbl + '任意 1 秒滑動視窗內 cflash ≤ 3 次（X12）', max <= 3 && (mode !== 'natural' || ts.length > 5), info);
+      // 量測的是玩家真正看到的 CSS 動畫開播（animationstart）時間戳，門檻不留容差：≥ 400ms
+      check(lbl + '相鄰兩次 cflash 間隔 ≥ 400ms（17:26 裁決，由 350ms 改）', ts.length < 2 || minGap >= 400, info);
     }
+    if (WANT_SHOTS) { fs.mkdirSync(SHOTS, { recursive: true }); fs.writeFileSync(path.join(SHOTS, 'cflash-measure.json'), JSON.stringify(cflashLog, null, 1)); }
+    console.log('CFLASH ' + JSON.stringify(cflashLog.map((c) => ({ mode: c.mode, total: c.total, maxPerSec: c.maxPerSec, minGapMs: c.minGapMs }))));
   }
 
   // ===== 截圖（1280×720；本包無對應 UI 草稿） =====
