@@ -1,0 +1,25 @@
+32cbfb5405d7e46a594186399b0d947d98a52017
+--- run 1
+結果：37/37 PASS
+--- run 2
+結果：37/37 PASS
+--- run 3
+結果：37/37 PASS
+--- run 4
+FAIL  [走動] 灰窯 7 個走動者 800ms 內全部移動  — {"moved":6,"of":7}
+結果：36/37 PASS，1 FAIL
+--- run 5
+結果：37/37 PASS
+--- run 6
+結果：37/37 PASS
+--- run 7
+FAIL  [走動] 灰窯 7 個走動者 800ms 內全部移動  — {"moved":6,"of":7}
+結果：36/37 PASS，1 FAIL
+--- run 8
+結果：37/37 PASS
+--- run 9
+FAIL  [走動] 灰窯 7 個走動者 800ms 內全部移動  — {"moved":6,"of":7}
+結果：36/37 PASS，1 FAIL
+--- run 10
+FAIL  [走動] 灰窯 7 個走動者 800ms 內全部移動  — {"moved":6,"of":7}
+結果：36/37 PASS，1 FAIL

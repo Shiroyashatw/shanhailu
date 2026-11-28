@@ -686,3 +686,8 @@ h4 { margin-top: 0; }
 .fperks { display: flex; gap: 6px; margin-top: 6px; flex-wrap: wrap; }
 .fperks span { border: 1px solid var(--line-soft); padding: 1px 8px; font-size: 11px; color: var(--ink-3); }
 .fperks span.got { border-color: var(--jade); color: var(--jade); }
+/* DEV-03 街上走動的匿名路人與巡邏（不可點，壓在有職位者與對話框之下） */
+.walkers { position: absolute; left: 0; top: 0; width: 796px; height: 520px; pointer-events: none; z-index: 2; }
+.walker { position: absolute; left: 0; top: 0; width: 32px; height: 32px; pointer-events: none; will-change: transform; }
+.walker .px { filter: drop-shadow(0 2px 1px rgba(0, 0, 0, .7)); }
+.walker.anon .px { opacity: .92; }
