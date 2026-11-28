@@ -1,5 +1,5 @@
-/* 《山海錄》灰盒 v0.25 — 靜態資料表
- * 依據：docs/design/GDD-v0.25.md（增修）、GDD-v0.2.md、UIUX-v2-README.md
+/* 《山海錄》灰盒 v0.3 — 靜態資料表
+ * 依據：docs/design/GDD-v0.3.md
  * 所有數值皆為「15 分鐘可玩灰盒初版平衡」，待數值設計定案。
  */
 'use strict';
@@ -26,17 +26,46 @@ window.SHL_DATA = (function () {
     pig_iron: { name: '生鐵', g: '錠', wt: 3, stack: 5, type: 'goods', desc: '灰窯鎮特產，渡陰關收價高（跑商可選）。' },
     yam: { name: '山藥', g: '薯', wt: 2, stack: 5, type: 'goods', desc: '渡陰關特產，灰窯鎮收價高（跑商可選）。' },
     smoked: { name: '燻皮', g: '燻', wt: 2, stack: 5, type: 'goods', desc: '渡陰關特產，灰窯鎮收價高（跑商可選）。' },
+    poison_oil: { name: '淬毒油', g: '毒', wt: 1, stack: 5, type: 'use', use: { oil: 1 }, combatOnly: true, desc: '戰鬥中塗在武器上：本場命中有五成機會使敵中毒。' },
+    antidote: { name: '解毒丸', g: '解', wt: 1, stack: 5, type: 'use', use: { cure: 1 }, desc: '解除中毒。' },
+    tea: { name: '粗茶', g: '茶', wt: 1, stack: 5, type: 'use', use: { fat: -10, food: 5 }, desc: '疲累 −10、飽食 +5。' },
+    bog_iron: { name: '沼鐵', g: '沼', wt: 4, stack: 3, type: 'mat', dl: 25, desc: '腐骨沼泥裡的鏽鐵，鐵匠肯出好價。' },
+    leech_gland: { name: '蛭腺', g: '腺', wt: 1, stack: 5, type: 'mat', desc: '沼蛭的毒腺，可製解毒丸。' },
+    dogtag: { name: '軍牌', g: '牌', wt: 1, stack: 5, type: 'mat', desc: '遠征軍的軍牌。破曉營軍需帳與撿骨師都收。' },
+    bone_relic: { name: '神骨碎片', g: '骨', wt: 2, stack: 3, type: 'mat', desc: '嵌在裂口岩壁裡、微微發光的骨頭。撿骨師重金收。' },
+    blood_moss: { name: '血苔', g: '苔', wt: 1, stack: 10, type: 'mat', desc: '長在血霧裡的苔，藥鋪收。' },
+    incense: { name: '線香', g: '香', wt: 0, stack: 5, type: 'quest', desc: '三炷線香。可以拿去窯神廟。' },
     parcel: { name: '委託包裹', g: '包', wt: 3, stack: 1, type: 'quest', desc: '送貨委託的包裹。送到指定城鎮的委託板交付。' },
     scroll_beng: { name: '崩岩擊殘卷', g: '卷', ic: 'scroll', wt: 1, stack: 1, type: 'scroll', skill: 'beng', desc: '點擊研讀：習得主動技「崩岩擊」。' },
     scroll_xi: { name: '調息殘卷', g: '卷', ic: 'scroll', wt: 1, stack: 1, type: 'scroll', skill: 'xi', desc: '點擊研讀：習得被動技「調息」。' },
   };
 
-  // ---------- 技能（不靠升級點數；殘卷與探索取得） ----------
+  // ---------- 技能（殘卷與勢力傳授；不靠熟練度） ----------
+  // active：出現在戰鬥行動列；cost＝增加的疲累；cd＝冷卻回合
   const SKILLS = {
-    beng: { name: '崩岩擊', g: '崩', kind: '主', cd: 3, desc: '主動：造成 170% 傷害並無視防禦，冷卻 3 回合。' },
-    xi: { name: '調息', g: '息', kind: '被', desc: '被動：戰鬥每回合回復 2 生命；露宿疲累回復 +25%。' },
-    jixing: { name: '疾行', g: '疾', kind: '被', desc: '被動：撤退率 +10%，趕路疲累 −10%。' },
+    beng: { name: '崩岩擊', g: '崩', ic: 's_beng', kind: '主', active: true, cost: 5, cd: 3, src: '亂葬古窯首領的殘卷', desc: '170% 傷害，無視防禦。' },
+    xi: { name: '調息', g: '息', ic: 's_xi', kind: '被', src: '沉淵祭窟首領的殘卷', desc: '戰鬥每回合回復 2 生命；露宿疲累回復 +25%。' },
+    jixing: { name: '疾行', g: '疾', ic: 's_jixing', kind: '被', src: '路旁古碑', desc: '撤退率 +10%，趕路疲累 −10%。' },
+    pozhen: { name: '破陣', g: '陣', ic: 's_pozhen', kind: '主', active: true, cost: 6, cd: 5, src: '破曉軍團（聲望 10）', desc: '攻擊全體 90%，打斷所有蓄力。' },
+    yaying: { name: '鴉影', g: '鴉', ic: 's_yaying', kind: '主', active: true, cost: 4, cd: 5, src: '鴉衛（聲望 14）', desc: '本回合敵人的攻擊必定落空，本場撤退率 +30%。' },
   };
+
+  // ---------- 招式：靠熟練度解鎖，跟著手上的武器走 ----------
+  // prof＝對應熟練度；lv＝門檻；mult＝傷害倍率；其餘旗標見 game.js useTech()
+  const TECHS = [
+    { id: 't_slash', prof: 'dao', lv: 10, name: '橫斬', g: '斬', cost: 4, cd: 3, mult: 0.7, all: true, desc: '攻擊全體，70% 傷害。' },
+    { id: 't_execute', prof: 'dao', lv: 30, name: '奪命', g: '奪', cost: 6, cd: 4, mult: 1.5, vsBleed: 2, desc: '150% 傷害；對流血的敵人 200%。' },
+    { id: 't_thrust', prof: 'qiang', lv: 10, name: '突刺', g: '刺', cost: 3, cd: 2, mult: 1.2, pierce: true, desc: '120% 傷害，無視防禦。' },
+    { id: 't_sweep', prof: 'qiang', lv: 30, name: '掃腿', g: '掃', cost: 5, cd: 4, mult: 0.8, stagger: true, desc: '80% 傷害，使敵失衡（首領五成抵抗）。' },
+    { id: 't_cleave', prof: 'fu', lv: 10, name: '重劈', g: '劈', cost: 5, cd: 3, mult: 1.6, hit: -0.15, desc: '160% 傷害，命中 −15%。' },
+    { id: 't_quake', prof: 'fu', lv: 30, name: '震地', g: '震', cost: 6, cd: 4, mult: 0.6, all: true, brk: 3, desc: '攻擊全體 60%，並破甲 3 回合。' },
+    { id: 't_aim', prof: 'gong', lv: 10, name: '瞄準', g: '瞄', cost: 3, cd: 2, mult: 1.3, sure: true, crit: 0.2, desc: '130% 傷害，必中，會心 +20%。' },
+    { id: 't_volley', prof: 'gong', lv: 30, name: '連珠', g: '連', cost: 5, cd: 3, mult: 0.75, times: 2, desc: '連射兩箭，各 75%。' },
+    { id: 't_grapple', prof: 'quan', lv: 10, name: '擒拿', g: '擒', cost: 3, cd: 3, mult: 0.6, stagger: true, sureStagger: true, desc: '60% 傷害，打斷對方這回合的行動。' },
+    { id: 't_inner', prof: 'quan', lv: 30, name: '內勁', g: '勁', cost: 6, cd: 4, mult: 1.4, noArmor: true, desc: '140% 傷害，無視護甲。' },
+    { id: 't_bash', prof: 'dun', lv: 15, name: '盾擊', g: '盾', cost: 4, cd: 3, shield: true, desc: '以盾的護甲值造成傷害，打斷蓄力。' },
+    { id: 't_evade', prof: 'shan', lv: 15, name: '遊身', g: '遊', cost: 3, cd: 4, evade: true, desc: '本回合閃避 +60%，下一擊 +30%。' },
+  ];
 
   // ---------- 裝備基底（10 部位全開，每部位至少 2 種＋4 種背包，共 30） ----------
   // slot: main/off/head/chest/gloves/boots/amulet/ring/belt/bag
@@ -124,32 +153,59 @@ window.SHL_DATA = (function () {
     corpse_king: { name: '窯屍王', g: '王', lv: 35, hp: 60, dmg: [6, 9], heavy: [16, 22], spd: 7, armor: 4, boss: true, pat: ['atk', 'charge', 'bleed', 'atk', 'guard'] },
     serpent: { name: '沉淵祭蛇', g: '蛇', lv: 35, hp: 40, dmg: [7, 10], spd: 13, armor: 2, pat: ['atk', 'bleed', 'atk', 'guard'] },
     shaman: { name: '祭窟巫祝', g: '巫', lv: 55, hp: 95, dmg: [9, 12], heavy: [22, 28], spd: 9, armor: 5, boss: true, pat: ['atk', 'charge', 'bleed', 'guard', 'atk'] },
+    leech: { name: '沼蛭', g: '蛭', lv: 20, hp: 24, dmg: [3, 5], spd: 9, armor: 0, beast: true, pat: ['drain', 'poison', 'atk'], skin: [0, 0], meat: [0, 0], extra: 'leech_gland' },
+    bogcorpse: { name: '沼屍', g: '沼', lv: 30, hp: 42, dmg: [6, 9], heavy: [14, 18], spd: 5, armor: 3, pat: ['atk', 'poison', 'charge', 'atk'] },
+    deserter: { name: '逃兵', g: '逃', lv: 20, hp: 30, dmg: [5, 8], heavy: [12, 16], spd: 10, armor: 4, pat: ['atk', 'guard', 'charge', 'atk'], silver: [6, 16], drop: ['dogtag', 0.4] },
+    wraith: { name: '血霧妖', g: '霧', lv: 45, hp: 34, dmg: [7, 10], spd: 13, armor: 0, pat: ['corrupt', 'atk', 'bleed'] },
+    soldier_dead: { name: '遠征亡卒', g: '卒', lv: 50, hp: 50, dmg: [8, 11], heavy: [18, 24], spd: 8, armor: 6, pat: ['atk', 'guard', 'charge', 'atk'], drop: ['dogtag', 0.6] },
+    rooster: { name: '酉神殘影', g: '酉', lv: 80, hp: 160, dmg: [11, 15], heavy: [26, 34], spd: 12, armor: 5, boss: true, pat: ['atk', 'corrupt', 'charge', 'bleed', 'atk', 'guard'] },
+    golem: { name: '守墓俑', g: '俑', lv: 40, hp: 55, dmg: [6, 9], heavy: [16, 20], spd: 5, armor: 9, pat: ['guard', 'atk', 'charge', 'atk'] },
+    tomblord: { name: '墓主', g: '墓', lv: 60, hp: 100, dmg: [9, 12], heavy: [20, 26], spd: 8, armor: 6, boss: true, pat: ['atk', 'drain', 'charge', 'bleed', 'guard'] },
     xiao: { name: '山魈', g: '魈', lv: 70, hp: 120, dmg: [10, 14], heavy: [24, 30], spd: 11, armor: 6, boss: true, pat: ['atk', 'charge', 'atk', 'bleed', 'guard'] },
   };
 
-  // ---------- 世界節點（沿用 v2 世界地圖拓撲；座標為中欄 796×560 地圖內） ----------
+  // ---------- 世界節點：西山東麓・灰窯原（座標為中欄 796×560 區域圖內） ----------
+  // kind: town 城鎮／驛站（平面圖＋建築）、wild 荒野、dungeon 地城；hidden＝要探查才會出現
   const NODES = {
-    duyin: { name: '渡陰關', g: '關', ic: 'n_gate', kind: 'town', x: 502, y: 96 },
-    road: { name: '安全官道', kind: 'way', x: 490, y: 200 },
-    huiyao: { name: '灰窯鎮', g: '鎮', ic: 'n_town', kind: 'town', x: 124, y: 330 },
-    trail: { name: '山嶺野徑', kind: 'way', x: 391, y: 330 },
-    qingwu: { name: '青霧藥林', g: '林', ic: 'n_forest', kind: 'wild', x: 594, y: 330 },
-    guyao: { name: '亂葬古窯', g: '窯', ic: 'n_kiln', kind: 'dungeon', x: 693, y: 232 },
-    chishi: { name: '赤石廢礦', g: '礦', ic: 'n_mine', kind: 'wild', x: 391, y: 456 },
-    kugu: { name: '枯骨獸徑', g: '獸', ic: 'n_bones', kind: 'wild', x: 594, y: 456 },
-    jiku: { name: '沉淵祭窟', g: '窟', ic: 'n_cave', kind: 'dungeon', x: 217, y: 456 },
+    huiyao: { name: '灰窯鎮', g: '鎮', ic: 'n_town', kind: 'town', x: 678, y: 330 },
+    yizhan: { name: '官道驛站', g: '驛', ic: 'n_station', kind: 'town', x: 496, y: 205 },
+    duyin: { name: '渡陰關', g: '關', ic: 'n_gate', kind: 'town', x: 316, y: 92 },
+    poxiao: { name: '破曉營', g: '營', ic: 'n_camp', kind: 'town', x: 106, y: 100 },
+    chakou: { name: '野徑岔口', g: '岔', ic: 'n_cross', kind: 'wild', x: 478, y: 350 },
+    qingwu: { name: '青霧藥林', g: '林', ic: 'n_forest', kind: 'wild', x: 291, y: 300 },
+    guyao: { name: '亂葬古窯', g: '窯', ic: 'n_kiln', kind: 'dungeon', x: 106, y: 228 },
+    kugu: { name: '枯骨獸徑', g: '獸', ic: 'n_bones', kind: 'wild', x: 186, y: 400 },
+    chishi: { name: '赤石廢礦', g: '礦', ic: 'n_mine', kind: 'wild', x: 396, y: 480 },
+    fuzhao: { name: '腐骨沼', g: '沼', ic: 'n_swamp', kind: 'wild', x: 581, y: 470 },
+    jiku: { name: '沉淵祭窟', g: '窟', ic: 'n_cave', kind: 'dungeon', x: 726, y: 455 },
+    shigu: { name: '撿骨師營地', g: '骨', ic: 'n_bonecamp', kind: 'town', x: 176, y: 500 },
+    liekou: { name: '酉神裂口', g: '裂', ic: 'n_rift', kind: 'dungeon', x: 61, y: 470 },
+    yachao: { name: '鴉巢', g: '鴉', ic: 'n_crow', kind: 'town', x: 581, y: 245, hidden: true },
+    guzhong: { name: '無名古塚', g: '塚', ic: 'n_tomb', kind: 'dungeon', x: 496, y: 512, hidden: true },
   };
-  // 1 條安全官道＋1 條山嶺野徑；h＝基礎時數；road＝官道（低遇險）
+  // h＝基礎時數；road＝官道（低遇險）
   const EDGES = [
-    { a: 'huiyao', b: 'road', h: 2, road: true },
-    { a: 'road', b: 'duyin', h: 2, road: true },
-    { a: 'huiyao', b: 'trail', h: 1 },
-    { a: 'trail', b: 'qingwu', h: 1 },
-    { a: 'trail', b: 'chishi', h: 2 },
-    { a: 'chishi', b: 'jiku', h: 2 },
-    { a: 'qingwu', b: 'kugu', h: 1 },
+    { a: 'huiyao', b: 'yizhan', h: 2, road: true },
+    { a: 'yizhan', b: 'duyin', h: 2, road: true },
+    { a: 'duyin', b: 'poxiao', h: 2, road: true },
+    { a: 'huiyao', b: 'chakou', h: 1 },
+    { a: 'yizhan', b: 'chakou', h: 1 },
+    { a: 'chakou', b: 'qingwu', h: 1 },
+    { a: 'chakou', b: 'chishi', h: 2 },
     { a: 'qingwu', b: 'guyao', h: 2 },
+    { a: 'qingwu', b: 'kugu', h: 1 },
+    { a: 'poxiao', b: 'guyao', h: 2 },
+    { a: 'chishi', b: 'kugu', h: 2 },
+    { a: 'chishi', b: 'fuzhao', h: 2 },
+    { a: 'huiyao', b: 'fuzhao', h: 2 },
+    { a: 'fuzhao', b: 'jiku', h: 1 },
+    { a: 'kugu', b: 'shigu', h: 1 },
+    { a: 'shigu', b: 'liekou', h: 1 },
+    { a: 'chakou', b: 'yachao', h: 1 },
+    { a: 'fuzhao', b: 'guzhong', h: 1 },
   ];
+  // 區域圖上的淡色地名
+  const REGION_LABELS = [['灰窯原', 640, 250], ['青霧山', 250, 372], ['腐骨沼', 610, 512], ['血霧', 40, 420]];
 
   // ---------- 3 類荒野採集區 ----------
   const WILDS = {
@@ -185,7 +241,26 @@ window.SHL_DATA = (function () {
     },
   };
 
-  // ---------- 2 個地城 ----------
+  WILDS.fuzhao = {
+    risk: '中高', scene: '退水的沼地，黑水底下全是骨頭。',
+    points: [
+      { id: 'h1', kind: 'herb', item: 'vine_du', max: 2, x: 150, y: 230, label: '毒藤' },
+      { id: 'm1', kind: 'ore', item: 'bog_iron', max: 2, x: 330, y: 270, label: '沼鐵' },
+      { id: 't1', kind: 'track', enemy: 'leech', max: 2, x: 520, y: 210, label: '蛭跡' },
+      { id: 't2', kind: 'track', enemy: 'bogcorpse', max: 1, x: 640, y: 290, label: '屍跡' },
+    ],
+    fire: { x: 366, y: 320 }, ambush: { on: 'herb', enemy: 'leech', p: 0.2 },
+  };
+  WILDS.chakou = {
+    risk: '低', scene: '野徑在這裡分成三條，路牌上的字早就磨平了。',
+    points: [
+      { id: 'h1', kind: 'herb', item: 'herb_zx', max: 2, x: 160, y: 260, label: '藥叢' },
+      { id: 't1', kind: 'track', enemy: 'deserter', max: 1, x: 600, y: 240, label: '人跡' },
+    ],
+    fire: { x: 366, y: 320 }, ambush: { on: 'herb', enemy: null, p: 0 },
+  };
+
+  // ---------- 地城 ----------
   const DUNGEONS = {
     guyao: {
       risk: '低', scene: '燒窯廢墟改作亂葬崗，窯口飄出屍氣。',
@@ -203,40 +278,143 @@ window.SHL_DATA = (function () {
     },
   };
 
-  // ---------- 2 座城鎮：收購價與貨架 ----------
-  const TOWNS = {
-    huiyao: {
-      desc: '起始礦窯小鎮。',
-      buy: { herb_zx: 3, leaf_qx: 3, vine_du: 4, hide: 8, hide_fine: 20, beast_core: 38, meat: 2, ore_fe: 4, ore_cu: 6, ore_xs: 14, salt: 3, pig_iron: 4, yam: 10, smoked: 11, pot_hp: 5, pot_ft: 5, ration: 3, bread: 1 },
-      stock: [
-        ['bag_travel', 48], ['bag_trade', 96], ['blade_short', 30], ['hammer', 34], ['leather', 34], ['boots', 14], ['buckler', 18],
-        ['cap', 9], ['ring', 26, 'blue'], ['gloves', 8], ['belt', 12],
-        ['pot_hp', 9, 6], ['bread', 3, 10], ['salt', 4, 8], ['pig_iron', 5, 6],
-      ],
-    },
-    duyin: {
-      desc: '邊關集鎮，委託多。',
-      buy: { herb_zx: 5, leaf_qx: 4, vine_du: 7, hide: 5, hide_fine: 15, beast_core: 55, meat: 3, ore_fe: 8, ore_cu: 12, ore_xs: 26, salt: 9, pig_iron: 10, yam: 4, smoked: 5, pot_hp: 6, pot_ft: 6, ration: 3, bread: 1 },
-      stock: [
-        ['bag_travel', 48], ['bag_trade', 96], ['bag_fine', 180], ['saber', 48], ['spear', 42], ['bow', 32], ['helm', 30], ['mail', 64],
-        ['ironshield', 38], ['amulet', 44, 'blue'], ['axe2h', 60], ['belt_wide', 28],
-        ['pot_hp', 10, 6], ['pot_ft', 12, 4], ['bread', 3, 10], ['yam', 5, 8], ['smoked', 6, 6],
-      ],
-    },
+  DUNGEONS.guzhong = {
+    risk: '中', scene: '沼邊的古塚，墓道兩側站滿了陶俑。',
+    floors: [['golem'], ['golem', 'golem'], ['tomblord']],
+    floorNames: ['墓道', '俑坑', '主室'],
+    loot: { blue: 0.6, rare: 0.4 }, silver: [12, 24], drops: '良品／稀有裝備、陪葬銀器',
+    boss: { loot: { rare: 0.8, legend: 0.2 }, silver: [60, 90] },
+  };
+  DUNGEONS.liekou = {
+    risk: '極高', scene: '神墜之處。地層一層一層露在外面，血霧從底下往上湧。', mist: 2,
+    floors: [['wraith'], ['soldier_dead', 'wraith'], ['soldier_dead', 'soldier_dead'], ['rooster']],
+    floorNames: ['裂口', '霧層', '亡卒道', '神墜處'],
+    loot: { rare: 0.7, legend: 0.3 }, silver: [20, 40], drops: '稀有／傳奇裝備、軍牌、神骨碎片',
+    boss: { loot: { legend: 1 }, silver: [120, 180], extra: ['bone_relic', 2], codex: 'c_mingmen' },
+  };
+  DUNGEONS.guyao.drops = '凡品／良品裝備、基礎殘卷';
+  DUNGEONS.jiku.drops = '稀有／傳奇試做裝、玄石、殘卷';
+
+  // ---------- 行情：兩套基準價（灰窯鎮、渡陰關）；其他地點引用其中一套 ----------
+  const PRICES = {
+    huiyao: { herb_zx: 3, leaf_qx: 3, vine_du: 4, hide: 8, hide_fine: 20, beast_core: 38, meat: 2, ore_fe: 4, ore_cu: 6, ore_xs: 14, bog_iron: 6, leech_gland: 5, dogtag: 10, bone_relic: 34, blood_moss: 10, salt: 3, pig_iron: 4, yam: 10, smoked: 11, pot_hp: 5, pot_ft: 5, poison_oil: 7, antidote: 5, ration: 3, bread: 1, tea: 1 },
+    duyin: { herb_zx: 5, leaf_qx: 4, vine_du: 7, hide: 5, hide_fine: 15, beast_core: 55, meat: 3, ore_fe: 8, ore_cu: 12, ore_xs: 26, bog_iron: 11, leech_gland: 7, dogtag: 13, bone_relic: 48, blood_moss: 15, salt: 9, pig_iron: 10, yam: 4, smoked: 5, pot_hp: 6, pot_ft: 6, poison_oil: 8, antidote: 6, ration: 3, bread: 1, tea: 1 },
   };
 
+  // ---------- 城鎮與驛站：平面圖上的建築與路人 ----------
+  // plan＝平面圖場景 id（js/scenes_town.js）；price＝引用哪套行情；board＝有委託板；tide＝會被獸潮襲擊
+  const PLACES = {
+    huiyao: { plan: 'plan_huiyao', price: 'huiyao', desc: '礦窯小鎮。煤灰落在每一片屋瓦上。', buildings: ['hy_market', 'hy_inn', 'hy_apoth', 'hy_smith', 'hy_board', 'hy_shrine'], street: ['np_aman', 'np_story', 'np_miner'], board: 'hy_board', tide: true },
+    duyin: { plan: 'plan_duyin', price: 'duyin', desc: '邊關。牆外就是血霧起的方向。', buildings: ['dy_market', 'dy_inn', 'dy_smith', 'dy_apoth', 'dy_board', 'dy_tower'], street: ['np_refugee'], board: 'dy_board', tide: true },
+    poxiao: { plan: 'plan_poxiao', price: 'duyin', desc: '破曉軍團的營地。旗上繡著半個日頭。', buildings: ['px_drill', 'px_quarter', 'px_medic', 'px_board'], street: ['np_wounded', 'np_recruit'], board: 'px_board' },
+    yizhan: { plan: 'plan_yizhan', price: 'huiyao', desc: '官道上的驛站。來往的人在這裡喝一碗茶。', buildings: ['yz_tea', 'yz_peddler'], street: [] },
+    shigu: { plan: 'plan_shigu', price: 'duyin', desc: '裂口出口旁的營地。骨頭排得很整齊。', buildings: ['sg_tent'], street: [] },
+    yachao: { plan: 'plan_yachao', price: 'duyin', desc: '枯樹下的暗樁。樹上全是烏鴉。', buildings: ['yc_nest'], street: [] },
+  };
+  // type 決定服務；buys＝收購哪幾類（all＝全收；其餘為 ITEM_CLASS 的類別，專門店加價 15%）
+  // stock 每列：[基底或物品, 價格, 稀有度或庫存量]；rep＝需要的聲望才上架
+  const BUILDINGS = {
+    hy_market: { place: 'huiyao', type: 'market', name: '天星分號', npc: 'np_qian', faction: 'star', buys: 'all', identify: true,
+      stock: [['bag_travel', 48], ['bag_trade', 96], ['cap', 9], ['hat', 7], ['gloves', 8], ['boots', 14], ['belt', 12], ['ring', 26, 'blue'], ['bread', 3, 10], ['salt', 4, 8], ['pig_iron', 5, 6], ['incense', 1, 5]] },
+    hy_inn: { place: 'huiyao', type: 'inn', name: '老窯客棧', npc: 'np_liu' },
+    hy_apoth: { place: 'huiyao', type: 'apoth', name: '回春藥鋪', npc: 'np_baizhu', buys: ['herb', 'potion'],
+      stock: [['pot_hp', 9, 6], ['antidote', 8, 4], ['herb_zx', 5, 6]] },
+    hy_smith: { place: 'huiyao', type: 'smith', name: '石記鐵鋪', npc: 'np_shigan', buys: ['ore', 'eq'],
+      stock: [['blade_short', 30], ['hammer', 34], ['spear', 40], ['buckler', 18], ['leather', 34]] },
+    hy_board: { place: 'huiyao', type: 'board', name: '鎮公所', npc: 'np_zhou', faction: 'dawn' },
+    hy_shrine: { place: 'huiyao', type: 'shrine', name: '窯神廟', npc: 'np_yabo' },
+    dy_market: { place: 'duyin', type: 'market', name: '天星關市', npc: 'np_jia', faction: 'star', buys: 'all', identify: true,
+      stock: [['bag_travel', 48], ['bag_trade', 96], ['bag_fine', 180, null, { star: 25 }], ['belt_wide', 28], ['amulet', 44, 'blue'], ['ring_jade', 40, 'blue'], ['jade', 46], ['bread', 3, 10], ['yam', 5, 8], ['smoked', 6, 6], ['tea', 2, 6]] },
+    dy_inn: { place: 'duyin', type: 'inn', name: '關下酒肆', npc: 'np_ge' },
+    dy_smith: { place: 'duyin', type: 'smith', name: '軍械坊', npc: 'np_yan', buys: ['ore', 'eq'],
+      stock: [['saber', 48], ['spear', 42], ['bow', 32], ['axe2h', 60], ['helm', 30], ['mail', 64], ['ironshield', 38], ['gauntlet', 26], ['ironboots', 28]] },
+    dy_apoth: { place: 'duyin', type: 'apoth', name: '藥攤', npc: 'np_kushen', buys: ['herb', 'potion'],
+      stock: [['pot_hp', 10, 6], ['pot_ft', 12, 4], ['antidote', 8, 4], ['poison_oil', 12, 3]] },
+    dy_board: { place: 'duyin', type: 'board', name: '破曉募兵處', npc: 'np_han', faction: 'dawn' },
+    dy_tower: { place: 'duyin', type: 'tower', name: '關樓', npc: 'np_ding' },
+    px_drill: { place: 'poxiao', type: 'drill', name: '校場', npc: 'np_huo', faction: 'dawn' },
+    px_quarter: { place: 'poxiao', type: 'smith', name: '軍需帳', npc: 'np_suanpan', faction: 'dawn', buys: ['beast', 'tag'],
+      stock: [['blade_short', 28], ['buckler', 17], ['helm', 29], ['leather', 32], ['pot_hp', 9, 4], ['ration', 5, 6]] },
+    px_medic: { place: 'poxiao', type: 'medic', name: '傷兵帳', npc: 'np_wen', faction: 'dawn' },
+    px_board: { place: 'poxiao', type: 'board', name: '軍令牌', npc: 'np_xiaoman', faction: 'dawn' },
+    yz_tea: { place: 'yizhan', type: 'tea', name: '茶攤', npc: 'np_zhang' },
+    yz_peddler: { place: 'yizhan', type: 'market', name: '天星行商', npc: 'np_ma', faction: 'star', buys: 'all', buyMult: 0.9, rotate: 5,
+      pool: [['pot_hp', 11, 3], ['pot_ft', 13, 2], ['antidote', 9, 2], ['poison_oil', 13, 2], ['tea', 2, 4], ['bread', 3, 6], ['salt', 5, 4], ['yam', 7, 4], ['incense', 1, 3], ['bag_travel', 52], ['boots', 15], ['offblade', 24], ['ring', 30, 'blue'], ['amulet', 50, 'blue'], ['belt_wide', 30]] },
+    sg_tent: { place: 'shigu', type: 'bone', name: '撿骨師的棚子', npc: 'np_bone', buys: ['tag', 'relic'], gamble: 3 },
+    yc_nest: { place: 'yachao', type: 'crow', name: '鴉巢', npc: 'np_chiya', faction: 'crow' },
+  };
+  // 物品類別（給專門店的收購規則用）
+  const ITEM_CLASS = {
+    herb_zx: 'herb', leaf_qx: 'herb', vine_du: 'herb', blood_moss: 'herb', leech_gland: 'herb',
+    pot_hp: 'potion', pot_ft: 'potion', poison_oil: 'potion', antidote: 'potion',
+    ore_fe: 'ore', ore_cu: 'ore', ore_xs: 'ore', bog_iron: 'ore', pig_iron: 'ore',
+    hide: 'beast', hide_fine: 'beast', meat: 'beast', beast_core: 'beast', smoked: 'beast',
+    dogtag: 'tag', bone_relic: 'relic',
+  };
+  // NPC：頭像 ic＝npc id；fig＝站在平面圖上的小人；codex＝閒談會給的見聞錄條目（依序）
+  const NPCS = {
+    np_qian: { name: '錢四海', title: '天星分號掌櫃' }, np_liu: { name: '柳三娘', title: '老窯客棧老闆娘' },
+    np_baizhu: { name: '白朮', title: '回春藥鋪藥師', codex: ['c_bloodrain'] }, np_shigan: { name: '石敢', title: '鐵匠' },
+    np_zhou: { name: '周里正', title: '灰窯鎮里正', codex: ['c_warlord'] }, np_yabo: { name: '啞伯', title: '守廟人' },
+    np_jia: { name: '賈掌櫃', title: '天星商會大掌櫃', codex: ['c_star'] }, np_ge: { name: '老葛', title: '酒保', codex: ['c_army'] },
+    np_yan: { name: '嚴鐵娘', title: '軍械匠' }, np_kushen: { name: '苦參', title: '遊方郎中', codex: ['c_qiqing'] },
+    np_han: { name: '韓厲', title: '破曉軍團百夫長', codex: ['c_dawn'] }, np_ding: { name: '丁老七', title: '守關老卒', codex: ['c_night'] },
+    np_huo: { name: '霍青', title: '破曉營教頭' }, np_suanpan: { name: '算盤', title: '軍需官' },
+    np_wen: { name: '溫姑', title: '醫官', codex: ['c_mist'] }, np_xiaoman: { name: '小滿', title: '傳令兵' },
+    np_zhang: { name: '駝背張', title: '茶攤老闆' }, np_ma: { name: '馬六', title: '天星行商' },
+    np_bone: { name: '撿骨師', title: '', codex: ['c_bonepicker'] }, np_chiya: { name: '赤鴉', title: '鴉衛', codex: ['c_crow', 'c_chiya'] },
+    np_aman: { name: '阿滿', title: '乞兒', fig: 'fig_child', act: 'rumor' },
+    np_story: { name: '說書人', title: '', fig: 'fig_elder', codex: ['c_geo', 'c_gods'] },
+    np_miner: { name: '老礦工', title: '', fig: 'fig_man', codex: ['c_fall'] },
+    np_refugee: { name: '難民婦人', title: '', fig: 'fig_woman', quest: 'b_refugee', codex: ['c_kiln'] },
+    np_wounded: { name: '傷兵', title: '破曉軍團', fig: 'fig_soldier', codex: ['c_army'] },
+    np_recruit: { name: '新兵', title: '破曉軍團', fig: 'fig_soldier' },
+  };
+
+  // ---------- 三大勢力與聲望門檻 ----------
+  const FACTIONS = {
+    dawn: { name: '破曉軍團', g: '曉', ic: 'f_dawn', perks: [[10, '校場肯教〈破陣〉'], [20, '委託報酬 +15%']] },
+    star: { name: '天星商會', g: '星', ic: 'f_star', perks: [[10, '商號九五折'], [25, '可買精工大囊、鑑定半價']] },
+    crow: { name: '鴉衛', g: '鴉', ic: 'f_crow', perks: [[6, '赤鴉肯替你辨傳聞'], [14, '傳授〈鴉影〉']] },
+  };
+
+  // ---------- 探查：每個地點固定幾樣發現，依序找到 ----------
+  // kind: lore 見聞（codex）／cache 藏物（items、silver、eq）／point 新採集點／node 新地點／fight 遭遇
+  const EXPLORE = {
+    huiyao: [{ id: 'e_hy1', kind: 'lore', codex: 'c_night' }, { id: 'e_hy2', kind: 'cache', items: [['ore_cu', 1], ['bread', 1]], silver: 8 }, { id: 'e_hy3', kind: 'lore', codex: 'c_army' }],
+    yizhan: [{ id: 'e_yz1', kind: 'lore', codex: 'c_star' }, { id: 'e_yz2', kind: 'cache', items: [['salt', 2]] }, { id: 'e_yz3', kind: 'fight', enemy: ['deserter'], items: [['dogtag', 1]] }],
+    duyin: [{ id: 'e_dy1', kind: 'lore', codex: 'c_duyin' }, { id: 'e_dy2', kind: 'lore', codex: 'c_mist' }, { id: 'e_dy3', kind: 'cache', items: [['pot_hp', 1]], silver: 15 }],
+    poxiao: [{ id: 'e_px1', kind: 'lore', codex: 'c_dawn' }, { id: 'e_px2', kind: 'lore', codex: 'c_warlord' }, { id: 'e_px3', kind: 'cache', items: [['ration', 2], ['pot_hp', 1]] }],
+    chakou: [{ id: 'e_ck1', kind: 'lore', codex: 'c_gods' }, { id: 'e_ck2', kind: 'node', node: 'yachao' }, { id: 'e_ck3', kind: 'cache', items: [['bread', 2]], silver: 12 }],
+    qingwu: [{ id: 'e_qw1', kind: 'point', point: { id: 'x1', kind: 'herb', item: 'vine_du', max: 2, x: 390, y: 210, label: '毒藤' } }, { id: 'e_qw2', kind: 'lore', codex: 'c_bloodrain' }, { id: 'e_qw3', kind: 'cache', items: [['herb_zx', 3], ['leaf_qx', 2]] }],
+    guyao: [{ id: 'e_gy1', kind: 'lore', codex: 'c_kiln' }, { id: 'e_gy2', kind: 'cache', silver: 18, eq: 'blue' }, { id: 'e_gy3', kind: 'lore', codex: 'c_sanshi' }],
+    kugu: [{ id: 'e_kg1', kind: 'point', point: { id: 'x1', kind: 'track', enemy: 'boar', max: 1, x: 540, y: 300, label: '鹿徑' } }, { id: 'e_kg2', kind: 'lore', codex: 'c_beasts' }, { id: 'e_kg3', kind: 'cache', items: [['hide_fine', 1], ['ration', 1]] }],
+    chishi: [{ id: 'e_cs1', kind: 'point', point: { id: 'x1', kind: 'ore', item: 'ore_cu', max: 2, x: 450, y: 270, label: '支坑' } }, { id: 'e_cs2', kind: 'lore', codex: 'c_fall' }, { id: 'e_cs3', kind: 'cache', items: [['ore_xs', 1]] }],
+    fuzhao: [{ id: 'e_fz1', kind: 'lore', codex: 'c_swamp' }, { id: 'e_fz2', kind: 'node', node: 'guzhong' }, { id: 'e_fz3', kind: 'point', point: { id: 'x1', kind: 'ore', item: 'bog_iron', max: 2, x: 430, y: 180, label: '鏽脈' } }],
+    jiku: [{ id: 'e_jk1', kind: 'lore', codex: 'c_sacrifice' }, { id: 'e_jk2', kind: 'cache', items: [['pot_ft', 1]], silver: 22 }, { id: 'e_jk3', kind: 'lore', codex: 'c_cult' }],
+    shigu: [{ id: 'e_sg1', kind: 'lore', codex: 'c_bonepicker' }, { id: 'e_sg2', kind: 'cache', items: [['dogtag', 2]] }],
+    liekou: [{ id: 'e_lk1', kind: 'lore', codex: 'c_rift' }, { id: 'e_lk2', kind: 'lore', codex: 'c_mingmen' }, { id: 'e_lk3', kind: 'cache', items: [['bone_relic', 1], ['blood_moss', 2]] }],
+    yachao: [{ id: 'e_yc1', kind: 'lore', codex: 'c_crow' }],
+    guzhong: [{ id: 'e_gz1', kind: 'lore', codex: 'c_tomb' }, { id: 'e_gz2', kind: 'cache', silver: 30, eq: 'rare' }],
+  };
+  const CODEX_CATS = ['天裂', '勢力', '地理', '人物', '異象'];
+
   // ---------- 委託（城鎮任務板）：固定懸賞＋每日生成 ----------
-  // 固定懸賞：開局即接灰髯狼；清窟為長期懸賞（無期限）
+  // 固定懸賞：開局即接灰髯狼；清窟為長期懸賞（無期限）；giver＝由路人給、不上板
   const BOUNTIES = [
     { id: 'b_wolf', town: 'huiyao', g: '狼', title: '灰髯狼 ×3', kind: 'kill', enemy: 'wolf', need: 3, reward: 40, start: true },
     { id: 'b_guyao', town: 'huiyao', g: '窯', title: '古窯清理', kind: 'clear', dungeon: 'guyao', need: 1, reward: 60 },
     { id: 'b_jiku', town: 'duyin', g: '巫', title: '祭窟巫祝', kind: 'clear', dungeon: 'jiku', need: 1, reward: 150 },
+    { id: 'b_liekou', town: 'poxiao', g: '裂', title: '裂口殘影', kind: 'clear', dungeon: 'liekou', need: 1, reward: 320 },
+    { id: 'b_refugee', town: 'duyin', g: '牌', title: '丈夫的軍牌', kind: 'collect', item: 'dogtag', need: 1, reward: 20, giver: 'np_refugee' },
   ];
-  // 每日生成的委託模板：每城每天補到 3 張
+  // 每日生成的委託模板：有委託板的地點每天補到 3 張
   const QUEST_GEN = {
     perTown: 3,
-    collect: { days: 3, pool: [['herb_zx', 4], ['leaf_qx', 3], ['vine_du', 2], ['hide', 3], ['meat', 3], ['ore_fe', 2], ['ore_cu', 2]] },
-    kill: { days: 4, pool: [['wolf', 2, 26], ['wolf', 3, 38], ['boar', 1, 22], ['boar', 2, 40], ['bug', 2, 16]] },
+    kinds: { huiyao: { collect: 45, kill: 35, deliver: 20 }, duyin: { collect: 45, kill: 35, deliver: 20 }, poxiao: { kill: 100 } },
+    collect: { days: 3, pool: [['herb_zx', 4], ['leaf_qx', 3], ['vine_du', 2], ['hide', 3], ['meat', 3], ['ore_fe', 2], ['ore_cu', 2], ['bog_iron', 2], ['leech_gland', 2]] },
+    kill: { days: 4, pool: [['wolf', 2, 26], ['wolf', 3, 38], ['boar', 1, 22], ['boar', 2, 40], ['bug', 2, 16], ['leech', 2, 34], ['deserter', 1, 30], ['bogcorpse', 1, 44]] },
+    where: { wolf: '枯骨獸徑・青霧藥林', boar: '枯骨獸徑', bug: '青霧藥林', leech: '腐骨沼', deserter: '野徑岔口', bogcorpse: '腐骨沼' },
     deliver: { days: 2, reward: 24, deposit: 10 },
   };
 
@@ -246,9 +424,9 @@ window.SHL_DATA = (function () {
     cost: 5, max: 3, days: 4, decay: 0.2,
     truth: { true: 30, guard: 25, strong: 15, gone: 15, bait: 15 },
     kinds: {
-      cache: { name: '秘寶', nodes: ['guyao', 'jiku', 'chishi', 'kugu'], text: ['聽說{n}一帶有人埋了一口箱子，還沒人去挖。', '有個老卒說，{n}的石縫裡藏著前人的行囊。'] },
-      vein: { name: '富脈', nodes: ['chishi', 'qingwu'], text: ['{n}崩出一段新脈，成色極好。', '採藥人說{n}深處長了一片沒人動過的好東西。'] },
-      beast: { name: '異獸', nodes: ['kugu', 'qingwu'], text: ['{n}出了一頭赤鬃的異獸，皮毛值大錢。', '獵戶們在傳，{n}有東西把狼群都趕跑了。'] },
+      cache: { name: '秘寶', nodes: ['guyao', 'jiku', 'chishi', 'kugu', 'chakou', 'fuzhao'], text: ['聽說{n}一帶有人埋了一口箱子，還沒人去挖。', '有個老卒說，{n}的石縫裡藏著前人的行囊。'] },
+      vein: { name: '富脈', nodes: ['chishi', 'qingwu', 'fuzhao'], text: ['{n}崩出一段新脈，成色極好。', '採藥人說{n}深處長了一片沒人動過的好東西。'] },
+      beast: { name: '異獸', nodes: ['kugu', 'qingwu', 'fuzhao'], text: ['{n}出了一頭赤鬃的異獸，皮毛值大錢。', '獵戶們在傳，{n}有東西把狼群都趕跑了。'] },
     },
     // 探聞 25：聽傳聞時多一句判斷
     hint: {
@@ -269,13 +447,15 @@ window.SHL_DATA = (function () {
   };
 
   // ---------- 世界事件：獸潮 ----------
-  const TIDE = { first: [3, 4], gap: [5, 7], days: 2, need: 4, reward: 50, potMult: 1.5, hurtDays: 2 };
+  const TIDE = { towns: ['huiyao', 'duyin'], first: [3, 4], gap: [5, 7], days: 2, need: 4, reward: 50, potMult: 1.5, hurtDays: 2 };
 
-  // ---------- 營火／藥爐 3 配方 ----------
+  // ---------- 營火／藥爐配方 ----------
   const RECIPES = [
     { id: 'r_hp', out: 'pot_hp', g: '創', name: '金創藥水', eff: '命 +30', mat: 'herb_zx', n: 2, where: '營火／藥爐', fireOnly: false, h: 1 },
     { id: 'r_ft', out: 'pot_ft', g: '神', name: '提神湯藥', eff: '疲 −25', mat: 'leaf_qx', n: 2, where: '營火／藥爐', fireOnly: false, h: 1 },
-    { id: 'r_ra', out: 'ration', g: '乾', name: '烤肉乾糧', eff: '食 +35', mat: 'meat', n: 1, where: '需 營火', fireOnly: true, h: 1 },
+    { id: 'r_ra', out: 'ration', g: '乾', name: '烤肉乾糧', eff: '食 +35', mat: 'meat', n: 1, where: '需營火', fireOnly: true, h: 1 },
+    { id: 'r_oil', out: 'poison_oil', g: '毒', name: '淬毒油', eff: '戰鬥塗刃', mat: 'vine_du', n: 2, where: '營火／藥爐', fireOnly: false, h: 1 },
+    { id: 'r_anti', out: 'antidote', g: '解', name: '解毒丸', eff: '解毒', mat: 'leech_gland', n: 1, where: '營火／藥爐', fireOnly: false, h: 1 },
   ];
 
   // ---------- 旅途事件（野徑） ----------
@@ -303,18 +483,18 @@ window.SHL_DATA = (function () {
     { id: 'kou', g: '口', name: '口才', desc: '買賣價格。帶動：議價、探聞、說服。' },
   ];
 
-  // ---------- 熟練度（四大類 22 項；0–100；25／50／75 門檻） ----------
+  // ---------- 熟練度（四大類 24 項；0–100；perks 的鍵＝門檻） ----------
   const PROF_GROUPS = [
     { id: 'wu', name: '武藝' }, { id: 'ye', name: '山野' }, { id: 'gong', name: '百工' }, { id: 'xing', name: '行走' },
   ];
   const PROFS = [
-    { id: 'dao', grp: 'wu', attr: 'li', name: '刀劍', how: '持刀劍命中', perks: { 25: '流血刀法：命中 20% 使敵流血' } },
-    { id: 'qiang', grp: 'wu', attr: 'li', name: '長兵', how: '持槍命中', perks: { 25: '先制：開戰第一回合必先出手' } },
-    { id: 'fu', grp: 'wu', attr: 'li', name: '斧錘', how: '持斧錘命中', perks: { 25: '破甲：無視敵方護甲' } },
-    { id: 'gong', grp: 'wu', attr: 'shen', name: '弓弩', how: '持弓命中', perks: { 25: '先射：開戰前免費射一箭' } },
-    { id: 'quan', grp: 'wu', attr: 'xin', name: '拳腳', how: '空手命中', perks: { 25: '卸力：空手時受傷 −15%' } },
-    { id: 'dun', grp: 'wu', attr: 'xin', name: '盾防', how: '持盾防禦', perks: { 25: '反震：防禦時回敬 2–4 傷害' } },
-    { id: 'shan', grp: 'wu', attr: 'shen', name: '閃躲', how: '被攻擊', perks: { 25: '撤退率 +8%' } },
+    { id: 'dao', grp: 'wu', attr: 'li', name: '刀劍', how: '持刀劍命中', perks: { 10: '招式〈橫斬〉', 25: '流血刀法：命中 20% 使敵流血', 30: '招式〈奪命〉' } },
+    { id: 'qiang', grp: 'wu', attr: 'li', name: '長兵', how: '持槍命中', perks: { 10: '招式〈突刺〉', 25: '先制：開戰第一回合必先出手', 30: '招式〈掃腿〉' } },
+    { id: 'fu', grp: 'wu', attr: 'li', name: '斧錘', how: '持斧錘命中', perks: { 10: '招式〈重劈〉', 25: '破甲：無視敵方護甲', 30: '招式〈震地〉' } },
+    { id: 'gong', grp: 'wu', attr: 'shen', name: '弓弩', how: '持弓命中', perks: { 10: '招式〈瞄準〉', 25: '先射：開戰前免費射一箭', 30: '招式〈連珠〉' } },
+    { id: 'quan', grp: 'wu', attr: 'xin', name: '拳腳', how: '空手命中', perks: { 10: '招式〈擒拿〉', 25: '卸力：空手時受傷 −15%', 30: '招式〈內勁〉' } },
+    { id: 'dun', grp: 'wu', attr: 'xin', name: '盾防', how: '持盾防禦', perks: { 15: '招式〈盾擊〉', 25: '反震：防禦時回敬 2–4 傷害' } },
+    { id: 'shan', grp: 'wu', attr: 'shen', name: '閃躲', how: '被攻擊', perks: { 15: '招式〈遊身〉', 25: '撤退率 +8%' } },
     { id: 'qing', grp: 'wu', attr: 'shen', name: '輕甲', how: '穿輕甲受擊', perks: { 25: '輕甲重量減半' } },
     { id: 'zhong', grp: 'wu', attr: 'ti', name: '重甲', how: '穿重甲受擊', perks: { 25: '受重擊再減 15%' } },
     { id: 'cai', grp: 'ye', attr: 'ling', name: '採藥', how: '採藥草', perks: { 25: '辨異草：25% 多得一株毒藤', 50: '40% 一次採雙份', 75: '毒蟲不侵' } },
@@ -322,6 +502,7 @@ window.SHL_DATA = (function () {
     { id: 'zong', grp: 'ye', attr: 'ling', name: '追蹤', how: '追蹤獸跡', perks: { 25: '辨痕：傳聞現場可先看痕跡', 50: '伏擊：狩獵戰首回合敵人不動' } },
     { id: 'bo', grp: 'ye', attr: 'ling', name: '剝皮', how: '剝皮取肉', perks: { 25: '50% 多剝一張皮', 50: '可剝出完整獸皮', 75: '可取異獸內丹' } },
     { id: 'ying', grp: 'ye', attr: 'ti', name: '野營', how: '生火、露宿', perks: { 25: '夜警機率 −40%', 50: '露宿回復 +25%' } },
+    { id: 'tanyou', grp: 'ye', attr: 'ling', name: '探幽', how: '探查地點', perks: { 25: '探查落空時不會驚動野獸', 50: '探查只花半小時' } },
     { id: 'yao', grp: 'gong', attr: 'wu', name: '煉藥', how: '製藥', perks: { 25: '30% 省一份材料', 50: '25% 一爐雙產' } },
     { id: 'peng', grp: 'gong', attr: 'wu', name: '烹食', how: '烤乾糧', perks: { 25: '30% 一肉兩糧' } },
     { id: 'jian', grp: 'gong', attr: 'wu', name: '鑑物', how: '鑑定裝備', perks: { 25: '可鑑稀有', 50: '可鑑傳奇' } },
@@ -351,5 +532,5 @@ window.SHL_DATA = (function () {
   const SLOT_NAMES = { main: '主手', off: '副手', head: '頭盔', chest: '胸甲', gloves: '手套', boots: '靴子', amulet: '護身符', ring1: '左戒', ring2: '右戒', belt: '腰帶', bag: '背包', cart: '馬車' };
   const SLOT_GLYPH = { main: '刃', off: '盾', head: '冠', chest: '甲', gloves: '手', boots: '靴', amulet: '符', ring1: '戒', ring2: '戒', belt: '帶', bag: '囊', cart: '車' };
 
-  return { ITEMS, SKILLS, BASES, AFFIXES, UNIQUES, LEGENDS, RARITY, ENEMIES, NODES, EDGES, WILDS, DUNGEONS, TOWNS, BOUNTIES, QUEST_GEN, RUMOR, TIDE, RECIPES, EVENTS, ATTRS, PROFS, PROF_GROUPS, WTYPE_NAMES, ORIGINS, SEASONS, YEAR_NAMES, EQ_SLOTS, SLOT_NAMES, SLOT_GLYPH };
+  return { ITEMS, SKILLS, TECHS, BASES, AFFIXES, UNIQUES, LEGENDS, RARITY, ENEMIES, NODES, EDGES, REGION_LABELS, WILDS, DUNGEONS, PRICES, PLACES, BUILDINGS, ITEM_CLASS, NPCS, FACTIONS, EXPLORE, CODEX_CATS, BOUNTIES, QUEST_GEN, RUMOR, TIDE, RECIPES, EVENTS, ATTRS, PROFS, PROF_GROUPS, WTYPE_NAMES, ORIGINS, SEASONS, YEAR_NAMES, EQ_SLOTS, SLOT_NAMES, SLOT_GLYPH };
 })();
