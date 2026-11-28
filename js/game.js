@@ -1323,7 +1323,7 @@ window.SHL = (function () {
     repelToday = null;
   }
   // §5 第 3 步 regionTick（§5.6 匪勢與人手）：只留接口。SPEC-01 §13 歸 DEV-04，任務書寫「匪勢 B 在 DEV-04 之前維持起手值」，
-  // 與「§5 規定的日結變化」字面互相牽動 → 列待裁；本包不更新 B、crew（維持起手 30／4）。
+  // 劫匪、crew、據點被端留給 DEV-04（製作人 16:46 裁決第 6 項：DEV-02 只做 R 乘項與 0.85 封頂）；本包不更新 B、crew（維持起手 30／4）。
   function regionTick(/* day */) { /* 待 DEV-04 */ }
   // 交易稅（§4.3、§5.7，Q1 乙）：只在賣出時扣，floor(得銀 × 5%) 進該鎮 T；買價與 sellPrice 顯示值不變
   function tradeTax(got) {

@@ -124,7 +124,7 @@ async function fresh(page, base, q) {
     check('AC-A1 灰窯第 1 天結算：T = 207.96、P／O 不變', a1.h.T === 207.96 && a1.h.P === 50 && a1.h.O === 55 && a1.B === 30, { T: a1.h.T, P: a1.h.P, O: a1.h.O, B: a1.B, at: a1.t });
     check('AC-A1 渡陰第 1 天結算：T = 314.81、P／O 不變', a1.d.T === 314.81 && a1.d.P === 45 && a1.d.O === 60, { T: a1.d.T, P: a1.d.P, O: a1.d.O });
     const b = a1.h.brief;
-    check('AC-A7（依 §7.2 手算）灰窯第 1 天 brief：Inc 22.96、treasuryIn 23、Out 15、Net +8、tier ok、trend flat、whyCode null（AC-A7 原文 18／+3 為 v0.2 殘值，待裁）',
+    check('AC-A7 灰窯第 1 天 brief：Inc 22.96、treasuryIn 23、Out 15、Net +8、tier ok、trend flat、whyCode null（已與最新 SPEC-01 AC-A7 一致；16:46 裁決第 4 項）',
       b.Inc === 22.96 && b.treasuryIn === 23 && b.treasuryOut === 15 && b.treasuryNet === 8 && b.treasuryTier === 'ok' && b.trend === 'flat' && b.whyCode === null && b.dT === 7.96 && b.Geff === 1 && b.day === 2, b);
     check('§7.6 brief 欄位齊全', ['dP', 'dO', 'trend', 'whyCode', 'T', 'dT', 'treasuryIn', 'treasuryOut', 'treasuryNet', 'Inc', 'tax', 'fines', 'rescueAmt', 'upkeepPaid', 'bountyPaid', 'overflow', 'treasuryTier', 'Geff', 'debtToday', 'debtDays', 'aidToday', 'aidDaysLeft', 'aidFund', 'rescueToday', 'taxCutDays', 'taxCutAmt'].every((k) => k in b), Object.keys(b).length);
     // AC-A7：同日玩家在灰窯賣 100 兩 → treasuryIn 28、Net +13（§7.2）
