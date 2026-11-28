@@ -1,0 +1,133 @@
+diff --git a/js/data.js b/js/data.js
+index 8f02049..42d831b 100644
+--- a/js/data.js
++++ b/js/data.js
+@@ -113,7 +113,7 @@ window.SHL_DATA = (function () {
+     armor: { t: '+{v} 護甲', r: [2, 6] },
+     bleedres: { t: '+{v}% 流血抗性', r: [8, 20] },
+     fatred: { t: '疲累累積 −{v}%', r: [4, 8] },
+-    spd: { t: '+{v}% 行動速度', r: [3, 8] },
++    spd: { t: '+{v}% 腳程', r: [3, 8] },
+     cap: { t: '+{v} 負重上限', r: [4, 10] },
+     gather: { t: '+{v}% 採集收成', r: [10, 25] },
+     skin: { t: '+{v}% 剝皮收成', r: [10, 25] },
+@@ -546,7 +546,7 @@ window.SHL_DATA = (function () {
+     { id: 'peng', grp: 'gong', attr: 'wu', name: '烹食', how: '烤乾糧', perks: { 25: '30% 一肉兩糧' } },
+     { id: 'jian', grp: 'gong', attr: 'wu', name: '鑑物', how: '鑑定裝備', perks: { 25: '可鑑稀有', 50: '可鑑傳奇' } },
+     { id: 'jiao', grp: 'xing', attr: 'shen', name: '腳力', how: '趕路', perks: { 25: '野徑遇險 −20%' } },
+-    { id: 'fuz', grp: 'xing', attr: 'ti', name: '負重', how: '背重趕路', perks: { 25: '常態重負的速度懲罰減半', 50: '超載懲罰減輕' } },
++    { id: 'fuz', grp: 'xing', attr: 'ti', name: '負重', how: '背重趕路', perks: { 25: '常態重負的腳程懲罰減半', 50: '超載懲罰減輕' } },
+     { id: 'yi', grp: 'xing', attr: 'kou', name: '議價', how: '買賣', perks: { 25: '委託報酬 +10%' } },
+     { id: 'tan', grp: 'xing', attr: 'kou', name: '探聞', how: '打聽傳聞', perks: { 25: '聽傳聞時多一句判斷', 50: '打聽半價' } },
+     { id: 'shuo', grp: 'xing', attr: 'kou', name: '說服', how: '事件中開口', perks: { 25: '劫匪買路錢減半' } },
+@@ -562,13 +562,22 @@ window.SHL_DATA = (function () {
+   ];
+   // 開局取名：預設名（不在池內）與整池 60 組（姓、名），原樣取自 docs/design/batch1/name-pool-v0.1.csv，順序與用字不改
+   const NAME_DEFAULT = { sur: '沈', given: '衡' };
++  // 自訂名「已有人用」清單：整名完全相同才攔（取名禁字規則定稿 v1.0 §3、§5 起始表）。
++  // 固定角色全名＋稱謂詞＋遊戲名詞＋九大勢力全名（共 42 項）。正式版可由 names-final 新名欄與勢力名產出後整批替換本常數。
++  const NAME_TAKEN = [
++    '虞九淵', '明夷',
++    '撿骨師', '傀母', '蠱母', '里正', '鴉首', '路人', '兇煞', '良民', '平民', '掌櫃', '先生', '客官',
++    '守備', '紅霧', '腳程', '輕快', '平常', '沉重', '蹣跚', '鎮衙', '祭祀', '侵蝕', '破曉', '天星', '鴉衛', '拜裂', '九幽', '飲霧', '四象', '黑水', '天工', '萬神',
++    // 九大勢力全名（定稿第 5 節末段；本地化 2026-11-28 18:09 裁定收入；鴉衛已在上列）
++    '四象軍', '破曉軍團', '天星商會', '拜裂教', '黑水盟', '天工盟', '萬神教', '九幽殿',
++  ];
+   const NAME_POOL = [
+     ['郝', '朔'], ['柏', '戎'], ['巢', '岩'], ['岳', '樵'], ['滕', '莽'], ['莘', '月'], ['茅', '葦'], ['紀', '谷'], ['卜', '雁'], ['芮', '秋'],
+     ['祁', '禾'], ['韋', '溪'], ['岑', '苗'], ['舒', '苓'], ['管', '沐'], ['譚', '荷'], ['尹', '若'], ['宓', '芹'], ['蒲', '穗'], ['杭', '柔'],
+     ['柯', '磐'], ['盧', '炭'], ['卓', '錘'], ['鈕', '魁'], ['裴', '厚'], ['井', '秀'], ['鄒', '桂'], ['竇', '香'], ['池', '蘭'], ['萬', '菊'],
+     ['賀', '固'], ['常', '垣'], ['靳', '北'], ['尚', '嶺'], ['解', '戈'], ['藺', '棠'], ['尤', '晴'], ['涂', '素'], ['步', '南'], ['成', '映'],
+     ['汪', '季航'], ['駱', '載行'], ['傅', '津渡'], ['盛', '車馬'], ['奚', '瀾舟'], ['鮑', '綺羅'], ['練', '晚泊'], ['邢', '繡織'], ['俞', '市南'], ['梅', '書柬'],
+-    ['包', '拴'], ['黎', '河'], ['史', '陌'], ['安', '麥'], ['喬', '路'], ['倪', '招弟'], ['甘', '細妹'], ['戴', '盼兒'], ['宋', '芋頭'], ['翁', '阿彩'],
++    ['包', '拴'], ['黎', '河'], ['史', '陌'], ['安', '麥'], ['喬', '路'], ['倪', '桃兒'], ['甘', '菜頭'], ['戴', '盼兒'], ['宋', '芋頭'], ['翁', '阿彩'],
+   ];
+ 
+   const SEASONS = ['春', '夏', '秋', '冬'];
+@@ -578,5 +587,5 @@ window.SHL_DATA = (function () {
+   const SLOT_NAMES = { main: '主手', off: '副手', head: '頭盔', chest: '胸甲', gloves: '手套', boots: '靴子', amulet: '護身符', ring1: '左戒', ring2: '右戒', belt: '腰帶', bag: '背包', cart: '馬車' };
+   const SLOT_GLYPH = { main: '刃', off: '盾', head: '冠', chest: '甲', gloves: '手', boots: '靴', amulet: '符', ring1: '戒', ring2: '戒', belt: '帶', bag: '囊', cart: '車' };
+ 
+-  return { ITEMS, SKILLS, TECHS, BASES, AFFIXES, UNIQUES, LEGENDS, RARITY, ENEMIES, NODES, EDGES, REGION_LABELS, WILDS, DUNGEONS, PRICES, PLACES, BUILDINGS, ITEM_CLASS, NPCS, FACTIONS, EXPLORE, CODEX_CATS, BOUNTIES, QUEST_GEN, RUMOR, TIDE, SLEEP, TIME, WORLD, RECIPES, EVENTS, ATTRS, PROFS, PROF_GROUPS, WTYPE_NAMES, ORIGINS, NAME_DEFAULT, NAME_POOL, SEASONS, YEAR_NAMES, EQ_SLOTS, SLOT_NAMES, SLOT_GLYPH };
++  return { ITEMS, SKILLS, TECHS, BASES, AFFIXES, UNIQUES, LEGENDS, RARITY, ENEMIES, NODES, EDGES, REGION_LABELS, WILDS, DUNGEONS, PRICES, PLACES, BUILDINGS, ITEM_CLASS, NPCS, FACTIONS, EXPLORE, CODEX_CATS, BOUNTIES, QUEST_GEN, RUMOR, TIDE, SLEEP, TIME, WORLD, RECIPES, EVENTS, ATTRS, PROFS, PROF_GROUPS, WTYPE_NAMES, ORIGINS, NAME_DEFAULT, NAME_TAKEN, NAME_POOL, SEASONS, YEAR_NAMES, EQ_SLOTS, SLOT_NAMES, SLOT_GLYPH };
+ })();
+diff --git a/js/game.js b/js/game.js
+index d456b2e..288bdf4 100644
+--- a/js/game.js
++++ b/js/game.js
+@@ -274,13 +274,15 @@ window.SHL = (function () {
+   }
+   // ================= 取名（DEV-01／UI-01） =================
+   // 硬規則（UI-01 §4）：姓 1–2 字、名 1–2 字，合計 2–4 個中文字；只收 CJK 統一漢字；不收空白、符號、英數。
+-  // 不做「不得與命名 NPC 同名」檢查；禁字表這批不做（製作人 16:46 裁決第 3 項），預設「沈衡」維持合法。
++  // 自訂名只再擋「整名（姓＋名）與 NAME_TAKEN 完全相同」（取名禁字規則定稿 v1.0 §3；2026-11-28 17:52 mumi 拍板）。
++  // 不攔單字、不攔「包含」，不做其他字面檢查：滿、衡、單獨數字字、姓釋、悟X、性別輩分字、難字、勢力特徵單字都放行；預設「沈衡」合法。
+   const CJK = /^[\u3400-\u4DBF\u4E00-\u9FFF\u{20000}-\u{2A6DF}\u{2A700}-\u{2EBEF}\u{30000}-\u{3134F}]$/u;
+   function nameErrors(sur, given) {
+     const a = Array.from(String(sur == null ? '' : sur)), b = Array.from(String(given == null ? '' : given));
+     const errs = [];
+     if (!a.concat(b).every((ch) => CJK.test(ch))) errs.push('chars');
+     if (a.length < 1 || a.length > 2 || b.length < 1 || b.length > 2) errs.push('length');
++    if (!errs.length && D.NAME_TAKEN.includes(a.join('') + b.join(''))) errs.push('taken');
+     return errs;
+   }
+   // 全名：S.name = { sur, given }
+diff --git a/js/ui.js b/js/ui.js
+index 265fd89..4389ee4 100644
+--- a/js/ui.js
++++ b/js/ui.js
+@@ -27,6 +27,9 @@
+ 
+   function pos(x, y, w, h) { return 'left:' + x + 'px;top:' + y + 'px;width:' + w + 'px;height:' + h + 'px;'; }
+   // 像素 ICON；沒有圖就退回文字代號
++  // SPEC-TIME 7.1b／AC 21：四檔險級（D.TIME.RISK_TIERS，即 riskTier() 的值域）共用一張色表 rk0–rk3（css），
++  // 路程 travelPreview 與荒野、地城標頭都走這裡；hot 只在「高」「極高」。
++  function riskCls(tier) { return ' rk' + D.TIME.RISK_TIERS.indexOf(tier) + (tier === '高' || tier === '極高' ? ' hot' : ''); }
+   function ico(id, glyph, size) {
+     if (id && IC.has(id)) return '<i class="px ic-' + id + '"' + (size ? ' style="width:' + size + 'px;height:' + size + 'px"' : '') + '></i>';
+     return '<span class="gl">' + (glyph || '') + '</span>';
+@@ -218,7 +221,7 @@
+     h += vit('ui_fat', '疲', S.fat, 100, 118, S.fat >= 80, 'fat', 'v-fat', '<b style="left:80%"></b>');
+     const band = G.loadBand(); const c = S.combat;
+     const sts = [
+-      ['st_bleed', '血', c && c.bleed > 0, '流血'], ['st_poison', '毒', c && c.poison > 0, '中毒'], ['', '餓', S.food < 20, '飢餓：回復停滯'], ['', '倦', S.fat >= 80, '力竭：命中與速度下降'],
++      ['st_bleed', '血', c && c.bleed > 0, '流血'], ['st_poison', '毒', c && c.poison > 0, '中毒'], ['', '餓', S.food < 20, '飢餓：回復停滯'], ['', '倦', S.fat >= 80, '力竭：命中與腳程下降'],
+       ['', '重', band.id === 'heavy' || band.id === 'over', '超載'], ['st_corrupt', '蝕', S.corrupt > 0, '侵蝕 ' + S.corrupt + '：生命上限 −' + S.corrupt],
+     ].filter((x) => x[2]);
+     h += '<div class="strow" data-testid="statuses">' + sts.map((x) => '<span class="stc" title="' + x[3] + '">' + ico(x[0], x[1], 16) + '</span>').join('') + '<span class="stt">護甲 ' + G.armor() + '・傷 ' + G.weaponDmg().join('–') + '</span></div>';
+@@ -306,7 +309,7 @@
+     return h + '</div></div>';
+   }
+   // ---------- 取名頁（UI-01 SHL-UI01-01）：中欄專頁，不寫入名字直到「確定」 ----------
+-  const NAME_MSG = { chars: '不可使用英數、空白或符號。', length: '合計須為 2–4 個中文字。' };
++  const NAME_MSG = { chars: '不可使用英數、空白或符號', length: '合計須為 2–4 個中文字', taken: '這個名字已經有人用了' };
+   const NAME_RULE = '只收中文，合計 2–4 字。預設「沈衡」，不想改也可以直接確定。';
+   let nameDraft = { sur: D.NAME_DEFAULT.sur, given: D.NAME_DEFAULT.given };
+   function nameRuleHtml(errs) { return errs.length ? errs.map((e) => '<div class="red" data-testid="name-err-' + e + '">' + NAME_MSG[e] + '</div>').join('') : '<div>' + NAME_RULE + '</div>'; }
+@@ -397,7 +400,7 @@
+     if (p) {
+       const n = D.NODES[dest];
+       h += '<div class="dic">' + ico(n.ic, n.g, 32) + '</div><div class="dname"><b>' + n.name + '</b><span class="sub">經 ' + p.via + '</span></div>';
+-      h += '<div class="vpill"><span class="ic">時</span>' + p.hours + ' 小時</div><div class="vpill"><span class="ic">食</span>−' + p.food + '</div><div class="vpill"><span class="ic">疲</span>+' + p.fat + '</div><div class="vpill' + (p.riskName === '高' || p.riskName === '極高' ? ' hot' : '') + '"><span class="ic">險</span>' + p.riskName + '</div><div class="vpill"><span class="ic">負</span>×' + p.mult.toFixed(2) + '</div>';
++      h += '<div class="vpill"><span class="ic">時</span>' + p.hours + ' 小時</div><div class="vpill"><span class="ic">食</span>−' + p.food + '</div><div class="vpill"><span class="ic">疲</span>+' + p.fat + '</div><div class="vpill' + riskCls(p.riskName) + '" data-testid="route-risk"><span class="ic">險</span>' + p.riskName + '</div><div class="vpill"><span class="ic">負</span>×' + p.mult.toFixed(2) + '</div>';
+       h += '<button class="btn dark go" data-a="travel" data-testid="btn-travel">前往</button>';
+     } else {
+       const n = D.NODES[S.loc];
+@@ -654,7 +657,7 @@
+   function sceneWild(S) {
+     const W = D.WILDS[S.loc]; const ns = G.nodeState(S.loc);
+     let h = '<div class="wildscene' + scn('wild_' + S.loc) + '" data-testid="wild">';
+-    h += '<div class="stagehead"><span class="pill">' + D.NODES[S.loc].name + '</span><span class="pill">險 ' + W.risk + '</span>' + (G.tideInfo() ? '<span class="pill hot">獸潮</span>' : '') + '</div>';
++    h += '<div class="stagehead"><span class="pill">' + D.NODES[S.loc].name + '</span><span class="pill' + riskCls(W.risk) + '" data-testid="head-risk">險 ' + W.risk + '</span>' + (G.tideInfo() ? '<span class="pill hot">獸潮</span>' : '') + '</div>';
+     h += '<button class="btn" style="position:absolute;right:6px;top:6px;font-weight:700" data-a="toMap" data-testid="btn-leave">離開・地圖</button>';
+     h += rumorChips(S);
+     G.wildPoints(S.loc).forEach((p) => {
+@@ -683,7 +686,7 @@
+     const DG = D.DUNGEONS[S.loc]; const st = S.dungeon;
+     const cleared = st.clearedDay === G.dayOf(S.t);
+     let h = '<div class="dgscene' + scn('dg_' + S.loc) + '" data-testid="dungeon">';
+-    h += '<div class="stagehead"><span class="pill">' + D.NODES[S.loc].name + '</span><span class="pill' + (DG.risk === '極高' ? ' hot' : '') + '">險 ' + DG.risk + '</span>' + (DG.mist ? '<span class="pill hot">血霧：每層侵蝕 +' + DG.mist + '</span>' : '') + '</div>';
++    h += '<div class="stagehead"><span class="pill">' + D.NODES[S.loc].name + '</span><span class="pill' + riskCls(DG.risk) + '" data-testid="head-risk">險 ' + DG.risk + '</span>' + (DG.mist ? '<span class="pill hot">血霧：每層侵蝕 +' + DG.mist + '</span>' : '') + '</div>';
+     h += rumorChips(S);
+     h += '<div class="dgdesc">' + DG.scene + '</div>';
+     h += '<div class="floors">';

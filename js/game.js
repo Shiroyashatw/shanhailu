@@ -245,7 +245,7 @@ window.SHL = (function () {
       schema: SCHEMA,
       seed: seed >>> 0, rng: seed >>> 0, uid: 0,
       meta: { saveMode: 'permadeath', createdAt: Date.now() },
-      name: '沈衡', origin: null,
+      name: null, origin: null, // name 由取名頁確定後寫入 { sur, given }（UI-01 §1）
       t: DAY_START, loc: 'huiyao', scene: 'origin', overlay: null,
       hp: 80, food: 80, fat: 10, silver: 60, corrupt: 0,
       attr, attrXp, prof, profTab: 'ye',
@@ -269,11 +269,55 @@ window.SHL = (function () {
     S.world.next = wri('tide-first', 0, 0, D.TIDE.first[0], D.TIDE.first[1]);
     S.equip.bag = newEq('bag_cloth').eq;
     padPack();
-    if (originId) applyOrigin(originId);
+    if (originId) applyOrigin(originId, D.NAME_DEFAULT); // 開局捷徑（?origin=…）：跳過標題與取名頁，用預設名
     else emit();
   }
-  function applyOrigin(id) {
-    const O = D.ORIGINS.find((o) => o.id === id) || D.ORIGINS[D.ORIGINS.length - 1];
+  // ================= 取名（DEV-01／UI-01） =================
+  // 硬規則（UI-01 §4）：姓 1–2 字、名 1–2 字，合計 2–4 個中文字；只收 CJK 統一漢字；不收空白、符號、英數。
+  // 自訂名只再擋「整名（姓＋名）與 NAME_TAKEN 完全相同」（取名禁字規則定稿 v1.0 §3；2026-11-28 17:52 mumi 拍板）。
+  // 不攔單字、不攔「包含」，不做其他字面檢查：滿、衡、單獨數字字、姓釋、悟X、性別輩分字、難字、勢力特徵單字都放行；預設「沈衡」合法。
+  const CJK = /^[\u3400-\u4DBF\u4E00-\u9FFF\u{20000}-\u{2A6DF}\u{2A700}-\u{2EBEF}\u{30000}-\u{3134F}]$/u;
+  function nameErrors(sur, given) {
+    const a = Array.from(String(sur == null ? '' : sur)), b = Array.from(String(given == null ? '' : given));
+    const errs = [];
+    if (!a.concat(b).every((ch) => CJK.test(ch))) errs.push('chars');
+    if (a.length < 1 || a.length > 2 || b.length < 1 || b.length > 2) errs.push('length');
+    if (!errs.length && D.NAME_TAKEN.includes(a.join('') + b.join(''))) errs.push('taken');
+    return errs;
+  }
+  // 全名：S.name = { sur, given }
+  function fullName(n) { n = n === undefined ? (S && S.name) : n; return n && n.sur && n.given ? n.sur + n.given : ''; }
+  // 身分：開局一律「平民」；找不到對應卡（例如舊存檔的已移除出身）時也顯示平民（假設）
+  function identity() { return (D.ORIGINS.find((o) => o.id === S.origin) || D.ORIGINS[0]).name; }
+  // 懸賞令只預留名字欄（UI-01 §2／§4；通緝令畫面不在本包）。告示榜、判決書、獵令之後一律從這裡讀 S.name。
+  function wantedPoster(silver) { return { name: fullName(), text: '緝拿 ' + fullName() + '，賞銀 ' + silver + ' 兩，死活不論' }; }
+  // 隨機鈕：整池 60 組抽一組，不依身分、性別或風格篩選。
+  // 假設：UI 層的隨機不使用 S.rng（避免改動遊戲內亂數序列），用 Math.random。
+  function randomName() { const p = D.NAME_POOL[Math.floor(Math.random() * D.NAME_POOL.length)]; return { sur: p[0], given: p[1] }; }
+  // 舊存檔後備名：固定「沈衡」（製作人 16:46 裁決第 2 項；living-world v0.2 §6、UI-01）。名池只給新開局「隨機」鈕用。
+  function fallbackName() { return { sur: D.NAME_DEFAULT.sur, given: D.NAME_DEFAULT.given }; }
+  function hasNameStruct(n) { return !!(n && typeof n === 'object' && typeof n.sur === 'string' && typeof n.given === 'string' && n.sur && n.given); }
+  // 標題頁點「平民」卡 → 中欄取名頁
+  function chooseOrigin(id) {
+    if (S.scene !== 'origin') return;
+    S.origin = (D.ORIGINS.find((o) => o.id === id) || D.ORIGINS[0]).id;
+    S.scene = 'naming';
+    emit();
+  }
+  // 返回標題：不寫入名字
+  function backToTitle() {
+    if (S.scene !== 'naming') return;
+    S.origin = null; S.scene = 'origin';
+    emit();
+  }
+  function confirmName(sur, given) {
+    if (S.scene !== 'naming' || nameErrors(sur, given).length) return false;
+    applyOrigin(S.origin, { sur, given });
+    return true;
+  }
+  function applyOrigin(id, name) {
+    S.name = { sur: name.sur, given: name.given };
+    const O = D.ORIGINS.find((o) => o.id === id) || D.ORIGINS[0];
     S.origin = O.id;
     Object.keys(O.attr).forEach((k) => (S.attr[k] = O.attr[k]));
     Object.keys(O.prof).forEach((k) => (S.prof[k].lv = O.prof[k]));
@@ -287,12 +331,11 @@ window.SHL = (function () {
     restockShops();
     D.BOUNTIES.forEach((b) => S.quests.push({ id: b.id, town: b.town, g: b.g, ic: b.enemy || b.item || D.NODES[b.dungeon].ic, title: b.title, kind: b.kind, enemy: b.enemy, item: b.item, dungeon: b.dungeon, need: b.need, reward: b.reward, due: null, fixed: true, giver: b.giver || null, prog: 0, status: b.giver ? 'hidden' : b.start ? 'active' : 'open' }));
     genQuests();
-    log('沈衡（' + O.name + '）在灰窯鎮醒來。鎮公所的「灰髯狼 ×3」已揭下。');
+    log(fullName() + '（' + O.name + '）在灰窯鎮醒來。鎮公所的「灰髯狼 ×3」已揭下。');
     log('點建築進去辦事，點路人交談。離鎮後每個地點都能探查。');
     save();
     emit();
   }
-  function chooseOrigin(id) { if (S.scene !== 'origin') return; applyOrigin(id); }
   // 貨架：每棟有貨的建築各自補貨；行商每天換貨；撿骨師賣未鑑定的撿來裝備
   function stockRow(row) {
     const [k, price, extra, rep] = row;
@@ -348,6 +391,8 @@ window.SHL = (function () {
     S = w.state;
     // SPEC-01 AC-J5／§2：讀到沒有 world.towns 的存檔，以起手值補、不回補過去（DEV-02 完成標準明文要求的唯一初始化例外，不是舊檔遷移）
     if (!S.world.towns) initTownWorld(S);
+    // DEV-01 舊存檔後備名（本批唯一的舊檔例外）：沒有姓名結構時，寫入固定「沈衡」並寫回
+    if (!hasNameStruct(S.name)) { S.name = fallbackName(); save(); }
     return true;
   }
 
@@ -438,6 +483,8 @@ window.SHL = (function () {
     if (S.food <= 0) { S.hp -= 3 * hours; S.stats.cause = '餓死荒野'; }
     else if (S.food >= 30 && !opts.noRegen) S.hp = Math.min(maxHp(), S.hp + 1 * hours);
     if (S.fat >= 100) { S.hp -= 2 * hours; S.stats.cause = '力竭倒地'; }
+    // SPEC-TIME Q7：hpFloor 只由客棧 rest／營帳 bunk 傳入，生存扣血最低留到此值（店家叫醒、灌湯）；露宿與一般等待不傳
+    if (opts.hpFloor !== undefined && S.hp < opts.hpFloor) S.hp = opts.hpFloor;
     S.food = Math.round(S.food); S.fat = Math.round(S.fat); S.hp = Math.round(S.hp);
     // SPEC-01 §2：一次 passTime 跨 ≥2 個日界時逐日補算；每次日結看到的 S.t 是該日 00:00（SPEC-TIME B2）
     const endT = S.t, endDay = dayOf(endT);
@@ -485,7 +532,9 @@ window.SHL = (function () {
     S.dead = {
       cause, where: N.name, when: fmtTime(S.t),
       days: dayOf(S.t), hours: Math.round(S.stats.hours),
-      origin: (D.ORIGINS.find((o) => o.id === S.origin) || {}).name || '無名', age: ageOf(S.t), date: fmtDate(S.t),
+      name: fullName(), origin: identity(), age: ageOf(S.t), date: fmtDate(S.t),
+      // SPEC-02 §12.2 墓誌銘接口：本包只寫 name（玩家自取名字）；善惡、所屬、終局等欄位屬之後的包
+      epitaph: { name: fullName(), cause },
       attrs: D.ATTRS.map((a) => a.name + ' ' + S.attr[a.id]).join('・'),
       profs: D.PROFS.filter((p) => profLv(p.id) > 0).sort((a, b) => profLv(b.id) - profLv(a.id)).slice(0, 5).map((p) => p.name + ' ' + profLv(p.id)).join('・') || '一事無成',
       rumors: S.stats.rumors, finds: S.stats.finds, codex: S.codex.length,
@@ -495,7 +544,7 @@ window.SHL = (function () {
     };
     S.combat = null; S.event = null; S.loot = null; S.overlay = null;
     S.scene = 'dead';
-    log('沈衡死於' + N.name + '：' + cause, 'bad');
+    log(fullName() + '死於' + N.name + '：' + cause, 'bad');
     // 純永久死亡：刪檔（檢查點模式則保留 checkpoint 快照，本版介面不開放）
     if (S.meta.saveMode === 'permadeath') wipeSave();
   }
@@ -598,7 +647,7 @@ window.SHL = (function () {
   }
   // ---------- 拖拉：from／to 形如 pack:3、slot:main、ground:0、ground、shop:2、sell ----------
   function drag(from, to) {
-    if (S.dead || S.scene === 'origin' || from === to) return false;
+    if (S.dead || S.scene === 'origin' || S.scene === 'naming' || from === to) return false;
     const [fz, fv] = from.split(':'); const [tz, tv] = to.split(':');
     const inShop = S.scene === 'town' && !!S.shops[S.townTab]; const inMarket = S.scene === 'town' && !!(bld() && bld().buys);
     if (fz === 'pack') {
@@ -651,19 +700,57 @@ window.SHL = (function () {
     return out;
   }
   function route(from, to) {
-    // Dijkstra：以基礎時數為權重，只走已知的地點
-    const dist = {}, prev = {}, Q = Object.keys(D.NODES).filter(known);
-    Q.forEach((k) => (dist[k] = Infinity)); dist[from] = 0;
+    // Dijkstra 先求（總時數, 野徑段數）字典序最短，只走已知的地點；再在所有並列最短路線中依序比
+    // (3) 路線險值 risk3(routeRisk)（以呼叫當下的時段、負重、獸潮、R 計）較低者，(4) 節點 id 序列字典序較小者。
+    // SPEC-TIME 7.1b／AC 20、數值 18:14 裁定：結果不隨 NODES／EDGES 的排列順序或邊的端點寫法改變。
+    const dist = {}, wild = {}, Q = Object.keys(D.NODES).filter(known);
+    Q.forEach((k) => { dist[k] = Infinity; wild[k] = Infinity; }); dist[from] = 0; wild[from] = 0;
+    const better = (h1, w1, h2, w2) => h1 < h2 || (h1 === h2 && w1 < w2);
     const left = new Set(Q);
     while (left.size) {
-      let u = null; left.forEach((k) => { if (u === null || dist[k] < dist[u]) u = k; });
+      let u = null; left.forEach((k) => { if (u === null || better(dist[k], wild[k], dist[u], wild[u])) u = k; });
       left.delete(u);
-      neighbors(u).forEach(([v, e]) => { if (dist[u] + e.h < dist[v]) { dist[v] = dist[u] + e.h; prev[v] = [u, e]; } });
+      neighbors(u).forEach(([v, e]) => {
+        const h = dist[u] + e.h, w = wild[u] + (e.road ? 0 : 1);
+        if (better(h, w, dist[v], wild[v])) { dist[v] = h; wild[v] = w; }
+      });
     }
-    const edges = []; const stops = []; let c = to;
-    while (c !== from && prev[c]) { edges.unshift(prev[c][1]); stops.unshift(c); c = prev[c][0]; }
-    edges.stops = stops;
+    // 由終點倒推所有並列最短路線（只沿「剛好達到最短值」的邊）
+    const paths = [];
+    const walk = (c, edges, nodes) => {
+      if (c === from) { paths.push({ edges, nodes: [from].concat(nodes) }); return; }
+      neighbors(c).forEach(([u, e]) => {
+        if (nodes.includes(u) || dist[u] + e.h !== dist[c] || wild[u] + (e.road ? 0 : 1) !== wild[c]) return;
+        walk(u, [e].concat(edges), [c].concat(nodes));
+      });
+    };
+    if (from !== to && dist[to] < Infinity) walk(to, [], []);
+    const seq = (x, y) => { for (let i = 0; i < Math.min(x.length, y.length); i++) if (x[i] !== y[i]) return x[i] < y[i] ? -1 : 1; return x.length - y.length; };
+    paths.forEach((p) => (p.r = risk3(routeRisk(p.edges))));
+    paths.sort((x, y) => x.r - y.r || seq(x.nodes, y.nodes));
+    const edges = paths.length ? paths[0].edges : [];
+    edges.stops = paths.length ? paths[0].nodes.slice(1) : [];
     return edges;
+  }
+  // 路線險值：封頂 RISK_CAP 後的值（未取位）。travelPreview 與 route() 的第三層 tie-break 共用。
+  function routeRisk(edges) {
+    const band = loadBand();
+    const wild = edges.some((e) => !e.road);
+    let risk = wild ? (edges.length > 1 ? 0.3 : 0.22) : 0.04;
+    if (isNight(S.t)) risk *= 2;
+    if (band.id === 'heavy' || band.id === 'over') risk *= 1.4;
+    if (wild && perk('jiao', 25)) risk *= 0.8;
+    if (wild && tideOn()) risk *= 1.5;
+    // SPEC-01 §4.8「套用」：多乘治安／匪勢修正 R，封頂 0.85 在所有乘項之後做一次（夜間仍用現況 isNight；SPEC-TIME 7.1 屬 DEV-TIME）
+    return Math.min(D.WORLD.RISK_CAP, risk * riskR(wild));
+  }
+  // SPEC-TIME 7.1b：先封頂 RISK_CAP，再 half-up 取三位，回傳千分位整數（防浮點：0.1495 → 150）
+  function risk3(risk) { return Math.floor(Math.min(D.WORLD.RISK_CAP, risk) * 1000 + 0.5 + 1e-9); }
+  // 依 D.TIME.RISK_CUTS 半開區間分四檔。所有用到路程險級的地方都走這一個函式。
+  function riskTier(risk) {
+    const k = risk3(risk), cuts = D.TIME.RISK_CUTS; let i = 0;
+    while (i < cuts.length && k >= Math.round(cuts[i] * 1000)) i++;
+    return D.TIME.RISK_TIERS[i];
   }
   function travelPreview(to) {
     const edges = route(S.loc, to);
@@ -675,15 +762,9 @@ window.SHL = (function () {
     const fat = Math.round(3 * hours * band.fat * xingRed * (1 - affixSum('fatred') / 100));
     const food = 4 * hours;
     const wild = edges.some((e) => !e.road);
-    let risk = wild ? (edges.length > 1 ? 0.3 : 0.22) : 0.04;
-    if (isNight(S.t)) risk *= 2;
-    if (band.id === 'heavy' || band.id === 'over') risk *= 1.4;
-    if (wild && perk('jiao', 25)) risk *= 0.8;
-    if (wild && tideOn()) risk *= 1.5;
-    // SPEC-01 §4.8「套用」：多乘治安／匪勢修正 R，封頂 0.85 在所有乘項之後做一次（夜間仍用現況 isNight；SPEC-TIME 7.1 屬 DEV-TIME）
     const R = riskR(wild);
-    risk = Math.min(D.WORLD.RISK_CAP, risk * R);
-    const riskName = risk < 0.15 ? '低' : risk < 0.35 ? '中' : '高';
+    const risk = routeRisk(edges);
+    const riskName = riskTier(risk);
     const via = edges.length > 1 ? D.NODES[edges.stops[0]].name : (edges[0] && edges[0].road ? '官道' : '野徑');
     return { edges, hours, fat, food, risk, riskName, mult: sm, via, wild, R };
   }
@@ -760,7 +841,9 @@ window.SHL = (function () {
     return Math.max(1, Math.round(p));
   }
   function rowLocked(row) { return !!row.rep && Object.keys(row.rep).some((f) => !repOk(f, row.rep[f])); }
-  function npcLine(npc, kind) { const L = LORE().NPC[npc]; if (!L) return ''; const a = L[kind]; return Array.isArray(a) ? (a.length ? pick(a) : '') : a || ''; }
+  // 台詞模板：{sur}＝玩家姓（S.name.sur；MVP 稱呼「{姓}客官」，製作人 17:04 (6)）
+  function fillLine(t) { return t ? String(t).replace(/\{sur\}/g, (S && S.name && S.name.sur) || '') : t; }
+  function npcLine(npc, kind) { const L = LORE().NPC[npc]; if (!L) return ''; const a = L[kind]; return fillLine(Array.isArray(a) ? (a.length ? pick(a) : '') : a || ''); }
   // 進建築（null＝回到街上）
   function setTab(t) {
     if (S.scene !== 'town' || S.combat) return;
@@ -844,9 +927,11 @@ window.SHL = (function () {
     if (n8 < now) n8 += 1440;
     return Math.min(Math.max(now + D.SLEEP.minH * 60, n8), now + D.SLEEP.maxH * 60);
   }
-  function sleepToMorning() {
-    const now = S.t;
-    passTime((wakeTime(now) - now) / 60, { food: 10, fat: 0, noRegen: true });
+  // SPEC-TIME §6.2：睡眠（客棧、傷兵帳）飽食 1.25／小時（取代整夜固定 10）；冬季 ×1.25 仍由 passTime 照現況套用
+  function sleepFoodCost(hours) { return 1.25 * hours; }
+  function sleepToMorning(opts) {
+    const now = S.t; const hours = (wakeTime(now) - now) / 60; // 起床公式不變（wakeTime）
+    passTime(hours, Object.assign({ food: sleepFoodCost(hours), fat: 0, noRegen: true }, opts || {}));
   }
   function innCost() {
     const m = townHurt(S.loc) ? 2 : 1;
@@ -858,7 +943,7 @@ window.SHL = (function () {
     const c = innCost();
     switch (k) {
       case 'rest': if (!inBld('inn') || !pay(c.rest)) return;
-        sleepToMorning(); S.hp = maxHp(); S.fat = 0; if (S.corrupt) { S.corrupt = Math.max(0, S.corrupt - 10); S.hp = maxHp(); }
+        sleepToMorning({ hpFloor: 1 }); S.hp = maxHp(); S.fat = 0; if (S.corrupt) { S.corrupt = Math.max(0, S.corrupt - 10); S.hp = maxHp(); }
         log('歇了一夜，疲累清零、生命回滿。', 'good'); break;
       case 'soup': if (!inBld('inn') || !pay(c.soup)) return;
         S.food = clamp(S.food + 30, 0, 100); passTime(0.5, { food: 0, fat: 0 }); log('喝了碗熱湯，飽食 +30'); break;
@@ -871,7 +956,7 @@ window.SHL = (function () {
       case 'cleanse': if (!inBld('medic')) return; if (!S.corrupt) { log('你身上沒有侵蝕。'); return emit(); } if (!pay(c.cleanse)) return;
         passTime(2, { fat: 5 }); S.corrupt = 0; log('放血、敷藥、灌湯。侵蝕退了。', 'good'); break;
       case 'bunk': if (!inBld('medic') || !pay(c.bunk)) return;
-        sleepToMorning(); S.fat = 0; S.hp = Math.min(maxHp(), S.hp + 30); log('在營帳的通鋪睡了一夜，疲累清零、生命 +30。', 'good'); break;
+        sleepToMorning({ hpFloor: 1 }); S.fat = 0; S.hp = Math.min(maxHp(), S.hp + 30); log('在營帳的通鋪睡了一夜，疲累清零、生命 +30。', 'good'); break;
       case 'drill': {
         const P = PROF[arg]; if (!inBld('drill') || !P || P.grp !== 'wu') return; if (!pay(c.drill)) return;
         passTime(4, { fat: 20 }); if (S.dead) return commit();
@@ -1459,7 +1544,7 @@ window.SHL = (function () {
     return clamp(0.55 + (attrVal('ling') - 10) * 0.04 + profLv('tanyou') * 0.006 - n * 0.08, 0.15, 0.95);
   }
   function explore() {
-    if (S.combat || S.dead || S.scene === 'origin' || S.scene === 'event' || S.scene === 'loot') return;
+    if (S.combat || S.dead || S.scene === 'origin' || S.scene === 'naming' || S.scene === 'event' || S.scene === 'loot') return;
     const id = S.loc; const list = D.EXPLORE[id] || []; const n = S.found[id] || 0;
     const hours = perk('tanyou', 50) ? 0.5 : 1;
     const p = exploreChance(id);
@@ -2063,8 +2148,9 @@ window.SHL = (function () {
     attrVal, attrProgress, profLv, profProgress, perk,
     eqBase, eqValue, itemWt, itemName, itemGlyph, itemIcon, countItem, affixSum, reqUnmet, slotFits,
     clickPack, unequip, useItem, pickupGround, drag, identify, identifyFee, chooseOrigin,
+    backToTitle, confirmName, nameErrors, fullName, identity, randomName, fallbackName, wantedPoster,
     place, bld, inBld, known, repOk, repOf, knownFactions, LORE,
-    selectDest, travel, travelPreview, toMap, enterHere, route, setMapView,
+    selectDest, travel, travelPreview, riskTier, routeRisk, toMap, enterHere, route, setMapView,
     explore, exploreInfo, exploreChance, wildPoints,
     setTab, selectShop, setQty, buy, sell, sellPrice, buyPrice, buysHere, rowLocked, shopRows, townPrice, avgPrice, innRest, innSoup, innCost, townHurt, service,
     talk, streetTalk, streetClose, cheapRumor,
@@ -2074,7 +2160,7 @@ window.SHL = (function () {
     craft, canCraftHere, gather, gatherFat, camp, nodeState, dungeonDelve,
     combatAction, combatActions, combatOrder, takeFx, toggleRetreat, toggleDrop, retreatChance, selWt, setTarget, playerSpeed, lootDone,
     eventChoose, eventDone, setOverlay, setProfTab, setJournalTab, sysCamp,
-    _debug: { passTime, addItem, die, startCombat, newEq, gainProf, addRumor, worldTick, lootEq, addRep, addCodex, addCorrupt,
+    _debug: { passTime, sleepFoodCost, addItem, die, startCombat, newEq, gainProf, addRumor, worldTick, lootEq, addRep, addCodex, addCorrupt,
       townTick, newDay, wrnd, tradeTax, HOOKS, setNoise: (on) => { NOISE = !!on; }, rnd,
       regionTick, banditKilled, tideDelta, tideTarget, truthW, liveTruth, genQuests, killEnemy, banditDraw, victory },
   };
