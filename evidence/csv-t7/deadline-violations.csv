@@ -1,0 +1,10 @@
+set,n_scenarios,compare,viol_deadline_any,viol_A_overslept,viol_B_expired,viol_B_overslept,viol_delay,viol_matched_tide_delay,info_more_expired_while_asleep,info_fewer_done
+orig,200,ref_v03_vs_main,0,0,0,0,7,0,61,0
+orig,200,v04_vs_v03,0,0,0,0,0,0,0,0
+orig,200,v04_vs_main,0,0,0,0,7,0,61,0
+allday_grid,2400,ref_v03_vs_main,0,0,0,0,0,0,0,200
+allday_grid,2400,v04_vs_v03,0,0,0,0,0,0,0,0
+allday_grid,2400,v04_vs_main,0,0,0,0,0,0,0,200
+allday_rand,200,ref_v03_vs_main,23,0,22,17,54,36,32,10
+allday_rand,200,v04_vs_v03,0,0,0,0,21,27,47,97
+allday_rand,200,v04_vs_main,0,0,0,0,8,6,3,10

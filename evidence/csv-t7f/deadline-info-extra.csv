@@ -1,0 +1,13 @@
+set,metric,new,v03,main
+orig,B_sleepH_mean,598.148,598.148,725.209
+orig,A_expAsleep_mean,27.520,27.520,28.585
+orig,B_expAsleep_mean,0,0,0
+orig,delay_scen_mean_of_means_h,8.029,8.029,9.191
+allday_grid,B_sleepH_mean,607.146,751.521,917.500
+allday_grid,A_expAsleep_mean,17.690,22.130,27.995
+allday_grid,B_expAsleep_mean,0,1.065,1.065
+allday_grid,delay_scen_mean_of_means_h,9.890,15.206,16.771
+allday_rand,B_sleepH_mean,655.068,731.558,893.339
+allday_rand,A_expAsleep_mean,19.160,21.400,25.505
+allday_rand,B_expAsleep_mean,0,0.215,0.375
+allday_rand,delay_scen_mean_of_means_h,11.364,13.482,14.930
