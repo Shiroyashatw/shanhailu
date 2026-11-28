@@ -753,3 +753,9 @@ h4 { margin-top: 0; }
 .qsheet .qbtn { margin-top: auto; height: 36px; font-size: 14px; font-weight: 700; }
 
 .cdanger { cursor: help; }
+
+/* DEV-03 街上走動的匿名路人與巡邏（不可點，壓在有職位者與對話框之下） */
+.walkers { position: absolute; left: 0; top: 0; width: 796px; height: 520px; pointer-events: none; z-index: 2; }
+.walker { position: absolute; left: 0; top: 0; width: 32px; height: 32px; pointer-events: none; will-change: transform; }
+.walker .px { filter: drop-shadow(0 2px 1px rgba(0, 0, 0, .7)); }
+.walker.anon .px { opacity: .92; }
