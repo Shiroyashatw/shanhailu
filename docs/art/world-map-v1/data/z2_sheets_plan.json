@@ -1,0 +1,546 @@
+{
+ "note": "Z2 地方分頁。A–D 批 27 頁全畫（A–D 全核可並鎖空位；地方層定案）。座標＝Z0 原生 398×280。",
+ "sheets": [
+  {
+   "sheet": "Z2-A1",
+   "name": "灰窯原・官道西（破曉營・渡陰關）",
+   "center": [
+    149,
+    140
+   ],
+   "scale": 16,
+   "batch": "A",
+   "status": "已畫",
+   "z1": "Z1-2",
+   "bounds_native": [
+    136.6,
+    131.2,
+    161.4,
+    148.8
+   ],
+   "points": 18,
+   "points_visible_default": 17
+  },
+  {
+   "sheet": "Z2-A2",
+   "name": "灰窯原・官道東（官道驛站・灰窯鎮）",
+   "center": [
+    173,
+    139
+   ],
+   "scale": 16,
+   "batch": "A",
+   "status": "已畫",
+   "z1": "Z1-2",
+   "bounds_native": [
+    160.6,
+    130.2,
+    185.4,
+    147.8
+   ],
+   "points": 24,
+   "points_visible_default": 24
+  },
+  {
+   "sheet": "Z2-A3",
+   "name": "灰窯原・獸徑裂口與窯礦坡（撿骨師營地・酉神裂口）",
+   "center": [
+    147,
+    153
+   ],
+   "scale": 15,
+   "batch": "A",
+   "status": "已畫",
+   "z1": "Z1-2",
+   "bounds_native": [
+    133.7,
+    143.7,
+    160.3,
+    162.3
+   ],
+   "points": 29,
+   "points_visible_default": 27
+  },
+  {
+   "sheet": "Z2-A4",
+   "name": "灰窯原・腐沼塚地（腐骨沼・沉淵祭窟）",
+   "center": [
+    172,
+    151
+   ],
+   "scale": 16,
+   "batch": "A",
+   "status": "已畫",
+   "z1": "Z1-2",
+   "bounds_native": [
+    159.6,
+    142.2,
+    184.4,
+    159.8
+   ],
+   "points": 22,
+   "points_visible_default": 20
+  },
+  {
+   "sheet": "Z2-A5",
+   "name": "瘴澤北（窮奇洞・蠱巢・瘴澤古墓）",
+   "center": [
+    115,
+    112
+   ],
+   "scale": 12,
+   "batch": "A",
+   "status": "已畫",
+   "z1": "Z1-2",
+   "bounds_native": [
+    98.4,
+    100.3,
+    131.6,
+    123.7
+   ],
+   "points": 9,
+   "points_visible_default": 9
+  },
+  {
+   "sheet": "Z2-A6",
+   "name": "鎮西城",
+   "center": [
+    125,
+    132
+   ],
+   "scale": 16,
+   "batch": "A",
+   "status": "已畫",
+   "z1": "Z1-2",
+   "bounds_native": [
+    112.6,
+    123.2,
+    137.4,
+    140.8
+   ],
+   "points": 18,
+   "points_visible_default": 15
+  },
+  {
+   "sheet": "Z2-A7",
+   "name": "瘴澤南（殃宅・瘴澤渡）",
+   "center": [
+    113,
+    136
+   ],
+   "scale": 12,
+   "batch": "A",
+   "status": "已畫",
+   "z1": "Z1-2",
+   "bounds_native": [
+    96.4,
+    124.3,
+    129.6,
+    147.7
+   ],
+   "points": 6,
+   "points_visible_default": 6
+  },
+  {
+   "sheet": "Z2-B1",
+   "name": "崑崙丘南（霧宮・戌神裂口・百獸窟）",
+   "center": [
+    90,
+    84
+   ],
+   "scale": 8,
+   "batch": "B",
+   "status": "已畫（14:45 核可）",
+   "z1": "Z1-1",
+   "bounds_native": [
+    65.1,
+    66.5,
+    114.9,
+    101.5
+   ],
+   "points": 14,
+   "points_visible_default": 14
+  },
+  {
+   "sheet": "Z2-B2",
+   "name": "崑崙丘北（申神裂口・三危）",
+   "center": [
+    90,
+    57
+   ],
+   "scale": 8,
+   "batch": "B",
+   "status": "已畫（14:45 核可）",
+   "z1": "Z1-1",
+   "bounds_native": [
+    65.1,
+    39.5,
+    114.9,
+    74.5
+   ],
+   "points": 7,
+   "points_visible_default": 7
+  },
+  {
+   "sheet": "Z2-B3",
+   "name": "北山西（冰牆西關・亥神裂口・寒淵）",
+   "center": [
+    146,
+    64
+   ],
+   "scale": 9,
+   "batch": "B",
+   "status": "已畫（14:45 核可）",
+   "z1": "Z1-3",
+   "bounds_native": [
+    123.9,
+    48.4,
+    168.1,
+    79.6
+   ],
+   "points": 9,
+   "points_visible_default": 9
+  },
+  {
+   "sheet": "Z2-B4",
+   "name": "北山・單狐與鎮北城",
+   "center": [
+    176,
+    74
+   ],
+   "scale": 12,
+   "batch": "B",
+   "status": "已畫（14:45 核可）",
+   "z1": "Z1-3",
+   "bounds_native": [
+    159.4,
+    62.3,
+    192.6,
+    85.7
+   ],
+   "points": 19,
+   "points_visible_default": 18
+  },
+  {
+   "sheet": "Z2-B5",
+   "name": "北山・冰窟與子神裂口",
+   "center": [
+    198,
+    61
+   ],
+   "scale": 8,
+   "batch": "B",
+   "status": "已畫（14:45 核可）",
+   "z1": "Z1-3",
+   "bounds_native": [
+    173.1,
+    43.5,
+    222.9,
+    78.5
+   ],
+   "points": 8,
+   "points_visible_default": 8
+  },
+  {
+   "sheet": "Z2-B6",
+   "name": "北山東（冰牆東關・丑神裂口・少咸山）",
+   "center": [
+    248,
+    56
+   ],
+   "scale": 9,
+   "batch": "B",
+   "status": "已畫（14:45 核可）",
+   "z1": "Z1-3",
+   "bounds_native": [
+    225.9,
+    40.4,
+    270.1,
+    71.6
+   ],
+   "points": 4,
+   "points_visible_default": 4
+  },
+  {
+   "sheet": "Z2-C1",
+   "name": "中山・冥門（血霧環帶・十二神座）",
+   "center": [
+    196,
+    116
+   ],
+   "scale": 5,
+   "batch": "C",
+   "status": "已畫（15:06 核可）",
+   "z1": "Z1-4",
+   "bounds_native": [
+    156.2,
+    88.0,
+    235.8,
+    144.0
+   ],
+   "points": 8,
+   "points_visible_default": 8
+  },
+  {
+   "sheet": "Z2-C2",
+   "name": "黑水渡",
+   "center": [
+    211,
+    149
+   ],
+   "scale": 16,
+   "batch": "C",
+   "status": "已畫（15:06 核可）",
+   "z1": "Z1-4",
+   "bounds_native": [
+    198.6,
+    140.2,
+    223.4,
+    157.8
+   ],
+   "points": 12,
+   "points_visible_default": 12
+  },
+  {
+   "sheet": "Z2-C3",
+   "name": "鎮東城（東山驛・竹山村）",
+   "center": [
+    257,
+    130
+   ],
+   "scale": 12,
+   "batch": "C",
+   "status": "已畫（15:06 核可）",
+   "z1": "Z1-5",
+   "bounds_native": [
+    240.4,
+    118.3,
+    273.6,
+    141.7
+   ],
+   "points": 10,
+   "points_visible_default": 10
+  },
+  {
+   "sheet": "Z2-C4",
+   "name": "東山北嶺（寅神・辰神裂口）",
+   "center": [
+    298,
+    100
+   ],
+   "scale": 5,
+   "batch": "C",
+   "status": "已畫（15:06 核可）",
+   "z1": "Z1-5",
+   "bounds_native": [
+    258.2,
+    72.0,
+    337.8,
+    128.0
+   ],
+   "points": 5,
+   "points_visible_default": 5
+  },
+  {
+   "sheet": "Z2-C5",
+   "name": "廢廟群（祀社總壇・祭品田）",
+   "center": [
+    285,
+    145
+   ],
+   "scale": 12,
+   "batch": "C",
+   "status": "已畫（15:06 核可）",
+   "z1": "Z1-5",
+   "bounds_native": [
+    268.4,
+    133.3,
+    301.6,
+    156.7
+   ],
+   "points": 17,
+   "points_visible_default": 17
+  },
+  {
+   "sheet": "Z2-C6",
+   "name": "扶桑坡（萬神堂・姑射山）",
+   "center": [
+    340,
+    129
+   ],
+   "scale": 10,
+   "batch": "C",
+   "status": "已畫（15:06 核可）",
+   "z1": "Z1-5",
+   "bounds_native": [
+    320.1,
+    115.0,
+    359.9,
+    143.0
+   ],
+   "points": 11,
+   "points_visible_default": 11
+  },
+  {
+   "sheet": "Z2-C7",
+   "name": "東山南（卯神裂口・子桐山）",
+   "center": [
+    313,
+    186
+   ],
+   "scale": 6,
+   "batch": "C",
+   "status": "已畫（15:06 核可）",
+   "z1": "Z1-5",
+   "bounds_native": [
+    279.8,
+    162.7,
+    346.2,
+    209.3
+   ],
+   "points": 2,
+   "points_visible_default": 2
+  },
+  {
+   "sheet": "Z2-D1",
+   "name": "南山・焚獄與祝融山（赤銅礦場・火山祝壇）",
+   "center": [
+    170,
+    174
+   ],
+   "scale": 10,
+   "batch": "D",
+   "status": "D 批",
+   "z1": "Z1-6",
+   "bounds_native": [
+    150.1,
+    160.0,
+    189.9,
+    188.0
+   ],
+   "points": 14,
+   "points_visible_default": 14
+  },
+  {
+   "sheet": "Z2-D2",
+   "name": "南山・鎮南城（巳神・午神裂口）",
+   "center": [
+    193,
+    178
+   ],
+   "scale": 8,
+   "batch": "D",
+   "status": "D 批",
+   "z1": "Z1-6",
+   "bounds_native": [
+    168.1,
+    160.5,
+    217.9,
+    195.5
+   ],
+   "points": 11,
+   "points_visible_default": 11
+  },
+  {
+   "sheet": "Z2-D3",
+   "name": "南山南（招搖鎮・射日崖・羽民國）",
+   "center": [
+    219,
+    211
+   ],
+   "scale": 7.5,
+   "batch": "D",
+   "status": "D 批",
+   "z1": "Z1-6",
+   "bounds_native": [
+    192.5,
+    192.3,
+    245.5,
+    229.7
+   ],
+   "points": 14,
+   "points_visible_default": 12
+  },
+  {
+   "sheet": "Z2-D4",
+   "name": "南山西・青丘（堯光山・黑水海外渡口）",
+   "center": [
+    58,
+    184
+   ],
+   "scale": 9,
+   "batch": "D",
+   "status": "D 批",
+   "z1": "Z1-7",
+   "bounds_native": [
+    35.9,
+    168.4,
+    80.1,
+    199.6
+   ],
+   "points": 6,
+   "points_visible_default": 6
+  },
+  {
+   "sheet": "Z2-D5",
+   "name": "南山西・炎州（未神裂口・箕尾山）",
+   "center": [
+    119,
+    198
+   ],
+   "scale": 7,
+   "batch": "D",
+   "status": "D 批",
+   "z1": "Z1-7",
+   "bounds_native": [
+    90.6,
+    178.0,
+    147.4,
+    218.0
+   ],
+   "points": 6,
+   "points_visible_default": 6
+  },
+  {
+   "sheet": "Z2-D6",
+   "name": "海外・奇肱國",
+   "center": [
+    14.5,
+    113
+   ],
+   "scale": 16,
+   "batch": "D",
+   "status": "D 批",
+   "z1": "Z1-8a",
+   "bounds_native": [
+    2.1,
+    104.2,
+    26.9,
+    121.8
+   ],
+   "points": 9,
+   "points_visible_default": 9
+  },
+  {
+   "sheet": "Z2-D7",
+   "name": "海外・三身國",
+   "center": [
+    151,
+    256
+   ],
+   "scale": 16,
+   "batch": "D",
+   "status": "D 批",
+   "z1": "Z1-8b",
+   "bounds_native": [
+    138.6,
+    247.2,
+    163.4,
+    264.8
+   ],
+   "points": 6,
+   "points_visible_default": 6
+  }
+ ],
+ "unassigned": []
+}

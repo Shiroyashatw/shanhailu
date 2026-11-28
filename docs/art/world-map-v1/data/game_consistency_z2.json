@@ -1,0 +1,580 @@
+{
+ "method": "遊戲 data.js 區域圖節點（鏡像後座標）以相似變換擬合到 points_v1 Z0 座標；殘差＝擬合後距離；pair_flips＝兩點相對方位差 >90°",
+ "rotation_deg": -13.6,
+ "scale": 0.0657,
+ "rms_residual_z0px": 5.73,
+ "spread_z0px": 17.53,
+ "nodes": [
+  {
+   "game": "huiyao",
+   "name": "灰窯鎮",
+   "point": "GD-01",
+   "z0": [
+    181.0,
+    136.0
+   ],
+   "game_fit_z0": [
+    179.9,
+    140.2
+   ],
+   "residual_z0px": 4.31,
+   "residual_vs_spread": 0.25
+  },
+  {
+   "game": "yizhan",
+   "name": "官道驛站",
+   "point": "GD-13",
+   "z0": [
+    166.0,
+    137.0
+   ],
+   "game_fit_z0": [
+    166.4,
+    135.0
+   ],
+   "residual_z0px": 2.03,
+   "residual_vs_spread": 0.12
+  },
+  {
+   "game": "duyin",
+   "name": "渡陰關",
+   "point": "GD-24",
+   "z0": [
+    152.0,
+    136.0
+   ],
+   "game_fit_z0": [
+    153.2,
+    130.6
+   ],
+   "residual_z0px": 5.55,
+   "residual_vs_spread": 0.32
+  },
+  {
+   "game": "poxiao",
+   "name": "破曉營",
+   "point": "GD-42",
+   "z0": [
+    142.0,
+    137.0
+   ],
+   "game_fit_z0": [
+    139.9,
+    134.3
+   ],
+   "residual_z0px": 3.41,
+   "residual_vs_spread": 0.19
+  },
+  {
+   "game": "chakou",
+   "name": "野徑岔口",
+   "point": "YJ-01",
+   "z0": [
+    173.0,
+    142.0
+   ],
+   "game_fit_z0": [
+    167.5,
+    144.5
+   ],
+   "residual_z0px": 6.07,
+   "residual_vs_spread": 0.35
+  },
+  {
+   "game": "qingwu",
+   "name": "青霧藥林",
+   "point": "YJ-10",
+   "z0": [
+    160.0,
+    144.0
+   ],
+   "game_fit_z0": [
+    154.8,
+    144.2
+   ],
+   "residual_z0px": 5.23,
+   "residual_vs_spread": 0.3
+  },
+  {
+   "game": "guyao",
+   "name": "亂葬古窯",
+   "point": "YK-01",
+   "z0": [
+    144.0,
+    146.0
+   ],
+   "game_fit_z0": [
+    141.9,
+    142.5
+   ],
+   "residual_z0px": 4.11,
+   "residual_vs_spread": 0.23
+  },
+  {
+   "game": "kugu",
+   "name": "枯骨獸徑",
+   "point": "SJ-01",
+   "z0": [
+    146.0,
+    153.0
+   ],
+   "game_fit_z0": [
+    149.6,
+    152.2
+   ],
+   "residual_z0px": 3.69,
+   "residual_vs_spread": 0.21
+  },
+  {
+   "game": "chishi",
+   "name": "赤石廢礦",
+   "point": "YK-04",
+   "z0": [
+    157.0,
+    151.0
+   ],
+   "game_fit_z0": [
+    164.3,
+    154.1
+   ],
+   "residual_z0px": 7.89,
+   "residual_vs_spread": 0.45
+  },
+  {
+   "game": "fuzhao",
+   "name": "腐骨沼",
+   "point": "FZ-01",
+   "z0": [
+    181.0,
+    149.0
+   ],
+   "game_fit_z0": [
+    175.9,
+    150.6
+   ],
+   "residual_z0px": 5.34,
+   "residual_vs_spread": 0.3
+  },
+  {
+   "game": "jiku",
+   "name": "沉淵祭窟",
+   "point": "FZ-13",
+   "z0": [
+    182.0,
+    144.0
+   ],
+   "game_fit_z0": [
+    184.9,
+    147.4
+   ],
+   "residual_z0px": 4.5,
+   "residual_vs_spread": 0.26
+  },
+  {
+   "game": "shigu",
+   "name": "撿骨師營地",
+   "point": "SJ-08",
+   "z0": [
+    141.0,
+    156.0
+   ],
+   "game_fit_z0": [
+    150.5,
+    158.8
+   ],
+   "residual_z0px": 9.92,
+   "residual_vs_spread": 0.57
+  },
+  {
+   "game": "liekou",
+   "name": "酉神裂口",
+   "point": "SJ-11",
+   "z0": [
+    137.0,
+    157.0
+   ],
+   "game_fit_z0": [
+    142.7,
+    158.6
+   ],
+   "residual_z0px": 5.95,
+   "residual_vs_spread": 0.34
+  },
+  {
+   "game": "yachao",
+   "name": "鴉巢",
+   "point": "YJ-08",
+   "z0": [
+    175.0,
+    142.0
+   ],
+   "game_fit_z0": [
+    172.4,
+    136.2
+   ],
+   "residual_z0px": 6.3,
+   "residual_vs_spread": 0.36
+  },
+  {
+   "game": "guzhong",
+   "name": "無名古塚",
+   "point": "FZ-09",
+   "z0": [
+    178.0,
+    154.0
+   ],
+   "game_fit_z0": [
+    171.1,
+    154.6
+   ],
+   "residual_z0px": 6.89,
+   "residual_vs_spread": 0.39
+  }
+ ],
+ "pair_flips": [],
+ "theme_checks_other_batches": {
+  "note": "B 批起：遊戲只有灰窯原區域圖，其餘地區只比大陸圖主題與色調。崑崙丘屬西山區塊，但 Z0／Z1 已定案為紅黑火山＋血霧（崑崙丘＝裂口源頭），與遊戲「西山＝毒沼古墓」的綠調不同，屬既定設定，非錯誤。C 批：黑水渡屬「海內」，遊戲無此大陸主題，借中山比對；中山在 GDD v0.3 為「大陸圖上可見，未開放」。東山遊戲色盤偏墨綠（廢棄廟宇），Z2 東山頁為暗綠林地＋灰岩。D 批：南山 5 頁（焚獄火山、鎮南城、招搖・射日崖、青丘、炎州）紅褐火山灰＋沙漠，對上遊戲「南山＝火與岩漿」紅色系；海外兩島（奇肱國、三身國）暗褐中性，對上「海外＝異國異人」；奇肱國偏橄欖（機關林），可接受。",
+  "sheets": [
+   {
+    "sheet": "Z2-B1",
+    "continent": "西山",
+    "game_theme": "毒沼古墓",
+    "z2_land_mean": [
+     28,
+     25,
+     23
+    ],
+    "game_palette_mean": [
+     17,
+     25,
+     16
+    ],
+    "z2_hue": "neutral",
+    "game_hue": "green"
+   },
+   {
+    "sheet": "Z2-B2",
+    "continent": "西山",
+    "game_theme": "毒沼古墓",
+    "z2_land_mean": [
+     41,
+     23,
+     22
+    ],
+    "game_palette_mean": [
+     17,
+     25,
+     16
+    ],
+    "z2_hue": "red",
+    "game_hue": "green"
+   },
+   {
+    "sheet": "Z2-B3",
+    "continent": "北山",
+    "game_theme": "冰雪洞窟",
+    "z2_land_mean": [
+     25,
+     29,
+     32
+    ],
+    "game_palette_mean": [
+     57,
+     67,
+     76
+    ],
+    "z2_hue": "blue-grey",
+    "game_hue": "blue-grey"
+   },
+   {
+    "sheet": "Z2-B4",
+    "continent": "北山",
+    "game_theme": "冰雪洞窟",
+    "z2_land_mean": [
+     26,
+     28,
+     27
+    ],
+    "game_palette_mean": [
+     57,
+     67,
+     76
+    ],
+    "z2_hue": "neutral",
+    "game_hue": "blue-grey"
+   },
+   {
+    "sheet": "Z2-B5",
+    "continent": "北山",
+    "game_theme": "冰雪洞窟",
+    "z2_land_mean": [
+     13,
+     16,
+     21
+    ],
+    "game_palette_mean": [
+     57,
+     67,
+     76
+    ],
+    "z2_hue": "blue-grey",
+    "game_hue": "blue-grey"
+   },
+   {
+    "sheet": "Z2-B6",
+    "continent": "北山",
+    "game_theme": "冰雪洞窟",
+    "z2_land_mean": [
+     31,
+     35,
+     38
+    ],
+    "game_palette_mean": [
+     57,
+     67,
+     76
+    ],
+    "z2_hue": "blue-grey",
+    "game_hue": "blue-grey"
+   },
+   {
+    "sheet": "Z2-C1",
+    "continent": "中山",
+    "game_theme": "地層與冥門所在",
+    "z2_land_mean": [
+     39,
+     28,
+     21
+    ],
+    "game_palette_mean": [
+     21,
+     19,
+     25
+    ],
+    "z2_hue": "red",
+    "game_hue": "neutral"
+   },
+   {
+    "sheet": "Z2-C2",
+    "continent": "中山",
+    "game_theme": "地層與冥門所在",
+    "z2_land_mean": [
+     33,
+     27,
+     22
+    ],
+    "game_palette_mean": [
+     21,
+     19,
+     25
+    ],
+    "z2_hue": "red",
+    "game_hue": "neutral"
+   },
+   {
+    "sheet": "Z2-C3",
+    "continent": "東山",
+    "game_theme": "廢棄廟宇",
+    "z2_land_mean": [
+     35,
+     34,
+     21
+    ],
+    "game_palette_mean": [
+     17,
+     33,
+     25
+    ],
+    "z2_hue": "olive",
+    "game_hue": "green"
+   },
+   {
+    "sheet": "Z2-C4",
+    "continent": "東山",
+    "game_theme": "廢棄廟宇",
+    "z2_land_mean": [
+     29,
+     28,
+     26
+    ],
+    "game_palette_mean": [
+     17,
+     33,
+     25
+    ],
+    "z2_hue": "neutral",
+    "game_hue": "green"
+   },
+   {
+    "sheet": "Z2-C5",
+    "continent": "東山",
+    "game_theme": "廢棄廟宇",
+    "z2_land_mean": [
+     33,
+     32,
+     24
+    ],
+    "game_palette_mean": [
+     17,
+     33,
+     25
+    ],
+    "z2_hue": "olive",
+    "game_hue": "green"
+   },
+   {
+    "sheet": "Z2-C6",
+    "continent": "東山",
+    "game_theme": "廢棄廟宇",
+    "z2_land_mean": [
+     34,
+     34,
+     32
+    ],
+    "game_palette_mean": [
+     17,
+     33,
+     25
+    ],
+    "z2_hue": "neutral",
+    "game_hue": "green"
+   },
+   {
+    "sheet": "Z2-C7",
+    "continent": "東山",
+    "game_theme": "廢棄廟宇",
+    "z2_land_mean": [
+     24,
+     25,
+     22
+    ],
+    "game_palette_mean": [
+     17,
+     33,
+     25
+    ],
+    "z2_hue": "neutral",
+    "game_hue": "green"
+   },
+   {
+    "sheet": "Z2-D1",
+    "continent": "南山",
+    "game_theme": "火與岩漿",
+    "z2_land_mean": [
+     42,
+     23,
+     18
+    ],
+    "game_palette_mean": [
+     32,
+     16,
+     13
+    ],
+    "z2_hue": "red",
+    "game_hue": "red"
+   },
+   {
+    "sheet": "Z2-D2",
+    "continent": "南山",
+    "game_theme": "火與岩漿",
+    "z2_land_mean": [
+     40,
+     25,
+     19
+    ],
+    "game_palette_mean": [
+     32,
+     16,
+     13
+    ],
+    "z2_hue": "red",
+    "game_hue": "red"
+   },
+   {
+    "sheet": "Z2-D3",
+    "continent": "南山",
+    "game_theme": "火與岩漿",
+    "z2_land_mean": [
+     35,
+     22,
+     19
+    ],
+    "game_palette_mean": [
+     32,
+     16,
+     13
+    ],
+    "z2_hue": "red",
+    "game_hue": "red"
+   },
+   {
+    "sheet": "Z2-D4",
+    "continent": "南山",
+    "game_theme": "火與岩漿",
+    "z2_land_mean": [
+     57,
+     45,
+     30
+    ],
+    "game_palette_mean": [
+     32,
+     16,
+     13
+    ],
+    "z2_hue": "red",
+    "game_hue": "red"
+   },
+   {
+    "sheet": "Z2-D5",
+    "continent": "南山",
+    "game_theme": "火與岩漿",
+    "z2_land_mean": [
+     56,
+     40,
+     27
+    ],
+    "game_palette_mean": [
+     32,
+     16,
+     13
+    ],
+    "z2_hue": "red",
+    "game_hue": "red"
+   },
+   {
+    "sheet": "Z2-D6",
+    "continent": "海外",
+    "game_theme": "異國異人",
+    "z2_land_mean": [
+     32,
+     29,
+     22
+    ],
+    "game_palette_mean": [
+     34,
+     31,
+     25
+    ],
+    "z2_hue": "olive",
+    "game_hue": "neutral"
+   },
+   {
+    "sheet": "Z2-D7",
+    "continent": "海外",
+    "game_theme": "異國異人",
+    "z2_land_mean": [
+     37,
+     34,
+     29
+    ],
+    "game_palette_mean": [
+     34,
+     31,
+     25
+    ],
+    "z2_hue": "neutral",
+    "game_hue": "neutral"
+   }
+  ]
+ }
+}

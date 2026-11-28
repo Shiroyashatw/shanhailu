@@ -1,0 +1,445 @@
+{
+ "Z1-2 瘴澤・鎮西城・灰窯原": {
+  "scale": 3.0,
+  "center": [
+   140,
+   132
+  ],
+  "terrain_colors": 42,
+  "overlay_colors": 22,
+  "combined_colors": 63,
+  "off_palette_px": 0,
+  "semi_transparent_px": 0,
+  "mean_rel_luminance": 0.0115,
+  "own_points_Z1": 25,
+  "icons_drawn": 36,
+  "own_icons_missing_or_clipped": [],
+  "icons_moved": [
+   [
+    "ZZ-12",
+    6.0
+   ],
+   [
+    "ZZ-18",
+    2.0
+   ],
+   [
+    "ZZ-20",
+    2.0
+   ]
+  ],
+  "label_failures": [],
+  "neighbour_labels_omitted": [],
+  "icon_contrast_min": 3.6,
+  "icons_below_3": [],
+  "border_contrast": {
+   "白虎軍": {
+    "color": "#d8cfbd",
+    "dash_px": 330,
+    "contrast_vs_ground_mean": 11.59,
+    "halo_px": 0,
+    "local_contrast_mean": 11.38,
+    "local_contrast_p10": 10.1
+   },
+   "朱雀軍": {
+    "color": "#b5382c",
+    "dash_px": 124,
+    "contrast_vs_ground_mean": 3.12,
+    "halo_px": 350,
+    "local_contrast_mean": 3.32,
+    "local_contrast_p10": 3.32
+   },
+   "炎祝部": {
+    "color": "#e07a2a",
+    "dash_px": 19,
+    "contrast_vs_ground_mean": 6.47,
+    "halo_px": 0,
+    "local_contrast_mean": 6.43,
+    "local_contrast_p10": 6.12
+   }
+  }
+ },
+ "Z1-1 崑崙丘": {
+  "scale": 3.5,
+  "center": [
+   90,
+   70
+  ],
+  "terrain_colors": 52,
+  "overlay_colors": 12,
+  "combined_colors": 63,
+  "off_palette_px": 0,
+  "semi_transparent_px": 0,
+  "mean_rel_luminance": 0.0162,
+  "own_points_Z1": 6,
+  "icons_drawn": 9,
+  "own_icons_missing_or_clipped": [],
+  "icons_moved": [],
+  "label_failures": [],
+  "neighbour_labels_omitted": [],
+  "icon_contrast_min": 4.08,
+  "icons_below_3": [],
+  "border_contrast": {}
+ },
+ "Z1-3 北山": {
+  "scale": 2.5,
+  "center": [
+   196,
+   62
+  ],
+  "terrain_colors": 44,
+  "overlay_colors": 20,
+  "combined_colors": 64,
+  "off_palette_px": 0,
+  "semi_transparent_px": 0,
+  "mean_rel_luminance": 0.0245,
+  "own_points_Z1": 17,
+  "icons_drawn": 20,
+  "own_icons_missing_or_clipped": [],
+  "icons_moved": [
+   [
+    "BS-19",
+    5.0
+   ],
+   [
+    "BS-17",
+    2.0
+   ],
+   [
+    "BS-32",
+    2.0
+   ],
+   [
+    "BS-33",
+    1.0
+   ]
+  ],
+  "label_failures": [],
+  "neighbour_labels_omitted": [],
+  "icon_contrast_min": 3.34,
+  "icons_below_3": [],
+  "border_contrast": {
+   "玄武軍": {
+    "color": "#587888",
+    "dash_px": 228,
+    "contrast_vs_ground_mean": 2.07,
+    "halo_px": 562,
+    "local_contrast_mean": 4.09,
+    "local_contrast_p10": 4.02
+   },
+   "青龍軍": {
+    "color": "#5f9a7a",
+    "dash_px": 58,
+    "contrast_vs_ground_mean": 5.03,
+    "halo_px": 3,
+    "local_contrast_mean": 5.26,
+    "local_contrast_p10": 4.73
+   },
+   "北海冰部": {
+    "color": "#8fb0bc",
+    "dash_px": 142,
+    "contrast_vs_ground_mean": 3.85,
+    "halo_px": 196,
+    "local_contrast_mean": 7.23,
+    "local_contrast_p10": 4.62
+   }
+  }
+ },
+ "Z1-4 中山・黑水渡": {
+  "scale": 3.5,
+  "center": [
+   202,
+   124
+  ],
+  "terrain_colors": 44,
+  "overlay_colors": 19,
+  "combined_colors": 63,
+  "off_palette_px": 0,
+  "semi_transparent_px": 0,
+  "mean_rel_luminance": 0.0184,
+  "own_points_Z1": 11,
+  "icons_drawn": 22,
+  "own_icons_missing_or_clipped": [],
+  "icons_moved": [
+   [
+    "HN-02",
+    1.0
+   ],
+   [
+    "HN-03",
+    6.0
+   ],
+   [
+    "HN-06",
+    3.0
+   ],
+   [
+    "HN-07",
+    5.0
+   ],
+   [
+    "HN-08",
+    8.0
+   ],
+   [
+    "HN-09",
+    8.0
+   ]
+  ],
+  "label_failures": [],
+  "neighbour_labels_omitted": [],
+  "icon_contrast_min": 3.0,
+  "icons_below_3": [],
+  "border_contrast": {
+   "白虎軍": {
+    "color": "#d8cfbd",
+    "dash_px": 204,
+    "contrast_vs_ground_mean": 10.55,
+    "halo_px": 0,
+    "local_contrast_mean": 10.69,
+    "local_contrast_p10": 9.28
+   },
+   "朱雀軍": {
+    "color": "#b5382c",
+    "dash_px": 59,
+    "contrast_vs_ground_mean": 2.79,
+    "halo_px": 170,
+    "local_contrast_mean": 3.32,
+    "local_contrast_p10": 3.32
+   },
+   "玄武軍": {
+    "color": "#587888",
+    "dash_px": 15,
+    "contrast_vs_ground_mean": 3.22,
+    "halo_px": 42,
+    "local_contrast_mean": 4.11,
+    "local_contrast_p10": 4.15
+   },
+   "青龍軍": {
+    "color": "#5f9a7a",
+    "dash_px": 190,
+    "contrast_vs_ground_mean": 4.73,
+    "halo_px": 49,
+    "local_contrast_mean": 5.08,
+    "local_contrast_p10": 4.33
+   }
+  }
+ },
+ "Z1-5 東山": {
+  "scale": 2.25,
+  "center": [
+   292,
+   140
+  ],
+  "terrain_colors": 43,
+  "overlay_colors": 21,
+  "combined_colors": 63,
+  "off_palette_px": 0,
+  "semi_transparent_px": 0,
+  "mean_rel_luminance": 0.0109,
+  "own_points_Z1": 13,
+  "icons_drawn": 18,
+  "own_icons_missing_or_clipped": [],
+  "icons_moved": [
+   [
+    "DS-08",
+    8.0
+   ],
+   [
+    "DS-34",
+    2.0
+   ],
+   [
+    "DS-35",
+    2.0
+   ],
+   [
+    "DS-37",
+    6.0
+   ],
+   [
+    "HN-05",
+    3.0
+   ]
+  ],
+  "label_failures": [],
+  "neighbour_labels_omitted": [],
+  "icon_contrast_min": 3.68,
+  "icons_below_3": [],
+  "border_contrast": {
+   "朱雀軍": {
+    "color": "#b5382c",
+    "dash_px": 53,
+    "contrast_vs_ground_mean": 3.02,
+    "halo_px": 168,
+    "local_contrast_mean": 3.32,
+    "local_contrast_p10": 3.32
+   },
+   "玄武軍": {
+    "color": "#587888",
+    "dash_px": 33,
+    "contrast_vs_ground_mean": 3.37,
+    "halo_px": 64,
+    "local_contrast_mean": 3.95,
+    "local_contrast_p10": 3.45
+   },
+   "青龍軍": {
+    "color": "#5f9a7a",
+    "dash_px": 266,
+    "contrast_vs_ground_mean": 5.27,
+    "halo_px": 16,
+    "local_contrast_mean": 5.34,
+    "local_contrast_p10": 4.86
+   }
+  }
+ },
+ "Z1-6 南山東・海內南": {
+  "scale": 3.0,
+  "center": [
+   188,
+   200
+  ],
+  "terrain_colors": 46,
+  "overlay_colors": 18,
+  "combined_colors": 63,
+  "off_palette_px": 0,
+  "semi_transparent_px": 0,
+  "mean_rel_luminance": 0.0097,
+  "own_points_Z1": 14,
+  "icons_drawn": 18,
+  "own_icons_missing_or_clipped": [],
+  "icons_moved": [
+   [
+    "NS-08",
+    3.0
+   ],
+   [
+    "NS-42",
+    4.0
+   ]
+  ],
+  "label_failures": [],
+  "neighbour_labels_omitted": [],
+  "icon_contrast_min": 3.89,
+  "icons_below_3": [],
+  "border_contrast": {
+   "朱雀軍": {
+    "color": "#b5382c",
+    "dash_px": 358,
+    "contrast_vs_ground_mean": 2.98,
+    "halo_px": 1062,
+    "local_contrast_mean": 3.32,
+    "local_contrast_p10": 3.32
+   },
+   "炎祝部": {
+    "color": "#e07a2a",
+    "dash_px": 161,
+    "contrast_vs_ground_mean": 5.89,
+    "halo_px": 0,
+    "local_contrast_mean": 5.93,
+    "local_contrast_p10": 5.11
+   }
+  }
+ },
+ "Z1-7 南山西": {
+  "scale": 3.0,
+  "center": [
+   100,
+   192
+  ],
+  "terrain_colors": 48,
+  "overlay_colors": 16,
+  "combined_colors": 63,
+  "off_palette_px": 0,
+  "semi_transparent_px": 0,
+  "mean_rel_luminance": 0.0252,
+  "own_points_Z1": 6,
+  "icons_drawn": 12,
+  "own_icons_missing_or_clipped": [],
+  "icons_moved": [],
+  "label_failures": [],
+  "neighbour_labels_omitted": [],
+  "icon_contrast_min": 4.09,
+  "icons_below_3": [],
+  "border_contrast": {
+   "朱雀軍": {
+    "color": "#b5382c",
+    "dash_px": 56,
+    "contrast_vs_ground_mean": 2.95,
+    "halo_px": 164,
+    "local_contrast_mean": 3.32,
+    "local_contrast_p10": 3.32
+   },
+   "炎祝部": {
+    "color": "#e07a2a",
+    "dash_px": 137,
+    "contrast_vs_ground_mean": 5.76,
+    "halo_px": 4,
+    "local_contrast_mean": 5.9,
+    "local_contrast_p10": 5.06
+   }
+  }
+ },
+ "Z1-8a 海外・奇肱國（插框）": {
+  "scale": 6.0,
+  "center": [
+   16,
+   113
+  ],
+  "terrain_colors": 48,
+  "overlay_colors": 9,
+  "combined_colors": 56,
+  "off_palette_px": 0,
+  "semi_transparent_px": 0,
+  "mean_rel_luminance": 0.0069,
+  "own_points_Z1": 4,
+  "icons_drawn": 4,
+  "own_icons_missing_or_clipped": [],
+  "icons_moved": [
+   [
+    "HW-02",
+    4.0
+   ]
+  ],
+  "label_failures": [],
+  "neighbour_labels_omitted": [],
+  "icon_contrast_min": 6.12,
+  "icons_below_3": [],
+  "border_contrast": {}
+ },
+ "Z1-8b 海外・三身國（插框）": {
+  "scale": 6.0,
+  "center": [
+   150,
+   254
+  ],
+  "terrain_colors": 35,
+  "overlay_colors": 11,
+  "combined_colors": 46,
+  "off_palette_px": 0,
+  "semi_transparent_px": 0,
+  "mean_rel_luminance": 0.0057,
+  "own_points_Z1": 5,
+  "icons_drawn": 5,
+  "own_icons_missing_or_clipped": [],
+  "icons_moved": [
+   [
+    "HW-10",
+    4.0
+   ],
+   [
+    "HW-11",
+    3.0
+   ],
+   [
+    "HW-13",
+    1.0
+   ]
+  ],
+  "label_failures": [],
+  "neighbour_labels_omitted": [],
+  "icon_contrast_min": 3.35,
+  "icons_below_3": [],
+  "border_contrast": {}
+ }
+}

@@ -1,0 +1,286 @@
+{
+ "version": "towns-v1 / ART-02 draft v0.2",
+ "date": "2026-11-28 (UTC+8)",
+ "game_palette_colours": 995,
+ "plans": {
+  "huiyao": {
+   "name": "灰窯鎮",
+   "tier": "鎮",
+   "colours": 25,
+   "off_palette_px": 0,
+   "semi_transparent_px": 0,
+   "mean_rel_luminance": 0.0196,
+   "hotspots": 9,
+   "hotspot_rule": "7–10（TOWN-SPEC 鎮）",
+   "new_hotspots": 2,
+   "optional_hotspots": 0,
+   "min_gap_native_px": 8,
+   "min_box": [
+    42,
+    40
+   ],
+   "contrast_lit_vs_ground_min": 1.56,
+   "contrast_lit_vs_ground": {
+    "hy_market": 2.12,
+    "hy_board": 2.12,
+    "hy_inn": 2.12,
+    "hy_shrine": 2.12,
+    "hy_relief": 2.07,
+    "hy_smith": 2.12,
+    "hy_apoth": 2.12,
+    "hy_tanner": 2.07,
+    "gate": 1.56
+   },
+   "contrast_building_min": 2.07,
+   "contrast_method": "框內 P90 相對亮度 vs 框外 4px 環中位數（WCAG 比）。建築熱區目標 ≥1.8（現行遊戲同法量測 1.30–2.45、中位約 1.75）；出口／空地類熱區不設門檻，靠滑過亮框",
+   "label_check": {
+    "label_overlaps": 0,
+    "label_clipped": 0,
+    "unplaced": []
+   },
+   "issues": []
+  },
+  "yizhan": {
+   "name": "官道驛站",
+   "tier": "驛站",
+   "colours": 24,
+   "off_palette_px": 0,
+   "semi_transparent_px": 0,
+   "mean_rel_luminance": 0.0152,
+   "hotspots": 6,
+   "hotspot_rule": "5–7（TOWN-SPEC 驛站）",
+   "new_hotspots": 3,
+   "optional_hotspots": 0,
+   "min_gap_native_px": 24,
+   "min_box": [
+    46,
+    26
+   ],
+   "contrast_lit_vs_ground_min": 1.25,
+   "contrast_lit_vs_ground": {
+    "yz_tea": 2.01,
+    "yz_peddler": 2.01,
+    "yz_stable": 2.01,
+    "yz_escort": 2.06,
+    "yz_refugee": 2.01,
+    "gate": 1.25
+   },
+   "contrast_building_min": 2.01,
+   "contrast_method": "框內 P90 相對亮度 vs 框外 4px 環中位數（WCAG 比）。建築熱區目標 ≥1.8（現行遊戲同法量測 1.30–2.45、中位約 1.75）；出口／空地類熱區不設門檻，靠滑過亮框",
+   "label_check": {
+    "label_overlaps": 0,
+    "label_clipped": 0,
+    "unplaced": []
+   },
+   "issues": []
+  },
+  "duyin": {
+   "name": "渡陰關（主圖）",
+   "tier": "關口（按鎮計）",
+   "colours": 24,
+   "off_palette_px": 0,
+   "semi_transparent_px": 0,
+   "mean_rel_luminance": 0.0199,
+   "hotspots": 10,
+   "hotspot_rule": "7–10（關口按 TOWN-SPEC 鎮計）",
+   "new_hotspots": 3,
+   "optional_hotspots": 0,
+   "min_gap_native_px": 8,
+   "min_box": [
+    44,
+    34
+   ],
+   "contrast_lit_vs_ground_min": 1.4,
+   "contrast_lit_vs_ground": {
+    "dy_tower": 2.33,
+    "dy_market": 2.13,
+    "dy_refugee": 2.07,
+    "dy_barracks": 2.13,
+    "dy_inn": 2.13,
+    "dy_smith": 2.13,
+    "dy_apoth": 2.92,
+    "dy_board": 2.13,
+    "dy_alley": 1.56,
+    "gate": 1.4
+   },
+   "contrast_building_min": 2.07,
+   "contrast_method": "框內 P90 相對亮度 vs 框外 4px 環中位數（WCAG 比）。建築熱區目標 ≥1.8（現行遊戲同法量測 1.30–2.45、中位約 1.75）；出口／空地類熱區不設門檻，靠滑過亮框",
+   "label_check": {
+    "label_overlaps": 0,
+    "label_clipped": 0,
+    "unplaced": []
+   },
+   "issues": []
+  },
+  "duyin_alley": {
+   "name": "渡陰關後巷（子圖）",
+   "tier": "關口子圖",
+   "colours": 23,
+   "off_palette_px": 0,
+   "semi_transparent_px": 0,
+   "mean_rel_luminance": 0.0162,
+   "hotspots": 6,
+   "hotspot_rule": "4–8（子圖（已定 D1））",
+   "new_hotspots": 5,
+   "optional_hotspots": 0,
+   "min_gap_native_px": 8,
+   "min_box": [
+    52,
+    40
+   ],
+   "contrast_lit_vs_ground_min": 1.33,
+   "contrast_lit_vs_ground": {
+    "da_back": 1.33,
+    "da_yahang": 2.13,
+    "da_jihun": 2.13,
+    "da_bone": 2.13,
+    "da_dice": 2.13,
+    "da_ghost": 1.4
+   },
+   "contrast_building_min": 2.13,
+   "contrast_method": "框內 P90 相對亮度 vs 框外 4px 環中位數（WCAG 比）。建築熱區目標 ≥1.8（現行遊戲同法量測 1.30–2.45、中位約 1.75）；出口／空地類熱區不設門檻，靠滑過亮框",
+   "label_check": {
+    "label_overlaps": 0,
+    "label_clipped": 0,
+    "unplaced": []
+   },
+   "issues": []
+  },
+  "poxiao": {
+   "name": "破曉營＋射圃",
+   "tier": "據點",
+   "colours": 30,
+   "off_palette_px": 0,
+   "semi_transparent_px": 0,
+   "mean_rel_luminance": 0.0195,
+   "hotspots": 6,
+   "hotspot_rule": "6–9（TOWN-SPEC 據點）",
+   "new_hotspots": 1,
+   "optional_hotspots": 0,
+   "min_gap_native_px": 14,
+   "min_box": [
+    58,
+    44
+   ],
+   "contrast_lit_vs_ground_min": 1.04,
+   "contrast_lit_vs_ground": {
+    "px_quarter": 1.99,
+    "px_board": 2.04,
+    "px_drill": 1.21,
+    "px_medic": 4.48,
+    "gate": 1.5,
+    "px_archery": 1.04
+   },
+   "contrast_building_min": 1.99,
+   "contrast_method": "框內 P90 相對亮度 vs 框外 4px 環中位數（WCAG 比）。建築熱區目標 ≥1.8（現行遊戲同法量測 1.30–2.45、中位約 1.75）；出口／空地類熱區不設門檻，靠滑過亮框",
+   "label_check": {
+    "label_overlaps": 0,
+    "label_clipped": 0,
+    "unplaced": []
+   },
+   "issues": []
+  },
+  "shigu": {
+   "name": "撿骨師營地",
+   "tier": "營地（小）",
+   "colours": 21,
+   "off_palette_px": 0,
+   "semi_transparent_px": 0,
+   "mean_rel_luminance": 0.0115,
+   "hotspots": 2,
+   "hotspot_rule": "2–4（小營地（已定 D2））",
+   "new_hotspots": 0,
+   "optional_hotspots": 0,
+   "min_gap_native_px": 54,
+   "min_box": [
+    46,
+    52
+   ],
+   "contrast_lit_vs_ground_min": 1.2,
+   "contrast_lit_vs_ground": {
+    "sg_tent": 2.01,
+    "gate": 1.2
+   },
+   "contrast_building_min": 2.01,
+   "contrast_method": "框內 P90 相對亮度 vs 框外 4px 環中位數（WCAG 比）。建築熱區目標 ≥1.8（現行遊戲同法量測 1.30–2.45、中位約 1.75）；出口／空地類熱區不設門檻，靠滑過亮框",
+   "label_check": {
+    "label_overlaps": 0,
+    "label_clipped": 0,
+    "unplaced": []
+   },
+   "issues": []
+  },
+  "yachao": {
+   "name": "鴉巢",
+   "tier": "營地（小）",
+   "colours": 21,
+   "off_palette_px": 0,
+   "semi_transparent_px": 0,
+   "mean_rel_luminance": 0.0107,
+   "hotspots": 2,
+   "hotspot_rule": "2–4（小營地（已定 D2））",
+   "new_hotspots": 0,
+   "optional_hotspots": 0,
+   "min_gap_native_px": 50,
+   "min_box": [
+    56,
+    50
+   ],
+   "contrast_lit_vs_ground_min": 1.11,
+   "contrast_lit_vs_ground": {
+    "yc_nest": 2.07,
+    "gate": 1.11
+   },
+   "contrast_building_min": 2.07,
+   "contrast_method": "框內 P90 相對亮度 vs 框外 4px 環中位數（WCAG 比）。建築熱區目標 ≥1.8（現行遊戲同法量測 1.30–2.45、中位約 1.75）；出口／空地類熱區不設門檻，靠滑過亮框",
+   "label_check": {
+    "label_overlaps": 0,
+    "label_clipped": 0,
+    "unplaced": []
+   },
+   "issues": []
+  }
+ },
+ "z2_entries": {
+  "GD-08": {
+   "enter_plan": "huiyao",
+   "focus": "hy_relief",
+   "ok": true
+  },
+  "GD-17": {
+   "enter_plan": "yizhan",
+   "focus": "yz_escort",
+   "ok": true
+  },
+  "GD-18": {
+   "enter_plan": "yizhan",
+   "focus": "yz_refugee",
+   "ok": true
+  },
+  "GD-31": {
+   "enter_plan": "duyin",
+   "focus": "dy_barracks",
+   "ok": true
+  },
+  "GD-33": {
+   "enter_plan": "duyin",
+   "focus": "dy_refugee",
+   "ok": true
+  },
+  "GD-34": {
+   "enter_plan": "duyin_alley",
+   "focus": "da_ghost",
+   "ok": true
+  },
+  "GD-47": {
+   "enter_plan": "poxiao",
+   "focus": "px_archery",
+   "ok": true
+  }
+ },
+ "d5_ghost_overlay": {
+  "day_night": "same-base",
+  "open_closed": "state + day-night overlay (D5)"
+ },
+ "all_pass": true
+}

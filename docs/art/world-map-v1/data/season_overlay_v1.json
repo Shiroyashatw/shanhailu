@@ -1,0 +1,186 @@
+{
+ "version": "season_overlay_v1（草案，供 ART-SEASON 接手）",
+ "base": "常態底圖（全季中性）：out/continent_v1_terrain_* 與 z1/out/{sheet}_terrain_*；不屬於任何單一季節",
+ "time_system": {
+  "seasons": [
+   "spring",
+   "summer",
+   "autumn",
+   "winter"
+  ],
+  "days_per_season": 30,
+  "phases": [
+   "清晨",
+   "白天",
+   "黃昏",
+   "黑夜"
+  ],
+  "night": "20:00–05:00",
+  "source": "rollout-plan-v0.1.md"
+ },
+ "layer_order": [
+  {
+   "z": 0,
+   "id": "L0_base",
+   "what": "常態底圖地形 PNG（不改）"
+  },
+  {
+   "z": 1,
+   "id": "L1_season_remap",
+   "what": "依地形分類圖逐類做調色盤色表重映射（索引色→索引色）",
+   "data": "data/season_remap_v1.json → remap_tables[season][class]"
+  },
+  {
+   "z": 2,
+   "id": "L2_season_ground",
+   "what": "季節地表點綴：冬季積雪、春季泥濘水窪、秋季落葉點；以分類遮罩＋4×4 Bayer 有序網點蓋上不透明像素",
+   "assets": "season/{season}_ground_{sheet}_398x280.png（透明底、只含不透明像素）"
+  },
+  {
+   "z": 3,
+   "id": "L3_weather",
+   "what": "天氣粒子／霧：雪、雨、霧、沙塵、灰燼；可動畫（偏移循環），只含不透明像素",
+   "assets": "weather/wx_{type}_{frames}f_398x280.png 或程式產生"
+  },
+  {
+   "z": 4,
+   "id": "L4_fog_of_war",
+   "what": "未探索遮蔽（若有）"
+  },
+  {
+   "z": 5,
+   "id": "L5_roads",
+   "what": "官道／驛路"
+  },
+  {
+   "z": 6,
+   "id": "L6_territory",
+   "what": "勢力虛線＋墨暈"
+  },
+  {
+   "z": 7,
+   "id": "L7_icons",
+   "what": "城鎮與地標圖示"
+  },
+  {
+   "z": 8,
+   "id": "L8_ui_text",
+   "what": "字（UI 層，暫名）"
+  }
+ ],
+ "blend": "不用 alpha、不用乘色。L1 是調色盤索引重映射（一對一或多對一，目的色必在 MAP_PAL+EXT 內）；L2/L3 是不透明像素覆蓋或有序網點（Dz 4×4 Bayer：25%/50% 等級）。結果仍 0 半透明、0 色票外。",
+ "colour_budget": "合成（L0–L7）≤64 色。季節重映射後若某頁超過 64，該頁的色表改成『只映射到該頁既有色』（per-sheet LUT）。天氣層只能用保留 4 色：#d8cfbd（雪）、#aea48f（雪影）、#66747e（雨）、#38434c（霧）；ART-SEASON 實作時地形量化上限改為 64−疊層色−4。",
+ "terrain_classes": {
+  "file_Z0": "data/terrain_class_398x280.png（看圖用色）＋ .npy（類別索引 0–9）",
+  "file_Z1": "z1/out/{sheet}_class_398x280.png ＋ .npy",
+  "classes": [
+   "water",
+   "void",
+   "plain",
+   "forest",
+   "swamp",
+   "desert",
+   "rock",
+   "snow_ice",
+   "lava",
+   "ash_waste"
+  ],
+  "rule": "先依調色盤色分類（palette_class_table），再以遮罩與區塊覆寫：sea/void 由遮罩；瘴澤區的水/林→swamp；灰窯原的 plain/rock→ash_waste；南山亮 plain→desert；北山亮 rock/plain→snow_ice"
+ },
+ "season_changes": {
+  "spring": {
+   "changes": [
+    "plain 偏綠",
+    "forest 偏亮綠",
+    "swamp 偏綠"
+   ],
+   "weather": [
+    "rain（細雨）",
+    "fog（清晨）"
+   ],
+   "gameplay": "春藥多"
+  },
+  "summer": {
+   "changes": [
+    "plain 微綠",
+    "forest 飽和",
+    "desert 微亮"
+   ],
+   "weather": [
+    "heat_haze（南山沙漠、火山，選用）",
+    "rain（雷雨，選用）"
+   ]
+  },
+  "autumn": {
+   "changes": [
+    "forest 轉赭黃",
+    "plain 轉赭",
+    "swamp 轉黃褐"
+   ],
+   "weather": [
+    "fog",
+    "ash（灰窯原，選用）"
+   ],
+   "gameplay": "秋獸跡"
+  },
+  "winter": {
+   "changes": [
+    "plain/forest/swamp/rock 去飽和、變亮（霜）",
+    "water 微亮",
+    "desert/ash_waste 降飽和"
+   ],
+   "ground": "snow cover：北山以外的 plain/rock/forest 依緯度（y）漸減的 Bayer 網點積雪",
+   "weather": [
+    "snow"
+   ],
+   "gameplay": "冬耗糧"
+  },
+  "unchanged_all_year": [
+   "void",
+   "lava",
+   "snow_ice（北山常年冰雪）"
+  ]
+ },
+ "weather_layers": {
+  "snow": {
+   "colours": [
+    "#d8cfbd",
+    "#aea48f"
+   ],
+   "pattern": "1px 雪點，密度 1/48，每幀下移 1px、橫向 ±1 抖動，8 幀循環",
+   "asset": "weather/wx_snow_8f_398x280.png"
+  },
+  "rain": {
+   "colours": [
+    "#66747e"
+   ],
+   "pattern": "2px 斜線（右下 45°），密度 1/64，4 幀循環",
+   "asset": "weather/wx_rain_4f_398x280.png"
+  },
+  "fog": {
+   "colours": [
+    "#38434c"
+   ],
+   "pattern": "4×4 Bayer 25%（薄霧）/50%（濃霧），以雜訊遮罩分片，緩慢平移",
+   "asset": "weather/wx_fog_{25,50}_398x280.png"
+  },
+  "sandstorm": {
+   "colours": [
+    "#8a6c2e"
+   ],
+   "pattern": "沙漠類別上 Bayer 25% 橫向條帶",
+   "asset": "weather/wx_sand_4f_398x280.png",
+   "note": "選用；顏色已在調色盤"
+  },
+  "ash": {
+   "colours": [
+    "#4f4b45"
+   ],
+   "pattern": "灰窯原／崑崙丘上 1px 灰點緩降",
+   "asset": "weather/wx_ash_8f_398x280.png",
+   "note": "選用"
+  }
+ },
+ "z1_scaling": "Z1 頁用同一份規則，類別圖已逐頁輸出；天氣層用 Z1 原生 398×280 繪製（不放大 Z0 天氣）",
+ "not_done_here": "不畫四季成品圖；季節色表數值是草案（Lab 位移→最近調色盤色），由 ART-SEASON 調整"
+}
