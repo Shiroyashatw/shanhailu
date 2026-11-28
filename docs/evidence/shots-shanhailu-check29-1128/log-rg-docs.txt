@@ -1,0 +1,10 @@
+2ec6fb83edef87b6f2e906afd0cc0f4e9bb76fb5
+# rg 舊詞檢查（js/ css/ index.html）
+血霧: 0 處 
+鎮公所: 0 處 
+上香: 0 處 
+老闆娘: 0 處 
+# docs/ 相對 main e03947e（排除 check29 目錄）
+     32 A	docs/evidence/shots-shanhailu-textsweep1-1128/
+# 非 docs/js/tests/css/index.html 變更：
+0
