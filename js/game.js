@@ -28,6 +28,27 @@ window.SHL = (function () {
     return ks[ks.length - 1];
   }
   const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
+  const r2 = (x) => Math.round(x * 100) / 100; // SPEC-01 §3：浮點值存兩位小數
+  // 世界擲骰（SPEC-01 §9 E4）：以 S.seed、標籤、日期、序號混合出 [0,1)，不消耗 S.rng。
+  // 假設：對齊 sim/lib/world.js（numbers/num-shl-b1-sim 的 sim/lib/util.js wrnd：FNV-1a 標籤雜湊＋混合後取 mulberry32 第一個輸出；Q-0 定案照驗算程式）。
+  function hashStr(s) {
+    let h = 0x811c9dc5;
+    for (let i = 0; i < s.length; i++) { h ^= s.charCodeAt(i); h = Math.imul(h, 0x01000193); }
+    return h >>> 0;
+  }
+  function wrnd(tag, day, i) {
+    let h = (S.seed >>> 0) ^ hashStr(tag);
+    h = Math.imul(h ^ (h >>> 16), 0x85ebca6b) >>> 0;
+    h = (h ^ Math.imul((day | 0) + 0x632be5ab, 0x9e3779b1)) >>> 0;
+    h = Math.imul(h ^ (h >>> 13), 0xc2b2ae35) >>> 0;
+    h = (h ^ Math.imul((i | 0) + 0x1b873593, 0x27d4eb2f)) >>> 0;
+    h = (h ^ (h >>> 16)) >>> 0;
+    let t = (h + 0x6d2b79f5) >>> 0;
+    t = Math.imul(t ^ (t >>> 15), t | 1);
+    t ^= t + Math.imul(t ^ (t >>> 7), t | 61);
+    return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+  }
+  const wri = (tag, day, i, a, b) => a + Math.floor(wrnd(tag, day, i) * (b - a + 1));
 
   // ================= 時間：一律 24 小時制 =================
   function fmtClock(t) {
@@ -234,6 +255,8 @@ window.SHL = (function () {
       nodes: {}, fire: false,
       quests: [], rumors: [], freeRumor: {},
       world: { tide: null, next: 0, hurt: {} },
+      // SPEC-01 §1／§3.3 預留欄位（只存、不做介面；內容由 SPEC-02 定）
+      wanted: {}, hostility: {}, jurisdiction: null, influence: {},
       known: {}, found: {}, visited: {}, codex: [], reported: [], rep: { dawn: 0, star: 0, crow: 0 },
       talk: {}, say: null, street: null, journalTab: 'quest', mapView: 'region',
       dungeon: null, combat: null, event: null, loot: null,
@@ -241,7 +264,9 @@ window.SHL = (function () {
       log: [], stats: { kills: 0, gathers: 0, crafts: 0, hours: 0, maxSilver: 60, bounties: 0, rumors: 0, finds: 0, cause: '' },
       shops: {}, dead: null,
     };
-    S.world.next = ri(D.TIDE.first[0], D.TIDE.first[1]);
+    initTownWorld(S);
+    // 獸潮首次日程改用世界擲骰（SPEC-01 E4；對齊 sim/lib/world.js 的 'tide-first'）
+    S.world.next = wri('tide-first', 0, 0, D.TIDE.first[0], D.TIDE.first[1]);
     S.equip.bag = newEq('bag_cloth').eq;
     padPack();
     if (originId) applyOrigin(originId);
@@ -321,6 +346,8 @@ window.SHL = (function () {
     const w = readRaw();
     if (!w || w.schema !== SCHEMA || !w.state || w.state.dead) return false;
     S = w.state;
+    // SPEC-01 AC-J5／§2：讀到沒有 world.towns 的存檔，以起手值補、不回補過去（DEV-02 完成標準明文要求的唯一初始化例外，不是舊檔遷移）
+    if (!S.world.towns) initTownWorld(S);
     return true;
   }
 
@@ -412,15 +439,20 @@ window.SHL = (function () {
     else if (S.food >= 30 && !opts.noRegen) S.hp = Math.min(maxHp(), S.hp + 1 * hours);
     if (S.fat >= 100) { S.hp -= 2 * hours; S.stats.cause = '力竭倒地'; }
     S.food = Math.round(S.food); S.fat = Math.round(S.fat); S.hp = Math.round(S.hp);
-    if (dayOf(S.t) !== startDay) newDay();
+    // SPEC-01 §2：一次 passTime 跨 ≥2 個日界時逐日補算；每次日結看到的 S.t 是該日 00:00（SPEC-TIME B2）
+    const endT = S.t, endDay = dayOf(endT);
+    for (let d = startDay + 1; d <= endDay; d++) { S.t = (d - 1) * 1440; newDay(d); }
+    S.t = endT;
     checkDeath();
   }
-  function newDay() {
-    const day = dayOf(S.t);
+  function newDay(day) {
+    if (day === undefined) day = dayOf(S.t);
     S.nodes = {}; // 採集點每日回復
     if (S.dungeon) S.dungeon.clearedDay = null;
     log(fmtTime(S.t) + '，新的一天：採集點與貨架已回補。');
     worldTick(day);
+    townTick(day);
+    regionTick(day);
     restockShops();
     questTick(day);
     rumorTick(day);
@@ -646,9 +678,12 @@ window.SHL = (function () {
     if (band.id === 'heavy' || band.id === 'over') risk *= 1.4;
     if (wild && perk('jiao', 25)) risk *= 0.8;
     if (wild && tideOn()) risk *= 1.5;
+    // SPEC-01 §4.8「套用」：多乘治安／匪勢修正 R，封頂 0.85 在所有乘項之後做一次（夜間仍用現況 isNight；SPEC-TIME 7.1 屬 DEV-TIME）
+    const R = riskR(wild);
+    risk = Math.min(D.WORLD.RISK_CAP, risk * R);
     const riskName = risk < 0.15 ? '低' : risk < 0.35 ? '中' : '高';
     const via = edges.length > 1 ? D.NODES[edges.stops[0]].name : (edges[0] && edges[0].road ? '官道' : '野徑');
-    return { edges, hours, fat, food, risk, riskName, mult: sm, via, wild };
+    return { edges, hours, fat, food, risk, riskName, mult: sm, via, wild, R };
   }
   function selectDest(id) {
     if (S.dead || !known(id)) return;
@@ -781,12 +816,15 @@ window.SHL = (function () {
     if (!B || !B.buys || S.scene !== 'town') { log('要進店裡才能賣。', 'bad'); return emit(); }
     const p = sellPrice(it); let got = p;
     if (!p) { log(B.name + '不收' + itemName(it) + '。', 'bad'); return emit(); }
-    if (it.k === 'eq') { S.pack[slot] = null; S.silver += p; log('賣出' + itemName(it) + '，得銀 ' + p + ' 兩'); }
+    // 交易稅 5%（SPEC-01 §5.7）：在 sell() 內扣，日誌附「（交易稅 X 兩）」；熟練與聲望仍以行情所得計（沿用現況）
+    const taxNote = (x) => (x > 0 ? '（交易稅 ' + x + ' 兩）' : '');
+    if (it.k === 'eq') { S.pack[slot] = null; const x = tradeTax(p); S.silver += p - x; log('賣出' + itemName(it) + '，得銀 ' + (p - x) + ' 兩' + taxNote(x)); }
     else {
       const n = Math.min(qty || it.n, it.n);
       it.n -= n; if (it.n <= 0) S.pack[slot] = null;
       got = p * n;
-      S.silver += got; log('賣出' + D.ITEMS[it.k].name + ' ×' + n + '，得銀 ' + got + ' 兩');
+      const x = tradeTax(got);
+      S.silver += got - x; log('賣出' + D.ITEMS[it.k].name + ' ×' + n + '，得銀 ' + (got - x) + ' 兩' + taxNote(x));
       if (it.k === 'dogtag' && B.faction === 'dawn') addRep('dawn', n);
     }
     gainProf('yi', clamp(1 + got / 12, 1, 6)); tradeRep(got);
@@ -1138,21 +1176,161 @@ window.SHL = (function () {
       const td = W.tide; const q = S.quests.find((x) => x.kind === 'tide');
       if (td.kills >= td.need) {
         if (q) { q.status = 'done'; q.due = null; }
+        repelToday = td.town;
         log('獸潮退了。' + D.NODES[td.town].name + '守住了，委託板可領「擊退獸潮」的賞。', 'good');
       } else {
         S.quests = S.quests.filter((x) => x.kind !== 'tide');
         W.hurt[td.town] = day + T.hurtDays - 1;
         log('獸潮沖進了' + D.NODES[td.town].name + '。城鎮受創 ' + T.hurtDays + ' 天：貨架剩一半、客棧漲價。', 'bad');
       }
-      W.tide = null; W.next = day + ri(T.gap[0], T.gap[1]);
+      W.tide = null; W.next = day + wri('tide-gap', day, 0, T.gap[0], T.gap[1]); // E4：不吃 S.rng
     }
     if (!W.tide && day === W.next - 1) log('山裡的獸群躁動不安，城裡人說明天怕有獸潮。', 'bad');
     if (!W.tide && day >= W.next) {
-      const town = pick(D.TIDE.towns);
+      // E4：目標鎮改用 wrnd；權重維持現況各 1/2（§4.7 的 O>80 權重屬 DEV-04，接口：權重恆 1）
+      const town = D.TIDE.towns[Math.floor(wrnd('tide-town', day, 0) * D.TIDE.towns.length)];
       W.tide = { town, start: day, end: day + T.days - 1, kills: 0, need: T.need };
       S.quests.push({ id: 'tide' + day, town, kind: 'tide', g: '潮', ic: 'wolf', title: '擊退獸潮', need: T.need, reward: T.reward, due: W.tide.end, fixed: false, prog: 0, status: 'active' });
       log('獸潮來了，直撲' + D.NODES[town].name + '！為期 ' + T.days + ' 天：獸跡變多、野徑更險、藥水漲價。殺滿 ' + T.need + ' 頭野獸可領賞。', 'bad');
     }
+  }
+  // ================= 兩鎮循環（SPEC-01 v0.4 §3、§5.1–5.3、5.5、§7.6；DEV-02） =================
+  // 雜訊旗標：測試用 NOISE=0（_debug.setNoise(false)）關閉 PNOISE；不存檔。
+  let NOISE = true;
+  // SPEC-SEASON 鉤子（SPEC-01 §9 E17），預設全中性；本包不填值。taxMult 也供 AC-A4「Inc 設 0」測試使用。
+  const HOOKS = { pTargetOffset: {}, taxMult: {} };
+  // 本次 newDay 中玩家擊退獸潮的鎮（只給 whyCode 判斷，不存檔）；擊退對 P／O 的加成屬 §5.4（DEV-04），本包維持 0。
+  let repelToday = null;
+  function newTown(tid) {
+    const st = D.WORLD.START[tid];
+    return { P: st.P, T: st.T, O: st.O, Gnom: st.Gnom, Geff: st.Gnom, F: 0, Lpat: 0, debt: 0, rescueCd: 0, taxCut: 0, brief: {},
+      // 假設：acc＝上次日結以來直接進出 T 的即時款（交易稅；罰金與賞金實付留給 SPEC-02），給 brief 的「今日」收支用（§7.2）
+      acc: { tax: 0, fines: 0, bountyPaid: 0 },
+      // 假設：上一次「上繳」日誌的日期（§4.3「日誌最多每 10 天提示一次」需要記住；規格 §3 未列此欄）
+      remitLogDay: -99 };
+  }
+  // 建立本包的世界欄位（新局，或讀到沒有 world.towns 的存檔時）。§5.8–5.10 無人認領：heavyOps、refugee 只放預設值。
+  function initTownWorld(st) {
+    const W = st.world;
+    W.towns = {}; D.WORLD.TOWNS.forEach((tid) => (W.towns[tid] = newTown(tid)));
+    W.region = Object.assign({}, D.WORLD.REGION0);
+    W.heavyOps = { season: 0, n: 0 };
+    W.refugee = Object.assign({}, D.WORLD.REFUGEE0);
+    if (st.wanted === undefined) st.wanted = {};
+    if (st.hostility === undefined) st.hostility = {};
+    if (st.jurisdiction === undefined) st.jurisdiction = null;
+    if (st.influence === undefined) st.influence = {};
+  }
+  function townOf(id) { return S.world.towns ? S.world.towns[id] || null : null; }
+  function garrisonName(g) { return D.WORLD.GARRISON_NAMES[clamp(g | 0, 0, 3)]; }
+  // §4.10 治安修正（給 SPEC-02／03）：用最近一次日結後的 O、Geff
+  function sPub(tid) {
+    const t = townOf(tid); if (!t) return 1;
+    const C = D.WORLD.S_PUB;
+    return clamp(C.a + C.kO * t.O + C.kG * t.Geff, C.lo, C.hi) / C.norm;
+  }
+  // §4.8「套用」列的 R（rollout-plan DEV-02「只乘治安修正」）：路線全官道用 R_road，含野徑用 R_wild
+  function riskR(wild) {
+    const W = S.world, Wd = D.WORLD; if (!W.towns) return 1;
+    const Obar = (W.towns.huiyao.O + W.towns.duyin.O) / 2, B = W.region.B;
+    if (wild) return clamp(1 + Wd.R_WILD.kB * (B - Wd.B_REF) - Wd.R_WILD.kO * (Obar - Wd.O_MEAN), Wd.R_WILD.lo, Wd.R_WILD.hi);
+    return clamp(1 - Wd.R_ROAD.kO * (Obar - Wd.O_MEAN), Wd.R_ROAD.lo, Wd.R_ROAD.hi);
+  }
+  // 獸潮對 P／O 的日結變動（§4.7、§5.4）屬 DEV-04：只留接口，DEV-04 之前恆為 0
+  function tideDelta(/* tid, day */) { return { p: 0, o: 0 }; }
+  function inTide(tid, day) { const td = S.world.tide; return !!(td && td.town === tid && day >= td.start && day <= td.end); }
+  // §5 第 2 步：每鎮依序 5.1 稅 → 5.2 軍費與實際駐軍 → 5.3 目標與更新 → 5.5 上繳；全部用「昨日結束時」的 P、O、B（同步更新）
+  function townTick(day) {
+    const W = S.world, Wd = D.WORLD; if (!W.towns) return;
+    const snap = {}; Wd.TOWNS.forEach((tid) => (snap[tid] = { P: W.towns[tid].P, O: W.towns[tid].O }));
+    const B = W.region.B;
+    Wd.TOWNS.forEach((tid) => {
+      const t = W.towns[tid], y = snap[tid], bs = Wd.BASE[tid];
+      const prevBrief = t.brief || {};
+      // 5.1 稅（用目前 taxCut 算 Inc，之後才遞減計數器）
+      const mult = HOOKS.taxMult[tid] === undefined ? 1 : HOOKS.taxMult[tid];
+      const incFull = Wd.K_TAX[tid] * y.P * (Wd.TAX_O0 + Wd.TAX_O1 * y.O) * mult;
+      const cut = t.taxCut > 0;
+      const Inc = incFull * (cut ? Wd.TAX_CUT_MULT : 1);
+      t.T += Inc;
+      // 5.2 軍費與實際駐軍
+      t.rescueCd = Math.max(t.rescueCd - 1, 0); t.taxCut = Math.max(t.taxCut - 1, 0);
+      const need = Wd.UPKEEP[t.Gnom]; let paid = 0, debtToday = false, aidToday = false, rescueAmt = 0, d = 0;
+      if (t.T >= need) {
+        t.T -= need; paid = need; t.Geff = t.Gnom; t.debt = 0;
+        d = Wd.UPKEEP[Math.min(t.Gnom + 1, 3)] - need;
+        if (t.Gnom < 3 && t.F >= d) { t.F -= d; t.Geff = t.Gnom + 1; aidToday = true; }
+      } else {
+        t.Geff = Math.max(t.Gnom - 1, 0);
+        paid = Math.min(t.T, Wd.UPKEEP[t.Geff]); t.T -= paid;
+        t.debt += 1; debtToday = true; // F 不動（E2）
+      }
+      if (t.debt >= Wd.RESCUE_DEBT && t.rescueCd === 0) {
+        rescueAmt = Wd.RESCUE_UPKEEP_DAYS * Wd.UPKEEP[t.Gnom];
+        t.T += rescueAmt; t.debt = 0; t.taxCut = Wd.RESCUE_TAX_CUT; t.rescueCd = Wd.RESCUE_CD;
+      }
+      // 5.3 繁榮與治安（獸潮項 tideDelta 待 DEV-04；販人回饋 −0.2×soldToday 屬 §5.10，無人認領，恆 0）
+      const Pcap = Wd.P_CAP;
+      const Pstar = bs.P_base + Wd.P_OF_O * (y.O - bs.O_base) + (HOOKS.pTargetOffset[tid] || 0);
+      const Ostar = bs.O_base + Wd.O_OF_P * (y.P - bs.P_base) - Wd.O_OF_B * (B - Wd.B_REF) + Wd.O_PER_G * (t.Geff - bs.G0) + Wd.PATROL[t.Lpat];
+      const td = tideDelta(tid, day);
+      let eps = 0;
+      if (NOISE) { const u = wrnd('pnoise-' + tid, day, 0); eps = (u < 1 / 3 ? -1 : u < 2 / 3 ? 0 : 1) * Wd.PNOISE; }
+      let dP = Wd.K_REG * (Pstar - y.P) + eps + td.p;
+      let dO = Wd.K_REG * (Ostar - y.O) + td.o;
+      dP = clamp(dP, -Wd.DAY_CAP, Wd.DAY_CAP); dO = clamp(dO, -Wd.DAY_CAP, Wd.DAY_CAP);
+      if (dP > 0 && y.P > Wd.P_HIGH) dP *= Wd.P_HIGH_MULT;
+      t.P = r2(clamp(y.P + dP, Wd.P_MIN, Pcap)); t.O = r2(clamp(y.O + dO, 0, 100));
+      // 5.5 財庫上繳
+      const TCAP = Wd.T_CAP_DAYS * need; let overflow = 0;
+      if (t.T > TCAP) {
+        overflow = t.T - TCAP; t.T = TCAP;
+        if (day - t.remitLogDay >= Wd.REMIT_LOG_GAP) { t.remitLogDay = day; log(D.NODES[tid].name + '財庫滿了，多出的 ' + Math.round(overflow) + ' 兩上繳鎮西將軍府。'); }
+      }
+      t.T = r2(Math.max(0, t.T)); t.F = r2(t.F);
+      if (debtToday) log(D.NODES[tid].name + '欠餉，駐軍降一檔。', 'bad');
+      if (rescueAmt) log(D.NODES[tid].name + '求援：撥銀 ' + rescueAmt + ' 兩，往後 ' + Wd.RESCUE_TAX_CUT + ' 天稅收抽成。', 'bad');
+      // §7 brief（每次日結覆寫；UI 只讀不算，畫面屬 DEV-05）
+      const a = t.acc;
+      const inSum = Inc + a.tax + a.fines + rescueAmt, outSum = paid + a.bountyPaid + overflow;
+      const tIn = Math.round(inSum), tOut = Math.round(outSum);
+      const realdP = r2(t.P - y.P), realdO = r2(t.O - y.O);
+      const trend = Math.abs(realdP) < Wd.TREND_EPS ? 'flat' : realdP > 0 ? 'up' : 'down';
+      const aidDaysLeft = aidToday ? 1 + Math.floor(t.F / d) : 0;
+      let whyCode = null;
+      if (trend !== 'flat') {
+        const sgn = trend === 'up' ? 1 : -1;
+        const pdO = prevBrief.dO || 0;
+        const R = W.refugee || {};
+        const rules = [
+          [inTide(tid, day), -1, 'WHY_TIDE'], [townHurt(tid), -1, 'WHY_HURT'], [repelToday === tid, 1, 'WHY_REPEL'],
+          [debtToday, -1, 'WHY_DEBT'], [B >= Wd.WHY_BANDIT_B, -1, 'WHY_BANDIT'], [tid === 'duyin' && (R.soldYday || 0) > 0, -1, 'WHY_RENLU'],
+          [aidToday, 1, 'WHY_AID'], [pdO >= 1, 1, 'WHY_ORDER_UP'], [pdO <= -1, -1, 'WHY_ORDER_DOWN'],
+        ];
+        const hit = rules.find((r) => r[0] && r[1] === sgn);
+        whyCode = hit ? hit[2] : (Math.sign(realdP) === Math.sign(Pstar - y.P) ? 'WHY_REVERT' : 'WHY_NONE');
+      }
+      t.brief = {
+        day, dP: realdP, dO: realdO, trend, whyCode, T: t.T, dT: r2(inSum - outSum),
+        treasuryIn: tIn, treasuryOut: tOut, treasuryNet: tIn - tOut,
+        Inc: r2(Inc), tax: r2(a.tax), fines: r2(a.fines), rescueAmt: r2(rescueAmt), upkeepPaid: r2(paid), bountyPaid: r2(a.bountyPaid), overflow: r2(overflow),
+        treasuryTier: debtToday ? 'debt' : need === 0 ? 'ok' : t.T >= TCAP ? 'full' : t.T < Wd.TIGHT_DAYS * need ? 'tight' : 'ok',
+        Geff: t.Geff, debtToday, debtDays: t.debt, aidToday, aidDaysLeft, aidFund: t.F,
+        rescueToday: rescueAmt > 0, taxCutDays: t.taxCut, taxCutAmt: r2(cut ? incFull - Inc : 0),
+      };
+      t.acc = { tax: 0, fines: 0, bountyPaid: 0 };
+    });
+    repelToday = null;
+  }
+  // §5 第 3 步 regionTick（§5.6 匪勢與人手）：只留接口。SPEC-01 §13 歸 DEV-04，任務書寫「匪勢 B 在 DEV-04 之前維持起手值」，
+  // 與「§5 規定的日結變化」字面互相牽動 → 列待裁；本包不更新 B、crew（維持起手 30／4）。
+  function regionTick(/* day */) { /* 待 DEV-04 */ }
+  // 交易稅（§4.3、§5.7，Q1 乙）：只在賣出時扣，floor(得銀 × 5%) 進該鎮 T；買價與 sellPrice 顯示值不變
+  function tradeTax(got) {
+    const t = townOf(S.loc); if (!t) return 0; // 假設：只有兩鎮（灰窯、渡陰）課稅；破曉營等非鎮地點不課
+    const x = Math.floor(got * D.WORLD.TRADE_TAX);
+    if (x > 0) { t.T = r2(t.T + x); t.acc.tax += x; }
+    return x;
   }
   function tideInfo() {
     const td = S.world.tide; if (!td || !tideOn()) return null;
@@ -1772,7 +1950,7 @@ window.SHL = (function () {
   return {
     get state() { return S; },
     init, on, restart, save, wipeSave, readRaw, SAVE_KEY,
-    fmtTime, fmtClock, fmtDate, dayOf, isNight, seasonOf, ageOf, wakeTime,
+    fmtTime, fmtClock, fmtDate, dayOf, isNight, seasonOf, ageOf, wakeTime, garrisonName, sPub, riskR,
     maxHp, carryCap, totalWt, loadBand, speedMult, armor, weaponDmg, weaponType, hitChance, dodgeChance, critChance, bagCap,
     attrVal, attrProgress, profLv, profProgress, perk,
     eqBase, eqValue, itemWt, itemName, itemGlyph, itemIcon, countItem, affixSum, reqUnmet, slotFits,
@@ -1787,6 +1965,7 @@ window.SHL = (function () {
     craft, canCraftHere, gather, gatherFat, camp, nodeState, dungeonDelve,
     combatAction, combatActions, combatOrder, takeFx, toggleRetreat, toggleDrop, retreatChance, selWt, setTarget, playerSpeed, lootDone,
     eventChoose, eventDone, setOverlay, setProfTab, setJournalTab, sysCamp,
-    _debug: { passTime, addItem, die, startCombat, newEq, gainProf, addRumor, worldTick, lootEq, addRep, addCodex, addCorrupt },
+    _debug: { passTime, addItem, die, startCombat, newEq, gainProf, addRumor, worldTick, lootEq, addRep, addCodex, addCorrupt,
+      townTick, newDay, wrnd, tradeTax, HOOKS, setNoise: (on) => { NOISE = !!on; }, rnd },
   };
 })();

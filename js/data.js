@@ -454,6 +454,37 @@ window.SHL_DATA = (function () {
   const TIDE = { towns: ['huiyao', 'duyin'], first: [3, 4], gap: [5, 7], days: 2, need: 4, reward: 50, potMult: 1.5, hurtDays: 2 };
   // 歇息起床（SPEC-TIME v0.4 §11 B1）：起床＝min(max(現在+minH, 下一個 wakeMin), 現在+maxH)；maxH 13 為建議值、未經模擬（Q-T7 乙）
   const SLEEP = { wakeMin: 8 * 60, minH: 6, maxH: 13 };
+  // ===== 兩鎮循環（SPEC-01 v0.4 §3、§4；單一來源，DEV-02） =====
+  // 標記沿用規格：〔LW〕living-world、〔新〕規格補值、〔既有〕現況。數字全部照 SPEC-01 v0.4，未經本包調整。
+  const WORLD = {
+    TOWNS: ['huiyao', 'duyin'],
+    // §3.1 起手／§4.5 基準（P_base、O_base、G0＝Gnom）
+    START: { huiyao: { P: 50, T: 200, O: 55, Gnom: 1 }, duyin: { P: 45, T: 300, O: 60, Gnom: 2 } },
+    BASE: { huiyao: { P_base: 50, O_base: 55, G0: 1 }, duyin: { P_base: 45, O_base: 60, G0: 2 } },
+    // §4.1 驅動與回歸
+    K_REG: 0.10, DAY_CAP: 3, P_MIN: 15, P_CAP: 80, P_HIGH: 70, P_HIGH_MULT: 0.5, PNOISE: 1,
+    // §4.2 目標值係數
+    P_OF_O: 0.40, O_OF_P: 0.20, O_OF_B: 0.20, O_PER_G: 10, B_REF: 30, O_MEAN: 57.5, P_MEAN: 47.5,
+    // §4.3 軍費、稅、財庫（K_TAX v0.3 值）
+    UPKEEP: [0, 15, 40, 90], K_TAX: { huiyao: 0.56, duyin: 1.45 }, TAX_O0: 0.6, TAX_O1: 0.004, TAX_CUT_MULT: 0.8,
+    TRADE_TAX: 0.05, T_CAP_DAYS: 90, REMIT_LOG_GAP: 10,
+    // §4.4 欠餉與求援
+    RESCUE_DEBT: 3, RESCUE_UPKEEP_DAYS: 6, RESCUE_TAX_CUT: 10, RESCUE_CD: 20,
+    // §4.6（只留資料，資助與巡邏所的玩家行動屬 DEV-04）
+    PATROL: [0, 5, 9, 12], F_CAP: 500,
+    // §3.2 區域起手
+    REGION0: { B: 30, crew: 4, crewCtr: 0, crewWiped: false },
+    // §4.8 遇險率的治安／匪勢修正 R 與封頂（封頂在所有乘項之後做一次）
+    R_ROAD: { kO: 0.015, lo: 0.5, hi: 1.5 }, R_WILD: { kB: 0.012, kO: 0.010, lo: 0.5, hi: 1.8 }, RISK_CAP: 0.85,
+    // §4.10 S_pub＝P_DETECT(O, Geff)/0.57
+    S_PUB: { a: 0.25, kO: 0.004, kG: 0.10, lo: 0.15, hi: 0.95, norm: 0.57 },
+    // §7.1 簡報換算門檻（只給 brief 用，畫面屬 DEV-05）
+    TREND_EPS: 0.5, TIGHT_DAYS: 3, WHY_BANDIT_B: 35,
+    // §7.1／§7.6／§11 駐軍四檔顯示名（列名仍「駐軍」）：0 無、1 自衛隊、2 巡邏隊、3 守備（v0.4，mumi 16:10）
+    GARRISON_NAMES: ['無', '自衛隊', '巡邏隊', '守備'],
+    // §3.2／§5.10 難民棚起手（只存欄位；§5.10 規則無人認領，本包不結算）
+    REFUGEE0: { camp: 60, inTotal: 0, settledTotal: 0, soldTotal: 0, soldToday: 0, soldYday: 0 },
+  };
 
   // ---------- 營火／藥爐配方 ----------
   const RECIPES = [
@@ -538,5 +569,5 @@ window.SHL_DATA = (function () {
   const SLOT_NAMES = { main: '主手', off: '副手', head: '頭盔', chest: '胸甲', gloves: '手套', boots: '靴子', amulet: '護身符', ring1: '左戒', ring2: '右戒', belt: '腰帶', bag: '背包', cart: '馬車' };
   const SLOT_GLYPH = { main: '刃', off: '盾', head: '冠', chest: '甲', gloves: '手', boots: '靴', amulet: '符', ring1: '戒', ring2: '戒', belt: '帶', bag: '囊', cart: '車' };
 
-  return { ITEMS, SKILLS, TECHS, BASES, AFFIXES, UNIQUES, LEGENDS, RARITY, ENEMIES, NODES, EDGES, REGION_LABELS, WILDS, DUNGEONS, PRICES, PLACES, BUILDINGS, ITEM_CLASS, NPCS, FACTIONS, EXPLORE, CODEX_CATS, BOUNTIES, QUEST_GEN, RUMOR, TIDE, SLEEP, RECIPES, EVENTS, ATTRS, PROFS, PROF_GROUPS, WTYPE_NAMES, ORIGINS, SEASONS, YEAR_NAMES, EQ_SLOTS, SLOT_NAMES, SLOT_GLYPH };
+  return { ITEMS, SKILLS, TECHS, BASES, AFFIXES, UNIQUES, LEGENDS, RARITY, ENEMIES, NODES, EDGES, REGION_LABELS, WILDS, DUNGEONS, PRICES, PLACES, BUILDINGS, ITEM_CLASS, NPCS, FACTIONS, EXPLORE, CODEX_CATS, BOUNTIES, QUEST_GEN, RUMOR, TIDE, SLEEP, WORLD, RECIPES, EVENTS, ATTRS, PROFS, PROF_GROUPS, WTYPE_NAMES, ORIGINS, SEASONS, YEAR_NAMES, EQ_SLOTS, SLOT_NAMES, SLOT_GLYPH };
 })();
