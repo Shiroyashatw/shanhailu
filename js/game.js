@@ -943,6 +943,13 @@ window.SHL = (function () {
     const Bq = D.QUEST_GEN.bandit; const R = S.world.region; if (!R) return 0;
     return clamp((R.B - Bq.b0) / Bq.span, 0, Bq.pMax);
   }
+  // kill 類抽中時，以 p = clamp((B − 20)/80, 0, 0.5) 改為劫匪題（×2／×4 各半）。
+  // 假設：這兩次擲骰用 wrnd（以鎮、日、序號混合），不額外消耗 S.rng，讓既有流程的亂數序列不變
+  function banditDraw(town, day, i) {
+    if (wrnd('quest-bandit-' + town, day, i * 2) >= banditQuestP()) return null;
+    const pool = D.QUEST_GEN.bandit.pool;
+    return pool[Math.floor(wrnd('quest-bandit-' + town, day, i * 2 + 1) * pool.length)];
+  }
   function genQuests() {
     const day = dayOf(S.t); const G = D.QUEST_GEN;
     boardTowns().forEach((town) => {
@@ -956,10 +963,8 @@ window.SHL = (function () {
           if (S.quests.some((x) => x.town === town && x.kind === 'collect' && x.item === item && x.status !== 'claimed')) continue;
           Object.assign(q, { item, need: cnt, g: D.ITEMS[item].g, ic: item, title: '收購' + D.ITEMS[item].name + ' ×' + cnt, reward: Math.round(D.PRICES[D.PLACES[town].price][item] * cnt * 1.8) + 6, due: day + G.collect.days });
         } else if (kind === 'kill') {
-          // DEV-04（§4.9）：kill 類抽中時，以 p = clamp((B − 20)/80, 0, 0.5) 改為劫匪題（×2／×4 各半）；同種敵人去重沿用現況（Q-S5 甲）。
-          // 假設：這兩次擲骰用 wrnd（以鎮、日、序號混合），不額外消耗 S.rng，讓既有流程的亂數序列不變
-          const bq = wrnd('quest-bandit-' + town, day, guard * 2) < banditQuestP();
-          const [enemy, cnt, reward] = bq ? G.bandit.pool[Math.floor(wrnd('quest-bandit-' + town, day, guard * 2 + 1) * G.bandit.pool.length)] : pick(G.kill.pool);
+          // DEV-04（§4.9）：kill 類抽中時可能改為劫匪題；同種敵人去重沿用現況（Q-S5 甲）
+          const [enemy, cnt, reward] = banditDraw(town, day, guard) || pick(G.kill.pool);
           if (S.quests.some((x) => x.kind === 'kill' && x.enemy === enemy && (x.status === 'open' || x.status === 'active'))) continue;
           Object.assign(q, { enemy, need: cnt, g: D.ENEMIES[enemy].g, ic: D.ENEMIES[enemy].ic || enemy, title: '獵殺' + D.ENEMIES[enemy].name + ' ×' + cnt, reward, due: day + G.kill.days });
         } else {
@@ -1196,6 +1201,7 @@ window.SHL = (function () {
   // ================= 世界事件：獸潮 =================
   function worldTick(day) {
     const W = S.world; const T = D.TIDE;
+    repelToday = null; // DEV-04：只代表「本次日結」的擊退（townTick 末尾也會清）
     if (W.tide && day > W.tide.end) {
       const td = W.tide; const q = S.quests.find((x) => x.kind === 'tide');
       // DEV-04（§5.4）：玩家殺滿，或守軍自衛擊退（wrnd('tide', day) < P_DEF[昨日 Geff]，不吃 S.rng）
@@ -2070,6 +2076,6 @@ window.SHL = (function () {
     eventChoose, eventDone, setOverlay, setProfTab, setJournalTab, sysCamp,
     _debug: { passTime, addItem, die, startCombat, newEq, gainProf, addRumor, worldTick, lootEq, addRep, addCodex, addCorrupt,
       townTick, newDay, wrnd, tradeTax, HOOKS, setNoise: (on) => { NOISE = !!on; }, rnd,
-      regionTick, banditKilled, tideDelta, tideTarget, truthW, liveTruth, genQuests, killEnemy },
+      regionTick, banditKilled, tideDelta, tideTarget, truthW, liveTruth, genQuests, killEnemy, banditDraw, victory },
   };
 })();
