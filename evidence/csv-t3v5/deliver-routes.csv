@@ -1,0 +1,7 @@
+from,to,route,base_h,kind,equal_length_wild_alternatives,risk_day_R1,risk_night_R1
+huiyao,duyin,灰窯鎮→官道驛站→渡陰關,4,road,1,0.04,0.08
+duyin,huiyao,渡陰關→官道驛站→灰窯鎮,4,road,1,0.04,0.08
+huiyao,poxiao,灰窯鎮→官道驛站→渡陰關→破曉營,6,road,2,0.04,0.08
+poxiao,huiyao,破曉營→渡陰關→官道驛站→灰窯鎮,6,road,2,0.04,0.08
+duyin,poxiao,渡陰關→破曉營,2,road,0,0.04,0.08
+poxiao,duyin,破曉營→渡陰關,2,road,0,0.04,0.08
