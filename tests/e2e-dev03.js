@@ -1,8 +1,8 @@
 /* 《山海錄》DEV-03 路人與巡邏走動 — 新增驗收（Node + Playwright，headless Chromium）
  * 用法：node tests/e2e-dev03.js [--shots]
  *   --shots  另存 1280×720 實機截圖至 docs/evidence/shots-shanhailu-dev03-fix1-1128/（可用環境變數 SHOTS_DIR 覆寫）
- * 依據：docs/design/batch1/specs/SPEC-01.md v0.5（§6、AC-D2、AC-J6 與 v0.4 同）（§6 路人與巡邏人數、§10 AC-D2、AC-J6、§13 DEV-03 列）、
- *       docs/design/batch1/rollout-plan-v0.1.md 第 114 行（DEV-03）與 5.1 DEV-03 列。
+ * 依據：docs/specs/SPEC-01.md v0.5（§6、AC-D2、AC-J6 與 v0.4 同）（§6 路人與巡邏人數、§10 AC-D2、AC-J6、§13 DEV-03 列）、
+ *       docs/plan/rollout-plan-v0.1.md 第 114 行（DEV-03）與 5.1 DEV-03 列。
  * 既有 tests/e2e.js、tests/e2e-dev02.js 不動；本檔只放 DEV-03 的新斷言。
  */
 'use strict';

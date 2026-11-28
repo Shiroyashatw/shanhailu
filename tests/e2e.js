@@ -663,7 +663,7 @@ async function exploreUntil(page, pred, max) {
   await noOrigin('標題頁');
   const odata = await page.evaluate(() => window.SHL_DATA.ORIGINS);
   check('ORIGINS 只剩一張「平民」，沿用流民數值（素質全 10、銀 60、鏽刃＋布衣、無熟練度）', odata.length === 1 && odata[0].name === '平民' && odata[0].id === 'drifter' && Object.keys(odata[0].attr).length === 0 && Object.keys(odata[0].prof).length === 0 && odata[0].silver === 60 && odata[0].gear.join() === 'blade_rust,robe', odata.map((o) => o.id + ':' + o.name));
-  const csvRows = fs.readFileSync(path.join(ROOT, 'docs/design/batch1/name-pool-v0.1.csv'), 'utf8').replace(/^\uFEFF/, '').trim().split(/\r?\n/).slice(1).map((l) => l.split(','));
+  const csvRows = fs.readFileSync(path.join(ROOT, 'docs/loc/name-pool-v0.1.csv'), 'utf8').replace(/^\uFEFF/, '').trim().split(/\r?\n/).slice(1).map((l) => l.split(','));
   const pool = await page.evaluate(() => window.SHL_DATA.NAME_POOL);
   check('NAME_POOL 與 name-pool-v0.1.csv 60 組（姓、名）逐組一致，且預設「沈衡」不在池內', csvRows.length === 60 && pool.length === 60 && csvRows.every((r, i) => pool[i][0] === r[2] && pool[i][1] === r[3] && r[2] + r[3] === r[4]) && !pool.some((p) => p[0] + p[1] === '沈衡'), pool.length);
   await click(page, 'origin-drifter');

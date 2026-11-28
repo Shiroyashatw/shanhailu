@@ -2,7 +2,7 @@
  * 用法：node tests/e2e-dev05.js [--shots]
  *   --shots  另存 1280×720 實機截圖（deviceScaleFactor 2）至 docs/evidence/shots-shanhailu-dev05-1128/（可用 SHOTS_DIR 覆寫）
  * fix1（1128）：依 SPEC-TIME v0.5 §7.1b／§7.2／B1、SPEC-01 v0.5 §4.9／§7、SPEC-02 驗收 34、decisions-producer-1128-1727、dev05-strings-v0.1。
- * 依據（初版）：docs/design/batch1/specs/SPEC-01.md v0.4 §7、§13；UI-02/README.md 與 UI-02-01／02／03／05／06；
+ * 依據（初版）：docs/specs/SPEC-01.md v0.4 §7、§13；UI-02/README.md 與 UI-02-01／02／03／05／06；
  *       UI-02/wording-map-commission.md；city-status-copy-v0.1.csv；decisions-producer-1128-1646.md 第 1 項；rollout-plan-v0.1.md 第 116 行。
  * 既有 tests/e2e.js、tests/e2e-dev02.js 不在此重複；本檔只放 DEV-05 的新斷言。
  */

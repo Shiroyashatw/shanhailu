@@ -101,7 +101,7 @@ async function shot(page, name) {
   const pool = await page.evaluate(() => window.SHL_DATA.NAME_POOL);
   const poolBad = await page.evaluate(() => window.SHL_DATA.NAME_POOL.filter((p) => window.SHL.nameErrors(p[0], p[1]).length).map((p) => p.join('')));
   check('NAME_POOL 60 組全部通過 nameErrors', pool.length === 60 && poolBad.length === 0, poolBad);
-  const csvRows = fs.readFileSync(path.join(ROOT, 'docs/design/batch1/name-pool-v0.1.csv'), 'utf8').replace(/^﻿/, '').trim().split(/\r?\n/).slice(1).map((l) => l.split(','));
+  const csvRows = fs.readFileSync(path.join(ROOT, 'docs/loc/name-pool-v0.1.csv'), 'utf8').replace(/^﻿/, '').trim().split(/\r?\n/).slice(1).map((l) => l.split(','));
   check('NAME_POOL 與 name-pool-v0.1.csv 逐組一致', csvRows.length === 60 && csvRows.every((r, i) => pool[i][0] === r[2] && pool[i][1] === r[3] && r[2] + r[3] === r[4]));
   check('開局池：倪桃兒、甘菜頭在池內（第 56、57 組），倪招弟、甘細妹不在', pool[55].join('') === '倪桃兒' && pool[56].join('') === '甘菜頭' && !pool.some((p) => ['倪招弟', '甘細妹'].includes(p.join(''))) && csvRows[55][4] === '倪桃兒' && csvRows[56][4] === '甘菜頭');
 

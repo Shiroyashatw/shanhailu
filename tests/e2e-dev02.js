@@ -1,8 +1,8 @@
 /* 《山海錄》DEV-02 兩鎮循環 — 新增驗收（Node + Playwright，headless Chromium）
  * 用法：node tests/e2e-dev02.js [--shots]
  *   --shots  另存 1280×720 實機截圖至 docs/evidence/shots-shanhailu-dev02-1128/（可用環境變數 SHOTS_DIR 覆寫）
- * 依據：docs/design/batch1/specs/SPEC-01.md v0.4（§3、§4、§5.1–5.3、5.5、§7.6、§9 E4、§10 AC-A／AC-J）、
- *       docs/design/batch1/specs/SPEC-TIME.md v0.4（§11 B1、§12 E11、§14 第 12 條）、rollout-plan-v0.1.md 第 113 行。
+ * 依據：docs/specs/SPEC-01.md v0.4（§3、§4、§5.1–5.3、5.5、§7.6、§9 E4、§10 AC-A／AC-J）、
+ *       docs/specs/SPEC-TIME.md v0.4（§11 B1、§12 E11、§14 第 12 條）、rollout-plan-v0.1.md 第 113 行。
  * 既有 tests/e2e.js 不動斷言；本檔只放 DEV-02 的新斷言。
  */
 'use strict';

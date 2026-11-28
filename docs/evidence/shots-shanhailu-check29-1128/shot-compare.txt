@@ -1,0 +1,36 @@
+shot-compare：check29 截圖 vs shots-shanhailu-textsweep1-1128（逐位元組 cmp；1280×720）
+
+00–21：check29 當時（2ec6fb8）用 e2e.js --shots 重拍，測試在 666 行 ENOENT 前拍到的 23 張。
+22／23／24／30／31：fix1（textsweep1-fix1，路徑修正後）重跑 e2e.js --shots 補拍；e2e.js 本次 461/461 PASS。
+（25、26、27 不在本次補拍範圍，未放入此目錄。）
+
+00-origin.png                  相同
+01-town-street.png             不同（路人走位；cmp-01-town-street.png 左舊右新）
+02-street-npc.png              不同（路人走位）
+03-building-market.png         相同
+04-building-apoth.png          相同
+05-building-inn.png            相同
+06-building-board.png          相同
+07-journal-codex.png           相同
+07b-factions.png               相同
+08-worldmap.png                相同
+09-continent.png               相同
+10-crow-nest.png               相同
+11-wild-campfire.png           相同
+12-combat-actionbar.png        相同
+13-combat-fx.png               不同（傷害飄字時間；cmp-13-combat-fx.png）
+14-combat-retreat.png          相同
+15-rumor-guard.png             相同
+16-duyin-street.png            不同（路人走位；cmp-16-duyin-street.png）
+17-drill.png                   相同
+18-character.png               相同
+19-rift.png                    相同
+20-death-epitaph.png           相同
+21-title.png                   相同
+22-naming-valid.png            相同（fix1 補拍）
+23-naming-invalid.png          相同（fix1 補拍）
+24-wake-log-right.png          不同（fix1 補拍；差異框 x999–1024 y265–301 共 376 px，單一路人位置；cmp-24-wake-log-right.png）
+30-naming-preview-twoline.png  相同（fix1 補拍）
+31-storyteller-surname.png     不同（fix1 補拍；差異框 x486–1021 y209–398，路人位置；對話框與字面一致；cmp-31-storyteller-surname.png）
+
+結論：所有差異都是路人隨機走位或飄字時間，畫面上的字面一致。

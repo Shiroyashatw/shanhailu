@@ -510,7 +510,7 @@ window.SHL_DATA = (function () {
 
   // ===== 題材文字表（DEV-05；可替換資料檔） =====
   // 假設：分檔檔名與切點待 mumi（製作人 16:46 裁決第 1 項）；本包先集中放在這一處，ui.js 只讀這張表，不寫死句子。
-  // 來源：city.* ＝ docs/design/batch1/city-status-copy-v0.1.csv（字串 key 照 CSV）；map.* ＝ UI-02/wording-map-commission.md §1；
+  // 來源：city.* ＝ docs/loc/city-status-copy-v0.1.csv（字串 key 照 CSV）；map.* ＝ UI-02/wording-map-commission.md §1；
   //       quest.* ＝ wording-map §2；腳程懸浮＝mumi 原句（16:29 拍板、16:46 裁決第 1 項）。駐軍四檔名在 WORLD.GARRISON_NAMES（DEV-02），不在此重複。
   // {名稱} 為代入欄位，名稱對齊 brief 欄位（SPEC-01 §7.6）。
   const TEXT = {
@@ -650,7 +650,7 @@ window.SHL_DATA = (function () {
   const ORIGINS = [
     { id: 'drifter', name: '平民', desc: '什麼都不會，什麼都能學。', attr: {}, prof: {}, gear: ['blade_rust', 'robe'], silver: 60 },
   ];
-  // 開局取名：預設名（不在池內）與整池 60 組（姓、名），原樣取自 docs/design/batch1/name-pool-v0.1.csv，順序與用字不改
+  // 開局取名：預設名（不在池內）與整池 60 組（姓、名），原樣取自 docs/loc/name-pool-v0.1.csv，順序與用字不改
   const NAME_DEFAULT = { sur: '沈', given: '衡' };
   // 自訂名「已有人用」清單：整名完全相同才攔（取名禁字規則定稿 v1.0 §3、§5 起始表）。
   // 固定角色全名＋稱謂詞＋遊戲名詞＋九大勢力全名（共 42 項）。正式版可由 names-final 新名欄與勢力名產出後整批替換本常數。

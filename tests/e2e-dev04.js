@@ -1,7 +1,7 @@
 /* 《山海錄》DEV-04 斷路幫與獸潮連動 — 新增驗收（Node + Playwright，headless Chromium）
  * 用法：node tests/e2e-dev04.js [--shots]
  *   --shots  另存 1280×720 實機截圖至 docs/evidence/shots-shanhailu-dev04-1128/（可用環境變數 SHOTS_DIR 覆寫）
- * 依據：docs/design/batch1/specs/SPEC-01.md v0.5（含 18:19 剿匪單延後、AC-E12；§4.6、§4.7、§4.8、§4.9、§5.4、§5.6、§5.7、§10 AC-E、AC-A2／A3、AC-D1、AC-J2／J4）、
+ * 依據：docs/specs/SPEC-01.md v0.5（含 18:19 剿匪單延後、AC-E12；§4.6、§4.7、§4.8、§4.9、§5.4、§5.6、§5.7、§10 AC-E、AC-A2／A3、AC-D1、AC-J2／J4）、
  *       rollout-plan-v0.1.md 第 115 行（DEV-04）、decisions-producer-1128-1646.md 第 5、6 項、specs/CHANGELOG.md（S4、劫匪掉落）。
  * 既有 tests/e2e.js、tests/e2e-dev02.js 不動斷言；本檔只放 DEV-04 的新斷言。
  * 不在本檔：AC-E7（遇險封頂，DEV-02 已測，本包不重做 R／0.85）；AC-E5、AC-E8（v0.5 18:19：延後到第 4 期匪窩，第一批不驗）。
