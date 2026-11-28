@@ -84,12 +84,13 @@
       h += '<div class="cell click' + rcls(it) + '" data-a="pickup" data-v="' + i + '" data-tip="ground:' + i + '" data-drag="ground:' + i + '" data-testid="ground-' + i + '" style="' + pos(x, y, 40, 40) + '">' + itIco(it) + (it.k !== 'eq' && it.n > 1 ? '<span class="n">' + it.n + '</span>' : '') + '</div>';
     }
     h += '</div>';
-    // 三大勢力聲望（原小地圖的位置）
-    h += '<div class="lhead" style="top:546px"><span class="lbl"><b>勢力</b></span><span class="sub">聲望</span></div><div class="reps" data-testid="reps">';
-    Object.keys(D.FACTIONS).forEach((f) => {
-      const F = D.FACTIONS[f]; const v = S.rep[f]; const nx = F.perks.find((p) => v < p[0]);
+    // 勢力聲望（原小地圖的位置）：勢力會越來越多，所以做成可捲動的精簡清單，聲望高的排前面；點開看全部
+    const fs = G.knownFactions().sort((a, b) => G.repOf(b) - G.repOf(a));
+    h += '<div class="lhead" style="top:546px" data-a="overlay" data-v="faction"><span class="lbl"><b>勢力 ' + fs.length + '</b></span><span class="sub lnk">點開看全部</span></div><div class="reps" data-testid="reps">';
+    fs.forEach((f) => {
+      const F = D.FACTIONS[f]; const v = G.repOf(f); const nx = F.perks.find((p) => v < p[0]);
       const base = nx ? (F.perks[F.perks.indexOf(nx) - 1] || [0])[0] : 0;
-      h += '<div class="rep" data-testid="rep-' + f + '" title="' + F.name + '：' + F.perks.map((p) => p[0] + ' ' + p[1]).join('；') + '">' + ico(F.ic, F.g, 24) + '<span class="rn">' + F.name + '</span><b>' + Math.floor(v) + '</b><div class="pb"><i style="width:' + (nx ? Math.min(100, ((v - base) / (nx[0] - base)) * 100) : 100).toFixed(0) + '%"></i></div><span class="rx">' + (nx ? '→' + nx[0] : '滿') + '</span></div>';
+      h += '<div class="rep" data-a="overlay" data-v="faction" data-testid="rep-' + f + '" title="' + F.name + '：' + (F.perks.length ? F.perks.map((p) => p[0] + ' ' + p[1]).join('；') : '尚無往來') + '">' + ico(F.ic, F.g, 16) + '<span class="rn">' + F.name + '</span><div class="pb"><i style="width:' + (F.perks.length ? (nx ? Math.min(100, ((v - base) / (nx[0] - base)) * 100) : 100) : 0).toFixed(0) + '%"></i></div><b>' + Math.floor(v) + '</b></div>';
     });
     h += '</div>';
     // 負重底條
@@ -285,8 +286,7 @@
   }
   // 探查鈕：每個地點都有
   function exploreBtn(S, cls) {
-    const ex = G.exploreInfo(S.loc); const done = ex.found >= ex.total;
-    return '<button class="btn ' + (done ? 'dis' : 'gold') + (cls ? ' ' + cls : '') + '" ' + (done ? 'disabled' : '') + ' data-a="explore" data-testid="btn-explore" title="花 1 小時翻找這個地點。成功率看靈覺與探幽。">' + (done ? '已翻遍 ' : '探查 ') + ex.found + '/' + ex.total + (done ? '' : '（' + Math.round(G.exploreChance(S.loc) * 100) + '%）') + '</button>';
+    return '<button class="btn gold' + (cls ? ' ' + cls : '') + '" data-a="explore" data-testid="btn-explore" title="花 1 小時在這裡四處翻找：可能找到東西、聽到見聞，或發現新的地方。靈覺與探幽越高越容易有收穫。">探查（1 小時）</button>';
   }
 
   // ---------- 出身 ----------
@@ -320,7 +320,7 @@
     if (S.mapView === 'continent') h = sceneContinent(S);
     else {
       h = '<div class="map' + scn('map_region') + '" data-testid="worldmap">';
-      h += '<div class="legend"><span>━ 官道</span><span>╍ 野徑</span><span class="red">■ 有傳聞</span><span class="gold">▪ 探查</span></div>';
+      h += '<div class="legend"><span>━ 官道</span><span>╍ 野徑</span><span class="red">■ 有傳聞</span></div>';
       h += '<button class="btn mapsw" data-a="mapView" data-v="continent" data-testid="btn-continent">大陸圖</button>';
       D.REGION_LABELS.forEach(([n, x, y]) => (h += '<div class="region" style="left:' + x + 'px;top:' + y + 'px">' + n + '</div>'));
       let svg = '<svg width="796" height="560">';
@@ -338,10 +338,8 @@
         const n = D.NODES[id];
         const rum = S.rumors.some((r) => r.node === id); const tide = td && td.town === id;
         const cls = (id === S.loc ? ' cur' : '') + (id === dest ? ' dest' : '') + (rum ? ' rum' : '') + (tide ? ' tide' : '') + (n.hidden ? ' secret' : '');
-        const ex = G.exploreInfo(id);
         h += '<div class="mnode' + cls + '" data-a="dest" data-v="' + id + '" data-testid="node-' + id + '" style="left:' + (n.x - 19) + 'px;top:' + (n.y - 19) + 'px">' + ico(n.ic, n.g, 32) + '</div>';
         h += '<div class="mlabel" data-a="dest" data-v="' + id + '" style="left:' + (n.x - 34) + 'px;top:' + (n.y + 23) + 'px;width:68px;justify-content:center;cursor:pointer">' + n.name + '</div>';
-        h += '<div class="exd" style="left:' + (n.x - 34) + 'px;top:' + (n.y + 43) + 'px" title="探查 ' + ex.found + '/' + ex.total + '">' + Array.from({ length: ex.total }, (_, k) => '<i class="' + (k < ex.found ? 'on' : '') + '"></i>').join('') + '</div>';
         if (id === S.loc) h += '<div class="here" style="left:' + (n.x - 22) + 'px;top:' + (n.y - 44) + 'px">此地</div>';
         else if (tide) h += '<div class="here tidel" style="left:' + (n.x - 22) + 'px;top:' + (n.y - 44) + 'px">獸潮</div>';
         else if (rum && id !== dest) h += '<div class="here ruml" style="left:' + (n.x - 22) + 'px;top:' + (n.y - 44) + 'px">傳聞</div>';
@@ -363,7 +361,7 @@
       h += '<button class="btn dark go" data-a="travel" data-testid="btn-travel">前往</button>';
     } else {
       const n = D.NODES[S.loc];
-      h += '<div class="dic">' + ico(n.ic, n.g, 32) + '</div><div class="dname"><b>' + n.name + '</b><span class="sub">此地</span></div><span class="sub dhint">點任何地點設定目的地。每個地點都能探查。</span>';
+      h += '<div class="dic">' + ico(n.ic, n.g, 32) + '</div><div class="dname"><b>' + n.name + '</b><span class="sub">此地</span></div><span class="sub dhint">點任何地點設定目的地；每個地點都能進去。</span>';
       h += exploreBtn(S, 'dexp') + '<button class="btn dark go" data-a="enterHere" data-testid="btn-enter">進入此地</button>';
     }
     h += '</div>';
@@ -430,7 +428,7 @@
   function sceneBuilding(S) {
     const B = G.bld(); const NP = D.NPCS[B.npc]; const F = B.faction ? D.FACTIONS[B.faction] : null;
     let h = '<div class="bhead" data-testid="town"><div class="bface">' + npcFace(B.npc, 96) + '</div>';
-    h += '<div class="btitle"><b data-testid="bld-name">' + B.name + '</b><span>' + NP.name + (NP.title ? '・' + NP.title : '') + '</span>' + (F ? '<span class="bfac">' + ico(F.ic, F.g, 16) + F.name + ' ' + Math.floor(S.rep[B.faction]) + '</span>' : '') + '</div>';
+    h += '<div class="btitle"><b data-testid="bld-name">' + B.name + '</b><span>' + NP.name + (NP.title ? '・' + NP.title : '') + '</span>' + (F ? '<span class="bfac">' + ico(F.ic, F.g, 16) + F.name + ' ' + Math.floor(G.repOf(B.faction)) + '</span>' : '') + '</div>';
     h += '<div class="bsay" data-testid="say">' + esc((S.say && S.say.text) || '……') + '</div>';
     h += '<div class="bbtns"><button class="btn" data-a="talk" data-v="' + B.npc + '" data-testid="btn-talk">閒談</button><button class="btn dark" data-a="tab" data-v="" data-testid="btn-street">回到街上</button></div></div>';
     h += '<div class="tpanel">';
@@ -492,7 +490,7 @@
       h += '<div class="dcard" style="left:' + x + 'px;top:' + y + 'px"><span class="bt"><b>' + p.name + ' ' + G.profLv(p.id) + '</b><span class="sub">' + (next ? next + '：' + cut(p.perks[next], 14) : '已無新門檻') + '</span></span><button class="btn" data-a="svc" data-v="drill:' + p.id + '" data-testid="drill-' + p.id + '">操練</button></div>';
     });
     const has = S.skills.includes('pozhen');
-    h += '<div class="ttl" style="left:0;top:194px">軍團傳授</div><div class="dcard wide" style="left:0;top:212px">' + ico('s_pozhen', '陣', 32) + '<span class="bt"><b>破陣</b><span class="sub">' + D.SKILLS.pozhen.desc + '需破曉軍團聲望 10（目前 ' + Math.floor(S.rep.dawn) + '）</span></span><button class="btn ' + (has ? 'dis' : 'gold') + '" ' + (has ? 'disabled' : '') + ' data-a="svc" data-v="pozhen" data-testid="svc-pozhen">' + (has ? '已習得' : '學（' + c.pozhen + ' 兩）') + '</button></div>';
+    h += '<div class="ttl" style="left:0;top:194px">軍團傳授</div><div class="dcard wide" style="left:0;top:212px">' + ico('s_pozhen', '陣', 32) + '<span class="bt"><b>破陣</b><span class="sub">' + D.SKILLS.pozhen.desc + '需破曉軍團聲望 10（目前 ' + Math.floor(G.repOf('dawn')) + '）</span></span><button class="btn ' + (has ? 'dis' : 'gold') + '" ' + (has ? 'disabled' : '') + ' data-a="svc" data-v="pozhen" data-testid="svc-pozhen">' + (has ? '已習得' : '學（' + c.pozhen + ' 兩）') + '</button></div>';
     return h;
   }
   function tabShop(S, B) {
@@ -628,12 +626,11 @@
     h += '<div class="scap">' + W.scene + (G.isNight(S.t) ? '　夜裡，遇險上升。' : '') + '</div>';
     h += '</div>';
     const herbF = Math.round(G.gatherFat('herb')), oreF = Math.round(G.gatherFat('ore'));
-    const ex = G.exploreInfo(S.loc); const exDone = ex.found >= ex.total;
     h += '<div class="gbtns">';
     h += '<button class="gbtn" data-a="gather" data-v="herb" data-testid="act-herb"><span class="ic">' + ico('p_herb', '草', 28) + '</span><span><b>採藥</b><span>1 小時・疲 +' + herbF + '</span></span></button>';
     h += '<button class="gbtn" data-a="gather" data-v="ore" data-testid="act-ore"><span class="ic">' + ico('p_ore', '礦', 28) + '</span><span><b>挖礦</b><span>2 小時・疲 +' + oreF + '</span></span></button>';
     h += '<button class="gbtn" data-a="gather" data-v="track" data-testid="act-track"><span class="ic">' + ico('p_track', '獸', 28) + '</span><span><b>追蹤</b><span>1 小時・入戰</span></span></button>';
-    h += '<button class="gbtn' + (exDone ? ' off' : '') + '" data-a="explore" data-testid="btn-explore"><span class="ic">' + ico('ui_explore', '探', 28) + '</span><span><b>探查 ' + ex.found + '/' + ex.total + '</b><span>' + (exDone ? '已翻遍' : '1 小時・' + Math.round(G.exploreChance(S.loc) * 100) + '%') + '</span></span></button>';
+    h += '<button class="gbtn" data-a="explore" data-testid="btn-explore"><span class="ic">' + ico('ui_explore', '探', 28) + '</span><span><b>探查</b><span>1 小時・四處翻找</span></span></button>';
     h += '<button class="gbtn hot" data-a="camp" data-testid="act-camp"><span class="ic">' + ico('ui_fire', '火', 28) + '</span><span><b>' + (S.fire ? '露宿' : '紮營') + '</b><span>' + (S.fire ? '8 小時・夜警' : '生火・1 小時') + '</span></span></button>';
     h += '</div>';
     h += '<div class="recipes" data-testid="recipes"><div class="ttl" style="left:8px;top:4px">營火' + (S.fire ? '' : '（未生火：先紮營）') + '　煉藥 ' + G.profLv('yao') + '・烹食 ' + G.profLv('peng') + '</div>' + recipeCards(S, 4, 24) + '</div>';
@@ -795,6 +792,17 @@
           ids.forEach((k) => { const has = S.codex.includes(k); h += '<div class="cx' + (has ? '' : ' unk') + '"><b>' + (has ? esc(L.CODEX[k].title) : '？？？') + '</b>' + (has ? '<p>' + esc(L.CODEX[k].text).replace(/\n/g, '<br>') + '</p>' : '') + '</div>'; });
         });
       }
+      h += '</div>';
+    } else if (S.overlay === 'faction') {
+      const fs = G.knownFactions(); const all = Object.keys(D.FACTIONS);
+      h += '<h2>勢力</h2><div class="jbody">';
+      fs.sort((a, b) => G.repOf(b) - G.repOf(a)).forEach((f) => {
+        const F = D.FACTIONS[f]; const v = G.repOf(f);
+        h += '<div class="fcard" data-testid="fcard-' + f + '"><div class="fic">' + ico(F.ic, F.g, 32) + '</div><div class="fbd"><b>' + F.name + '</b>　<span class="gold">聲望 ' + Math.floor(v) + '</span><p>' + F.desc + '</p><p class="sub">怎麼漲：' + F.how + '</p>';
+        h += F.perks.length ? '<div class="fperks">' + F.perks.map((p) => '<span class="' + (v >= p[0] ? 'got' : '') + '">' + p[0] + '　' + p[1] + '</span>').join('') + '</div>' : '<p class="sub">尚無往來。</p>';
+        h += '</div></div>';
+      });
+      if (all.length > fs.length) h += '<p class="sub">還有 ' + (all.length - fs.length) + ' 個勢力你還不知道。多聽、多看、多探查。</p>';
       h += '</div>';
     } else if (S.overlay === 'char') {
       const O = D.ORIGINS.find((o) => o.id === S.origin);

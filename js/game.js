@@ -133,9 +133,12 @@ window.SHL = (function () {
   function inBld(type) { const b = bld(); return !!(b && S.scene === 'town' && b.place === S.loc && b.type === type); }
   function priceTable() { const P = place(); return D.PRICES[P ? P.price : 'duyin']; }
   function known(id) { const N = D.NODES[id]; return !!N && (!N.hidden || !!S.known[id]); }
-  function repOk(f, th) { return S.rep[f] >= th; }
+  function repOf(f) { return S.rep[f] || 0; }
+  function repOk(f, th) { return repOf(f) >= th; }
+  // 已知的勢力：沒有 reveal 的一開始就知道；有 reveal 的要讀到那條見聞
+  function knownFactions() { return Object.keys(D.FACTIONS).filter((f) => !D.FACTIONS[f].reveal || S.codex.includes(D.FACTIONS[f].reveal)); }
   function addRep(f, n) {
-    const before = S.rep[f]; S.rep[f] = Math.round((before + n) * 100) / 100;
+    const before = repOf(f); S.rep[f] = Math.round((before + n) * 100) / 100;
     D.FACTIONS[f].perks.forEach(([th, txt]) => { if (before < th && S.rep[f] >= th) log(D.FACTIONS[f].name + '聲望 ' + th + '：' + txt, 'good'); });
   }
   function addCodex(id, how) {
@@ -143,6 +146,7 @@ window.SHL = (function () {
     S.codex.push(id);
     const L = LORE().CODEX[id];
     log('見聞錄新增「' + (L ? L.title : id) + '」' + (how ? '（' + how + '）' : ''), 'good');
+    Object.keys(D.FACTIONS).forEach((f) => { if (D.FACTIONS[f].reveal === id) log('你知道了一個勢力：' + D.FACTIONS[f].name + '。', 'good'); });
     return true;
   }
   function addCorrupt(n) {
@@ -1158,17 +1162,17 @@ window.SHL = (function () {
   }
   function exploreChance(id) {
     id = id || S.loc; const n = S.found[id] || 0;
+    if (n >= (D.EXPLORE[id] || []).length) return clamp(0.1 + (attrVal('ling') - 10) * 0.01, 0.05, 0.2);
     return clamp(0.55 + (attrVal('ling') - 10) * 0.04 + profLv('tanyou') * 0.006 - n * 0.08, 0.15, 0.95);
   }
   function explore() {
     if (S.combat || S.dead || S.scene === 'origin' || S.scene === 'event' || S.scene === 'loot') return;
     const id = S.loc; const list = D.EXPLORE[id] || []; const n = S.found[id] || 0;
-    if (n >= list.length) { log(D.NODES[id].name + '已經翻遍了。'); return emit(); }
     const hours = perk('tanyou', 50) ? 0.5 : 1;
     const p = exploreChance(id);
     passTime(hours, { fat: 3 * hours }); if (S.dead) return commit();
     gainProf('tanyou', 7, n * 15);
-    if (rnd() >= p) {
+    if (n >= list.length || rnd() >= p) {
       log('探查' + D.NODES[id].name + '：' + pick(LORE().MISS));
       if (D.NODES[id].kind !== 'town' && !perk('tanyou', 25) && rnd() < 0.15) {
         const en = localBeast(id);
@@ -1765,7 +1769,7 @@ window.SHL = (function () {
     attrVal, attrProgress, profLv, profProgress, perk,
     eqBase, eqValue, itemWt, itemName, itemGlyph, itemIcon, countItem, affixSum, reqUnmet, slotFits,
     clickPack, unequip, useItem, pickupGround, drag, identify, identifyFee, chooseOrigin,
-    place, bld, inBld, known, repOk, LORE,
+    place, bld, inBld, known, repOk, repOf, knownFactions, LORE,
     selectDest, travel, travelPreview, toMap, enterHere, route, setMapView,
     explore, exploreInfo, exploreChance, wildPoints,
     setTab, selectShop, setQty, buy, sell, sellPrice, buyPrice, buysHere, rowLocked, shopRows, townPrice, avgPrice, innRest, innSoup, innCost, townHurt, service,

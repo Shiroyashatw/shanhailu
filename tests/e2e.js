@@ -204,7 +204,7 @@ async function exploreUntil(page, pred, max) {
   check('建築的點擊範圍來自平面圖場景（不是後備排版）', await page.evaluate(() => { const b = window.SHL_SCENES.buildings.plan_huiyao; return !!b && ['hy_market', 'hy_inn', 'hy_apoth', 'hy_smith', 'hy_board', 'hy_shrine', 'gate'].every((k) => Array.isArray(b[k]) && b[k].length === 4); }));
   check('街上有 3 個路人', (await page.$$('.plan .fig')).length === 3);
   check('#5 城鎮沒有分頁列', !(await page.$('.tabs')));
-  check('#1 左下小地圖已移除，改為三大勢力聲望', !(await page.$('.minimap')) && (await page.$$('[data-testid^=rep-]')).length === 3);
+  check('#1 左下小地圖已移除，改為勢力聲望（開局知道 3 個）', !(await page.$('.minimap')) && (await page.$$('[data-testid^=rep-]')).length === 3);
   check('#8 右欄不再有技能格', !(await page.$('.skillgrid')));
   check('開局委託：灰髯狼 ×3 已追蹤（兩行大字）', (await page.textContent('[data-testid=bounty]')).includes('灰髯狼 0/3') && await page.evaluate(() => parseFloat(getComputedStyle(document.querySelector('.jent .jt b')).fontSize) >= 12), await page.textContent('[data-testid=bounty]'));
   check('左欄 10 部位＋背包槽＋鎖定馬車槽', (await page.$$('[data-testid^=slot-]')).length === 11 && !!(await page.$('.slot-cart.locked')));
@@ -318,6 +318,16 @@ async function exploreUntil(page, pred, max) {
   await shot(page, '07-journal-codex.png');
   await click(page, 'sys-journal');
 
+  // ===== 6b. 勢力欄：讀到見聞會多出勢力，清單可捲動，點開看全部 =====
+  await page.evaluate(() => { window.SHL._debug.addCodex('c_warlord'); window.SHL._debug.addCodex('c_cult'); window.SHL._debug.addRep('crow', 3); window.SHL.setProfTab(window.SHL.state.profTab); });
+  const reps = await page.evaluate(() => ({ n: document.querySelectorAll('[data-testid^=rep-]').length, first: document.querySelector('[data-testid^=rep-]').getAttribute('data-testid'), scroll: getComputedStyle(document.querySelector('.reps')).overflowY }));
+  check('勢力欄：讀到見聞後多出勢力（5 個）、聲望高的排前面、可捲動', reps.n === 5 && reps.first === 'rep-crow' && reps.scroll === 'auto', reps);
+  await audit(page, '勢力欄 5 個');
+  await click(page, 'rep-dawn');
+  check('點勢力開啟勢力總覽：每個勢力的說明、怎麼漲、門檻', (await has(page, 'overlay-faction')) && (await page.$$('.fcard')).length === 5);
+  await shot(page, '07b-factions.png');
+  await click(page, 'sys-char'); await click(page, 'sys-char');
+
   // ===== 7. 探查（城鎮也能探查） =====
   await exploreUntil(page, () => window.SHL.state.found.huiyao >= 1);
   s = await st(page);
@@ -330,7 +340,7 @@ async function exploreUntil(page, pred, max) {
   check('點平面圖上的出口＝離鎮到地圖', s.scene === 'map');
   check('地圖：13 個地點可見、2 個隱藏地點不在圖上', (await page.$$('.mnode')).length === 13 && !(await has(page, 'node-yachao')) && !(await has(page, 'node-guzhong')));
   check('地圖底圖已載入', await page.evaluate(() => window.SHL_SCENES.has('map_region') && getComputedStyle(document.querySelector('.map')).backgroundImage.startsWith('url')));
-  check('地圖上每個地點都標了探查進度', (await page.$$('.exd')).length === 13 && (await page.$$('.exd i.on')).length >= 1);
+  check('地圖上不再標探查次數，探查鈕也不顯示次數', (await page.$$('.exd')).length === 0 && !/\d+\/\d+/.test(await page.textContent('[data-testid=btn-explore]')));
   await click(page, 'btn-continent');
   check('大陸圖：中山、四山、海外、大荒與此地', (await has(page, 'continent')) && (await page.$$('.cchip')).length === 7 && !!(await page.$('.chere')));
   await audit(page, '大陸圖');
