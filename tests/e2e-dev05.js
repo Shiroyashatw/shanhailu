@@ -198,6 +198,8 @@ function sameCity(dom, want) {
   // 非持平日：數字行用 CSV「較昨日+N／−N」、收合有箭頭、因果句方向與 trend 相同
   const moved = await page.evaluate(() => {
     const G = window.SHL; const S = G.state; G._debug.setNoise(false);
+    // 合 main（DEV-04）後：世界擲骰的獸潮可能正落在灰窯；此情境驗「無獸潮時市面回穩」，先清掉獸潮再日結（斷言不變）
+    S.world.tide = null; S.world.next = G.dayOf(S.t) + 99;
     const t = S.world.towns.huiyao; t.P = 40; t.O = 55; G._debug.townTick(G.dayOf(S.t)); return { trend: t.brief.trend, dP: t.brief.dP, why: t.brief.whyCode };
   });
   await redraw(page);
