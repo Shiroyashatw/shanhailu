@@ -113,7 +113,7 @@ window.SHL_DATA = (function () {
     armor: { t: '+{v} 護甲', r: [2, 6] },
     bleedres: { t: '+{v}% 流血抗性', r: [8, 20] },
     fatred: { t: '疲累累積 −{v}%', r: [4, 8] },
-    spd: { t: '+{v}% 行動速度', r: [3, 8] },
+    spd: { t: '+{v}% 腳程', r: [3, 8] },
     cap: { t: '+{v} 負重上限', r: [4, 10] },
     gather: { t: '+{v}% 採集收成', r: [10, 25] },
     skin: { t: '+{v}% 剝皮收成', r: [10, 25] },
@@ -511,7 +511,7 @@ window.SHL_DATA = (function () {
     { id: 'peng', grp: 'gong', attr: 'wu', name: '烹食', how: '烤乾糧', perks: { 25: '30% 一肉兩糧' } },
     { id: 'jian', grp: 'gong', attr: 'wu', name: '鑑物', how: '鑑定裝備', perks: { 25: '可鑑稀有', 50: '可鑑傳奇' } },
     { id: 'jiao', grp: 'xing', attr: 'shen', name: '腳力', how: '趕路', perks: { 25: '野徑遇險 −20%' } },
-    { id: 'fuz', grp: 'xing', attr: 'ti', name: '負重', how: '背重趕路', perks: { 25: '常態重負的速度懲罰減半', 50: '超載懲罰減輕' } },
+    { id: 'fuz', grp: 'xing', attr: 'ti', name: '負重', how: '背重趕路', perks: { 25: '常態重負的腳程懲罰減半', 50: '超載懲罰減輕' } },
     { id: 'yi', grp: 'xing', attr: 'kou', name: '議價', how: '買賣', perks: { 25: '委託報酬 +10%' } },
     { id: 'tan', grp: 'xing', attr: 'kou', name: '探聞', how: '打聽傳聞', perks: { 25: '聽傳聞時多一句判斷', 50: '打聽半價' } },
     { id: 'shuo', grp: 'xing', attr: 'kou', name: '說服', how: '事件中開口', perks: { 25: '劫匪買路錢減半' } },
@@ -527,13 +527,22 @@ window.SHL_DATA = (function () {
   ];
   // 開局取名：預設名（不在池內）與整池 60 組（姓、名），原樣取自 docs/design/batch1/name-pool-v0.1.csv，順序與用字不改
   const NAME_DEFAULT = { sur: '沈', given: '衡' };
+  // 自訂名「已有人用」清單：整名完全相同才攔（取名禁字規則定稿 v1.0 §3、§5 起始表）。
+  // 固定角色全名＋稱謂詞＋遊戲名詞＋九大勢力全名（共 42 項）。正式版可由 names-final 新名欄與勢力名產出後整批替換本常數。
+  const NAME_TAKEN = [
+    '虞九淵', '明夷',
+    '撿骨師', '傀母', '蠱母', '里正', '鴉首', '路人', '兇煞', '良民', '平民', '掌櫃', '先生', '客官',
+    '守備', '紅霧', '腳程', '輕快', '平常', '沉重', '蹣跚', '鎮衙', '祭祀', '侵蝕', '破曉', '天星', '鴉衛', '拜裂', '九幽', '飲霧', '四象', '黑水', '天工', '萬神',
+    // 九大勢力全名（定稿第 5 節末段；本地化 2026-11-28 18:09 裁定收入；鴉衛已在上列）
+    '四象軍', '破曉軍團', '天星商會', '拜裂教', '黑水盟', '天工盟', '萬神教', '九幽殿',
+  ];
   const NAME_POOL = [
     ['郝', '朔'], ['柏', '戎'], ['巢', '岩'], ['岳', '樵'], ['滕', '莽'], ['莘', '月'], ['茅', '葦'], ['紀', '谷'], ['卜', '雁'], ['芮', '秋'],
     ['祁', '禾'], ['韋', '溪'], ['岑', '苗'], ['舒', '苓'], ['管', '沐'], ['譚', '荷'], ['尹', '若'], ['宓', '芹'], ['蒲', '穗'], ['杭', '柔'],
     ['柯', '磐'], ['盧', '炭'], ['卓', '錘'], ['鈕', '魁'], ['裴', '厚'], ['井', '秀'], ['鄒', '桂'], ['竇', '香'], ['池', '蘭'], ['萬', '菊'],
     ['賀', '固'], ['常', '垣'], ['靳', '北'], ['尚', '嶺'], ['解', '戈'], ['藺', '棠'], ['尤', '晴'], ['涂', '素'], ['步', '南'], ['成', '映'],
     ['汪', '季航'], ['駱', '載行'], ['傅', '津渡'], ['盛', '車馬'], ['奚', '瀾舟'], ['鮑', '綺羅'], ['練', '晚泊'], ['邢', '繡織'], ['俞', '市南'], ['梅', '書柬'],
-    ['包', '拴'], ['黎', '河'], ['史', '陌'], ['安', '麥'], ['喬', '路'], ['倪', '招弟'], ['甘', '細妹'], ['戴', '盼兒'], ['宋', '芋頭'], ['翁', '阿彩'],
+    ['包', '拴'], ['黎', '河'], ['史', '陌'], ['安', '麥'], ['喬', '路'], ['倪', '桃兒'], ['甘', '菜頭'], ['戴', '盼兒'], ['宋', '芋頭'], ['翁', '阿彩'],
   ];
 
   const SEASONS = ['春', '夏', '秋', '冬'];
@@ -543,5 +552,5 @@ window.SHL_DATA = (function () {
   const SLOT_NAMES = { main: '主手', off: '副手', head: '頭盔', chest: '胸甲', gloves: '手套', boots: '靴子', amulet: '護身符', ring1: '左戒', ring2: '右戒', belt: '腰帶', bag: '背包', cart: '馬車' };
   const SLOT_GLYPH = { main: '刃', off: '盾', head: '冠', chest: '甲', gloves: '手', boots: '靴', amulet: '符', ring1: '戒', ring2: '戒', belt: '帶', bag: '囊', cart: '車' };
 
-  return { ITEMS, SKILLS, TECHS, BASES, AFFIXES, UNIQUES, LEGENDS, RARITY, ENEMIES, NODES, EDGES, REGION_LABELS, WILDS, DUNGEONS, PRICES, PLACES, BUILDINGS, ITEM_CLASS, NPCS, FACTIONS, EXPLORE, CODEX_CATS, BOUNTIES, QUEST_GEN, RUMOR, TIDE, RECIPES, EVENTS, ATTRS, PROFS, PROF_GROUPS, WTYPE_NAMES, ORIGINS, NAME_DEFAULT, NAME_POOL, SEASONS, YEAR_NAMES, EQ_SLOTS, SLOT_NAMES, SLOT_GLYPH };
+  return { ITEMS, SKILLS, TECHS, BASES, AFFIXES, UNIQUES, LEGENDS, RARITY, ENEMIES, NODES, EDGES, REGION_LABELS, WILDS, DUNGEONS, PRICES, PLACES, BUILDINGS, ITEM_CLASS, NPCS, FACTIONS, EXPLORE, CODEX_CATS, BOUNTIES, QUEST_GEN, RUMOR, TIDE, RECIPES, EVENTS, ATTRS, PROFS, PROF_GROUPS, WTYPE_NAMES, ORIGINS, NAME_DEFAULT, NAME_TAKEN, NAME_POOL, SEASONS, YEAR_NAMES, EQ_SLOTS, SLOT_NAMES, SLOT_GLYPH };
 })();

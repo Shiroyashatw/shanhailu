@@ -699,7 +699,7 @@ async function exploreUntil(page, pred, max) {
   for (const [su, gi, want] of cases) {
     nv = await typeName(su, gi);
     const errs = await page.evaluate(() => Array.from(document.querySelectorAll('[data-testid^=name-err-]')).map((e) => e.getAttribute('data-testid').slice(9)));
-    check('取名不合法「' + su + '｜' + gi + '」：確定熄滅、顯示固定句 ' + want.join('＋'), !nv.ok && errs.join() === want.join() && (want.includes('chars') ? nv.rule.includes('不可使用英數、空白或符號。') : true) && (want.includes('length') ? nv.rule.includes('合計須為 2–4 個中文字。') : true), { errs, rule: nv.rule });
+    check('取名不合法「' + su + '｜' + gi + '」：確定熄滅、顯示固定句 ' + want.join('＋'), !nv.ok && errs.join() === want.join() && (want.includes('chars') ? nv.rule.includes('不可使用英數、空白或符號') : true) && (want.includes('length') ? nv.rule.includes('合計須為 2–4 個中文字') : true), { errs, rule: nv.rule });
   }
   nv = await typeName('a', '衡衡衡');
   check('不合法時點確定不會開局', (await page.evaluate(() => { window.SHL.confirmName('a', '衡衡衡'); return window.SHL.state.scene; })) === 'naming');
@@ -773,7 +773,7 @@ async function exploreUntil(page, pred, max) {
   fb = await reloadWith('other', seedOrig); // 最後一次讀檔把 seed 還原，不影響後續測試
   check('後備名不依 seed、不抽名池：不同 seed 的無姓名存檔、或舊字串非「沈衡」，一律讀成「沈衡」', seedFb.every((x) => x === SHEN) && JSON.stringify(fb.name) === SHEN, seedFb.concat(JSON.stringify(fb.name)));
   check('fallbackName() 固定回傳「沈衡」，且「沈衡」不在名池內', (await page.evaluate(() => [0, 1, 2].map((sd) => JSON.stringify(window.SHL.fallbackName(sd))))).every((x) => x === SHEN) && !pool.some((r) => r[0] + r[1] === '沈衡'));
-  check('禁字表本批不做：nameErrors 不攔「沈衡」，也不攔三、七、九、滿、衡', await page.evaluate(() => window.SHL.nameErrors('沈', '衡').length === 0 && ['三', '七', '九', '滿', '衡'].every((c) => window.SHL.nameErrors('沈', c).length === 0)));
+  check('取名新規則（定稿 v1.0，只攔整名完全相同）：nameErrors 不攔「沈衡」，單字三、七、九、滿、衡在自訂名也不攔', await page.evaluate(() => window.SHL.nameErrors('沈', '衡').length === 0 && ['三', '七', '九', '滿', '衡'].every((c) => window.SHL.nameErrors('沈', c).length === 0)));
   await page.evaluate(() => { window.SHL.state.name = { sur: '歐陽', given: '明月' }; window.SHL.save(); });
   await page.goto(base + 'index.html?fx=0'); await page.waitForSelector('[data-testid=town]'); await settle(page);
   check('有姓名結構的存檔讀回不被改寫', JSON.stringify((await st(page)).name) === JSON.stringify({ sur: '歐陽', given: '明月' }));
